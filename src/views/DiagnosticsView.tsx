@@ -316,7 +316,9 @@ export const DiagnosticsView: React.FC<DiagnosticsViewProps> = ({
                         <span className="font-mono text-white">{pct(p.impact.scoreWith)}</span> vs{' '}
                         <span className="font-mono text-white">{pct(p.impact.scoreWithout)}</span> in your other{' '}
                         {p.color === 'both' ? '' : `${p.color} `}games
-                        {costing ? (
+                        {p.impact.gamesWithout === 0 ? (
+                          <span className="text-slate-400"> (no other {p.color === 'both' ? '' : `${p.color} `}games to compare against yet)</span>
+                        ) : costing ? (
                           <span className="text-rose-300 font-semibold"> ({p.deviations[0]?.evaluationDelta})</span>
                         ) : (
                           <span className="text-emerald-300 font-semibold"> ({p.deviations[0]?.evaluationDelta}, not costing points so far)</span>

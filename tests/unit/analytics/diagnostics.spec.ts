@@ -16,6 +16,20 @@ const byId = (id: string): StoredGame => {
   return g;
 };
 
+/** A minimal uploaded game by hoot65 (as Black unless the first mover is hoot65) for detector edge cases. */
+const synthetic = (movesSan: string[], color: 'white' | 'black' = 'black'): StoredGame => ({
+  id: `synthetic-${movesSan.join('-')}`,
+  source: 'upload',
+  pgn: '',
+  white: { name: color === 'white' ? 'hoot65' : 'rival' },
+  black: { name: color === 'black' ? 'hoot65' : 'rival' },
+  result: '1/2-1/2',
+  timestamp: 0,
+  movesSan,
+  userColor: color,
+  userResult: 'draw',
+});
+
 describe('DiagnosticAnalyzer & Game Diagnostics Engine', () => {
   it('conforms to the PROJECT.md § 4 DiagnosticReport interface contract and injects nothing', () => {
     const report = analyzeGames([], 'hoot65');
@@ -106,36 +120,94 @@ describe('DiagnosticAnalyzer & Game Diagnostics Engine', () => {
     );
   });
 
-  it('flags ...Bg4 only when the aftermath cost something (chase or loose b7), not every ...Bg4', () => {
+  it('flags ...Bg4 only when the aftermath cost something (a real chase or a queen that hits something), not every ...Bg4', () => {
     const chased = byId('169098759508');
     const chase = DiagnosticAnalyzer.detectBlackBg4ChaseLeak(chased, chased.movesSan);
     expect(chase).not.toBeNull();
     expect(chase?.playedSan).toBe('Bg4');
     expect(chase?.description).toMatch(/chased|g4/);
 
-    const looseB7 = byId('168471072534');
-    const qb3 = DiagnosticAnalyzer.detectBlackBg4ChaseLeak(looseB7, looseB7.movesSan);
-    expect(qb3).not.toBeNull();
-    expect(qb3?.description).toMatch(/b7/);
+    // In 168471072534 White closed the fourth rank with 5.d4 before 6.Qa4+, so the check hit nothing: not a leak
+    const closedRank = byId('168471072534');
+    expect(DiagnosticAnalyzer.detectBlackBg4ChaseLeak(closedRank, closedRank.movesSan)).toBeNull();
 
     // A theory-approved ...Bg4 that was never punished is not a leak (1.e4 c6 2.Nf3 d5 3.e5 Bg4)
     const quietBg4 = seedGames.find((g) => g.url?.endsWith('/173676860416'))!;
     expect(DiagnosticAnalyzer.detectBlackBg4ChaseLeak(quietBg4, quietBg4.movesSan)).toBeNull();
   });
 
+  it('reads the board for the ...Bg4 aftermath: b7 must be hit with a clear path, a check must also hit the bishop, a chase needs h3/f3 first', () => {
+    const b7 = synthetic(['e4', 'c6', 'Nf3', 'd5', 'exd5', 'cxd5', 'c3', 'Bg4', 'Qb3']);
+    expect(DiagnosticAnalyzer.detectBlackBg4ChaseLeak(b7, b7.movesSan)?.description).toMatch(/b7 pawn is loose/);
+
+    const fork = synthetic(['e4', 'c6', 'Nf3', 'd5', 'exd5', 'cxd5', 'c3', 'Bg4', 'Qa4+']);
+    expect(DiagnosticAnalyzer.detectBlackBg4ChaseLeak(fork, fork.movesSan)?.description).toMatch(/check also hit your bishop/);
+
+    // b7 is empty, so Qa4+ hits nothing that ...Bg4 left behind
+    const harmless = synthetic(['d4', 'd5', 'Nf3', 'b6', 'c4', 'Bg4', 'Qa4+']);
+    expect(DiagnosticAnalyzer.detectBlackBg4ChaseLeak(harmless, harmless.movesSan)).toBeNull();
+
+    // g4 without a preceding h3/f3 is not the chase pattern
+    const noKick = synthetic(['e4', 'c6', 'Nf3', 'd5', 'e5', 'Bg4', 'd4', 'Bh5', 'g4']);
+    expect(DiagnosticAnalyzer.detectBlackBg4ChaseLeak(noKick, noKick.movesSan)).toBeNull();
+  });
+
+  it('calls a queen move a sortie only when the queen leaves its home square', () => {
+    // The forced Scandinavian recapture and retreat are not sorties
+    const scandi = synthetic(['e4', 'd5', 'exd5', 'Qxd5', 'Nc3', 'Qa5']);
+    expect(DiagnosticAnalyzer.detectEarlyQueenSortie(scandi, scandi.movesSan, 'black')).toBeNull();
+    const retreat = synthetic(['e4', 'd5', 'exd5', 'Qxd5', 'Nc3', 'Qd8']);
+    expect(DiagnosticAnalyzer.detectEarlyQueenSortie(retreat, retreat.movesSan, 'black')).toBeNull();
+
+    // A queen leaving d8 with both knights and bishops at home is one
+    const sortie = synthetic(['e4', 'e5', 'Nf3', 'Qf6']);
+    const flagged = DiagnosticAnalyzer.detectEarlyQueenSortie(sortie, sortie.movesSan, 'black');
+    expect(flagged?.playedSan).toBe('Qf6');
+    expect(flagged?.ply).toBe(4);
+    expect(flagged?.fen).toBe('rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2');
+  });
+
+  it('prints n/a instead of a fabricated delta when there are no games to compare against', () => {
+    const onlyScandis = CANONICAL_HOOT65_GAMES.filter((g) =>
+      ['185031553576', '185035281692', '184582182704', '171000270176'].includes(g.id)
+    );
+    const report = analyzeGames(onlyScandis, 'hoot65');
+    const scandi = report.patterns!.find((p) => p.id === 'white-scandi-e5')!;
+    expect(scandi.impact.gamesWith).toBe(4);
+    expect(scandi.impact.gamesWithout).toBe(0);
+    expect(scandi.isLeak).toBe(true); // inferior by theory, so still a leak
+    for (const leak of report.whiteStats.keyLeaks) expect(leak.evaluationDelta).toBe('n/a');
+
+    const onlyChase = analyzeGames([byId('169098759508')], 'hoot65');
+    const bg4 = onlyChase.patterns!.find((p) => p.id === 'black-bg4-chase')!;
+    expect(bg4.impact.gamesWith).toBe(1);
+    expect(bg4.impact.gamesWithout).toBe(0);
+    expect(bg4.isLeak).toBe(false); // neutral and nothing to compare against: information only
+    expect(bg4.deviations[0].evaluationDelta).toBe('n/a');
+  });
+
   it('lists a neutral pattern as a leak only when it measurably costs points', () => {
+    // Fixtures: the one chased ...Bg4 game was lost while the other Black games scored 20%, so it is a leak here
     const report = analyzeGames(CANONICAL_HOOT65_GAMES, 'hoot65');
     const bg4 = report.patterns!.find((p) => p.id === 'black-bg4-chase')!;
     expect(bg4.theoryVerdict).toBe('neutral');
-    expect(bg4.impact.gamesWith).toBe(2);
-    // In the fixtures the chased games scored better than the other Black games, so: information, not a leak
-    expect(bg4.impact.scoreWith).toBeGreaterThan(bg4.impact.scoreWithout);
-    expect(bg4.isLeak).toBe(false);
-    expect(report.blackStats.keyLeaks.some((l) => l.patternId === 'black-bg4-chase')).toBe(false);
+    expect(bg4.impact.gamesWith).toBe(1);
+    expect(bg4.impact.scoreWith).toBeLessThan(bg4.impact.scoreWithout);
+    expect(bg4.isLeak).toBe(true);
+    expect(report.blackStats.keyLeaks.some((l) => l.patternId === 'black-bg4-chase')).toBe(true);
 
     const scandi = report.patterns!.find((p) => p.id === 'white-scandi-e5')!;
     expect(scandi.theoryVerdict).toBe('inferior');
     expect(scandi.isLeak).toBe(true);
+
+    // Whole archive: the ...Bg4 games scored better than the rest, so the same pattern is information, not a leak
+    const archive = analyzeGames(seedGames, 'hoot65');
+    const bg4All = archive.patterns!.find((p) => p.id === 'black-bg4-chase')!;
+    expect(bg4All.impact.gamesWith).toBe(13);
+    expect(bg4All.impact.scoreWith).toBeGreaterThan(bg4All.impact.scoreWithout);
+    expect(bg4All.isLeak).toBe(false);
+    expect(archive.blackStats.keyLeaks.some((l) => l.patternId === 'black-bg4-chase')).toBe(false);
+    expect(bg4All.deviations[0].evaluationDelta).toMatch(/^\+\d+\.\d pts$/);
   });
 
   it('on the full archive reports exactly the stored games and only legal book moves', () => {
@@ -146,6 +218,11 @@ describe('DiagnosticAnalyzer & Game Diagnostics Engine', () => {
 
     const scandi = report.patterns!.find((p) => p.id === 'white-scandi-e5')!;
     expect(scandi.impact.gamesWith).toBe(15);
+    expect(scandi.isLeak).toBe(true);
+    const queen = report.patterns!.find((p) => p.id === 'early-queen-sortie')!;
+    expect(queen.impact.gamesWith).toBe(56);
+    expect(queen.impact.scoreWith).toBeLessThan(queen.impact.scoreWithout);
+    expect(queen.isLeak).toBe(true);
 
     for (const leak of [...report.whiteStats.keyLeaks, ...report.blackStats.keyLeaks]) {
       const chess = new Chess(leak.fen);

@@ -66,6 +66,12 @@ export const App: React.FC = () => {
     if (activeTab === 'diagnostics') loadGames();
   }, [activeTab, loadGames]);
 
+  // A manual tab click clears any lesson hand-off so the Lessons tab opens on its default again
+  const selectTab = useCallback((tab: ActiveTab) => {
+    setPendingLessonId(null);
+    setActiveTab(tab);
+  }, []);
+
   const handleNavigateToLesson = useCallback((_repertoireId: string, lineId?: string) => {
     setPendingLessonId(lineId ? REPERTOIRE_LINE_TO_LESSON[lineId] || null : null);
     setActiveTab('lessons');
@@ -320,7 +326,7 @@ export const App: React.FC = () => {
               type="button"
               data-tab="play"
               data-tab-nav="play"
-              onClick={() => setActiveTab('play')}
+              onClick={() => selectTab('play')}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                 activeTab === 'play'
                   ? 'bg-emerald-600 text-white shadow-sm'
@@ -335,7 +341,7 @@ export const App: React.FC = () => {
               type="button"
               data-tab="database"
               data-tab-nav="database"
-              onClick={() => setActiveTab('database')}
+              onClick={() => selectTab('database')}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                 activeTab === 'database'
                   ? 'bg-emerald-600 text-white shadow-sm'
@@ -350,7 +356,7 @@ export const App: React.FC = () => {
               type="button"
               data-tab="diagnostics"
               data-tab-nav="diagnostics"
-              onClick={() => setActiveTab('diagnostics')}
+              onClick={() => selectTab('diagnostics')}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                 activeTab === 'diagnostics'
                   ? 'bg-emerald-600 text-white shadow-sm'
@@ -365,7 +371,7 @@ export const App: React.FC = () => {
               type="button"
               data-tab="lessons"
               data-tab-nav="lessons"
-              onClick={() => setActiveTab('lessons')}
+              onClick={() => selectTab('lessons')}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                 activeTab === 'lessons'
                   ? 'bg-emerald-600 text-white shadow-sm'
@@ -380,7 +386,7 @@ export const App: React.FC = () => {
               type="button"
               data-tab="worksheets"
               data-tab-nav="worksheets"
-              onClick={() => setActiveTab('worksheets')}
+              onClick={() => selectTab('worksheets')}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                 activeTab === 'worksheets'
                   ? 'bg-emerald-600 text-white shadow-sm'

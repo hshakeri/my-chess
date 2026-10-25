@@ -2,6 +2,10 @@ import { describe, it, expect } from 'vitest';
 import { renderToString } from 'react-dom/server';
 import { DiagnosticsView } from '../../../src/views/DiagnosticsView';
 import { CANONICAL_HOOT65_GAMES } from '../../../src/analytics/diagnostics';
+import { StoredGame } from '../../../src/types/db';
+import seedGamesRaw from '../../../src/data/seed_hoot65_games.json';
+
+const seedGames = seedGamesRaw as unknown as StoredGame[];
 
 const render = () => renderToString(<DiagnosticsView games={CANONICAL_HOOT65_GAMES} />).replace(/<!-- -->/g, '');
 
@@ -41,12 +45,33 @@ describe('DiagnosticsView Component', () => {
     expect(html).toContain('Caro-Kann');
   });
 
-  it('shows the ...Bg4 pattern as measured information, not a leak, when it did not cost points', () => {
-    const html = render();
+  it('shows the ...Bg4 pattern as measured information on the archive, and as a leak only where it cost points', () => {
+    // Whole archive: the ...Bg4 games scored better than the other Black games
+    const archiveHtml = renderToString(<DiagnosticsView games={seedGames} />).replace(/<!-- -->/g, '');
+    const strip = archiveHtml.slice(archiveHtml.indexOf('data-pattern="black-bg4-chase"'));
+    expect(strip.slice(0, 1500)).toContain('Bg4');
+    expect(strip.slice(0, 1500)).toContain('not costing points so far');
+    expect(strip.slice(0, 1500)).toContain('>info<');
 
-    expect(html).toContain('data-pattern="black-bg4-chase"');
-    expect(html).toContain('Bg4');
-    expect(html).toContain('not costing points so far');
+    // Fixtures: the single chased game was lost, so the same pattern is reported as a leak with its measured cost
+    const html = render();
+    const fixtureStrip = html.slice(html.indexOf('data-pattern="black-bg4-chase"'));
+    expect(fixtureStrip.slice(0, 1500)).toContain('>leak<');
+  });
+
+  it('says plainly when a pattern has no comparison group instead of claiming it costs nothing', () => {
+    const lone = CANONICAL_HOOT65_GAMES.filter((g) => g.id === '169098759508');
+    const html = renderToString(<DiagnosticsView games={lone} />).replace(/<!-- -->/g, '');
+    expect(html).toContain('no other black games to compare against yet');
+    expect(html).not.toContain('not costing points so far');
+
+    // An inferior-by-theory habit stays a leak, but its impact reads n/a rather than a made-up number
+    const scandis = CANONICAL_HOOT65_GAMES.filter((g) =>
+      ['185031553576', '185035281692', '184582182704', '171000270176'].includes(g.id)
+    );
+    const scandiHtml = renderToString(<DiagnosticsView games={scandis} />).replace(/<!-- -->/g, '');
+    expect(scandiHtml).toContain('Score impact: n/a');
+    expect(scandiHtml).toContain('no other white games to compare against yet');
   });
 
   it('displays tailored repertoire recommendation titles', () => {

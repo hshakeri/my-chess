@@ -1,4 +1,4 @@
-import { Chess } from 'chess.js';
+import { Chess, Square } from 'chess.js';
 import { StoredGame } from '../types/db';
 import {
   DiagnosticReport,
@@ -97,10 +97,42 @@ function scoreOf(games: StoredGame[], handle: string): number {
 }
 
 function formatImpact(impact: PatternImpact): string {
-  if (impact.gamesWith === 0) return 'n/a';
+  // No occurrences, or nothing to compare against: there is no honest number to print
+  if (impact.gamesWith === 0 || impact.gamesWithout === 0) return 'n/a';
   const delta = (impact.scoreWith - impact.scoreWithout) * 100;
   const sign = delta > 0 ? '+' : '';
   return `${sign}${delta.toFixed(1)} pts`;
+}
+
+/** Does a queen on `from` attack `to`: same rank, file or diagonal with nothing in between? */
+function queenAttacks(chess: Chess, from: string, to: string): boolean {
+  const fx = from.charCodeAt(0) - 97;
+  const fy = Number(from[1]) - 1;
+  const tx = to.charCodeAt(0) - 97;
+  const ty = Number(to[1]) - 1;
+  const dx = Math.sign(tx - fx);
+  const dy = Math.sign(ty - fy);
+  const aligned = fx === tx || fy === ty || Math.abs(tx - fx) === Math.abs(ty - fy);
+  if (!aligned || (dx === 0 && dy === 0)) return false;
+  let x = fx + dx;
+  let y = fy + dy;
+  while (x !== tx || y !== ty) {
+    if (chess.get(`${String.fromCharCode(97 + x)}${y + 1}` as Square)) return false;
+    x += dx;
+    y += dy;
+  }
+  return true;
+}
+
+/** True when `san` moves the queen off its starting square: a genuine sortie, not a retreat or regrouping move. */
+function queenLeavesHome(chess: Chess, san: string, mover: 'w' | 'b'): boolean {
+  const probe = new Chess(chess.fen());
+  try {
+    const mv = probe.move(san);
+    return mv.piece === 'q' && mv.from === (mover === 'w' ? 'd1' : 'd8');
+  } catch {
+    return false;
+  }
 }
 
 const MINOR_START_SQUARES: Record<'w' | 'b', string[]> = {
@@ -228,42 +260,49 @@ export class DiagnosticAnalyzer {
       return null;
     }
     const window = moves.slice(bg4Index + 1, bg4Index + 7).map(cleanSan);
-    let sawH3 = false;
+    let sawPawnKick = false; // h3 or f3 asked the bishop a question
     let sawBh5 = false;
 
     for (let k = 0; k < window.length; k++) {
       const san = window[k];
       const isWhiteMove = k % 2 === 0; // the ply right after ...Bg4 is White's
+      let played;
+      try {
+        played = chess.move(san);
+      } catch {
+        return null;
+      }
 
       if (isWhiteMove) {
-        if (san === 'h3' || san === 'f3') sawH3 = true;
-        if (san === 'g4' && sawBh5) {
+        if (san === 'h3' || san === 'f3') sawPawnKick = true;
+        if (san === 'g4' && sawPawnKick && sawBh5) {
           return 'Your bishop was chased: after h3 it retreated to h5 and g4 drove it again, costing tempi and leaving it short of squares. Retreat only when the bishop has an exit (...h6 or ...h5 prepared), otherwise take on f3 or go back to d7.';
         }
-        if (san === 'Qb3' || san === 'Qa4+' || san === 'Qa4') {
-          return 'With the bishop gone from c8 the b7 pawn is loose: the queen came to b3/a4 hitting b7 (and f7 or the king). Before ...Bg4 make sure b7 is covered or that ...Qb6/...Qd7 is available.';
+        if (played.piece === 'q') {
+          // Only a queen that really hits something counts: the b7 pawn with a clear path, or a check that also hits the bishop
+          const b7 = chess.get('b7');
+          if (b7 && b7.color === 'b' && b7.type === 'p' && queenAttacks(chess, played.to, 'b7')) {
+            return 'With the bishop gone from c8 the b7 pawn is loose: the queen came to b3 hitting b7 (and f7 or the king). Before ...Bg4 make sure b7 is covered or that ...Qb6/...Qd7 is available.';
+          }
+          const g4 = chess.get('g4');
+          if (chess.inCheck() && g4 && g4.color === 'b' && g4.type === 'b' && queenAttacks(chess, played.to, 'g4')) {
+            return 'The check also hit your bishop: with the fourth rank open, the queen checked the king and attacked the bishop on g4 at once, so the pin had to be given up with a blocking move (...Bd7, ...Qd7 or ...Nc6). Pin on g4 only when the rank is closed by a pawn on d4 or e4.';
+          }
         }
         if (san === 'Qxf3') {
           const bishopOnDiagonal = ['c4', 'b3', 'a2', 'd5'].some((sq) => {
-            const p = chess.get(sq as any);
+            const p = chess.get(sq as Square);
             return p && p.color === 'w' && p.type === 'b';
           });
           if (bishopOnDiagonal) {
             return 'After ...Bxf3 Qxf3 the queen and the c4 bishop form a battery against f7. Trading on f3 is only safe when f7 is already covered (...e6, ...Nf6 or ...Qd7).';
           }
         }
-      } else {
-        if (san === 'Bh5') sawBh5 = true;
-      }
-
-      try {
-        chess.move(san);
-      } catch {
-        return null;
+      } else if (san === 'Bh5') {
+        sawBh5 = true;
       }
     }
 
-    void sawH3;
     return null;
   }
 
@@ -284,7 +323,7 @@ export class DiagnosticAnalyzer {
       const turn = chess.turn();
       const fenBefore = chess.fen();
 
-      if (turn === mover && san.startsWith('Q') && !san.includes('x')) {
+      if (turn === mover && san.startsWith('Q') && !san.includes('x') && queenLeavesHome(chess, san, mover)) {
         const undeveloped = undevelopedMinors(chess, mover);
         if (undeveloped >= 2) {
           const opponentName = color === 'white' ? game.black?.name : game.white?.name;
@@ -459,7 +498,7 @@ export class DiagnosticAnalyzer {
       const deviations = patternDeviations[meta.id]
         .map((d) => ({ ...d, impact, evaluationDelta: deltaText }))
         .sort((a, b) => (b.gameDate || '').localeCompare(a.gameDate || '') || a.ply - b.ply);
-      const measuredCost = impact.gamesWith > 0 && impact.scoreWith < impact.scoreWithout;
+      const measuredCost = impact.gamesWith > 0 && impact.gamesWithout > 0 && impact.scoreWith < impact.scoreWithout;
       const isLeak = impact.gamesWith > 0 && (meta.theoryVerdict === 'inferior' || measuredCost);
       patterns.push({ ...meta, isLeak, impact, deviations });
     }

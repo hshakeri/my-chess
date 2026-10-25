@@ -143,13 +143,14 @@ export const queenCageBoxMate: CurriculumLesson = buildVerifiedLesson({
   ],
   mistakesAndTraps: [
     {
-      triggerFen: 'k7/8/1K1Q4/8/8/8/8/8 w - - 0 1',
-      attemptedSan: 'Qc7',
+      // Reachable: the very first decision of this lesson (queen f1, kings e1 and e5)
+      plyIndex: 0,
+      attemptedSan: 'Qf5+',
       isTrap: true,
       severity: 'blunder',
-      explanatoryFeedback: 'Playing 1.Qc7?? causes an immediate STALEMATE catastrophe! The Black king has no legal moves and is not in check. Instead, 1.Qd8# wins immediately!',
-      refutationSanList: [],
-      punishmentSummary: 'Draw by stalemate in a 100% winning position.',
+      explanatoryFeedback: '1.Qf5+?? puts the queen next to the enemy king with nothing defending it: Black simply takes it. A check is only useful when the queen is safe and the king loses squares; here it loses the game-winning piece.',
+      refutationSanList: ['Kxf5'],
+      punishmentSummary: 'The queen is lost for nothing and the game is a dead draw.',
     },
   ],
 });
@@ -181,6 +182,17 @@ export const stalemateCatastrophes: CurriculumLesson = buildVerifiedLesson({
       hintSquare: 'd8',
       hintTheme: 'Deliver back-rank mate',
       accept: { predicate: 'checkmate' },
+    },
+  ],
+  mistakesAndTraps: [
+    {
+      plyIndex: 0,
+      attemptedSan: 'Qc7',
+      isTrap: true,
+      severity: 'blunder',
+      explanatoryFeedback: 'Playing 1.Qc7?? causes an immediate STALEMATE catastrophe! The Black king has no legal moves and is not in check. Instead, 1.Qd8# wins immediately!',
+      refutationSanList: [],
+      punishmentSummary: 'Draw by stalemate in a 100% winning position.',
     },
   ],
   exercises: [

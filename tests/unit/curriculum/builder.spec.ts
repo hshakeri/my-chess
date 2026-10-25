@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+import { Chess } from 'chess.js';
 import { buildVerifiedLesson, firstUserDecision, positionKey, LessonConfig } from '../../../src/curriculum/builder';
 import { allCurriculumLessons } from '../../../src/curriculum';
 import { scandinavianRefutationDrill } from '../../../src/curriculum/drills';
@@ -70,9 +71,20 @@ describe('Curriculum builder: derived hints, acceptance rules and strict legalit
         })
       )
     ).toThrow(/Illegal refutation move 'Qh5'/);
-    // Every shipped refutation line replays legally (the builder would have thrown otherwise)
+  });
+
+  it('every shipped mistake record is reachable from a position of its own lesson line', () => {
     for (const lesson of allCurriculumLessons) {
-      expect(lesson.commonMistakesAndTraps).toBeDefined();
+      const keys = new Set<string>();
+      const chess = new Chess(lesson.initialFen);
+      keys.add(positionKey(chess.fen()));
+      for (const m of lesson.moves) {
+        chess.move(m.san);
+        keys.add(positionKey(chess.fen()));
+      }
+      for (const mt of lesson.commonMistakesAndTraps || []) {
+        expect(keys.has(positionKey(mt.triggerFen)), `${lesson.id}: ${mt.attemptedSan} trap is unreachable`).toBe(true);
+      }
     }
   });
 

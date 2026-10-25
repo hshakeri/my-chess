@@ -282,13 +282,14 @@ export const caroKannDisciplineDrill: CurriculumLesson = buildVerifiedLesson({
   ],
   mistakesAndTraps: [
     {
-      triggerFen: 'rnbqkbnr/pp2pppp/2p5/3p4/4P3/2N5/PPPP1PPP/R1BQKBNR w KQkq - 0 3',
+      // Reachable: the position before move 3 of this drill (1.e4 c6 2.d4 d5)
+      plyIndex: 4,
       attemptedSan: 'h3',
       isTrap: false,
       severity: 'inaccuracy',
-      explanatoryFeedback: '3.h3?! was played in your game vs Brandon0015. It wastes an entire tempo on a passive move when a developing move (3.Nf3, or 3.d4 to fight for the center) is called for.',
-      refutationSanList: ['dxe4', 'Nxe4', 'Bf5'],
-      punishmentSummary: 'Black easily neutralizes White\'s first-move advantage.',
+      explanatoryFeedback: '3.h3?! is the move from your game vs Brandon0015. There it only wasted a tempo; here, with no knight on c3 yet, it even drops the e4 pawn: 3...dxe4 and nothing recaptures. A third move must develop a piece or defend the center (3.Nc3, 3.Nd2 or 3.e5).',
+      refutationSanList: ['dxe4'],
+      punishmentSummary: 'Black wins the e4 pawn for free and White has nothing to show for it.',
     },
   ],
 });

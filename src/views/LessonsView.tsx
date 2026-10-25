@@ -73,13 +73,18 @@ function sideName(turn: 'w' | 'b'): string {
 }
 
 export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId }) => {
-  // Lesson list filter: 'all' (core lessons), a course id, or the pattern library
-  const [selectedFilter, setSelectedFilter] = useState<string>('all');
-
-  const [currentLesson, setCurrentLesson] = useState<CurriculumLesson>(() => {
+  const resolveInitialLesson = (): CurriculumLesson => {
     const requested = initialLessonId ? allCurriculumLessons.find((l) => l.id === initialLessonId) : undefined;
     return requested || scandinavianRefutationDrill || allCurriculumLessons[0];
-  });
+  };
+
+  const [currentLesson, setCurrentLesson] = useState<CurriculumLesson>(resolveInitialLesson);
+
+  // Lesson list filter: 'all' (core lessons), a course id, or the pattern library.
+  // A hand-off straight into a pattern-library lesson opens that list so the active card is visible.
+  const [selectedFilter, setSelectedFilter] = useState<string>(() =>
+    resolveInitialLesson().relevance === 'outside-repertoire' ? PATTERN_LIBRARY_ID : 'all'
+  );
 
   const [currentPlyIndex, setCurrentPlyIndex] = useState<number>(() => currentLesson.startPly ?? 0);
   const [phase, setPhase] = useState<LessonPhase>('line');
@@ -91,6 +96,7 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId }) => 
 
   const rulesRef = useRef<RulesEngine>(new RulesEngine());
   const timersRef = useRef<number[]>([]);
+  const ratingInFlightRef = useRef<boolean>(false); // one review per run, even on a double click
   const [position, setPosition] = useState<ChessPosition>(() => rulesRef.current.getPosition());
 
   // Feedback state
@@ -180,6 +186,49 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId }) => 
 
   // ---- Board setup -----------------------------------------------------------------
 
+  // Load one exercise position. This is the single owner of the exercise phase: it is called from
+  // the line-complete hold, from "Next exercise" and from setupLessonBoard, never from an effect,
+  // so switching lessons can never re-enter it with stale phase state.
+  const loadExercise = useCallback((lesson: CurriculumLesson, index: number) => {
+    const ex = lesson.exercises[index];
+    if (!ex) {
+      setPhase('complete');
+      setCorrectFeedback(null);
+      return;
+    }
+    const rules = new RulesEngine(ex.fen);
+    rulesRef.current = rules;
+    setPosition(rules.getPosition());
+    setPhase('exercises');
+    setExerciseIndex(index);
+    setExerciseStep(0);
+    setExerciseSolved(false);
+    setWrongFeedback(null);
+    setCorrectFeedback(null);
+    setOpponentIdea(null);
+    setCoachArrows([]);
+    setCoachHighlights([]);
+    setHintLevel(0);
+    setAttemptsThisDecision(0);
+  }, []);
+
+  // After the final line move (by either side) the finished line stays on the board briefly so the
+  // last annotation and arrows can be read, then the exercise quiz loads (or the lesson completes).
+  const finishLine = useCallback(
+    (lesson: CurriculumLesson) => {
+      if (lesson.exercises.length === 0) {
+        setPhase('complete');
+        return;
+      }
+      setIsLineHold(true);
+      schedule(() => {
+        setIsLineHold(false);
+        loadExercise(lesson, 0);
+      }, LINE_COMPLETE_HOLD_MS);
+    },
+    [schedule, loadExercise]
+  );
+
   const playOpponentMoveIfNeeded = useCallback(
     (lesson: CurriculumLesson, game: RulesEngine, plyIndex: number) => {
       const next = lesson.moves[plyIndex];
@@ -192,11 +241,11 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId }) => 
         setOpponentIdea(next.annotation || null);
         setIsOpponentThinking(false);
         if (plyIndex + 1 >= lesson.moves.length) {
-          setPhase(lesson.exercises.length > 0 ? 'exercises' : 'complete');
+          finishLine(lesson);
         }
       }, OPPONENT_REPLY_MS);
     },
-    [schedule]
+    [schedule, finishLine]
   );
 
   const setupLessonBoard = useCallback(
@@ -210,7 +259,7 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId }) => 
       rulesRef.current = rules;
       setPosition(rules.getPosition());
       setCurrentPlyIndex(startPly);
-      setPhase(startPly >= lesson.moves.length ? (lesson.exercises.length > 0 ? 'exercises' : 'complete') : 'line');
+      setPhase('line');
       setExerciseIndex(0);
       setExerciseStep(0);
       setExerciseSolved(false);
@@ -227,37 +276,23 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId }) => 
       setIsRollingBack(false);
       setIsShaking(false);
       setIsLineHold(false);
+      setSrsMessage(null);
+      ratingInFlightRef.current = false;
+      if (startPly >= lesson.moves.length) {
+        // Nothing left to play on the line: straight to the exercises (or complete)
+        if (lesson.exercises.length > 0) loadExercise(lesson, 0);
+        else setPhase('complete');
+        return;
+      }
       // Black-perspective lessons: the opponent's first move is played for the student
       playOpponentMoveIfNeeded(lesson, rules, startPly);
     },
-    [clearTimers, playOpponentMoveIfNeeded]
+    [clearTimers, playOpponentMoveIfNeeded, loadExercise]
   );
 
   useEffect(() => {
     setupLessonBoard(currentLesson);
   }, [currentLesson, setupLessonBoard]);
-
-  // Load the exercise position when entering the exercise phase or moving to the next exercise
-  useEffect(() => {
-    if (phase !== 'exercises') return;
-    const ex = currentLesson.exercises[exerciseIndex];
-    if (!ex) {
-      setPhase('complete');
-      return;
-    }
-    const rules = new RulesEngine(ex.fen);
-    rulesRef.current = rules;
-    setPosition(rules.getPosition());
-    setExerciseStep(0);
-    setExerciseSolved(false);
-    setWrongFeedback(null);
-    setCorrectFeedback(null);
-    setOpponentIdea(null);
-    setCoachArrows([]);
-    setCoachHighlights([]);
-    setHintLevel(0);
-    setAttemptsThisDecision(0);
-  }, [phase, exerciseIndex, currentLesson]);
 
   // ---- Derived values ----------------------------------------------------------------
 
@@ -363,16 +398,7 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId }) => 
       setCurrentPlyIndex(nextPly);
 
       if (nextPly >= currentLesson.moves.length) {
-        if (currentLesson.exercises.length === 0) {
-          setPhase('complete');
-          return;
-        }
-        // Hold the finished line on the board so the final annotation and arrows can be read
-        setIsLineHold(true);
-        schedule(() => {
-          setIsLineHold(false);
-          setPhase('exercises');
-        }, LINE_COMPLETE_HOLD_MS);
+        finishLine(currentLesson);
         return;
       }
       playOpponentMoveIfNeeded(currentLesson, game, nextPly);
@@ -509,13 +535,7 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId }) => 
   };
 
   const handleNextExercise = () => {
-    const next = exerciseIndex + 1;
-    if (next >= currentLesson.exercises.length) {
-      setPhase('complete');
-      setCorrectFeedback(null);
-    } else {
-      setExerciseIndex(next);
-    }
+    loadExercise(currentLesson, exerciseIndex + 1);
   };
 
   // ---- Hints -----------------------------------------------------------------------
@@ -557,7 +577,10 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId }) => 
   // ---- SRS rating ----------------------------------------------------------------------
 
   const handleRateSRS = async (grade: number) => {
-    if (!canRate || grade > suggestedGrade) return;
+    if (!canRate || grade > suggestedGrade || ratingInFlightRef.current) return;
+    // Lock synchronously: a second click before the write resolves must not count as a second review
+    ratingInFlightRef.current = true;
+    setRatedThisRun(true);
     try {
       const updated = await SrsService.recordReview(currentLesson.id, grade, {
         usedHint: runStats.hintLevel > 0,
@@ -565,7 +588,6 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId }) => 
         mistakeCount: runStats.mistakes,
       });
       setSrsCard(updated);
-      setRatedThisRun(true);
       setSrsMessage(
         `Rated ${GRADE_LABELS[grade] || grade}: Scheduled next review in ${updated.intervalDays} day(s) (Leitner Box ${updated.box})`
       );
@@ -582,6 +604,8 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId }) => 
         }
       }
     } catch (err) {
+      ratingInFlightRef.current = false;
+      setRatedThisRun(false);
       console.warn('Error rating SRS:', err);
     }
   };
@@ -617,6 +641,16 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId }) => 
     const course = curriculumCourses.find((c) => c.id === selectedFilter);
     return course ? course.lessons : [];
   }, [selectedFilter, patternLibrary]);
+
+  // Keep the active lesson visible: a review-queue or hand-off lesson that lives outside the
+  // current list switches the filter to where it is listed.
+  useEffect(() => {
+    if (!filteredLessons.some((l) => l.id === currentLesson.id)) {
+      setSelectedFilter(currentLesson.relevance === 'outside-repertoire' ? PATTERN_LIBRARY_ID : 'all');
+    }
+    // Only when the lesson changes; browsing other courses while a lesson is open is allowed.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentLesson.id]);
 
   const courseLabel = (category: string): string => {
     switch (category) {

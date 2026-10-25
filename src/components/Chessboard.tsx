@@ -18,12 +18,12 @@ export type BoardCueColor = 'green' | 'red' | 'yellow' | 'blue';
 export interface BoardArrow {
   from: string;
   to: string;
-  color?: BoardCueColor | string;
+  color?: BoardCueColor;
 }
 
 export interface BoardHighlight {
   square: string;
-  color?: BoardCueColor | string;
+  color?: BoardCueColor;
 }
 
 /** At most this many arrows and this many highlights are drawn (sparse cues). */
