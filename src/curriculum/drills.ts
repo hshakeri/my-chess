@@ -193,9 +193,7 @@ export const caroKannDisciplineDrill: CurriculumLesson = buildVerifiedLesson({
       annotation: 'Defend e4 while developing a minor piece.',
       hintPiece: 'Queen Knight',
       hintSquare: 'c3',
-      wrongMoveFeedback: {
-        'h3': 'Timid mistake from your game vs Brandon0015! 3.h3?! loses a precious tempo and concedes the center.',
-      },
+      // 3.h3?! is handled by the mistake record below so its refutation is played out
     },
     { san: 'dxe4', isUserMove: false },
     {

@@ -57,7 +57,7 @@ test.describe('04. Personalized Diagnostics & Repertoire Recommendation (F13 - F
     await expect(pattern.getByText(/Bg4/).first()).toBeVisible();
     await expect(pattern.getByText(/games, score/).first()).toBeVisible();
     await expect(pattern.getByText(/not costing points so far/).first()).toBeVisible();
-    await expect(pattern.getByText('info')).toBeVisible();
+    await expect(pattern.getByText('info', { exact: true })).toBeVisible();
   });
 
   test('Recommends tailored White (Italian/Anti-Scandi) and Black (Caro-Kann/KID) repertoires', async ({ page }) => {

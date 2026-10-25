@@ -9,6 +9,15 @@ const seedGames = seedGamesRaw as unknown as StoredGame[];
 
 const render = () => renderToString(<DiagnosticsView games={CANONICAL_HOOT65_GAMES} />).replace(/<!-- -->/g, '');
 
+/** The markup of one pattern card only, bounded at the next card so a neighbour cannot satisfy an assertion. */
+const patternCard = (html: string, id: string): string => {
+  const start = html.indexOf(`data-pattern="${id}"`);
+  expect(start).toBeGreaterThan(-1);
+  const rest = html.slice(start);
+  const next = rest.indexOf('data-pattern=', 1);
+  return next > 0 ? rest.slice(0, next) : rest;
+};
+
 describe('DiagnosticsView Component', () => {
   it('renders without crashing and displays hoot65 diagnostic banner', () => {
     const html = render();
@@ -48,22 +57,26 @@ describe('DiagnosticsView Component', () => {
   it('shows the ...Bg4 pattern as measured information on the archive, and as a leak only where it cost points', () => {
     // Whole archive: the ...Bg4 games scored better than the other Black games
     const archiveHtml = renderToString(<DiagnosticsView games={seedGames} />).replace(/<!-- -->/g, '');
-    const strip = archiveHtml.slice(archiveHtml.indexOf('data-pattern="black-bg4-chase"'));
-    expect(strip.slice(0, 1500)).toContain('Bg4');
-    expect(strip.slice(0, 1500)).toContain('not costing points so far');
-    expect(strip.slice(0, 1500)).toContain('>info<');
+    const archiveCard = patternCard(archiveHtml, 'black-bg4-chase');
+    expect(archiveCard).toContain('Bg4');
+    expect(archiveCard).toContain('not costing points so far');
+    expect(archiveCard).toContain('>info<');
+    expect(archiveCard).not.toContain('>leak<');
 
     // Fixtures: the single chased game was lost, so the same pattern is reported as a leak with its measured cost
-    const html = render();
-    const fixtureStrip = html.slice(html.indexOf('data-pattern="black-bg4-chase"'));
-    expect(fixtureStrip.slice(0, 1500)).toContain('>leak<');
+    const fixtureCard = patternCard(render(), 'black-bg4-chase');
+    expect(fixtureCard).toContain('>leak<');
+    expect(fixtureCard).not.toContain('>info<');
   });
 
   it('says plainly when a pattern has no comparison group instead of claiming it costs nothing', () => {
     const lone = CANONICAL_HOOT65_GAMES.filter((g) => g.id === '169098759508');
     const html = renderToString(<DiagnosticsView games={lone} />).replace(/<!-- -->/g, '');
-    expect(html).toContain('no other black games to compare against yet');
-    expect(html).not.toContain('not costing points so far');
+    const card = patternCard(html, 'black-bg4-chase');
+    expect(card).toContain('no other black games to compare against yet');
+    expect(card).not.toContain('not costing points so far');
+    expect(card).not.toContain('in your other'); // no comparison score is printed for an empty comparison group
+    expect(card).toContain('1</span> games, score'); // the one lost game still shows its own (0.0%) score
 
     // An inferior-by-theory habit stays a leak, but its impact reads n/a rather than a made-up number
     const scandis = CANONICAL_HOOT65_GAMES.filter((g) =>

@@ -260,8 +260,14 @@ export class DiagnosticAnalyzer {
       return null;
     }
     const window = moves.slice(bg4Index + 1, bg4Index + 7).map(cleanSan);
-    let sawPawnKick = false; // h3 or f3 asked the bishop a question
+    let kick: string | null = null; // the White move that first attacked the bishop on g4 (h3, f3, Ne5, ...)
     let sawBh5 = false;
+    const blackBishopOn = (sq: Square) => {
+      const p = chess.get(sq);
+      return !!p && p.color === 'b' && p.type === 'b';
+    };
+    const looseB7 = (how: string) =>
+      `With the bishop gone from c8 the b7 pawn is loose: ${how}. Before ...Bg4 make sure b7 is covered or that ...Qb6/...Qd7 is available.`;
 
     for (let k = 0; k < window.length; k++) {
       const san = window[k];
@@ -274,28 +280,43 @@ export class DiagnosticAnalyzer {
       }
 
       if (isWhiteMove) {
-        if (san === 'h3' || san === 'f3') sawPawnKick = true;
-        if (san === 'g4' && sawPawnKick && sawBh5) {
-          return 'Your bishop was chased: after h3 it retreated to h5 and g4 drove it again, costing tempi and leaving it short of squares. Retreat only when the bishop has an exit (...h6 or ...h5 prepared), otherwise take on f3 or go back to d7.';
+        if (!kick && blackBishopOn('g4') && chess.isAttacked('g4', 'w')) kick = san;
+        if (san === 'g4' && kick && sawBh5 && blackBishopOn('h5')) {
+          return `Your bishop was chased: after ${kick} it retreated to h5 and g4 drove it again, costing tempi and leaving it short of squares. Retreat only when the bishop has an exit (...h6 or ...h5 prepared), otherwise take on f3 or go back to d7.`;
         }
         if (played.piece === 'q') {
-          // Only a queen that really hits something counts: the b7 pawn with a clear path, or a check that also hits the bishop
-          const b7 = chess.get('b7');
-          if (b7 && b7.color === 'b' && b7.type === 'p' && queenAttacks(chess, played.to, 'b7')) {
-            return 'With the bishop gone from c8 the b7 pawn is loose: the queen came to b3 hitting b7 (and f7 or the king). Before ...Bg4 make sure b7 is covered or that ...Qb6/...Qd7 is available.';
+          // Only a queen that really hits something counts: a pawn on b7 that is undefended with a clear path
+          // (or simply taken), or a check that also hits an undefended bishop on g4.
+          if (played.to === 'b7' && played.captured === 'p') {
+            return looseB7('the queen simply took it with Qxb7');
           }
-          const g4 = chess.get('g4');
-          if (chess.inCheck() && g4 && g4.color === 'b' && g4.type === 'b' && queenAttacks(chess, played.to, 'g4')) {
-            return 'The check also hit your bishop: with the fourth rank open, the queen checked the king and attacked the bishop on g4 at once, so the pin had to be given up with a blocking move (...Bd7, ...Qd7 or ...Nc6). Pin on g4 only when the rank is closed by a pawn on d4 or e4.';
+          const b7 = chess.get('b7');
+          if (
+            !played.captured &&
+            b7 &&
+            b7.color === 'b' &&
+            b7.type === 'p' &&
+            queenAttacks(chess, played.to, 'b7') &&
+            !chess.isAttacked('b7', 'b')
+          ) {
+            return looseB7(`the queen came to ${played.to} hitting b7 (and f7 or the king)`);
+          }
+          if (
+            chess.inCheck() &&
+            blackBishopOn('g4') &&
+            queenAttacks(chess, played.to, 'g4') &&
+            !chess.isAttacked('g4', 'b')
+          ) {
+            return 'The check also hit your bishop: with the fourth rank open, the queen checked the king and attacked the undefended bishop on g4 at once, so the pin had to be given up with a blocking move (...Bd7, ...Qd7 or ...Nc6). Pin on g4 only when the rank is closed by a pawn on d4 or e4.';
           }
         }
         if (san === 'Qxf3') {
-          const bishopOnDiagonal = ['c4', 'b3', 'a2', 'd5'].some((sq) => {
-            const p = chess.get(sq as Square);
-            return p && p.color === 'w' && p.type === 'b';
+          const batterySquare = (['c4', 'b3', 'a2', 'd5'] as Square[]).find((sq) => {
+            const p = chess.get(sq);
+            return p && p.color === 'w' && p.type === 'b' && queenAttacks(chess, sq, 'f7');
           });
-          if (bishopOnDiagonal) {
-            return 'After ...Bxf3 Qxf3 the queen and the c4 bishop form a battery against f7. Trading on f3 is only safe when f7 is already covered (...e6, ...Nf6 or ...Qd7).';
+          if (batterySquare) {
+            return `After ...Bxf3 Qxf3 the queen and the ${batterySquare} bishop form a battery against f7. Trading on f3 is only safe when f7 is already covered (...e6, ...Nf6 or ...Qd7).`;
           }
         }
       } else if (san === 'Bh5') {

@@ -73,19 +73,39 @@ describe('Curriculum builder: derived hints, acceptance rules and strict legalit
     ).toThrow(/Illegal refutation move 'Qh5'/);
   });
 
-  it('every shipped mistake record is reachable from a position of its own lesson line', () => {
+  it('every shipped mistake record is reachable: it triggers from a position where the student is to move, at or after the drill point', () => {
     for (const lesson of allCurriculumLessons) {
       const keys = new Set<string>();
       const chess = new Chess(lesson.initialFen);
-      keys.add(positionKey(chess.fen()));
-      for (const m of lesson.moves) {
+      const startPly = lesson.startPly ?? 0;
+      lesson.moves.forEach((m, i) => {
+        if (i >= startPly && m.isUserMove) keys.add(positionKey(chess.fen()));
         chess.move(m.san);
-        keys.add(positionKey(chess.fen()));
-      }
+      });
       for (const mt of lesson.commonMistakesAndTraps || []) {
         expect(keys.has(positionKey(mt.triggerFen)), `${lesson.id}: ${mt.attemptedSan} trap is unreachable`).toBe(true);
       }
     }
+  });
+
+  it('rejects a mistake record anchored to a ply the lesson does not have', () => {
+    expect(() =>
+      buildVerifiedLesson(
+        base({
+          mistakesAndTraps: [
+            {
+              plyIndex: 99,
+              attemptedSan: 'd4',
+              isTrap: false,
+              severity: 'inaccuracy',
+              explanatoryFeedback: 'x',
+              refutationSanList: [],
+              punishmentSummary: 'y',
+            },
+          ],
+        })
+      )
+    ).toThrow(/plyIndex 99 is out of range/);
   });
 
   it('records startPly and relevance and rejects an out-of-range start ply', () => {

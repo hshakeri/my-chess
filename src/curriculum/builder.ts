@@ -223,8 +223,14 @@ export function buildVerifiedLesson(config: LessonConfig): CurriculumLesson {
   if (config.mistakesAndTraps) {
     for (const mInput of config.mistakesAndTraps) {
       let triggerFen = mInput.triggerFen;
-      if (!triggerFen && mInput.plyIndex !== undefined && fenHistory[mInput.plyIndex]) {
-        triggerFen = fenHistory[mInput.plyIndex];
+      if (!triggerFen && mInput.plyIndex !== undefined) {
+        const anchored = fenHistory[mInput.plyIndex];
+        if (!anchored) {
+          throw new Error(
+            `[Curriculum Builder] plyIndex ${mInput.plyIndex} is out of range for the mistake '${mInput.attemptedSan}' in lesson '${config.id}'`
+          );
+        }
+        triggerFen = anchored;
       }
       if (!triggerFen) {
         triggerFen = startFen;

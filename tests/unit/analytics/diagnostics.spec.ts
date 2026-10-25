@@ -147,9 +147,31 @@ describe('DiagnosticAnalyzer & Game Diagnostics Engine', () => {
     const harmless = synthetic(['d4', 'd5', 'Nf3', 'b6', 'c4', 'Bg4', 'Qa4+']);
     expect(DiagnosticAnalyzer.detectBlackBg4ChaseLeak(harmless, harmless.movesSan)).toBeNull();
 
-    // g4 without a preceding h3/f3 is not the chase pattern
+    // g4 without a preceding kick on the bishop is not the chase pattern
     const noKick = synthetic(['e4', 'c6', 'Nf3', 'd5', 'e5', 'Bg4', 'd4', 'Bh5', 'g4']);
     expect(DiagnosticAnalyzer.detectBlackBg4ChaseLeak(noKick, noKick.movesSan)).toBeNull();
+
+    // The kick is read from the board, not from a SAN list, and the message names the real move
+    const knightKick = seedGames.find((g) => g.url?.endsWith('/168526222308'))!;
+    expect(DiagnosticAnalyzer.detectBlackBg4ChaseLeak(knightKick, knightKick.movesSan)?.description).toMatch(/after Ne5 it retreated/);
+    const f3Kick = seedGames.find((g) => g.url?.endsWith('/184423467872'))!;
+    expect(DiagnosticAnalyzer.detectBlackBg4ChaseLeak(f3Kick, f3Kick.movesSan)?.description).toMatch(/after f3 it retreated/);
+
+    // A defended b7 pawn is not loose, and an unrelated queen capture (Qxb4 winning a knight) is not a ...Bg4 cost
+    const defendedB7 = synthetic(['e4', 'c6', 'Nf3', 'd5', 'exd5', 'cxd5', 'c3', 'Qc7', 'd4', 'Bg4', 'Qb3']);
+    expect(DiagnosticAnalyzer.detectBlackBg4ChaseLeak(defendedB7, defendedB7.movesSan)).toBeNull();
+    const knightWin = seedGames.find((g) => g.url?.endsWith('/185778503204'))!;
+    expect(DiagnosticAnalyzer.detectBlackBg4ChaseLeak(knightWin, knightWin.movesSan)).toBeNull();
+
+    // A queen already on b3 that simply takes b7 is the most direct cost of all
+    const takesB7 = synthetic(['e4', 'c6', 'Nf3', 'd5', 'exd5', 'cxd5', 'c3', 'Nf6', 'Qb3', 'Bg4', 'Qxb7']);
+    expect(DiagnosticAnalyzer.detectBlackBg4ChaseLeak(takesB7, takesB7.movesSan)?.description).toMatch(/took it with Qxb7/);
+
+    // The f7 battery needs an open diagonal; a bishop on b3 behind its own pawn on d5 is not one
+    const blockedBattery = synthetic(['e4', 'e5', 'Nf3', 'Nc6', 'Bc4', 'Nf6', 'd3', 'd5', 'Bb3', 'Bg4', 'h3', 'Bxf3', 'Qxf3']);
+    expect(DiagnosticAnalyzer.detectBlackBg4ChaseLeak(blockedBattery, blockedBattery.movesSan)).toBeNull();
+    const openBattery = synthetic(['e4', 'e5', 'Nf3', 'Nc6', 'Bc4', 'd6', 'd3', 'Bg4', 'h3', 'Bxf3', 'Qxf3']);
+    expect(DiagnosticAnalyzer.detectBlackBg4ChaseLeak(openBattery, openBattery.movesSan)?.description).toMatch(/the c4 bishop form a battery/);
   });
 
   it('calls a queen move a sortie only when the queen leaves its home square', () => {

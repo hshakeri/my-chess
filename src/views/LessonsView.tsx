@@ -97,6 +97,7 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId }) => 
   const rulesRef = useRef<RulesEngine>(new RulesEngine());
   const timersRef = useRef<number[]>([]);
   const ratingInFlightRef = useRef<boolean>(false); // one review per run, even on a double click
+  const runIdRef = useRef<number>(0); // bumped on every board setup so async continuations can tell they are stale
   const [position, setPosition] = useState<ChessPosition>(() => rulesRef.current.getPosition());
 
   // Feedback state
@@ -278,6 +279,7 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId }) => 
       setIsLineHold(false);
       setSrsMessage(null);
       ratingInFlightRef.current = false;
+      runIdRef.current += 1;
       if (startPly >= lesson.moves.length) {
         // Nothing left to play on the line: straight to the exercises (or complete)
         if (lesson.exercises.length > 0) loadExercise(lesson, 0);
@@ -581,31 +583,43 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId }) => 
     // Lock synchronously: a second click before the write resolves must not count as a second review
     ratingInFlightRef.current = true;
     setRatedThisRun(true);
+    const runId = runIdRef.current;
+    const ratedLessonId = currentLesson.id;
     try {
-      const updated = await SrsService.recordReview(currentLesson.id, grade, {
+      const updated = await SrsService.recordReview(ratedLessonId, grade, {
         usedHint: runStats.hintLevel > 0,
         hintLevel: runStats.hintLevel,
         mistakeCount: runStats.mistakes,
       });
+      await refreshDue();
+      // The user may have opened another lesson while the write was in flight: that lesson owns the view now
+      if (runIdRef.current !== runId) return;
+
       setSrsCard(updated);
       setSrsMessage(
         `Rated ${GRADE_LABELS[grade] || grade}: Scheduled next review in ${updated.intervalDays} day(s) (Leitner Box ${updated.box})`
       );
       schedule(() => setSrsMessage(null), 4000);
-      await refreshDue();
 
-      // Continue the review queue when one is active
+      // Continue the review queue when one is active. The queue is advanced when the hand-off happens,
+      // so a Restart during the pause leaves the rated lesson at its head instead of dropping the next one.
       if (reviewQueue.length > 0) {
-        const [, ...rest] = reviewQueue;
-        setReviewQueue(rest);
+        const rest = reviewQueue.filter((id) => id !== ratedLessonId);
         const nextLesson = rest.length > 0 ? allCurriculumLessons.find((l) => l.id === rest[0]) : undefined;
         if (nextLesson) {
-          schedule(() => setCurrentLesson(nextLesson), 1200);
+          schedule(() => {
+            setReviewQueue(rest);
+            setCurrentLesson(nextLesson);
+          }, 1200);
+        } else {
+          setReviewQueue([]);
         }
       }
     } catch (err) {
-      ratingInFlightRef.current = false;
-      setRatedThisRun(false);
+      if (runIdRef.current === runId) {
+        ratingInFlightRef.current = false;
+        setRatedThisRun(false);
+      }
       console.warn('Error rating SRS:', err);
     }
   };

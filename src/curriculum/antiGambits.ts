@@ -94,7 +94,7 @@ export const refutingKonikowskiGambit: CurriculumLesson = buildVerifiedLesson({
     {
       san: 'Re1',
       isUserMove: true,
-      annotation: 'Pin the e4 pawn to the queen along the open e-file. White is a clean pawn up with the safer king and the more active pieces.',
+      annotation: 'Pin the e4 pawn to the queen along the open e-file. Material is level again (two bishops against bishop and knight), but the e4 pawn is pinned and White has the safer king and the more active pieces.',
       hintPiece: 'Rook on f1',
       hintSquare: 'e1',
     },
