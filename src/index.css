@@ -1,0 +1,111 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-slate-900 text-slate-100 antialiased selection:bg-emerald-500 selection:text-white;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+}
+
+/* Custom crisp board styling */
+.chess-square {
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+
+/* Legal move target dot */
+.legal-move-dot {
+  width: 32%;
+  height: 32%;
+  border-radius: 9999px;
+  background-color: rgba(20, 120, 20, 0.35);
+  pointer-events: none;
+}
+
+/* Legal move target capture ring */
+.legal-capture-ring {
+  box-sizing: border-box;
+  width: 90%;
+  height: 90%;
+  border-radius: 9999px;
+  border: 4px solid rgba(20, 120, 20, 0.45);
+  pointer-events: none;
+}
+
+/* King in check radial indicator */
+.king-check-glow {
+  background: radial-gradient(circle, rgba(239, 68, 68, 0.8) 0%, rgba(220, 38, 38, 0.4) 55%, transparent 75%);
+}
+
+/* Move list scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.5);
+  border-radius: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(100, 116, 139, 0.5);
+  border-radius: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.8);
+}
+
+/* Print Stylesheet for physical worksheets */
+@media print {
+  body {
+    background-color: white !important;
+    color: black !important;
+  }
+
+  /* Hide app navigation, buttons, controls, and interactive chrome during print */
+  .no-print,
+  nav,
+  header,
+  footer,
+  button,
+  .engine-controls-panel,
+  .board-controls-bar,
+  .move-list-panel {
+    display: none !important;
+  }
+
+  .print-only {
+    display: block !important;
+  }
+
+  .page-break {
+    page-break-before: always;
+    break-before: page;
+  }
+
+  /* High-contrast crisp print board */
+  .chess-board-print {
+    border: 2px solid #000 !important;
+    box-shadow: none !important;
+  }
+}
+
+/* Shake animation for incorrect moves in interactive drills */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-8px); }
+  40%, 80% { transform: translateX(8px); }
+}
+.animate-shake {
+  animation: shake 0.4s ease-in-out;
+}
+
+/* Page break utilities for printable worksheets */
+.break-before-page,
+.page-break-always {
+  break-before: page;
+  page-break-before: always;
+}
+
