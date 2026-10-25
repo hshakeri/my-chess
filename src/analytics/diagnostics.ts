@@ -4,221 +4,122 @@ import {
   DiagnosticReport,
   OpeningDeviation,
   OpeningStats,
+  PatternImpact,
+  PatternSummary,
 } from '../types/diagnostics';
 import {
   getRecommendedWhiteRepertoire,
   getRecommendedBlackRepertoire,
 } from './repertoire';
+import { CANONICAL_HOOT65_GAMES } from './canonicalGames';
 
 /**
- * Verified canonical hoot65 games cited in prior art and analysis.
- * Used as a baseline corpus to ensure reliable diagnostics on cold-start or empty DB.
+ * Real hoot65 archive games used as test fixtures for the detectors below.
+ * They are NOT injected into analysis: the report describes exactly the games
+ * it is given (the live IndexedDB archive in the app).
  */
-export const CANONICAL_HOOT65_GAMES: StoredGame[] = [
-  // White Leaks: Scandinavian 2.e5?! (4 real games)
-  {
-    id: '185031553576',
-    source: 'chesscom',
-    url: 'https://www.chess.com/game/live/185031553576',
-    pgn: '[Event "Live Chess"]\n[Site "Chess.com"]\n[Date "2026.10.08"]\n[White "hoot65"]\n[Black "meny_26"]\n[Result "0-1"]\n\n1. e4 d5 2. e5 d4 3. Nf3 f6 4. d3 fxe5 0-1',
-    white: { name: 'hoot65', rating: 1176 },
-    black: { name: 'meny_26', rating: 1191 },
-    result: '0-1',
-    eco: 'B01',
-    openingName: 'Scandinavian Defense: 2.e5?!',
-    timestamp: 1791852000000,
-    timeClass: 'rapid',
-    movesSan: ['e4', 'd5', 'e5', 'd4', 'Nf3', 'f6', 'd3', 'fxe5'],
-    userColor: 'white',
-    userResult: 'loss',
-  },
-  {
-    id: '185035281692',
-    source: 'chesscom',
-    url: 'https://www.chess.com/game/live/185035281692',
-    pgn: '[Event "Live Chess"]\n[Site "Chess.com"]\n[Date "2026.10.09"]\n[White "hoot65"]\n[Black "arsalan65125"]\n[Result "0-1"]\n\n1. e4 d5 2. e5 e6 3. d4 a6 4. Nc3 h6 0-1',
-    white: { name: 'hoot65', rating: 1168 },
-    black: { name: 'arsalan65125', rating: 1197 },
-    result: '0-1',
-    eco: 'B01',
-    openingName: 'Scandinavian Defense: 2.e5?!',
-    timestamp: 1791870000000,
-    timeClass: 'rapid',
-    movesSan: ['e4', 'd5', 'e5', 'e6', 'd4', 'a6', 'Nc3', 'h6'],
-    userColor: 'white',
-    userResult: 'loss',
-  },
-  {
-    id: '184582182704',
-    source: 'chesscom',
-    url: 'https://www.chess.com/game/live/184582182704',
-    pgn: '[Event "Live Chess"]\n[Site "Chess.com"]\n[Date "2026.09.30"]\n[White "hoot65"]\n[Black "sunil5353"]\n[Result "0-1"]\n\n1. e4 d5 2. e5 Bf5 3. Nc3 e6 4. Bb5+ c6 0-1',
-    white: { name: 'hoot65', rating: 1138 },
-    black: { name: 'sunil5353', rating: 1163 },
-    result: '0-1',
-    eco: 'B01',
-    openingName: 'Scandinavian Defense: 2.e5?!',
-    timestamp: 1791160000000,
-    timeClass: 'rapid',
-    movesSan: ['e4', 'd5', 'e5', 'Bf5', 'Nc3', 'e6', 'Bb5+', 'c6'],
-    userColor: 'white',
-    userResult: 'loss',
-  },
-  {
-    id: '171000270176',
-    source: 'chesscom',
-    url: 'https://www.chess.com/game/live/171000270176',
-    pgn: '[Event "Live Chess"]\n[Site "Chess.com"]\n[Date "2026.07.02"]\n[White "hoot65"]\n[Black "jamadeus0913"]\n[Result "0-1"]\n\n1. e4 d5 2. e5 Nc6 3. d4 Bf5 4. g4 Bg6 0-1',
-    white: { name: 'hoot65', rating: 1167 },
-    black: { name: 'jamadeus0913', rating: 1187 },
-    result: '0-1',
-    eco: 'B01',
-    openingName: 'Scandinavian Defense: 2.e5?!',
-    timestamp: 1783400000000,
-    timeClass: 'rapid',
-    movesSan: ['e4', 'd5', 'e5', 'Nc6', 'd4', 'Bf5', 'g4', 'Bg6'],
-    userColor: 'white',
-    userResult: 'loss',
-  },
+export { CANONICAL_HOOT65_GAMES };
 
-  // Black Leaks: Premature ...Bg4 in Caro-Kann/Pirc (4 real games)
-  {
-    id: '185282462950',
-    source: 'chesscom',
-    url: 'https://www.chess.com/game/live/185282462950',
-    pgn: '[Event "Live Chess"]\n[Site "Chess.com"]\n[Date "2026.10.13"]\n[White "deo998"]\n[Black "hoot65"]\n[Result "1-0"]\n\n1. e4 c6 2. Nf3 d5 3. exd5 cxd5 4. Nc3 Nf6 5. d4 Bg4 1-0',
-    white: { name: 'deo998', rating: 1167 },
-    black: { name: 'hoot65', rating: 1129 },
-    result: '1-0',
-    eco: 'B13',
-    openingName: 'Caro-Kann Defense: Exchange Variation',
-    timestamp: 1792300000000,
-    timeClass: 'rapid',
-    movesSan: ['e4', 'c6', 'Nf3', 'd5', 'exd5', 'cxd5', 'Nc3', 'Nf6', 'd4', 'Bg4'],
-    userColor: 'black',
-    userResult: 'loss',
-  },
-  {
-    id: '173676860416',
-    source: 'chesscom',
-    url: 'https://www.chess.com/game/live/173676860416',
-    pgn: '[Event "Live Chess"]\n[Site "Chess.com"]\n[Date "2026.08.29"]\n[White "hafezj"]\n[Black "hoot65"]\n[Result "1-0"]\n\n1. e4 c6 2. Nf3 d5 3. e5 Bg4 4. d4 e6 1-0',
-    white: { name: 'hafezj', rating: 1119 },
-    black: { name: 'hoot65', rating: 1115 },
-    result: '1-0',
-    eco: 'B12',
-    openingName: 'Caro-Kann Defense: Advance Variation',
-    timestamp: 1788000000000,
-    timeClass: 'rapid',
-    movesSan: ['e4', 'c6', 'Nf3', 'd5', 'e5', 'Bg4', 'd4', 'e6'],
-    userColor: 'black',
-    userResult: 'loss',
-  },
-  {
-    id: '171894388406',
-    source: 'chesscom',
-    url: 'https://www.chess.com/game/live/171894388406',
-    pgn: '[Event "Live Chess"]\n[Site "Chess.com"]\n[Date "2026.07.21"]\n[White "mrrs6"]\n[Black "hoot65"]\n[Result "1-0"]\n\n1. e4 c6 2. f4 d6 3. Nc3 Qb6 4. Nf3 Bg4 1-0',
-    white: { name: 'mrrs6', rating: 1197 },
-    black: { name: 'hoot65', rating: 1165 },
-    result: '1-0',
-    eco: 'B10',
-    openingName: 'Caro-Kann Defense',
-    timestamp: 1785100000000,
-    timeClass: 'rapid',
-    movesSan: ['e4', 'c6', 'f4', 'd6', 'Nc3', 'Qb6', 'Nf3', 'Bg4'],
-    userColor: 'black',
-    userResult: 'loss',
-  },
-  {
-    id: '184720164178',
-    source: 'chesscom',
-    url: 'https://www.chess.com/game/live/184720164178',
-    pgn: '[Event "Live Chess"]\n[Site "Chess.com"]\n[Date "2026.10.02"]\n[White "Rithvik1811"]\n[Black "hoot65"]\n[Result "1-0"]\n\n1. e4 d6 2. d4 Nf6 3. Nc3 c6 4. Bd3 Bg4 5. f3 Bh5 6. g4 Bg6 1-0',
-    white: { name: 'Rithvik1811', rating: 1149 },
-    black: { name: 'hoot65', rating: 1131 },
-    result: '1-0',
-    eco: 'B07',
-    openingName: 'Pirc Defense: Czech System',
-    timestamp: 1791330000000,
-    timeClass: 'rapid',
-    movesSan: ['e4', 'd6', 'd4', 'Nf6', 'Nc3', 'c6', 'Bd3', 'Bg4', 'f3', 'Bh5', 'g4', 'Bg6'],
-    userColor: 'black',
-    userResult: 'loss',
-  },
+export type PatternId = 'white-scandi-e5' | 'black-bg4-chase' | 'early-queen-sortie';
 
-  // Representative White Successful Games (Italian Game & Scotch)
-  {
-    id: '185894059676',
-    source: 'chesscom',
-    url: 'https://www.chess.com/game/live/185894059676',
-    pgn: '[Event "Live Chess"]\n[Site "Chess.com"]\n[Date "2026.10.24"]\n[White "hoot65"]\n[Black "abhinavghadage"]\n[Result "1-0"]\n\n1. e4 e5 2. Nf3 Nc6 3. Bc4 Bc5 4. c3 Nf6 5. d4 exd4 6. cxd4 Bb4+ 7. Bd2 Bxd2+ 8. Nbxd2 d5 9. exd5 Nxd5 10. O-O O-O 1-0',
-    white: { name: 'hoot65', rating: 1121 },
-    black: { name: 'abhinavghadage', rating: 1087 },
-    result: '1-0',
-    eco: 'C53',
-    openingName: 'Italian Game: Classical Variation',
-    timestamp: 1792886339000,
-    timeClass: 'rapid',
-    movesSan: ['e4', 'e5', 'Nf3', 'Nc6', 'Bc4', 'Bc5', 'c3', 'Nf6', 'd4', 'exd4', 'cxd4', 'Bb4+', 'Bd2', 'Bxd2+', 'Nbxd2', 'd5', 'exd5', 'Nxd5', 'O-O', 'O-O'],
-    userColor: 'white',
-    userResult: 'win',
-  },
-  {
-    id: '185500112233',
-    source: 'chesscom',
-    url: 'https://www.chess.com/game/live/185500112233',
-    pgn: '[Event "Live Chess"]\n[Site "Chess.com"]\n[Date "2026.10.18"]\n[White "hoot65"]\n[Black "chessfan2026"]\n[Result "1-0"]\n\n1. e4 e5 2. Nf3 Nc6 3. Bc4 Nf6 4. d3 Bc5 5. O-O d6 6. c3 O-O 7. Re1 a6 8. Bb3 Ba7 1-0',
-    white: { name: 'hoot65', rating: 1115 },
-    black: { name: 'chessfan2026', rating: 1102 },
-    result: '1-0',
-    eco: 'C50',
-    openingName: 'Italian Game: Giuoco Pianissimo',
-    timestamp: 1792500000000,
-    timeClass: 'rapid',
-    movesSan: ['e4', 'e5', 'Nf3', 'Nc6', 'Bc4', 'Nf6', 'd3', 'Bc5', 'O-O', 'd6', 'c3', 'O-O', 'Re1', 'a6', 'Bb3', 'Ba7'],
-    userColor: 'white',
-    userResult: 'win',
-  },
+interface PatternMeta {
+  id: PatternId;
+  label: string;
+  color: 'white' | 'black' | 'both';
+  theoryVerdict: 'inferior' | 'neutral';
+  description: string;
+}
 
-  // Representative Black Successful Games (Disciplined Caro-Kann with 3...Bf5)
-  {
-    id: '185600223344',
-    source: 'chesscom',
-    url: 'https://www.chess.com/game/live/185600223344',
-    pgn: '[Event "Live Chess"]\n[Site "Chess.com"]\n[Date "2026.10.20"]\n[White "tactician_bob"]\n[Black "hoot65"]\n[Result "0-1"]\n\n1. e4 c6 2. d4 d5 3. e5 Bf5 4. Nf3 e6 5. Be2 c5 6. c3 Nc6 7. O-O cxd4 8. cxd4 Nge7 0-1',
-    white: { name: 'tactician_bob', rating: 1140 },
-    black: { name: 'hoot65', rating: 1125 },
-    result: '0-1',
-    eco: 'B12',
-    openingName: 'Caro-Kann Defense: Advance Variation (3...Bf5!)',
-    timestamp: 1792600000000,
-    timeClass: 'rapid',
-    movesSan: ['e4', 'c6', 'd4', 'd5', 'e5', 'Bf5', 'Nf3', 'e6', 'Be2', 'c5', 'c3', 'Nc6', 'O-O', 'cxd4', 'cxd4', 'Nge7'],
-    userColor: 'black',
-    userResult: 'win',
+const PATTERN_META: Record<PatternId, PatternMeta> = {
+  'white-scandi-e5': {
+    id: 'white-scandi-e5',
+    label: 'Scandinavian: 2.e5?! instead of 2.exd5',
+    color: 'white',
+    theoryVerdict: 'inferior',
+    description:
+      'After 1.e4 d5 the pawn push 2.e5 hands Black a comfortable French-style structure with the light-squared bishop already free. 2.exd5 keeps the initiative: after 2...Qxd5 the knight comes to c3 with tempo on the queen, after 2...Nf6 White holds the extra pawn with d4 and c4.',
   },
-  {
-    id: '185700334455',
-    source: 'chesscom',
-    url: 'https://www.chess.com/game/live/185700334455',
-    pgn: '[Event "Live Chess"]\n[Site "Chess.com"]\n[Date "2026.10.22"]\n[White "d4_master"]\n[Black "hoot65"]\n[Result "0-1"]\n\n1. d4 Nf6 2. c4 g6 3. Nc3 Bg7 4. e4 d6 5. Nf3 O-O 6. Be2 e5 7. O-O Nc6 0-1',
-    white: { name: 'd4_master', rating: 1135 },
-    black: { name: 'hoot65', rating: 1128 },
-    result: '0-1',
-    eco: 'E97',
-    openingName: 'King\'s Indian Defense',
-    timestamp: 1792750000000,
-    timeClass: 'rapid',
-    movesSan: ['d4', 'Nf6', 'c4', 'g6', 'Nc3', 'Bg7', 'e4', 'd6', 'Nf3', 'O-O', 'Be2', 'e5', 'O-O', 'Nc6'],
-    userColor: 'black',
-    userResult: 'win',
+  'black-bg4-chase': {
+    id: 'black-bg4-chase',
+    label: '...Bg4 that got chased or cost b7/f7',
+    color: 'black',
+    theoryVerdict: 'neutral',
+    description:
+      'An early ...Bg4 is fine when there is a knight on f3 to pin and the bishop has an exit. It costs tempi or material when the retreat ...Bh5 can be hit by g4, when a queen check on a4 or Qb3 picks up the loose b7 pawn, or when ...Bxf3 Qxf3 builds a battery against f7. Before ...Bg4 ask: is there a knight to pin, am I happy to give bishop for knight, and does the bishop have an exit square?',
   },
-];
+  'early-queen-sortie': {
+    id: 'early-queen-sortie',
+    label: 'Queen out before the minor pieces',
+    color: 'both',
+    theoryVerdict: 'inferior',
+    description:
+      'The queen left home within the first five moves while at least two minor pieces were still on their starting squares. A queen that comes out early becomes a target for developing moves (Nc3, Bd2, b4), and every retreat is a lost tempo. Develop knights and bishops first; the queen decides later.',
+  },
+};
+
+const START_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
+
+function cleanSan(san: string): string {
+  return san.replace(/[!?]/g, '');
+}
+
+function toDateString(game: StoredGame): string | undefined {
+  const m = game.pgn?.match(/\[Date "(\d{4})\.(\d{2})\.(\d{2})"\]/);
+  if (m) return `${m[1]}-${m[2]}-${m[3]}`;
+  if (game.timestamp) return new Date(game.timestamp).toISOString().slice(0, 10);
+  return undefined;
+}
+
+function gameUrlOf(game: StoredGame): string {
+  if (game.url) return game.url;
+  const numeric = game.id.replace(/^chesscom:/, '');
+  return `https://www.chess.com/game/live/${numeric}`;
+}
+
+/** Numeric Chess.com game id when the URL carries one, otherwise the stored id. */
+export function displayGameId(game: StoredGame): string {
+  const fromUrl = game.url?.match(/\/(\d+)\/?$/);
+  if (fromUrl) return fromUrl[1];
+  return game.id;
+}
+
+function scoreOf(games: StoredGame[], handle: string): number {
+  if (games.length === 0) return 0;
+  let points = 0;
+  for (const g of games) {
+    const color = DiagnosticAnalyzer.getPlayerColor(g, handle);
+    if (!color) continue;
+    const res = DiagnosticAnalyzer.getPlayerResult(g, color);
+    if (res === 'win') points += 1;
+    else if (res === 'draw') points += 0.5;
+  }
+  return Number((points / games.length).toFixed(3));
+}
+
+function formatImpact(impact: PatternImpact): string {
+  if (impact.gamesWith === 0) return 'n/a';
+  const delta = (impact.scoreWith - impact.scoreWithout) * 100;
+  const sign = delta > 0 ? '+' : '';
+  return `${sign}${delta.toFixed(1)} pts`;
+}
+
+const MINOR_START_SQUARES: Record<'w' | 'b', string[]> = {
+  w: ['b1', 'g1', 'c1', 'f1'],
+  b: ['b8', 'g8', 'c8', 'f8'],
+};
+
+function undevelopedMinors(chess: Chess, color: 'w' | 'b'): number {
+  let count = 0;
+  for (const sq of MINOR_START_SQUARES[color]) {
+    const piece = chess.get(sq as any);
+    if (piece && piece.color === color && (piece.type === 'n' || piece.type === 'b')) count++;
+  }
+  return count;
+}
 
 /**
  * Diagnostic Game Analyzer Engine
- * Analyzes games for player handle, detecting recurring opening and tactical deviations.
+ * Analyzes the games it is given for recurring, measurable opening habits.
  */
 export class DiagnosticAnalyzer {
   /**
@@ -246,223 +147,357 @@ export class DiagnosticAnalyzer {
 
   /**
    * Detect Scandinavian 2.e5?! deviation in a White game.
+   * bookSan 2.exd5 is legal by construction in the position after 1.e4 d5.
    */
   public static detectWhiteScandinavianLeak(
     game: StoredGame,
     moves: string[]
   ): OpeningDeviation | null {
     if (moves.length < 3) return null;
-    // 1. e4 d5 2. e5?!
-    if (moves[0] === 'e4' && moves[1] === 'd5' && moves[2] === 'e5') {
+    if (cleanSan(moves[0]) === 'e4' && cleanSan(moves[1]) === 'd5' && cleanSan(moves[2]) === 'e5') {
       const fenBeforeE5 = 'rnbqkbnr/ppp1pppp/8/3p4/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2';
       return {
-        gameId: game.id,
-        gameUrl: game.url || `https://www.chess.com/game/live/${game.id}`,
+        gameId: displayGameId(game),
+        gameUrl: gameUrlOf(game),
+        gameDate: toDateString(game),
         opponent: game.black?.name || 'Opponent',
         playedColor: 'white',
         ply: 3,
         fen: fenBeforeE5,
         playedSan: 'e5',
         bookSan: 'exd5',
-        evaluationDelta: '-0.80',
+        evaluationDelta: '',
+        patternId: 'white-scandi-e5',
         description:
-          'Against 1...d5 (Scandinavian Defense), 2.e5?! prematurely closes the center and relieves all pressure. Black easily equalizes with 2...c5 or 2...Bf5 developing their light-squared bishop outside the pawn chain before ...e6. The master refutation is 2.exd5! gaining a development tempo against Black\'s exposed queen after 2...Qxd5 3.Nc3!.',
+          'Against the Scandinavian Defense (1...d5), 2.e5?! closes the center and gives Black a comfortable French-style setup with the light-squared bishop already out (2...Bf5 or 2...c5). Take the pawn: 2.exd5! and after 2...Qxd5 develop with 3.Nc3, gaining a tempo on the queen; after 2...Nf6 keep the pawn with 3.d4 and 4.c4.',
       };
     }
     return null;
   }
 
   /**
-   * Detect premature ...Bg4 in Caro-Kann or Pirc for Black.
+   * Detect an early ...Bg4 by Black that actually cost something within the next
+   * six plies: chased by h3 ...Bh5 g4, a Qb3/Qa4+ hit on the loose b7 pawn, or a
+   * ...Bxf3 Qxf3 battery against f7 with a white bishop on the a2-g8 diagonal.
+   * A plain ...Bg4 that was never punished is NOT flagged.
    */
-  public static detectBlackPrematureBg4Leak(
+  public static detectBlackBg4ChaseLeak(
     game: StoredGame,
     moves: string[]
   ): OpeningDeviation | null {
     if (moves.length < 6) return null;
 
-    const isCaroKann = moves[1] === 'c6';
-    const isPirc = moves[1] === 'd6';
-
-    if (!isCaroKann && !isPirc) return null;
-
-    // Check plies 5 to 12 (Black moves at odd plies in 1-based indexing: 6, 8, 10, 12)
-    const chess = new Chess();
+    const chess = new Chess(START_FEN);
     for (let i = 0; i < Math.min(moves.length, 12); i++) {
-      const ply = i + 1;
-      const san = moves[i];
-      const fenBefore = chess.fen();
+      const san = cleanSan(moves[i]);
       const isBlackTurn = i % 2 === 1;
+      const fenBefore = chess.fen();
 
       if (isBlackTurn && san === 'Bg4') {
-        const bookMove = isCaroKann && moves[4] === 'e5' ? 'Bf5' : 'Nf6';
+        const tax = this.classifyBg4Aftermath(fenBefore, moves, i);
+        if (!tax) return null;
         return {
-          gameId: game.id,
-          gameUrl: game.url || `https://www.chess.com/game/live/${game.id}`,
+          gameId: displayGameId(game),
+          gameUrl: gameUrlOf(game),
+          gameDate: toDateString(game),
           opponent: game.white?.name || 'Opponent',
           playedColor: 'black',
-          ply,
+          ply: i + 1,
           fen: fenBefore,
           playedSan: 'Bg4',
-          bookSan: bookMove,
-          evaluationDelta: '+1.20',
-          description:
-            `Premature ...Bg4 in ${isCaroKann ? 'Caro-Kann' : 'Pirc'} develops the bishop before kingside safety or central consolidation is established. White easily gains attacking tempos with f3, h3, g4, or exploits the weakened b7 square with Qb3, often trapping or harassing the bishop. In the Caro-Kann Advance, 3...Bf5! is the correct, disciplined placement.`,
+          evaluationDelta: '',
+          patternId: 'black-bg4-chase',
+          description: tax,
         };
       }
 
-      const moveRes = chess.move(san);
-      if (!moveRes) break; // Corrupted move sequence, stop traversal
+      try {
+        chess.move(san);
+      } catch {
+        return null; // corrupted move list
+      }
+    }
+    return null;
+  }
+
+  private static classifyBg4Aftermath(fenBefore: string, moves: string[], bg4Index: number): string | null {
+    const chess = new Chess(fenBefore);
+    try {
+      chess.move(cleanSan(moves[bg4Index]));
+    } catch {
+      return null;
+    }
+    const window = moves.slice(bg4Index + 1, bg4Index + 7).map(cleanSan);
+    let sawH3 = false;
+    let sawBh5 = false;
+
+    for (let k = 0; k < window.length; k++) {
+      const san = window[k];
+      const isWhiteMove = k % 2 === 0; // the ply right after ...Bg4 is White's
+
+      if (isWhiteMove) {
+        if (san === 'h3' || san === 'f3') sawH3 = true;
+        if (san === 'g4' && sawBh5) {
+          return 'Your bishop was chased: after h3 it retreated to h5 and g4 drove it again, costing tempi and leaving it short of squares. Retreat only when the bishop has an exit (...h6 or ...h5 prepared), otherwise take on f3 or go back to d7.';
+        }
+        if (san === 'Qb3' || san === 'Qa4+' || san === 'Qa4') {
+          return 'With the bishop gone from c8 the b7 pawn is loose: the queen came to b3/a4 hitting b7 (and f7 or the king). Before ...Bg4 make sure b7 is covered or that ...Qb6/...Qd7 is available.';
+        }
+        if (san === 'Qxf3') {
+          const bishopOnDiagonal = ['c4', 'b3', 'a2', 'd5'].some((sq) => {
+            const p = chess.get(sq as any);
+            return p && p.color === 'w' && p.type === 'b';
+          });
+          if (bishopOnDiagonal) {
+            return 'After ...Bxf3 Qxf3 the queen and the c4 bishop form a battery against f7. Trading on f3 is only safe when f7 is already covered (...e6, ...Nf6 or ...Qd7).';
+          }
+        }
+      } else {
+        if (san === 'Bh5') sawBh5 = true;
+      }
+
+      try {
+        chess.move(san);
+      } catch {
+        return null;
+      }
     }
 
+    void sawH3;
     return null;
   }
 
   /**
-   * Analyze games array for a specific player handle.
+   * Detect an early queen sortie by the player: the queen leaves its home square
+   * within the first ten plies (move 5) while at least two of the player's minor
+   * pieces are still undeveloped, and the move is not a capture.
+   */
+  public static detectEarlyQueenSortie(
+    game: StoredGame,
+    moves: string[],
+    color: 'white' | 'black'
+  ): OpeningDeviation | null {
+    const mover: 'w' | 'b' = color === 'white' ? 'w' : 'b';
+    const chess = new Chess(START_FEN);
+    for (let i = 0; i < Math.min(moves.length, 10); i++) {
+      const san = cleanSan(moves[i]);
+      const turn = chess.turn();
+      const fenBefore = chess.fen();
+
+      if (turn === mover && san.startsWith('Q') && !san.includes('x')) {
+        const undeveloped = undevelopedMinors(chess, mover);
+        if (undeveloped >= 2) {
+          const opponentName = color === 'white' ? game.black?.name : game.white?.name;
+          return {
+            gameId: displayGameId(game),
+            gameUrl: gameUrlOf(game),
+            gameDate: toDateString(game),
+            opponent: opponentName || 'Opponent',
+            playedColor: color,
+            ply: i + 1,
+            fen: fenBefore,
+            playedSan: san,
+            evaluationDelta: '',
+            patternId: 'early-queen-sortie',
+            description: `${san} brought the queen out on move ${Math.floor(i / 2) + 1} with ${undeveloped} minor pieces still at home. Each developing move that hits the queen wins a tempo for the opponent. Develop a knight or bishop instead and keep the queen flexible until the center is decided.`,
+          };
+        }
+      }
+
+      try {
+        chess.move(san);
+      } catch {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Group games by their first six plies, sort by frequency, and compute score rates.
+   */
+  private static buildOpeningStats(games: StoredGame[], color: 'white' | 'black'): OpeningStats[] {
+    const map = new Map<string, OpeningStats & { nameCounts: Map<string, number> }>();
+    for (const g of games) {
+      const line = (g.movesSan || []).slice(0, 6).map(cleanSan).join(' ');
+      const key = line || '(no moves)';
+      if (!map.has(key)) {
+        map.set(key, {
+          eco: g.eco || (color === 'white' ? 'C00' : 'B00'),
+          openingName: g.openingName || 'Unnamed opening',
+          lineSan: line,
+          totalGames: 0,
+          wins: 0,
+          losses: 0,
+          draws: 0,
+          winRate: 0,
+          nameCounts: new Map(),
+        });
+      }
+      const stat = map.get(key)!;
+      stat.totalGames++;
+      const res = this.getPlayerResult(g, color);
+      if (res === 'win') stat.wins++;
+      else if (res === 'loss') stat.losses++;
+      else stat.draws++;
+      const name = g.openingName || 'Unnamed opening';
+      stat.nameCounts.set(name, (stat.nameCounts.get(name) || 0) + 1);
+    }
+
+    const result: OpeningStats[] = [];
+    for (const stat of map.values()) {
+      let bestName = stat.openingName;
+      let bestCount = -1;
+      for (const [name, count] of stat.nameCounts) {
+        if (count > bestCount) {
+          bestCount = count;
+          bestName = name;
+        }
+      }
+      result.push({
+        eco: stat.eco,
+        openingName: bestName,
+        lineSan: stat.lineSan,
+        totalGames: stat.totalGames,
+        wins: stat.wins,
+        losses: stat.losses,
+        draws: stat.draws,
+        winRate: Number(((stat.wins + stat.draws * 0.5) / stat.totalGames).toFixed(3)),
+      });
+    }
+    result.sort((a, b) => b.totalGames - a.totalGames || a.openingName.localeCompare(b.openingName));
+    return result;
+  }
+
+  /**
+   * Analyze the given games for a specific player handle. Nothing is injected:
+   * the report describes exactly the games passed in.
    */
   public static analyze(
     games: StoredGame[] = [],
     playerHandle: 'hoot65' = 'hoot65'
   ): DiagnosticReport {
-    // If games is empty or small, combine with canonical games for hoot65 to ensure comprehensive reporting
-    const combinedGames = [...games];
-    const existingIds = new Set(games.map(g => g.id));
-    for (const canonical of CANONICAL_HOOT65_GAMES) {
-      if (!existingIds.has(canonical.id)) {
-        combinedGames.push(canonical);
-      }
-    }
-
     const whiteGames: StoredGame[] = [];
     const blackGames: StoredGame[] = [];
 
-    for (const g of combinedGames) {
+    for (const g of games) {
       const color = this.getPlayerColor(g, playerHandle);
       if (color === 'white') whiteGames.push(g);
       else if (color === 'black') blackGames.push(g);
     }
 
-    // Process White games
-    let whiteWins = 0;
-    let whiteLosses = 0;
-    let whiteDraws = 0;
-    const whiteLeaks: OpeningDeviation[] = [];
-    const whiteOpeningsMap = new Map<string, OpeningStats>();
+    const tally = (list: StoredGame[], color: 'white' | 'black') => {
+      let wins = 0, losses = 0, draws = 0;
+      for (const g of list) {
+        const res = this.getPlayerResult(g, color);
+        if (res === 'win') wins++;
+        else if (res === 'loss') losses++;
+        else draws++;
+      }
+      const winRate = list.length > 0 ? Number(((wins + draws * 0.5) / list.length).toFixed(3)) : 0;
+      return { wins, losses, draws, winRate };
+    };
+
+    const whiteTally = tally(whiteGames, 'white');
+    const blackTally = tally(blackGames, 'black');
+
+    // Run detectors
+    const patternDeviations: Record<PatternId, OpeningDeviation[]> = {
+      'white-scandi-e5': [],
+      'black-bg4-chase': [],
+      'early-queen-sortie': [],
+    };
+    const patternGameIds: Record<PatternId, Set<string>> = {
+      'white-scandi-e5': new Set(),
+      'black-bg4-chase': new Set(),
+      'early-queen-sortie': new Set(),
+    };
 
     for (const g of whiteGames) {
-      const res = this.getPlayerResult(g, 'white');
-      if (res === 'win') whiteWins++;
-      else if (res === 'loss') whiteLosses++;
-      else whiteDraws++;
-
-      const eco = g.eco || 'C00';
-      const name = g.openingName || 'King\'s Pawn Opening';
-      const opKey = `${eco}:${name}`;
-      if (!whiteOpeningsMap.has(opKey)) {
-        whiteOpeningsMap.set(opKey, {
-          eco,
-          openingName: name,
-          totalGames: 0,
-          wins: 0,
-          losses: 0,
-          draws: 0,
-          winRate: 0,
-        });
+      const moves = g.movesSan || [];
+      const scandi = this.detectWhiteScandinavianLeak(g, moves);
+      if (scandi) {
+        patternDeviations['white-scandi-e5'].push(scandi);
+        patternGameIds['white-scandi-e5'].add(g.id);
       }
-      const opStat = whiteOpeningsMap.get(opKey)!;
-      opStat.totalGames++;
-      if (res === 'win') opStat.wins++;
-      else if (res === 'loss') opStat.losses++;
-      else opStat.draws++;
-
-      // Detect White Scandinavian leak
-      const scandiLeak = this.detectWhiteScandinavianLeak(g, g.movesSan || []);
-      if (scandiLeak) {
-        whiteLeaks.push(scandiLeak);
+      const queen = this.detectEarlyQueenSortie(g, moves, 'white');
+      if (queen) {
+        patternDeviations['early-queen-sortie'].push(queen);
+        patternGameIds['early-queen-sortie'].add(g.id);
       }
     }
-
-    for (const stat of whiteOpeningsMap.values()) {
-      stat.winRate = stat.totalGames > 0 ? Number(((stat.wins + stat.draws * 0.5) / stat.totalGames).toFixed(3)) : 0;
-    }
-
-    // Process Black games
-    let blackWins = 0;
-    let blackLosses = 0;
-    let blackDraws = 0;
-    const blackLeaks: OpeningDeviation[] = [];
-    const blackOpeningsMap = new Map<string, OpeningStats>();
-
     for (const g of blackGames) {
-      const res = this.getPlayerResult(g, 'black');
-      if (res === 'win') blackWins++;
-      else if (res === 'loss') blackLosses++;
-      else blackDraws++;
-
-      const eco = g.eco || 'B00';
-      const name = g.openingName || 'Caro-Kann / Pirc Defense';
-      const opKey = `${eco}:${name}`;
-      if (!blackOpeningsMap.has(opKey)) {
-        blackOpeningsMap.set(opKey, {
-          eco,
-          openingName: name,
-          totalGames: 0,
-          wins: 0,
-          losses: 0,
-          draws: 0,
-          winRate: 0,
-        });
+      const moves = g.movesSan || [];
+      const bg4 = this.detectBlackBg4ChaseLeak(g, moves);
+      if (bg4) {
+        patternDeviations['black-bg4-chase'].push(bg4);
+        patternGameIds['black-bg4-chase'].add(g.id);
       }
-      const opStat = blackOpeningsMap.get(opKey)!;
-      opStat.totalGames++;
-      if (res === 'win') opStat.wins++;
-      else if (res === 'loss') opStat.losses++;
-      else opStat.draws++;
-
-      // Detect Black premature ...Bg4 leak
-      const bg4Leak = this.detectBlackPrematureBg4Leak(g, g.movesSan || []);
-      if (bg4Leak) {
-        blackLeaks.push(bg4Leak);
+      const queen = this.detectEarlyQueenSortie(g, moves, 'black');
+      if (queen) {
+        patternDeviations['early-queen-sortie'].push(queen);
+        patternGameIds['early-queen-sortie'].add(g.id);
       }
     }
 
-    for (const stat of blackOpeningsMap.values()) {
-      stat.winRate = stat.totalGames > 0 ? Number(((stat.wins + stat.draws * 0.5) / stat.totalGames).toFixed(3)) : 0;
+    // Measured impact per pattern: games with the pattern vs the player's other
+    // games of the colour(s) the pattern applies to.
+    const patterns: PatternSummary[] = [];
+    for (const meta of Object.values(PATTERN_META)) {
+      const pool =
+        meta.color === 'white' ? whiteGames : meta.color === 'black' ? blackGames : [...whiteGames, ...blackGames];
+      const ids = patternGameIds[meta.id];
+      const withGames = pool.filter((g) => ids.has(g.id));
+      const withoutGames = pool.filter((g) => !ids.has(g.id));
+      const impact: PatternImpact = {
+        gamesWith: withGames.length,
+        scoreWith: scoreOf(withGames, playerHandle),
+        gamesWithout: withoutGames.length,
+        scoreWithout: scoreOf(withoutGames, playerHandle),
+      };
+      const deltaText = formatImpact(impact);
+      const deviations = patternDeviations[meta.id]
+        .map((d) => ({ ...d, impact, evaluationDelta: deltaText }))
+        .sort((a, b) => (b.gameDate || '').localeCompare(a.gameDate || '') || a.ply - b.ply);
+      const measuredCost = impact.gamesWith > 0 && impact.scoreWith < impact.scoreWithout;
+      const isLeak = impact.gamesWith > 0 && (meta.theoryVerdict === 'inferior' || measuredCost);
+      patterns.push({ ...meta, isLeak, impact, deviations });
     }
 
-    const whiteWinRate = whiteGames.length > 0
-      ? Number(((whiteWins + whiteDraws * 0.5) / whiteGames.length).toFixed(3))
-      : 0;
-
-    const blackWinRate = blackGames.length > 0
-      ? Number(((blackWins + blackDraws * 0.5) / blackGames.length).toFixed(3))
-      : 0;
+    // Key leaks: patterns theory calls inferior, plus neutral patterns that
+    // measurably cost points in this player's own games.
+    const allDeviations = patterns.filter((p) => p.isLeak).flatMap((p) => p.deviations);
+    const whiteLeaks = allDeviations.filter((d) => d.playedColor === 'white');
+    const blackLeaks = allDeviations.filter((d) => d.playedColor === 'black');
 
     const whiteRepertoire = getRecommendedWhiteRepertoire();
     const blackRepertoire = getRecommendedBlackRepertoire();
 
     return {
       playerHandle,
-      totalGamesAnalyzed: combinedGames.length,
+      totalGamesAnalyzed: whiteGames.length + blackGames.length,
       whiteStats: {
-        winRate: whiteWinRate,
+        winRate: whiteTally.winRate,
         keyLeaks: whiteLeaks,
         totalGames: whiteGames.length,
-        wins: whiteWins,
-        losses: whiteLosses,
-        draws: whiteDraws,
-        openings: Array.from(whiteOpeningsMap.values()),
+        wins: whiteTally.wins,
+        losses: whiteTally.losses,
+        draws: whiteTally.draws,
+        openings: this.buildOpeningStats(whiteGames, 'white'),
       },
       blackStats: {
-        winRate: blackWinRate,
+        winRate: blackTally.winRate,
         keyLeaks: blackLeaks,
         totalGames: blackGames.length,
-        wins: blackWins,
-        losses: blackLosses,
-        draws: blackDraws,
-        openings: Array.from(blackOpeningsMap.values()),
+        wins: blackTally.wins,
+        losses: blackTally.losses,
+        draws: blackTally.draws,
+        openings: this.buildOpeningStats(blackGames, 'black'),
       },
+      patterns,
+      // Recommendation headlines are reviewed in the repertoire-divergence work
+      // (roadmap CL-4); the Black plan will move from a King's Indian to the
+      // c6-d5 structures hoot65 already plays.
       recommendedWhiteRepertoire: 'Italian Game & Anti-Scandinavian (2.exd5!)',
       recommendedBlackRepertoire: 'Caro-Kann & King\'s Indian',
       whiteRepertoirePlan: whiteRepertoire,

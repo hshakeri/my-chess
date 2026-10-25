@@ -25,19 +25,37 @@ test.describe('04. Personalized Diagnostics & Repertoire Recommendation (F13 - F
     await expect(view.getByText(/Scandinavian|2\.e5/i).first()).toBeVisible();
 
     // Must cite at least one of hoot65's real Scandinavian game IDs: 185031553576, 185035281692, 184582182704, 171000270176
-    const hasGameCitation = await view.getByText(/185031553576|185035281692|184582182704|171000270176/).first().isVisible();
-    expect(hasGameCitation).toBe(true);
+    // (the archive is read from IndexedDB, so wait for the report rather than probing synchronously)
+    await expect(view.getByText(/185031553576|185035281692|184582182704|171000270176/).first()).toBeVisible();
+    await expect(view.getByText(/Ply 3: e5\?!/).first()).toBeVisible();
+    await expect(view.getByText(/Better: exd5!/).first()).toBeVisible();
   });
 
-  test('Cites specific real game IDs and plies for Black premature ...Bg4 leak', async ({ page }) => {
+  test('Cites specific real game IDs and plies for the Black early-queen leak, with measured impact', async ({ page }) => {
     const view = page.locator('.diagnostics-view, [data-view="diagnostics"]').first();
 
-    // Check that premature Bg4 in Caro-Kann/Pirc is highlighted
-    await expect(view.getByText(/Bg4|Caro-Kann/i).first()).toBeVisible();
+    // The early queen sortie is the measured Black leak (e.g. ...Qa5 / ...Qb6 before the minor pieces)
+    await expect(view.getByText(/Queen out before the minor pieces/i).first()).toBeVisible();
 
-    // Must cite at least one of hoot65's real Black game IDs: 185282462950, 173676860416, 171894388406, 184720164178
-    const hasBlackCitation = await view.getByText(/185282462950|173676860416|171894388406|184720164178/).first().isVisible();
-    expect(hasBlackCitation).toBe(true);
+    // Must cite real Black games from the archive where the queen came out early
+    await expect(view.getByText(/171894388406|185129553252|168910457740|185346239794/).first()).toBeVisible();
+
+    // Impact is measured from the archive, never a constant evaluation
+    await expect(view.getByText(/Score impact:/).first()).toBeVisible();
+    await expect(view.getByText('+1.20')).toHaveCount(0);
+
+    // The report covers the whole archive, with nothing injected
+    await expect(view.locator('[data-stat="games-analyzed"]')).toHaveText(/^\d+$/);
+    const analyzed = Number(await view.locator('[data-stat="games-analyzed"]').textContent());
+    expect(analyzed).toBeGreaterThanOrEqual(301);
+  });
+
+  test('Shows the ...Bg4 habit as measured information rather than a fabricated leak', async ({ page }) => {
+    const view = page.locator('.diagnostics-view, [data-view="diagnostics"]').first();
+    const pattern = view.locator('[data-pattern="black-bg4-chase"]');
+    await expect(pattern).toBeVisible();
+    await expect(pattern.getByText(/Bg4/).first()).toBeVisible();
+    await expect(pattern.getByText(/games, score/).first()).toBeVisible();
   });
 
   test('Recommends tailored White (Italian/Anti-Scandi) and Black (Caro-Kann/KID) repertoires', async ({ page }) => {
@@ -50,12 +68,21 @@ test.describe('04. Personalized Diagnostics & Repertoire Recommendation (F13 - F
     await expect(view.getByText(/Caro-Kann|King's Indian/i).first()).toBeVisible();
   });
 
-  test('Provides "Adopt Repertoire" action for interactive learning', async ({ page }) => {
-    const adoptBtn = page.locator('button[data-action="adopt-repertoire"], button:has-text("Adopt"), button:has-text("Train Repertoire")').first();
-    if (await adoptBtn.isVisible()) {
-      await adoptBtn.click();
-      // Should show confirmation toast or navigate to lessons
-      await expect(page.locator('text=Adopted|Saved|Active|Training/i').first()).toBeVisible({ timeout: 5000 });
-    }
+  test('Practice Line hands the selected repertoire line over to the matching lesson', async ({ page }) => {
+    const view = page.locator('.diagnostics-view, [data-view="diagnostics"]').first();
+    await view.getByText('Tailored Opening Repertoires').click();
+
+    const practiceBtn = page.locator('button[data-action="practice-line"]').first();
+    await expect(practiceBtn).toBeVisible();
+    await practiceBtn.click();
+
+    // The Anti-Scandinavian line opens the Scandinavian drill at its drill point (after 1.e4 d5)
+    await expect(page.locator('.lessons-view, [data-view="lessons"]').first()).toBeVisible();
+    await expect(page.locator('[data-lesson-id="lesson-scandinavian-refutation-drill"]')).toHaveClass(/border-emerald-500/);
+    await expect(page.locator('[data-square="d5"] img')).toBeVisible();
+  });
+
+  test.fixme('Provides an "Adopt Repertoire" action that saves the plan (roadmap CL-4)', async () => {
+    // Implemented with repertoire divergence detection; see docs/pedagogy-audit.md, item CL-4.
   });
 });

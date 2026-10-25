@@ -196,7 +196,7 @@ export const hoot65ScandiWorksheet: PrintableWorksheetData = {
   coordinates: true,
   movesSan: ['1.e4 d5', '2.exd5! Qxd5', '3.Nc3! Qa5', '4.d4! Nf6', '5.Nf3 c6', '6.Bc4 Bf5', '7.Bd2 e6', '8.Nd5 Qd8', '9.Nxf6+ Qxf6', '10.Qe2'],
   lessonSummary:
-    'Diagnostic Review: On 2026/10/22, in a 10-minute Rapid game against meny_26, you faced 1...d5. You responded with 2.e5?!. This pawn push relinquished all central pressure, allowed Black to play 2...d4, and ceded an easy win to Black. Master the correct discipline: always capture 2.exd5! and immediately develop with tempo using 3.Nc3! against Black\'s early queen.',
+    'Diagnostic Review: On 2026-10-08 (Chess.com game 185031553576), in a 10-minute Rapid game against meny_26, you faced 1...d5. You responded with 2.e5?!. This pawn push relinquished all central pressure, allowed Black to play 2...d4, and ceded an easy win to Black. Master the correct discipline: always capture 2.exd5! and immediately develop with tempo using 3.Nc3! against Black\'s early queen.',
   physicalBoardSteps: [
     'Place your physical board on the table. Sit on the White side.',
     'Play 1.e4 d5. Pause. Say aloud: "Never push 2.e5?!. Capture with 2.exd5!".',
@@ -261,7 +261,7 @@ export const hoot65CaroWorksheet: PrintableWorksheetData = {
   coordinates: true,
   movesSan: ['1.e4 c6', '2.d4 d5', '3.Nc3 dxe4', '4.Nxe4 Bf5', '5.Ng3! Bg6', '6.h4! h6', '7.Nf3 Nd7', '8.h5 Bh7', '9.Bd3 Bxd3', '10.Qxd3'],
   lessonSummary:
-    'Diagnostic Review: On 2026/10/21, in a game against Brandon0015, you played 2.Nc3 d5 3.h3?!. That passive move lost the initiative and allowed Black an easy opening. The correct plan is to establish the full center with 2.d4! d5 3.Nc3 dxe4 4.Nxe4 Bf5, then aggressively chase Black’s bishop with 5.Ng3! and 6.h4! to seize the kingside space.',
+    'Diagnostic Review: On 2026-10-11 (Chess.com game 185135704918), in a game against Brandon0015, you played 2.Nc3 d5 3.h3?!. That passive move lost the initiative and allowed Black an easy opening. The correct plan is to establish the full center with 2.d4! d5 3.Nc3 dxe4 4.Nxe4 Bf5, then aggressively chase Black’s bishop with 5.Ng3! and 6.h4! to seize the kingside space.',
   physicalBoardSteps: [
     'Set up your physical board.',
     'Play moves 1 through 4: 1.e4 c6 2.d4 d5 3.Nc3 dxe4 4.Nxe4 Bf5.',

@@ -4,6 +4,18 @@
  * and Explorer 3's surveyed curriculum data models.
  */
 
+/**
+ * How a user move is judged. By default only the scripted SAN is accepted.
+ * `san` lists equally good alternatives (validated by the builder); `predicate`
+ * accepts any legal move satisfying a condition (currently only 'checkmate').
+ * Alternatives are allowed only on the final user move of a line, because the
+ * scripted continuation assumes the scripted move.
+ */
+export interface MoveAcceptance {
+  san?: string[];
+  predicate?: 'checkmate';
+}
+
 export interface CurriculumMove {
   ply: number;
   san: string;
@@ -13,10 +25,11 @@ export interface CurriculumMove {
   isUserMove: boolean;
   wrongMoveFeedback?: Record<string, string>; // SAN -> explanation
   arrows?: Array<{ from: string; to: string; color?: 'green' | 'red' | 'yellow' | 'blue' }>;
-  highlights?: Array<{ square: string; color?: 'green' | 'red' | 'yellow' }>;
-  hintPiece?: string; // e.g. "White Queen"
-  hintSquare?: string; // e.g. "d5"
+  highlights?: Array<{ square: string; color?: 'green' | 'red' | 'yellow' | 'blue' }>;
+  hintPiece?: string; // e.g. "White Queen" (derived from the move when not authored)
+  hintSquare?: string; // e.g. "d5" (derived from the move when not authored)
   hintTheme?: string; // e.g. "Double attack against f7 and c6"
+  accept?: MoveAcceptance;
 }
 
 export interface CurriculumExercise {
@@ -66,6 +79,17 @@ export interface CurriculumLesson {
   keyTacticalMotif?: string;
   targetColor?: 'white' | 'black' | 'both';
   targetRatingBand?: 'beginner' | 'intermediate' | 'advanced';
+  /**
+   * Ply index (0-based into `moves`) where the interactive drill starts. The
+   * moves before it are replayed automatically as the shared prefix.
+   */
+  startPly?: number;
+  /**
+   * 'core' lessons are on hoot65's actual repertoire and shown by default;
+   * 'outside-repertoire' lessons are kept as a pattern library and hidden
+   * from the default list.
+   */
+  relevance?: 'core' | 'outside-repertoire';
   moves: CurriculumMove[];
   exercises: CurriculumExercise[];
   commonMistakesAndTraps?: CurriculumMistakeTrap[];
@@ -78,7 +102,14 @@ export interface ChessCurriculumCourse {
   id: string;
   title: string;
   subtitle: string;
-  category: 'white_repertoire' | 'black_repertoire' | 'opening_traps' | 'tactical_patterns' | 'beginner_fundamentals' | 'hoot65_drills';
+  category:
+    | 'white_repertoire'
+    | 'anti_gambit'
+    | 'black_repertoire'
+    | 'opening_traps'
+    | 'tactical_patterns'
+    | 'beginner_fundamentals'
+    | 'hoot65_drills';
   targetColor: 'white' | 'black' | 'both';
   targetRatingBand: 'beginner' | 'intermediate' | 'advanced';
   description: string;
@@ -86,7 +117,8 @@ export interface ChessCurriculumCourse {
     bookTitle: string;
     author: string;
     publicationYear: number;
-    pagesRef: string;
+    /** Chapter or section names only; page numbers are not tracked. */
+    pagesRef?: string;
   };
   lessons: CurriculumLesson[];
 }
@@ -150,5 +182,6 @@ export interface SRSCardState {
     grade: number; // 0 to 5
     mistakeCount: number;
     usedHint: boolean;
+    hintLevel?: number; // highest hint level used during the run (0 to 3)
   }>;
 }

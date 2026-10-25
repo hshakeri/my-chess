@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import {
   calculateNextReview,
   createInitialCard,
+  suggestGrade,
   SrsService,
   toStoredSrsCard,
   fromStoredSrsCard,
@@ -23,6 +24,30 @@ describe('Spaced Repetition Service (SM-2 & Leitner 5-Box)', () => {
       expect(card.easeFactor).toBe(2.5);
       expect(card.nextReviewTimestamp).toBe(1000000);
       expect(card.expectedMoveSan).toBe('e4');
+    });
+
+    it('keys a drill card to its first real decision, not the start position', () => {
+      const card = createInitialCard(scandinavianRefutationDrill, 1000000);
+      expect(card.expectedMoveSan).toBe('exd5');
+      expect(card.fen).toBe('rnbqkbnr/ppp1pppp/8/3p4/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2');
+    });
+
+    it('infers the grade from what happened in the run (downgrade-only suggestion)', () => {
+      expect(suggestGrade({ mistakes: 0, hintLevel: 0 })).toBe(5);
+      expect(suggestGrade({ mistakes: 1, hintLevel: 0 })).toBe(4);
+      expect(suggestGrade({ mistakes: 0, hintLevel: 1 })).toBe(4);
+      expect(suggestGrade({ mistakes: 2, hintLevel: 0 })).toBe(3);
+      expect(suggestGrade({ mistakes: 0, hintLevel: 2 })).toBe(3);
+      expect(suggestGrade({ mistakes: 3, hintLevel: 0 })).toBe(1);
+      expect(suggestGrade({ mistakes: 0, hintLevel: 3 })).toBe(1);
+    });
+
+    it('records mistakes and hint usage in the review history', () => {
+      const card = createInitialCard(scotchGambitBreakthrough, 1000000);
+      const reviewed = calculateNextReview(card, 3, 1000000, { mistakeCount: 2, hintLevel: 2 });
+      expect(reviewed.history?.[0]).toMatchObject({ grade: 3, mistakeCount: 2, usedHint: true, hintLevel: 2 });
+      const clean = calculateNextReview(card, 5, 1000000, { mistakeCount: 0, hintLevel: 0 });
+      expect(clean.history?.[0]).toMatchObject({ grade: 5, mistakeCount: 0, usedHint: false, hintLevel: 0 });
     });
 
     it('should advance repetition and box smoothly on consecutive perfect grades (5)', () => {
@@ -109,7 +134,7 @@ describe('Spaced Repetition Service (SM-2 & Leitner 5-Box)', () => {
 
     it('should record review updates and persist card state', async () => {
       const now = 1000000000;
-      await SrsService.recordReview('test-card-1', 5, { now, moveSan: 'e4' });
+      await SrsService.recordReview('test-card-1', 5, { now, moveSan: 'e4', mistakeCount: 1, hintLevel: 1 });
 
       const fetched = await SrsService.getCard('test-card-1');
       expect(fetched).toBeDefined();
@@ -118,6 +143,8 @@ describe('Spaced Repetition Service (SM-2 & Leitner 5-Box)', () => {
       expect(fetched?.lastReviewTimestamp).toBe(now);
       expect(fetched?.history?.length).toBe(1);
       expect(fetched?.history?.[0].grade).toBe(5);
+      expect(fetched?.history?.[0].mistakeCount).toBe(1);
+      expect(fetched?.history?.[0].usedHint).toBe(true);
     });
 
     it('should filter due cards accurately by timestamp', async () => {

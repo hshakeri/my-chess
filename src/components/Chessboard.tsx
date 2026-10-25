@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useId } from 'react';
 import {
   Square,
   PieceInfo,
@@ -7,6 +7,34 @@ import {
 } from '../types/chess';
 import { ChessPiece } from './ChessPiece';
 import { PromotionModal } from './PromotionModal';
+
+/**
+ * Semantic cue colours for coaching overlays:
+ * red = attacker to target / the move that went wrong, green = the plan move,
+ * yellow = a weak or key square, blue = a defender or supporting piece.
+ */
+export type BoardCueColor = 'green' | 'red' | 'yellow' | 'blue';
+
+export interface BoardArrow {
+  from: string;
+  to: string;
+  color?: BoardCueColor | string;
+}
+
+export interface BoardHighlight {
+  square: string;
+  color?: BoardCueColor | string;
+}
+
+/** At most this many arrows and this many highlights are drawn (sparse cues). */
+export const MAX_BOARD_CUES = 3;
+
+const CUE_FILL: Record<string, string> = {
+  green: '#15803d',
+  red: '#dc2626',
+  yellow: '#ca8a04',
+  blue: '#2563eb',
+};
 
 export interface ChessboardProps {
   board: (PieceInfo | null)[][];
@@ -17,6 +45,10 @@ export interface ChessboardProps {
   interactive?: boolean;
   getLegalMovesForSquare?: (square: Square) => Array<{ to: Square; san: string; promotion?: string }>;
   customSquareStyles?: Record<string, string>;
+  /** Coaching arrows drawn as an SVG overlay (first three are used). */
+  arrows?: BoardArrow[];
+  /** Coaching square highlights drawn as an SVG overlay (first three are used). */
+  highlights?: BoardHighlight[];
   className?: string;
 }
 
@@ -32,8 +64,11 @@ export const Chessboard: React.FC<ChessboardProps> = ({
   interactive = true,
   getLegalMovesForSquare,
   customSquareStyles = {},
+  arrows = [],
+  highlights = [],
   className = '',
 }) => {
+  const overlayId = useId().replace(/:/g, '');
   const [selectedSquare, setSelectedSquare] = useState<Square | null>(null);
   const [draggedSquare, setDraggedSquare] = useState<Square | null>(null);
   const [pendingPromotion, setPendingPromotion] = useState<{
@@ -69,6 +104,23 @@ export const Chessboard: React.FC<ChessboardProps> = ({
 
   const displayRanks = orientation === 'w' ? RANKS : [...RANKS].reverse();
   const displayFiles = orientation === 'w' ? FILES : [...FILES].reverse();
+
+  // Square -> SVG centre in an 8x8 viewBox, respecting the board orientation.
+  const squareCentre = (square: string): { x: number; y: number } | null => {
+    const file = square[0];
+    const rank = square[1];
+    const fx = (displayFiles as readonly string[]).indexOf(file);
+    const ry = (displayRanks as readonly string[]).indexOf(rank);
+    if (fx < 0 || ry < 0) return null;
+    return { x: fx + 0.5, y: ry + 0.5 };
+  };
+
+  const visibleArrows = arrows.slice(0, MAX_BOARD_CUES);
+  const visibleHighlights = highlights.slice(0, MAX_BOARD_CUES);
+  const hasOverlay = visibleArrows.length > 0 || visibleHighlights.length > 0;
+  const cueColors = Array.from(
+    new Set([...visibleArrows, ...visibleHighlights].map((c) => c.color || 'green'))
+  );
 
   const handleSquareClick = (square: Square) => {
     if (!interactive) return;
@@ -291,6 +343,82 @@ export const Chessboard: React.FC<ChessboardProps> = ({
           })
         )}
       </div>
+
+      {/* Coaching overlay: arrows and square highlights. pointer-events-none keeps
+          every data-square click and drag target hit-testable underneath. */}
+      {hasOverlay && (
+        <svg
+          className="board-overlay absolute inset-0 w-full h-full pointer-events-none"
+          viewBox="0 0 8 8"
+          data-overlay="cues"
+          aria-hidden="true"
+        >
+          <defs>
+            {cueColors.map((color) => (
+              <marker
+                key={color}
+                id={`arrowhead-${overlayId}-${color}`}
+                viewBox="0 0 10 10"
+                refX="7"
+                refY="5"
+                markerWidth="2.2"
+                markerHeight="2.2"
+                orient="auto"
+                markerUnits="strokeWidth"
+              >
+                <path d="M 0 0 L 10 5 L 0 10 z" fill={CUE_FILL[color] || color} />
+              </marker>
+            ))}
+          </defs>
+          {visibleHighlights.map((h, idx) => {
+            const c = squareCentre(h.square);
+            if (!c) return null;
+            const color = h.color || 'yellow';
+            return (
+              <rect
+                key={`hl-${idx}`}
+                data-cue="highlight"
+                data-square-cue={h.square}
+                x={c.x - 0.5}
+                y={c.y - 0.5}
+                width={1}
+                height={1}
+                fill={CUE_FILL[color] || color}
+                opacity={0.45}
+              />
+            );
+          })}
+          {visibleArrows.map((a, idx) => {
+            const from = squareCentre(a.from);
+            const to = squareCentre(a.to);
+            if (!from || !to) return null;
+            const dx = to.x - from.x;
+            const dy = to.y - from.y;
+            const len = Math.hypot(dx, dy) || 1;
+            // Leave room for the arrowhead so its tip lands on the square centre.
+            const headRoom = 0.32;
+            const x2 = to.x - (dx / len) * headRoom;
+            const y2 = to.y - (dy / len) * headRoom;
+            const color = a.color || 'green';
+            return (
+              <line
+                key={`ar-${idx}`}
+                data-cue="arrow"
+                data-arrow={`${a.from}${a.to}`}
+                x1={from.x}
+                y1={from.y}
+                x2={x2}
+                y2={y2}
+                stroke={CUE_FILL[color] || color}
+                strokeWidth={0.17}
+                strokeLinecap="round"
+                opacity={0.85}
+                markerEnd={`url(#arrowhead-${overlayId}-${color})`}
+              />
+            );
+          })}
+        </svg>
+      )}
 
       {/* Promotion Dialog Modal */}
       {pendingPromotion && (

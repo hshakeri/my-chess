@@ -14,10 +14,12 @@ export const scotchGambitBreakthrough: CurriculumLesson = buildVerifiedLesson({
   sourceBook: 'Tactics in Junior Openings',
   author: 'Dave',
   publicationYear: 2009,
-  pagesRef: 'pp. 3–15',
+  pagesRef: 'Scotch Gambit chapter',
   eco: 'C44',
   targetColor: 'white',
   targetRatingBand: 'beginner',
+  // hoot65 plays 3.Bc4 in every Italian game; the 3.d4 move order has never occurred.
+  relevance: 'outside-repertoire',
   description:
     'The Scotch Gambit (1.e4 e5 2.Nf3 Nc6 3.d4 exd4 4.Bc4) is one of the most lethal weapons against 1...e5. White sacrifices a pawn to seize the center, open diagonal lines toward Black’s vulnerable f7 square, and punish greedy pawn snatching.',
   thematicObjective: 'Rip open the center, exploit the weak f7 square, and coordinate Queen and Bishop before Black can castle.',
@@ -65,11 +67,7 @@ export const scotchGambitBreakthrough: CurriculumLesson = buildVerifiedLesson({
     },
     {
       san: 'Be7',
-      annotation: 'Black plays a passive, timid retreat, neglecting central counterplay.',
-      wrongMoveFeedback: {
-        Nf6: 'Black can counter with 4...Nf6, leading to sharp Two Knights lines.',
-        Bc5: 'Black can support the pawn with 4...Bc5 5.c3.',
-      },
+      annotation: 'Black plays a passive retreat. Club players more often answer 4...Nf6 or 4...Bc5; this line shows what happens when Black neglects the center.',
     },
     {
       san: 'c3',
@@ -92,7 +90,7 @@ export const scotchGambitBreakthrough: CurriculumLesson = buildVerifiedLesson({
     },
     {
       san: 'Nh6',
-      annotation: 'Black\'s only move to guard f7 with a piece.',
+      annotation: 'Black\'s most stubborn defence of f7. 6...Ne5 and 6...d6 also stop the mate but lose material.',
     },
     {
       san: 'Bxh6',
@@ -149,7 +147,7 @@ export const scotchGambitBreakthrough: CurriculumLesson = buildVerifiedLesson({
       attemptedSan: 'bxc3',
       isTrap: false,
       severity: 'inaccuracy',
-      explanatoryFeedback: 'Recapturing quietly with 6.bxc3 is playable, but it misses the immediate tactical knockout 6.Qd5! which threatens unavoidable mate or massive material gain.',
+      explanatoryFeedback: 'Recapturing quietly with 6.bxc3 is playable, but it misses 6.Qd5!, which threatens Qxf7# and forces Black into an awkward defence.',
       refutationSanList: ['Nf6', 'e5', 'd5'],
       punishmentSummary: 'Allows Black to coordinate defense with ...Nf6.',
     },
@@ -164,10 +162,12 @@ export const evansGambitDestruction: CurriculumLesson = buildVerifiedLesson({
   sourceBook: 'Tactics in Junior Openings',
   author: 'Dave',
   publicationYear: 2009,
-  pagesRef: 'pp. 16–28',
+  pagesRef: 'Evans Gambit chapter',
   eco: 'C51',
   targetColor: 'white',
   targetRatingBand: 'intermediate',
+  // hoot65's best-scoring White line (6 wins in 7 games with 4.b4).
+  relevance: 'core',
   description:
     'Captain William Evans introduced 4.b4! in the 1820s. By deflecting Black’s bishop from c5, White gains crucial tempi with c3 and d4, seizing the center and keeping Black’s king trapped in the middle.',
   thematicObjective: 'Build an ideal pawn center (c3+d4), gain development tempi, and pin or open the e-file.',
@@ -251,10 +251,12 @@ export const adamsAttackSicilian: CurriculumLesson = buildVerifiedLesson({
   sourceBook: 'Modernized: The Open Sicilian',
   author: 'IM Zhanibek Amanov & FM Kostya Kavutskiy',
   publicationYear: 2015,
-  pagesRef: 'pp. 1–26',
+  pagesRef: 'Najdorf 6.h3 chapter',
   eco: 'B90',
   targetColor: 'white',
   targetRatingBand: 'intermediate',
+  // Requires an Open Sicilian with 5...a6; hoot65 has never reached this move order.
+  relevance: 'outside-repertoire',
   description:
     'Against Black’s popular Najdorf Sicilian (5...a6), the Adams Attack (6.h3) prepares g4, creating an immediate kingside pawn storm while avoiding heavily analyzed theoretical main lines.',
   thematicObjective: 'Push g4, control the d5 square, and overwhelm Black’s kingside before queenside counterplay manifests.',
@@ -282,7 +284,7 @@ export const adamsAttackSicilian: CurriculumLesson = buildVerifiedLesson({
     {
       san: 'Nde2',
       isUserMove: true,
-      annotation: 'Retreat the knight to e2 to reroute toward g3 and avoid obstructing White’s f-pawn.',
+      annotation: 'Retreat the knight to e2: it keeps the f-pawn free and lets White follow with g3 and Bg2 on the long diagonal.',
       hintPiece: 'Knight on d4',
       hintSquare: 'e2',
     },

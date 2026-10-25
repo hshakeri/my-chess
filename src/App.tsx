@@ -20,11 +20,56 @@ import { DatabaseView } from './views/DatabaseView';
 import { DiagnosticsView } from './views/DiagnosticsView';
 import { LessonsView } from './views/LessonsView';
 import { WorksheetsView } from './views/WorksheetsView';
+import { gamesRepo } from './db/gamesRepo';
+import { StoredGame } from './types/db';
+import seedGamesRaw from './data/seed_hoot65_games.json';
+
+const seedGames = seedGamesRaw as unknown as StoredGame[];
 
 type ActiveTab = 'play' | 'database' | 'diagnostics' | 'lessons' | 'worksheets';
 
+/**
+ * Repertoire lines that have an interactive lesson today. Lines without an entry
+ * open the Lessons tab at its default lesson (the closed loop is completed in the
+ * repertoire-divergence work, roadmap CL-4).
+ */
+const REPERTOIRE_LINE_TO_LESSON: Record<string, string> = {
+  'white-scandi-refutation': 'lesson-scandinavian-refutation-drill',
+  'white-italian-giuoco-piano': 'lesson-evans-gambit-destruction',
+  'white-scotch-gambit': 'lesson-scotch-gambit-breakthrough',
+};
+
 export const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<ActiveTab>('play');
+
+  // Live game archive from IndexedDB (seeded on first run), shared with Diagnostics
+  const [dbGames, setDbGames] = useState<StoredGame[] | null>(null);
+  const [pendingLessonId, setPendingLessonId] = useState<string | null>(null);
+
+  const loadGames = useCallback(async () => {
+    try {
+      await gamesRepo.seedIfEmpty(seedGames);
+      const all = await gamesRepo.getAllGames();
+      setDbGames(all);
+    } catch (err) {
+      console.warn('Could not load the game archive from IndexedDB:', err);
+      setDbGames((prev) => prev ?? []);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadGames();
+  }, [loadGames]);
+
+  // Re-read the archive whenever the Diagnostics tab opens so synced or uploaded games are included
+  useEffect(() => {
+    if (activeTab === 'diagnostics') loadGames();
+  }, [activeTab, loadGames]);
+
+  const handleNavigateToLesson = useCallback((_repertoireId: string, lineId?: string) => {
+    setPendingLessonId(lineId ? REPERTOIRE_LINE_TO_LESSON[lineId] || null : null);
+    setActiveTab('lessons');
+  }, []);
 
   // Rules Engine instance (ref preserved across re-renders)
   const rulesRef = useRef<RulesEngine>(new RulesEngine());
@@ -419,12 +464,14 @@ export const App: React.FC = () => {
         {/* Tab 3: Opening Diagnostics */}
         {activeTab === 'diagnostics' && (
           <DiagnosticsView
-            onNavigateToLesson={() => setActiveTab('lessons')}
+            games={dbGames ?? undefined}
+            isLoadingGames={dbGames === null}
+            onNavigateToLesson={handleNavigateToLesson}
           />
         )}
 
         {/* Tab 4: Interactive Lessons */}
-        {activeTab === 'lessons' && <LessonsView />}
+        {activeTab === 'lessons' && <LessonsView initialLessonId={pendingLessonId ?? undefined} />}
 
         {/* Tab 5: Printable Worksheets */}
         {activeTab === 'worksheets' && <WorksheetsView />}

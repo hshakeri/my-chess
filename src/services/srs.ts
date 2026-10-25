@@ -1,9 +1,25 @@
 import { db } from '../db/database';
 import { StoredSrsCard } from '../types/db';
 import { SRSCardState, CurriculumLesson } from '../types/curriculum';
+import { firstUserDecision } from '../curriculum/builder';
 
 export const SRS_STORAGE_KEY = 'my_chess_srs_state_v1';
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
+
+/**
+ * Infer an SM-2 grade (1, 3, 4 or 5) from what actually happened during a run:
+ * no mistakes and no hints is a perfect recall; a single slip or a theme-only
+ * hint is "Good"; needing the piece hint or two slips is "Hard"; the square hint
+ * or three slips means the move was not recalled.
+ */
+export function suggestGrade(run: { mistakes: number; hintLevel: number }): 1 | 3 | 4 | 5 {
+  const mistakes = Math.max(0, run.mistakes);
+  const hint = Math.max(0, run.hintLevel);
+  if (hint >= 3 || mistakes >= 3) return 1;
+  if (hint === 2 || mistakes === 2) return 3;
+  if (hint === 1 || mistakes === 1) return 4;
+  return 5;
+}
 
 /**
  * Pure function: calculates the next SRS state using SM-2 & Leitner 5-box algorithm
@@ -14,7 +30,8 @@ const MS_PER_DAY = 24 * 60 * 60 * 1000;
 export function calculateNextReview(
   card: SRSCardState,
   grade: number,
-  now: number = Date.now()
+  now: number = Date.now(),
+  performance?: { mistakeCount?: number; usedHint?: boolean; hintLevel?: number }
 ): SRSCardState {
   const clampedGrade = Math.max(0, Math.min(5, Math.round(grade)));
   let { box, repetitionCount, intervalDays, easeFactor, consecutiveMistakes } = card;
@@ -66,8 +83,9 @@ export function calculateNextReview(
   const newHistoryItem = {
     timestamp: now,
     grade: clampedGrade,
-    mistakeCount: clampedGrade < 3 ? 1 : 0,
-    usedHint: false,
+    mistakeCount: performance?.mistakeCount ?? (clampedGrade < 3 ? 1 : 0),
+    usedHint: performance?.usedHint ?? (performance?.hintLevel ?? 0) > 0,
+    hintLevel: performance?.hintLevel ?? 0,
   };
 
   const history = card.history ? [...card.history, newHistoryItem] : [newHistoryItem];
@@ -86,20 +104,22 @@ export function calculateNextReview(
 }
 
 /**
- * Creates an initial Box 1 card for a lesson
+ * Creates an initial Box 1 card for a lesson. The card is keyed to the lesson's
+ * first real decision (the position at its start ply), not to the start position.
  */
 export function createInitialCard(
   lesson: CurriculumLesson,
   now: number = Date.now()
 ): SRSCardState {
-  const firstUserMove = lesson.moves.find((m) => m.isUserMove);
-  const expectedSan = firstUserMove ? firstUserMove.san : (lesson.moves[0]?.san || '');
+  const decision = firstUserDecision(lesson);
+  const expectedSan = decision ? decision.move.san : (lesson.moves[0]?.san || '');
+  const fen = decision ? decision.fenBefore : lesson.initialFen;
 
   return {
     cardId: lesson.id,
     repertoireId: lesson.category,
     title: lesson.title,
-    fen: lesson.initialFen,
+    fen,
     expectedMoveSan: expectedSan,
     box: 1,
     repetitionCount: 0,
@@ -288,7 +308,7 @@ export class SrsService {
   public static async recordReview(
     cardId: string,
     grade: number,
-    options?: { moveSan?: string; usedHint?: boolean; now?: number }
+    options?: { moveSan?: string; usedHint?: boolean; hintLevel?: number; mistakeCount?: number; now?: number }
   ): Promise<SRSCardState> {
     let card = await this.getCard(cardId);
     const now = options?.now || Date.now();
@@ -311,10 +331,11 @@ export class SrsService {
       };
     }
 
-    const updated = calculateNextReview(card, grade, now);
-    if (options?.usedHint && updated.history && updated.history.length > 0) {
-      updated.history[updated.history.length - 1].usedHint = true;
-    }
+    const updated = calculateNextReview(card, grade, now, {
+      mistakeCount: options?.mistakeCount,
+      usedHint: options?.usedHint,
+      hintLevel: options?.hintLevel,
+    });
 
     await this.saveCard(updated);
     return updated;

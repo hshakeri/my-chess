@@ -6,6 +6,7 @@ import {
   allWorksheets,
   getCurriculumLessonById,
 } from '../../../src/curriculum';
+import seedGamesRaw from '../../../src/data/seed_hoot65_games.json';
 
 describe('Curriculum Move Legality & Verification (chess.js)', () => {
   it('should have at least 10 comprehensive curriculum lessons across 5 categories', () => {
@@ -75,23 +76,49 @@ describe('Curriculum Move Legality & Verification (chess.js)', () => {
     expect(totalExerciseMovesVerified).toBeGreaterThan(20);
   });
 
-  it('should verify common mistakes and traps have valid trigger FENs and refutations', () => {
+  it('should verify common mistakes and traps have valid trigger FENs and fully legal refutation lines', () => {
     for (const lesson of allCurriculumLessons) {
       if (lesson.commonMistakesAndTraps) {
         for (const mt of lesson.commonMistakesAndTraps) {
           const chess = new Chess(mt.triggerFen);
           expect(chess.fen()).toBe(mt.triggerFen);
 
-          // If the mistake is a legal chess move from triggerFen, test its execution
           const attempt = chess.move(mt.attemptedSan);
-          if (attempt && mt.refutationSanList.length > 0) {
-            // Test first refutation move
-            const firstRef = mt.refutationSanList[0];
-            const refResult = chess.move(firstRef);
-            expect(refResult).toBeDefined();
+          expect(attempt, `mistake ${mt.attemptedSan} in ${lesson.id}`).toBeDefined();
+          for (const refSan of mt.refutationSanList) {
+            const refResult = chess.move(refSan);
+            expect(refResult, `refutation ${refSan} in ${lesson.id}`).toBeDefined();
           }
         }
       }
+    }
+  });
+
+  it('cites personal drill games with the dates recorded in the archive', () => {
+    const drills = allCurriculumLessons.filter((l) => l.category === 'weakness_drill');
+    const archive = (seedGamesRaw as unknown as Array<{ url?: string; pgn: string }>);
+    const dateOf = (id: string) => {
+      const g = archive.find((x) => x.url?.endsWith(`/${id}`));
+      const m = g?.pgn.match(/\[Date "(\d{4})\.(\d{2})\.(\d{2})"\]/);
+      return m ? `${m[1]}-${m[2]}-${m[3]}` : undefined;
+    };
+    const meny = drills.find((l) => l.description?.includes('meny_26'));
+    expect(meny?.description).toContain(dateOf('185031553576')!);
+    expect(meny?.description).toContain('185031553576');
+    const brandon = drills.find((l) => l.description?.includes('Brandon0015'));
+    expect(brandon?.description).toContain(dateOf('185135704918')!);
+    expect(brandon?.description).toContain('185135704918');
+    for (const ws of allWorksheets.filter((w) => w.type === 'hoot65_drill')) {
+      expect(ws.lessonSummary).not.toMatch(/2026\/10\/2[12]/);
+    }
+  });
+
+  it('does not track page numbers in attributions (chapter names only)', () => {
+    for (const lesson of allCurriculumLessons) {
+      expect(lesson.pagesRef || '').not.toMatch(/\bpp?\.\s*\d/);
+    }
+    for (const course of curriculumCourses) {
+      expect(course.sourceAttribution.pagesRef || '').not.toMatch(/\bpp?\.\s*\d/);
     }
   });
 
@@ -153,7 +180,7 @@ describe('Curriculum Move Legality & Verification (chess.js)', () => {
     expect(unknown).toBeUndefined();
   });
 
-  it('should have all 5 courses defined with valid metadata', () => {
+  it('should have all 5 courses defined with valid metadata and distinct categories', () => {
     expect(curriculumCourses.length).toBeGreaterThanOrEqual(5);
     for (const course of curriculumCourses) {
       expect(course.id).toBeDefined();
@@ -161,5 +188,8 @@ describe('Curriculum Move Legality & Verification (chess.js)', () => {
       expect(course.lessons.length).toBeGreaterThan(0);
       expect(course.sourceAttribution.bookTitle).toBeDefined();
     }
+    const categories = curriculumCourses.map((c) => c.category);
+    expect(new Set(categories).size).toBe(categories.length);
+    expect(categories).toContain('anti_gambit');
   });
 });

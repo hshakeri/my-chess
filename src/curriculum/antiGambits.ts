@@ -14,10 +14,12 @@ export const refutingKonikowskiGambit: CurriculumLesson = buildVerifiedLesson({
   sourceBook: 'Survive and Beat Annoying Chess Openings',
   author: 'Eric Schiller',
   publicationYear: 2003,
-  pagesRef: 'pp. 11–15',
-  eco: 'C65',
+  pagesRef: 'Konikowski Gambit chapter',
+  eco: 'C64',
   targetColor: 'white',
   targetRatingBand: 'intermediate',
+  // Starts with 3.Bb5, a move hoot65 has never played; kept as a pattern.
+  relevance: 'outside-repertoire',
   description:
     'In the Ruy Lopez / Italian structure, Black sometimes tries the tricky Konikowski Gambit with 3.Bb5 Bc5 4.c3 d5!? aiming for sudden tactical chaos with ...Qg5. Eric Schiller demonstrates how White refutes this with calm castling and a devastating central fork.',
   thematicObjective: 'Maintain composure against early queen attacks, castle to safety, and counter-strike in the center with d4.',
@@ -92,7 +94,7 @@ export const refutingKonikowskiGambit: CurriculumLesson = buildVerifiedLesson({
     {
       san: 'Re1',
       isUserMove: true,
-      annotation: 'Pin the e4 pawn to the queen along the open e-file. Black is completely paralyzed.',
+      annotation: 'Pin the e4 pawn to the queen along the open e-file. White is a clean pawn up with the safer king and the more active pieces.',
       hintPiece: 'Rook on f1',
       hintSquare: 'e1',
     },
@@ -115,9 +117,9 @@ export const refutingKonikowskiGambit: CurriculumLesson = buildVerifiedLesson({
       attemptedSan: 'Nxc6',
       isTrap: false,
       severity: 'inaccuracy',
-      explanatoryFeedback: 'Greedily taking on c6 with 6.Nxc6 allows Black to play 6...Qxg2! with severe tactical complications on White\'s rook.',
-      refutationSanList: ['Qxg2', 'Rf1', 'a6'],
-      punishmentSummary: 'Allows Black counterplay against g2 and the f1 rook.',
+      explanatoryFeedback: 'Greedily taking on c6 with 6.Nxc6 allows Black to play 6...Qxg2! hitting the rook, and after 7.Rf1 the queen takes on e4 with check.',
+      refutationSanList: ['Qxg2', 'Rf1', 'Qxe4+'],
+      punishmentSummary: 'Black regains the pawn with check and White\'s king is stuck in the center.',
     },
   ],
 });
@@ -130,10 +132,12 @@ export const refutingElephantGambit: CurriculumLesson = buildVerifiedLesson({
   sourceBook: 'Survive and Beat Annoying Chess Openings',
   author: 'Eric Schiller',
   publicationYear: 2003,
-  pagesRef: 'pp. 16–22',
+  pagesRef: 'Elephant Gambit chapter',
   eco: 'C40',
   targetColor: 'white',
   targetRatingBand: 'beginner',
+  // Faced once in 71 games starting 1.e4 e5 2.Nf3; kept as a pattern.
+  relevance: 'outside-repertoire',
   description:
     'The Elephant Gambit (1.e4 e5 2.Nf3 d5?!) is an aggressive but fundamentally unsound attempt by Black to seize the initiative. White easily refutes it by pinning the e-pawn with 4.Qe2 and developing rapidly.',
   thematicObjective: 'Pin Black’s overextended e4 pawn, develop the queen knight to c3, and emerge a solid pawn ahead.',
@@ -215,10 +219,12 @@ export const refutingLatvianGambit: CurriculumLesson = buildVerifiedLesson({
   sourceBook: 'Survive and Beat Annoying Chess Openings',
   author: 'Eric Schiller',
   publicationYear: 2003,
-  pagesRef: 'pp. 23–29',
+  pagesRef: 'Latvian Gambit chapter',
   eco: 'C40',
   targetColor: 'white',
   targetRatingBand: 'intermediate',
+  // Never faced in 71 games starting 1.e4 e5 2.Nf3; kept as a pattern.
+  relevance: 'outside-repertoire',
   description:
     'The Latvian Gambit (1.e4 e5 2.Nf3 f5?!) attempts a reverse King’s Gambit. However, Black’s king becomes dangerously exposed along the e8-h5 diagonal. White exploits this decisively with 3.Nxe5! followed by 4.d4! and Nc4.',
   thematicObjective: 'Exploit the weakened e8-h5 diagonal, establish central pawns, and leave Black’s queen overextended.',
@@ -263,7 +269,7 @@ export const refutingLatvianGambit: CurriculumLesson = buildVerifiedLesson({
     {
       san: 'f3',
       isUserMove: true,
-      annotation: 'Chop away Black’s remaining central pawn, opening lines for the White heavy pieces.',
+      annotation: 'Challenge Black’s remaining central pawn with f3, opening lines for the White heavy pieces.',
       hintPiece: 'f-Pawn',
       hintSquare: 'f3',
     },

@@ -17,7 +17,30 @@ describe('LessonsView Component', () => {
     expect(html).toContain('lesson-card');
     expect(html).toContain('data-lesson-id="lesson-scandinavian-refutation-drill"');
     expect(html).toContain('lesson-item');
-    expect(html).toContain('Weakness Drill: Scandinavian 2.exd5! Refutation');
+    // Titles never print the answer the drill asks for
+    expect(html).toContain('Weakness Drill: Meeting the Scandinavian Defense');
+    expect(html).not.toContain('2.exd5! Refutation');
+  });
+
+  it('hides pattern-library lessons from the default list and offers them behind a toggle', () => {
+    const html = renderToString(<LessonsView />).replace(/<!-- -->/g, '');
+
+    expect(html).toContain('data-lesson-id="lesson-evans-gambit-destruction"');
+    expect(html).toContain('data-lesson-id="lesson-legals-mate"');
+    expect(html).not.toContain('data-lesson-id="lesson-siberian-trap"');
+    expect(html).not.toContain('data-lesson-id="lesson-adams-attack-sicilian"');
+    expect(html).toContain('data-course="pattern-library"');
+    expect(html).toContain('Pattern Library (8)');
+  });
+
+  it('renders the review-due control and gates the grade bar until the lesson is complete', () => {
+    const html = renderToString(<LessonsView />);
+
+    expect(html).toContain('data-action="review-due"');
+    expect(html).toContain('Complete the lesson to record a review.');
+    // All four grade buttons exist but are disabled before completion
+    const disabledGrades = html.match(/data-grade="[1345]"[^>]*disabled=""/g) || [];
+    expect(disabledGrades.length).toBe(4);
   });
 
   it('displays visible book source attribution text matching required curriculum authors', () => {

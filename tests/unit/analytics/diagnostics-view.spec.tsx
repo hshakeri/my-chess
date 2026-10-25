@@ -3,20 +3,24 @@ import { renderToString } from 'react-dom/server';
 import { DiagnosticsView } from '../../../src/views/DiagnosticsView';
 import { CANONICAL_HOOT65_GAMES } from '../../../src/analytics/diagnostics';
 
+const render = () => renderToString(<DiagnosticsView games={CANONICAL_HOOT65_GAMES} />).replace(/<!-- -->/g, '');
+
 describe('DiagnosticsView Component', () => {
   it('renders without crashing and displays hoot65 diagnostic banner', () => {
-    const html = renderToString(<DiagnosticsView games={CANONICAL_HOOT65_GAMES} />);
+    const html = render();
 
     expect(html).toContain('hoot65');
     expect(html).toContain('Personalized Diagnostics');
     expect(html).toContain('Games Analyzed');
     expect(html).toContain('White Win Rate');
     expect(html).toContain('Black Win Rate');
+    expect(html).toContain('draws count half');
+    // Exactly the fixture games, nothing injected
+    expect(html).toContain(`data-stat="games-analyzed">${CANONICAL_HOOT65_GAMES.length}<`);
   });
 
   it('displays the White Scandinavian 2.e5?! leak and citations', () => {
-    const rawHtml = renderToString(<DiagnosticsView games={CANONICAL_HOOT65_GAMES} />);
-    const html = rawHtml.replace(/<!-- -->/g, '');
+    const html = render();
 
     expect(html).toContain('185031553576');
     expect(html).toContain('185035281692');
@@ -25,30 +29,45 @@ describe('DiagnosticsView Component', () => {
     expect(html).toContain('Scandinavian');
   });
 
-  it('displays the Black premature ...Bg4 leak citations', () => {
-    const rawHtml = renderToString(<DiagnosticsView games={CANONICAL_HOOT65_GAMES} />);
-    const html = rawHtml.replace(/<!-- -->/g, '');
+  it('displays the Black early-queen leak citations and measured impact instead of a constant', () => {
+    const html = render();
 
-    expect(html).toContain('185282462950');
-    expect(html).toContain('173676860416');
-    expect(html).toContain('Bg4?!');
+    expect(html).toContain('171894388406');
+    expect(html).toContain('185129553252');
+    expect(html).toContain('Qb6?!');
+    expect(html).toContain('Score impact:');
+    expect(html).not.toContain('+1.20');
+    expect(html).not.toContain('-0.80');
     expect(html).toContain('Caro-Kann');
   });
 
+  it('shows the ...Bg4 pattern as measured information, not a leak, when it did not cost points', () => {
+    const html = render();
+
+    expect(html).toContain('data-pattern="black-bg4-chase"');
+    expect(html).toContain('Bg4');
+    expect(html).toContain('not costing points so far');
+  });
+
   it('displays tailored repertoire recommendation titles', () => {
-    const html = renderToString(<DiagnosticsView games={CANONICAL_HOOT65_GAMES} />);
+    const html = render();
 
     expect(html).toContain('Italian Game &amp; Anti-Scandinavian');
     expect(html).toContain('Caro-Kann &amp; King&#x27;s Indian');
   });
 
-  it('renders interactive 2D chessboard squares and coordinates', () => {
-    const html = renderToString(<DiagnosticsView games={CANONICAL_HOOT65_GAMES} />);
+  it('renders the shared 2D chessboard for the decision point with played and better-move arrows', () => {
+    const html = render();
 
     expect(html).toContain('Decision Point Board');
-    // Board rank and file coordinates
-    expect(html).toContain('8');
-    expect(html).toContain('a');
-    expect(html).toContain('h');
+    expect(html).toContain('data-board="decision-point"');
+    expect(html).toContain('data-square="e4"');
+    expect(html).toContain('data-overlay="cues"');
+    // The first leak is the Scandinavian 2.e5 (red) with 2.exd5 (green)
+    expect(html).toContain('data-arrow="e4e5"');
+    expect(html).toContain('data-arrow="e4d5"');
+    expect(html).toContain('>8<');
+    expect(html).toContain('>a<');
+    expect(html).toContain('>h<');
   });
 });

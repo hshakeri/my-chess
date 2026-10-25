@@ -14,10 +14,12 @@ export const siberianTrap: CurriculumLesson = buildVerifiedLesson({
   sourceBook: '101 Chess Opening Traps',
   author: 'Steve Giddins',
   publicationYear: 2001,
-  pagesRef: 'Trap 35, pp. 42–43',
+  pagesRef: 'Siberian Trap',
   eco: 'B21',
   targetColor: 'black',
   targetRatingBand: 'intermediate',
+  // hoot65 never plays 1...c5; kept as a deflection and Qh2# pattern.
+  relevance: 'outside-repertoire',
   description:
     'In the Smith-Morra Gambit against the Sicilian, White often plays the automatic move 9.h3? to kick Black\'s g4 knight. Black springs the shocking trap with 9...Nd4!!, attacking White\'s queen while simultaneously unleashing a checkmate threat on h2.',
   thematicObjective: 'Lure White into 9.h3?, then unleash 9...Nd4!! with dual mate threats on h2 and f3.',
@@ -95,10 +97,12 @@ export const legalsMate: CurriculumLesson = buildVerifiedLesson({
   sourceBook: '101 Chess Opening Traps',
   author: 'Steve Giddins',
   publicationYear: 2001,
-  pagesRef: 'Trap 101, pp. 112–113',
+  pagesRef: 'Legal\'s Mate',
   eco: 'C41',
   targetColor: 'white',
   targetRatingBand: 'beginner',
+  // 1.e4 e5 2.Nf3 d6 3.Bc4 Bg4 has occurred in hoot65's own games.
+  relevance: 'core',
   description:
     'Named after Sire de Légal in the 18th century, this timeless trap demonstrates the supreme value of piece coordination over material. White pretends to be pinned on the d1-h5 diagonal, then sacrifices the queen to deliver checkmate with two knights and a bishop.',
   thematicObjective: 'Ignore the pseudo-pin on f3, sacrifice the queen on d1, and deliver checkmate on d5/e7.',
@@ -175,10 +179,12 @@ export const noahsArkTrap: CurriculumLesson = buildVerifiedLesson({
   sourceBook: '101 Chess Opening Traps',
   author: 'Steve Giddins',
   publicationYear: 2001,
-  pagesRef: 'Trap 58, pp. 66–67',
+  pagesRef: 'Noah\'s Ark Trap',
   eco: 'C71',
   targetColor: 'black',
   targetRatingBand: 'intermediate',
+  // hoot65 never plays 1...e5 as Black; kept as a bishop-trapping pattern.
+  relevance: 'outside-repertoire',
   description:
     'One of the oldest and most famous traps in chess history. White gets seduced into grabbing the central d4 pawn with the queen, allowing Black to roll the queenside pawns forward with ...b5, ...c5, and ...c4, completely boxing in White’s b3 light-squared bishop like animals on Noah\'s Ark.',
   thematicObjective: 'Chase White\'s bishop to b3, push ...c5 and ...c4, and capture the trapped piece.',
@@ -286,10 +292,12 @@ export const elephantTrapQGD: CurriculumLesson = buildVerifiedLesson({
   sourceBook: '101 Chess Opening Traps',
   author: 'Steve Giddins',
   publicationYear: 2001,
-  pagesRef: 'Trap 77, pp. 86–87',
+  pagesRef: 'Elephant Trap',
   eco: 'D51',
   targetColor: 'black',
   targetRatingBand: 'beginner',
+  // hoot65 never plays the Queen's Gambit Declined; kept as a counter-pin pattern.
+  relevance: 'outside-repertoire',
   description:
     'In the Queen’s Gambit Declined, White often believes that Black\'s f6 knight is hopelessly pinned to the queen. When White greedily plays 6.Nxd5?, Black shocks them with 6...Nxd5! 7.Bxd8 Bb4+!, winning a piece after the dust clears.',
   thematicObjective: 'Use the ...Nbd7 setup to spring the ...Nxd5! counter-attack and ...Bb4+ skewer.',
@@ -346,7 +354,7 @@ export const elephantTrapQGD: CurriculumLesson = buildVerifiedLesson({
     {
       san: 'Kxd8',
       isUserMove: true,
-      annotation: 'Recapture the bishop on d8. Black is a full minor piece ahead!',
+      annotation: 'Recapture the bishop on d8. Black has won a knight for a pawn.',
       hintPiece: 'King',
       hintSquare: 'd8',
       hintTheme: 'Material triumph',

@@ -120,8 +120,8 @@ test.describe('09. Tier 4 Real-World User Scenarios (Journeys 1 - 15)', () => {
     await expect(view.getByText(/Scandinavian|2\.e5/i).first()).toBeVisible();
     await expect(view.getByText(/185031553576|185035281692|184582182704|171000270176/).first()).toBeVisible();
 
-    // Flags Black Caro-Kann Bg4 citing game ID
-    await expect(view.getByText(/185282462950|173676860416|171894388406|184720164178/).first()).toBeVisible();
+    // Flags the Black early-queen habit citing real game IDs
+    await expect(view.getByText(/171894388406|185129553252|168910457740|185346239794/).first()).toBeVisible();
   });
 
   test('Scenario 5: Adopting Recommended Repertoire into active study', async ({ page }) => {
@@ -157,11 +157,21 @@ test.describe('09. Tier 4 Real-World User Scenarios (Journeys 1 - 15)', () => {
     const lessonTab = page.locator('button:has-text("Interactive Lessons"), [data-tab="lessons"]').first();
     await lessonTab.click();
 
-    const ratingBtn = page.locator('button:has-text("Good"), [data-grade="4"]').first();
-    if (await ratingBtn.isVisible()) {
-      await ratingBtn.click();
-      await expect(page.locator('.lessons-view').first()).toBeVisible();
-    }
+    // Grading is gated until a lesson is actually completed
+    const ratingBtn = page.locator('[data-grade="4"]').first();
+    await expect(ratingBtn).toBeDisabled();
+
+    await page.locator('[data-lesson-id="lesson-stalemate-catastrophes"]').click();
+    await page.locator('[data-square="d6"]').click();
+    await page.locator('[data-square="d8"]').click();
+    await expect(page.locator('[data-exercise]')).toBeVisible();
+    await page.locator('[data-square="d6"]').click();
+    await page.locator('[data-square="d8"]').click();
+    await page.locator('button[data-action="next-exercise"]').click();
+
+    await expect(ratingBtn).toBeEnabled();
+    await ratingBtn.click();
+    await expect(page.locator('[data-srs-message]')).toContainText(/Scheduled next review/);
   });
 
   test('Scenario 8: Printable Worksheet Generation for Physical Board Practice', async ({ page }) => {

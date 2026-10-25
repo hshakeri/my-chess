@@ -9,19 +9,20 @@ import { buildVerifiedLesson } from './builder';
 
 export const scandinavianRefutationDrill: CurriculumLesson = buildVerifiedLesson({
   id: 'lesson-scandinavian-refutation-drill',
-  title: 'Weakness Drill: Scandinavian 2.exd5! Refutation',
-  subtitle: 'Overcome the passive 2.e5?! error from game vs meny_26 and seize immediate tempo',
+  title: 'Weakness Drill: Meeting the Scandinavian Defense',
+  subtitle: 'Fix the passive pawn push from your game vs meny_26 and keep the initiative after 1.e4 d5',
   category: 'weakness_drill',
   sourceBook: 'Tactics in Junior Openings / Chess.com Live Archive',
   author: 'Dave / hoot65 Diagnostic Analysis',
   publicationYear: 2026,
-  pagesRef: 'Tactics pp. 30–35 & Game vs meny_26 (2026/10/22)',
   eco: 'B01',
   targetColor: 'white',
   targetRatingBand: 'beginner',
+  startPly: 2,
+  relevance: 'core',
   description:
-    'In your game against meny_26 on Chess.com (2026/10/22), Black answered 1.e4 with the Scandinavian 1...d5. You responded with the passive push 2.e5?!, ceding central tension and allowing Black to play 2...d4, equalize effortlessly, and win. This drill teaches the textbook refutation: capture the pawn with 2.exd5! and immediately develop with tempo using 3.Nc3! against Black\'s exposed queen.',
-  thematicObjective: 'Never push 2.e5?! against the Scandinavian. Play 2.exd5! and 3.Nc3! to gain development tempo on Black’s queen.',
+    'In your game against meny_26 on Chess.com (2026-10-08, game 185031553576), Black answered 1.e4 with the Scandinavian 1...d5. You responded with the passive push 2.e5?!, ceding central tension and allowing Black to play 2...d4, equalize effortlessly, and win. You chose the same push in 15 of your 17 Scandinavian games. This drill teaches the principled answer: take the pawn and develop with tempo against Black\'s early queen.',
+  thematicObjective: 'Against 1...d5, take on d5 (2.exd5!) and meet 2...Qxd5 with 3.Nc3!, gaining a development tempo on the queen. The Scandinavian is a sound opening; the point is not to refute it but to keep the initiative instead of locking the center with 2.e5?!.',
   keyTacticalMotif: 'Gain of tempo with Nc3, central occupation with d4, active bishop development',
   moves: [
     {
@@ -95,7 +96,7 @@ export const scandinavianRefutationDrill: CurriculumLesson = buildVerifiedLesson
     {
       san: 'Bd2',
       isUserMove: true,
-      annotation: 'Develop with discovered threat! The bishop eyes Black\'s queen along the d-file through the c3 knight.',
+      annotation: 'Develop with a discovered threat in mind: the bishop eyes Black\'s queen along the d2-a5 diagonal through the c3 knight.',
       hintPiece: 'Dark-squared Bishop',
       hintSquare: 'd2',
       hintTheme: 'Discovered attack preparation',
@@ -105,7 +106,7 @@ export const scandinavianRefutationDrill: CurriculumLesson = buildVerifiedLesson
     {
       san: 'Nd5',
       isUserMove: true,
-      annotation: 'Unleash the discovery! The knight attacks the queen on a5 while targeting c7 and f6.',
+      annotation: 'Unleash the discovery! The knight steps off the c3-a5 diagonal so the d2 bishop attacks the queen, while the knight itself hits c7 and f6.',
       hintPiece: 'Knight on c3',
       hintSquare: 'd5',
       hintTheme: 'Discovered attack strike',
@@ -138,8 +139,9 @@ export const scandinavianRefutationDrill: CurriculumLesson = buildVerifiedLesson
       solutionSan: ['Nc3', 'Qa5', 'd4'],
       explanation: '3.Nc3! attacks Black’s queen on d5. After 3...Qa5, 4.d4! secures complete central domination for White.',
       sourceGame: {
-        white: 'hoot65 Diagnostic Antidote',
+        white: 'hoot65',
         black: 'meny_26',
+        event: 'Chess.com Live, game 185031553576 (the drill corrects 2.e5?! from this game)',
         year: 2026,
         eco: 'B01',
       },
@@ -160,19 +162,19 @@ export const scandinavianRefutationDrill: CurriculumLesson = buildVerifiedLesson
 
 export const caroKannDisciplineDrill: CurriculumLesson = buildVerifiedLesson({
   id: 'lesson-caro-kann-discipline-drill',
-  title: 'Weakness Drill: Active Play vs Caro-Kann Defense',
-  subtitle: 'Avoid passive moves like 3.h3?! from game vs Brandon0015 and dominate with 2.d4 & 4.Nxe4',
+  title: 'Weakness Drill: Active Play vs the Caro-Kann',
+  subtitle: 'Replace the passive 3.h3?! from your game vs Brandon0015 with a plan that develops with purpose',
   category: 'weakness_drill',
   sourceBook: 'Tactics in Junior Openings / Chess.com Live Archive',
   author: 'Dave / hoot65 Diagnostic Analysis',
   publicationYear: 2026,
-  pagesRef: 'Tactics pp. 36–42 & Game vs Brandon0015 (2026/10/21)',
   eco: 'B18',
   targetColor: 'white',
   targetRatingBand: 'intermediate',
+  relevance: 'core',
   description:
-    'In your game against Brandon0015 on Chess.com (2026/10/21), Black met 1.e4 with the Caro-Kann 1...c6. You played 2.Nc3 d5 3.h3?!, surrendering your initiative with a passive pawn move. This drill teaches the active Main Line: establish the full center with 2.d4 d5, challenge with 3.Nc3, and harass Black\'s light-squared bishop with 5.Ng3 and 6.h4! to seize the kingside space advantage.',
-  thematicObjective: 'Seize the center with 2.d4!, avoid timid moves like 3.h3?!, and gain time against Black’s bishop with Ng3 and h4.',
+    'In your game against Brandon0015 on Chess.com (2026-10-11, game 185135704918), Black met 1.e4 with the Caro-Kann 1...c6. After 2.Nc3 d5 you played 3.h3?!, a pawn move that develops nothing and hands Black a free tempo. Your usual 2.Nc3 and 2.Nf3 systems score well for you (13 wins in 19 games against the Caro-Kann); the lesson is about the third move, not the second. This drill shows the classical main line with 2.d4 as a second weapon: establish the center, and when Black develops the bishop to f5, gain time on it with Ng3 and h4.',
+  thematicObjective: 'Every opening move should develop a piece or fight for the center. Against the Caro-Kann, 2.d4 d5 3.Nc3 dxe4 4.Nxe4 Bf5 5.Ng3 Bg6 6.h4 gains time on Black’s bishop; a move like 3.h3?! does neither job.',
   keyTacticalMotif: 'Bishop harassment (Ng3, h4/h5), central dominance, kingside space',
   moves: [
     { san: 'e4', isUserMove: true },
@@ -270,8 +272,9 @@ export const caroKannDisciplineDrill: CurriculumLesson = buildVerifiedLesson({
       solutionSan: ['Ng3', 'Bg6', 'h4', 'h6', 'Nf3'],
       explanation: '5.Ng3! attacks the bishop, and after 5...Bg6, 6.h4! threatens to trap the bishop with h5, forcing Black to weaken their kingside structure.',
       sourceGame: {
-        white: 'hoot65 Diagnostic Antidote',
+        white: 'hoot65',
         black: 'Brandon0015',
+        event: 'Chess.com Live, game 185135704918 (the drill replaces 3.h3?! from this game)',
         year: 2026,
         eco: 'B18',
       },
@@ -283,7 +286,7 @@ export const caroKannDisciplineDrill: CurriculumLesson = buildVerifiedLesson({
       attemptedSan: 'h3',
       isTrap: false,
       severity: 'inaccuracy',
-      explanatoryFeedback: '3.h3?! was played in your game vs Brandon0015. It wastes an entire tempo on a passive move when active central play (3.Nc3 or 2.d4) is called for.',
+      explanatoryFeedback: '3.h3?! was played in your game vs Brandon0015. It wastes an entire tempo on a passive move when a developing move (3.Nf3, or 3.d4 to fight for the center) is called for.',
       refutationSanList: ['dxe4', 'Nxe4', 'Bf5'],
       punishmentSummary: 'Black easily neutralizes White\'s first-move advantage.',
     },
