@@ -142,11 +142,11 @@ test.describe('03. Chess.com Sync, Dexie DB & Game Replay (F07 - F12)', () => {
 1. e4 c5 2. Nf3 d6 3. d4 cxd4 4. Nxd4 1-0`;
 
         await pgnInput.fill(testPgn);
-        const submitUpload = page.locator('button[data-action="confirm-upload"], button:has-text("Import")').first();
+        const submitUpload = page.locator('button[data-action="confirm-upload"], button:has-text("Import PGN")').first();
         await submitUpload.click();
 
         // Notification showing added and duplicates skipped
-        await expect(page.locator('text=added|imported|duplicate|skipped/i').first()).toBeVisible({ timeout: 10000 });
+        await expect(page.getByText(/added|imported|duplicate|skipped/i).first()).toBeVisible({ timeout: 10000 });
       }
     }
   });

@@ -25,7 +25,7 @@ test.describe('04. Personalized Diagnostics & Repertoire Recommendation (F13 - F
     await expect(view.getByText(/Scandinavian|2\.e5/i).first()).toBeVisible();
 
     // Must cite at least one of hoot65's real Scandinavian game IDs: 185031553576, 185035281692, 184582182704, 171000270176
-    const hasGameCitation = await view.locator('text=185031553576, text=185035281692, text=184582182704, text=171000270176').first().isVisible();
+    const hasGameCitation = await view.getByText(/185031553576|185035281692|184582182704|171000270176/).first().isVisible();
     expect(hasGameCitation).toBe(true);
   });
 
@@ -36,7 +36,7 @@ test.describe('04. Personalized Diagnostics & Repertoire Recommendation (F13 - F
     await expect(view.getByText(/Bg4|Caro-Kann/i).first()).toBeVisible();
 
     // Must cite at least one of hoot65's real Black game IDs: 185282462950, 173676860416, 171894388406, 184720164178
-    const hasBlackCitation = await view.locator('text=185282462950, text=173676860416, text=171894388406, text=184720164178').first().isVisible();
+    const hasBlackCitation = await view.getByText(/185282462950|173676860416|171894388406|184720164178/).first().isVisible();
     expect(hasBlackCitation).toBe(true);
   });
 

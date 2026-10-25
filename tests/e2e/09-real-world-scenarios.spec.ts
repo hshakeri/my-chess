@@ -108,7 +108,7 @@ test.describe('09. Tier 4 Real-World User Scenarios (Journeys 1 - 15)', () => {
     await syncBtn.click();
 
     // Sync notification appears
-    await expect(page.locator('text=sync|games|complete/i').first()).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText(/sync|games|complete/i).first()).toBeVisible({ timeout: 10000 });
   });
 
   test('Scenario 4: Weakness Detection on hoot65 Archives', async ({ page }) => {
@@ -118,10 +118,10 @@ test.describe('09. Tier 4 Real-World User Scenarios (Journeys 1 - 15)', () => {
     const view = page.locator('.diagnostics-view, [data-view="diagnostics"]').first();
     // Flags White Scandinavian 2.e5?! citing game ID
     await expect(view.getByText(/Scandinavian|2\.e5/i).first()).toBeVisible();
-    await expect(view.locator('text=185031553576, text=185035281692, text=184582182704, text=171000270176').first()).toBeVisible();
+    await expect(view.getByText(/185031553576|185035281692|184582182704|171000270176/).first()).toBeVisible();
 
     // Flags Black Caro-Kann Bg4 citing game ID
-    await expect(view.locator('text=185282462950, text=173676860416, text=171894388406, text=184720164178').first()).toBeVisible();
+    await expect(view.getByText(/185282462950|173676860416|171894388406|184720164178/).first()).toBeVisible();
   });
 
   test('Scenario 5: Adopting Recommended Repertoire into active study', async ({ page }) => {
@@ -131,7 +131,7 @@ test.describe('09. Tier 4 Real-World User Scenarios (Journeys 1 - 15)', () => {
     const adoptBtn = page.locator('button[data-action="adopt-repertoire"], button:has-text("Adopt")').first();
     if (await adoptBtn.isVisible()) {
       await adoptBtn.click();
-      await expect(page.locator('text=Adopted|Saved|Active/i').first()).toBeVisible({ timeout: 5000 });
+      await expect(page.getByText(/Adopted|Saved|Active/i).first()).toBeVisible({ timeout: 5000 });
     }
   });
 
@@ -139,7 +139,7 @@ test.describe('09. Tier 4 Real-World User Scenarios (Journeys 1 - 15)', () => {
     const lessonTab = page.locator('button:has-text("Interactive Lessons"), [data-tab="lessons"]').first();
     await lessonTab.click();
 
-    const scandiItem = page.locator('text=Scandinavian|Anti-Scandinavian|Scotch').first();
+    const scandiItem = page.getByText(/Scandinavian|Anti-Scandinavian|Scotch/i).first();
     if (await scandiItem.isVisible()) {
       await scandiItem.click();
     }
@@ -149,7 +149,7 @@ test.describe('09. Tier 4 Real-World User Scenarios (Journeys 1 - 15)', () => {
     if (await e4Pawn.locator('img').isVisible()) {
       await e4Pawn.click();
       await page.locator('[data-square="e5"]').click();
-      await expect(page.locator('text=equalize|wrong|mistake/i').first()).toBeVisible({ timeout: 5000 });
+      await expect(page.getByText(/equalize|wrong|mistake/i).first()).toBeVisible({ timeout: 5000 });
     }
   });
 
@@ -179,7 +179,7 @@ test.describe('09. Tier 4 Real-World User Scenarios (Journeys 1 - 15)', () => {
     const wsTab = page.locator('button:has-text("Printable Worksheets"), [data-tab="worksheets"]').first();
     await wsTab.click();
 
-    const hootDrill = page.locator('text=hoot65|Scandinavian|185031553576').first();
+    const hootDrill = page.getByText(/hoot65|Scandinavian|185031553576/i).first();
     if (await hootDrill.isVisible()) {
       await hootDrill.click();
       await expect(page.locator('.printable-sheet').first()).toBeVisible();
@@ -193,7 +193,7 @@ test.describe('09. Tier 4 Real-World User Scenarios (Journeys 1 - 15)', () => {
     const uploadBtn = page.locator('button[data-action="upload-pgn"], button:has-text("Upload PGN")').first();
     if (await uploadBtn.isVisible()) {
       await uploadBtn.click();
-      await expect(page.locator('textarea, input[type="file"]').first()).toBeVisible();
+      await expect(page.locator('textarea, input[type="file"]:not(.hidden)').first()).toBeVisible();
     }
   });
 

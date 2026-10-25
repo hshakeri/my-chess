@@ -98,14 +98,14 @@ test.describe('08. Tier 3 Cross-Feature Integration Combinations', () => {
     await diagTab.click();
 
     // Verify Scandinavian leak is shown
-    await expect(page.locator('text=Scandinavian|2\.e5/i').first()).toBeVisible();
+    await expect(page.getByText(/Scandinavian|2\.e5/i).first()).toBeVisible();
 
     // Navigate to Lessons to practice the refutation
     const lessonTab = page.locator('button:has-text("Interactive Lessons"), [data-tab="lessons"]').first();
     await lessonTab.click();
 
     // Anti-Scandinavian drill available
-    await expect(page.locator('text=Scandinavian|Anti-Scandinavian|Refutation/i').first()).toBeVisible();
+    await expect(page.getByText(/Scandinavian|Anti-Scandinavian|Refutation/i).first()).toBeVisible();
   });
 
   test('Combination 6: Pawn Promotion to Knight -> live SAN records exd8=N', async ({ page }) => {

@@ -275,6 +275,7 @@ export const DatabaseView: React.FC = () => {
           <button
             onClick={handleSyncChessCom}
             disabled={isSyncing}
+            data-action="sync-chesscom"
             className="flex items-center gap-2 px-3.5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 disabled:bg-slate-800 disabled:text-slate-500 text-white font-medium text-sm transition shadow-sm hover:shadow-emerald-500/20"
           >
             <RefreshCw className={`w-4 h-4 ${isSyncing ? 'animate-spin' : ''}`} />
@@ -283,6 +284,7 @@ export const DatabaseView: React.FC = () => {
 
           <button
             onClick={() => setShowUploadModal(true)}
+            data-action="upload-pgn"
             className="flex items-center gap-2 px-3.5 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-medium text-sm transition"
           >
             <Upload className="w-4 h-4 text-slate-400" />
@@ -293,6 +295,7 @@ export const DatabaseView: React.FC = () => {
           <div className="flex items-center rounded-lg border border-slate-700 bg-slate-800 p-0.5">
             <button
               onClick={handleExportJson}
+              data-action="export-json"
               title="Export complete database backup as JSON"
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-md hover:bg-slate-700 text-slate-300 text-xs font-medium transition"
             >
@@ -302,6 +305,7 @@ export const DatabaseView: React.FC = () => {
             <div className="h-4 w-px bg-slate-700" />
             <button
               onClick={handleExportPgn}
+              data-action="export-pgn"
               title="Export filtered games as multi-game PGN"
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-md hover:bg-slate-700 text-slate-300 text-xs font-medium transition"
             >
@@ -313,6 +317,7 @@ export const DatabaseView: React.FC = () => {
           {/* Import JSON button */}
           <button
             onClick={() => jsonImportRef.current?.click()}
+            data-action="import-json"
             title="Import database from JSON backup file"
             className="flex items-center gap-2 px-3.5 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 font-medium text-sm transition"
           >
@@ -658,6 +663,7 @@ export const DatabaseView: React.FC = () => {
               <textarea
                 value={pastedPgn}
                 onChange={(e) => setPastedPgn(e.target.value)}
+                data-input="pgn-upload"
                 rows={6}
                 placeholder="[Event &quot;Casual Game&quot;]&#10;1. e4 e5 2. Nf3 Nc6..."
                 className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs font-mono text-slate-200 placeholder-slate-600 focus:outline-none focus:border-emerald-500 resize-none"
@@ -673,6 +679,7 @@ export const DatabaseView: React.FC = () => {
                 <button
                   onClick={() => handlePgnImport(pastedPgn)}
                   disabled={!pastedPgn.trim()}
+                  data-action="confirm-upload"
                   className="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 disabled:bg-slate-800 disabled:text-slate-500 text-white text-sm font-medium transition"
                 >
                   Import PGN
@@ -814,7 +821,7 @@ const GameReplayModal: React.FC<GameReplayModalProps> = ({ game, onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 md:p-6 bg-black/80 backdrop-blur-sm">
+    <div className="replay-modal fixed inset-0 z-50 flex items-center justify-center p-3 md:p-6 bg-black/80 backdrop-blur-sm" data-modal="replay">
       <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-4xl max-h-[95vh] overflow-hidden shadow-2xl flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-slate-800 bg-slate-900/90">
@@ -962,6 +969,7 @@ const GameReplayModal: React.FC<GameReplayModalProps> = ({ game, onClose }) => {
               <button
                 onClick={() => setCurrentPly((p) => Math.max(0, p - 1))}
                 disabled={currentPly === 0}
+                data-action="replay-prev"
                 title="Previous Ply (Left Arrow)"
                 className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 disabled:opacity-40 text-slate-200 transition"
               >
@@ -973,6 +981,7 @@ const GameReplayModal: React.FC<GameReplayModalProps> = ({ game, onClose }) => {
               <button
                 onClick={() => setCurrentPly((p) => Math.min(maxPly, p + 1))}
                 disabled={currentPly === maxPly}
+                data-action="replay-next"
                 title="Next Ply (Right Arrow)"
                 className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 disabled:opacity-40 text-slate-200 transition"
               >
