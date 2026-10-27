@@ -53,7 +53,35 @@ export const scandinavianRefutationDrill: CurriculumLesson = buildVerifiedLesson
     {
       san: 'Qxd5',
       isUserMove: false,
+      // Archive: in both games where you played 2.exd5, Black recaptured 2...Qxd5 (2 of 2).
+      frequency: 2,
       annotation: 'Black recaptures with the queen, bringing their strongest piece out far too early.',
+      alternatives: {
+        Nf6: [
+          {
+            san: 'd4',
+            isUserMove: true,
+            annotation:
+              'Black delays the recapture. 3.d4 simply takes the centre: the d5 pawn is not defended anyway, so let Black spend a move winning it back and develop meanwhile.',
+            hintTheme: 'Take the centre',
+            wrongMoveFeedback: {
+              c4: '3.c4 tries to keep the pawn, but 3...e6 or 3...c6 offers it back for fast development and leads into gambit lines. 3.d4 is the simple choice.',
+            },
+          },
+          { san: 'Nxd5', isUserMove: false, annotation: 'The knight recaptures. Material is level again.' },
+          {
+            san: 'Nf3',
+            isUserMove: true,
+            annotation: 'Develop toward castling. White has the only pawn in the centre.',
+          },
+          { san: 'Bg4', isUserMove: false, annotation: 'Pins the knight on f3 against the queen.' },
+          {
+            san: 'Be2',
+            isUserMove: true,
+            annotation: 'Breaks the pin with a developing move. Next come O-O and c4, hitting the knight on d5.',
+          },
+        ],
+      },
     },
     {
       san: 'Nc3',
@@ -67,7 +95,42 @@ export const scandinavianRefutationDrill: CurriculumLesson = buildVerifiedLesson
     {
       san: 'Qa5',
       isUserMove: false,
+      // Archive: after 3.Nc3 the queen went 3...Qd8 once and 3...Qe6+ once; the book retreat 3...Qa5 has not been seen yet.
       annotation: 'Black retreats the queen to the traditional a5 outpost.',
+      alternatives: {
+        Qd8: [
+          {
+            san: 'd4',
+            isUserMove: true,
+            frequency: 1,
+            annotation: 'The queen goes home, so Black has spent two moves on it and has nothing out. Take the centre.',
+            hintTheme: 'Take the centre',
+          },
+          { san: 'Nf6', isUserMove: false },
+          { san: 'Nf3', isUserMove: true, annotation: 'Develop the second knight; the bishops come out next.' },
+          { san: 'Bg4', isUserMove: false, annotation: 'Pins the knight on f3 against the queen.' },
+          {
+            san: 'h3',
+            isUserMove: true,
+            annotation: 'Puts the question to the bishop: it must take on f3, giving White the bishop pair after 7.Qxf3, or retreat.',
+          },
+        ],
+        'Qe6+': [
+          {
+            san: 'Be2',
+            isUserMove: true,
+            frequency: 1,
+            annotation: 'The check costs Black time. 4.Be2 blocks it with a developing move, and the queen on e6 now stands in front of its own e-pawn.',
+            hintTheme: 'Block with development',
+          },
+          { san: 'Nf6', isUserMove: false },
+          {
+            san: 'Nf3',
+            isUserMove: true,
+            annotation: 'Develop and castle next. Black still has to move the queen again before the e-pawn can advance.',
+          },
+        ],
+      },
     },
     {
       san: 'd4',
@@ -195,7 +258,57 @@ export const caroKannDisciplineDrill: CurriculumLesson = buildVerifiedLesson({
       hintSquare: 'c3',
       // 3.h3?! is handled by the mistake record below so its refutation is played out
     },
-    { san: 'dxe4', isUserMove: false },
+    {
+      san: 'dxe4',
+      isUserMove: false,
+      // Archive: you have never played 2.d4 against the Caro-Kann, so there are no reply counts here (each reply weighs 1).
+      annotation: 'The classical choice: Black trades the d-pawn and will develop the c8 bishop to f5.',
+      alternatives: {
+        Nf6: [
+          {
+            san: 'e5',
+            isUserMove: true,
+            annotation: 'The knight attacks e4, so push past it: the pawn gains space and the knight has to move again.',
+            hintTheme: 'Gain space with tempo',
+          },
+          {
+            san: 'Nfd7',
+            isUserMove: false,
+            annotation: 'The knight drops back to d7, where it watches e5 and prepares ...c5.',
+          },
+          {
+            san: 'f4',
+            isUserMove: true,
+            annotation: 'Supports e5 with a second pawn and takes space on the kingside.',
+          },
+          { san: 'e6', isUserMove: false },
+          {
+            san: 'Nf3',
+            isUserMove: true,
+            annotation: 'Develops and gives e5 a third defender before Black strikes with ...c5.',
+          },
+        ],
+        g6: [
+          {
+            san: 'Nf3',
+            isUserMove: true,
+            annotation: 'Black fianchettoes. Develop the knight toward the kingside; it covers d4 and e5.',
+          },
+          { san: 'Bg7', isUserMove: false },
+          {
+            san: 'h3',
+            isUserMove: true,
+            annotation: 'Takes g4 away from the bishop, so the f3 knight cannot be pinned against the queen.',
+          },
+          { san: 'Nf6', isUserMove: false },
+          {
+            san: 'Bd3',
+            isUserMove: true,
+            annotation: 'Develops the bishop and defends e4 a second time; O-O comes next.',
+          },
+        ],
+      },
+    },
     {
       san: 'Nxe4',
       isUserMove: true,

@@ -18,6 +18,14 @@ export interface MoveInput {
   hintSquare?: string;
   hintTheme?: string;
   accept?: MoveAcceptance;
+  /**
+   * Opponent moves only: replies the opponent may play instead of `san`, keyed by
+   * the alternative's SAN, each with the verified continuation that starts with the
+   * student's reply. See `CurriculumMove.alternatives`.
+   */
+  alternatives?: Record<string, MoveInput[]>;
+  /** Observed count (or authored weight) of this reply. See `CurriculumMove.frequency`. */
+  frequency?: number;
 }
 
 export interface ExerciseInput {
@@ -40,7 +48,7 @@ export interface ExerciseInput {
 
 export interface MistakeTrapInput {
   triggerFen?: string;
-  plyIndex?: number; // 0-based index into moves array to grab trigger fen
+  plyIndex?: number; // 0-based index into the MAIN LINE moves array to grab trigger fen (branches need triggerFen)
   attemptedSan: string;
   isTrap: boolean;
   severity: 'blunder' | 'inaccuracy' | 'trap_victim';
@@ -72,6 +80,24 @@ export interface LessonConfig {
   mistakesAndTraps?: MistakeTrapInput[];
 }
 
+/**
+ * One student decision in a lesson tree: the position before the student's move,
+ * every SAN the lesson accepts there, and where it sits in the tree. This is the
+ * input shape of the position-level card store (module A declares an identical
+ * structural type on its side).
+ */
+export interface DecisionSpec {
+  fen: string; // full FEN of the position BEFORE the student's move
+  acceptedSan: string[]; // every SAN the lesson accepts at this decision (main move first)
+  lessonId: string;
+  ply: number; // 0-based index into the line (main line) or into the branch sequence
+  color: 'w' | 'b'; // side to move = the student
+  path: string[]; // SAN sequence from the lesson's initialFen to this position
+  tags: string[]; // e.g. 'opening:italian', 'color:w', 'lesson:<id>', 'family:<course category>'
+  title?: string; // short human label for the decision (never the answer)
+  reachProb?: number; // 0..1 product of branch frequencies along the path (1 for main line)
+}
+
 const PIECE_NAMES: Record<string, string> = {
   p: 'Pawn',
   n: 'Knight',
@@ -87,58 +113,83 @@ export function derivePieceHint(move: { piece: string; from: string; san: string
   return `${PIECE_NAMES[move.piece] || 'Piece'} on ${move.from}`;
 }
 
-/**
- * Builds and strictly validates a CurriculumLesson using chess.js.
- * Ensures 100% of moves, acceptance alternatives, exercise solutions and
- * refutation lines are legal. Fills in piece/square hints from the move itself
- * when the author did not provide them, so a hint ladder never has to fall back
- * to printing the move.
- */
-export function buildVerifiedLesson(config: LessonConfig): CurriculumLesson {
-  const startFen = config.initialFen || 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
-  const chess = new Chess(startFen);
+/** Weight of a reply: its observed frequency, or 1 when nothing was observed. */
+const DEFAULT_WEIGHT = 1;
 
-  const verifiedMoves: CurriculumMove[] = [];
+function weightOf(move: CurriculumMove | undefined): number {
+  const f = move?.frequency;
+  return typeof f === 'number' && Number.isFinite(f) && f >= 0 ? f : DEFAULT_WEIGHT;
+}
+
+function isUserMoveFor(turn: 'w' | 'b', targetColor: LessonConfig['targetColor'], input: MoveInput): boolean {
+  if (input.isUserMove !== undefined) return input.isUserMove;
+  return targetColor === 'black' ? turn === 'b' : turn === 'w';
+}
+
+function tryMove(fen: string, san: string): { san: string; fen: string; from: string; to: string; piece: string; promotion?: string } | null {
+  const probe = new Chess(fen);
+  try {
+    const res = probe.move(san);
+    return res ? { san: res.san, fen: probe.fen(), from: res.from, to: res.to, piece: res.piece, promotion: res.promotion } : null;
+  } catch {
+    return null;
+  }
+}
+
+interface SequenceContext {
+  lessonId: string;
+  targetColor: LessonConfig['targetColor'];
+  /** Human label of the sequence for error messages: 'main line' or 'branch 3...Nf6'. */
+  where: string;
+}
+
+/**
+ * Verifies one move sequence (the main line or a branch continuation) from `startFen`.
+ * Returns the verified moves and the FEN before each move plus the final FEN.
+ */
+function verifySequence(
+  startFen: string,
+  inputs: MoveInput[],
+  firstPly: number,
+  ctx: SequenceContext
+): { moves: CurriculumMove[]; fenHistory: string[] } {
+  const chess = new Chess(startFen);
+  const verified: CurriculumMove[] = [];
   const fenHistory: string[] = [startFen];
 
-  // 1. Process and verify every main line move
-  for (let i = 0; i < config.moves.length; i++) {
-    const input = config.moves[i];
-    const ply = i + 1;
+  for (let i = 0; i < inputs.length; i++) {
+    const input = inputs[i];
+    const ply = firstPly + i;
     const turn = chess.turn();
     const fenBefore = chess.fen();
-
-    // Determine if user move: default to the target perspective, or respect input.isUserMove
-    const isUser = input.isUserMove !== undefined
-      ? input.isUserMove
-      : (config.targetColor === 'black' ? turn === 'b' : turn === 'w');
+    const isUser = isUserMoveFor(turn, ctx.targetColor, input);
+    const isLast = i === inputs.length - 1;
 
     // Acceptance alternatives are validated from the position BEFORE the move
     if (input.accept) {
       if (!isUser) {
         throw new Error(
-          `[Curriculum Builder] 'accept' is only allowed on user moves (ply ${ply}, lesson '${config.id}').`
+          `[Curriculum Builder] 'accept' is only allowed on user moves (ply ${ply}, ${ctx.where}, lesson '${ctx.lessonId}').`
         );
       }
-      if (i !== config.moves.length - 1) {
+      if (!isLast) {
         throw new Error(
-          `[Curriculum Builder] 'accept' alternatives are only allowed on the final move of the line (ply ${ply}, lesson '${config.id}'), because the scripted continuation assumes the scripted move.`
+          `[Curriculum Builder] 'accept' alternatives are only allowed on the final move of the line (ply ${ply}, ${ctx.where}, lesson '${ctx.lessonId}'), because the scripted continuation assumes the scripted move.`
         );
       }
       for (const altSan of input.accept.san || []) {
-        const probe = new Chess(fenBefore);
-        let ok = true;
-        try {
-          probe.move(altSan);
-        } catch {
-          ok = false;
-        }
-        if (!ok) {
+        if (!tryMove(fenBefore, altSan)) {
           throw new Error(
-            `[Curriculum Builder] Illegal acceptance alternative '${altSan}' at ply ${ply} in lesson '${config.id}'. FEN: ${fenBefore}`
+            `[Curriculum Builder] Illegal acceptance alternative '${altSan}' at ply ${ply} (${ctx.where}) in lesson '${ctx.lessonId}'. FEN: ${fenBefore}`
           );
         }
       }
+    }
+
+    if (input.frequency !== undefined && !(Number.isFinite(input.frequency) && input.frequency >= 0)) {
+      throw new Error(
+        `[Curriculum Builder] 'frequency' must be a non-negative number (ply ${ply}, ${ctx.where}, lesson '${ctx.lessonId}').`
+      );
     }
 
     let moveResult;
@@ -149,14 +200,58 @@ export function buildVerifiedLesson(config: LessonConfig): CurriculumLesson {
     }
     if (!moveResult) {
       throw new Error(
-        `[Curriculum Builder] Illegal move '${input.san}' at ply ${ply} in lesson '${config.id}'. Current FEN: ${fenBefore}`
+        `[Curriculum Builder] Illegal move '${input.san}' at ply ${ply} (${ctx.where}) in lesson '${ctx.lessonId}'. Current FEN: ${fenBefore}`
       );
     }
 
     if (input.accept?.predicate === 'checkmate' && !chess.isCheckmate()) {
       throw new Error(
-        `[Curriculum Builder] 'accept.predicate: checkmate' requires the scripted move to be checkmate (ply ${ply}, lesson '${config.id}').`
+        `[Curriculum Builder] 'accept.predicate: checkmate' requires the scripted move to be checkmate (ply ${ply}, ${ctx.where}, lesson '${ctx.lessonId}').`
       );
+    }
+
+    // Opponent alternatives: each key must be a legal move in the position before the
+    // scripted opponent move, and each continuation is verified from the branch FEN.
+    let alternatives: Record<string, CurriculumMove[]> | undefined;
+    if (input.alternatives) {
+      if (isUser) {
+        throw new Error(
+          `[Curriculum Builder] 'alternatives' are only allowed on opponent moves (ply ${ply}, ${ctx.where}, lesson '${ctx.lessonId}').`
+        );
+      }
+      alternatives = {};
+      for (const [altKey, continuation] of Object.entries(input.alternatives)) {
+        const alt = tryMove(fenBefore, altKey);
+        if (!alt) {
+          throw new Error(
+            `[Curriculum Builder] Illegal alternative key '${altKey}' for the opponent at ply ${ply} (${ctx.where}) in lesson '${ctx.lessonId}'. FEN: ${fenBefore}`
+          );
+        }
+        if (alt.san === moveResult.san) {
+          throw new Error(
+            `[Curriculum Builder] Alternative '${altKey}' duplicates the scripted reply '${moveResult.san}' at ply ${ply} (${ctx.where}) in lesson '${ctx.lessonId}'.`
+          );
+        }
+        if (alternatives[alt.san]) {
+          throw new Error(
+            `[Curriculum Builder] Alternative '${altKey}' is listed twice at ply ${ply} (${ctx.where}) in lesson '${ctx.lessonId}'.`
+          );
+        }
+        if (!Array.isArray(continuation) || continuation.length === 0) {
+          throw new Error(
+            `[Curriculum Builder] Alternative '${altKey}' at ply ${ply} (${ctx.where}) in lesson '${ctx.lessonId}' needs a continuation starting with the student's reply.`
+          );
+        }
+        const replyTurn = new Chess(alt.fen).turn();
+        if (!isUserMoveFor(replyTurn, ctx.targetColor, continuation[0])) {
+          throw new Error(
+            `[Curriculum Builder] The continuation after '${altKey}' at ply ${ply} (${ctx.where}) in lesson '${ctx.lessonId}' must start with the student's reply.`
+          );
+        }
+        const branchLabel = `${ctx.where === 'main line' ? '' : ctx.where + ' > '}branch ${plyLabel(fenBefore, 0, alt.san)}`;
+        const branch = verifySequence(alt.fen, continuation, ply + 1, { ...ctx, where: branchLabel });
+        alternatives[alt.san] = branch.moves;
+      }
     }
 
     const fenAfter = chess.fen();
@@ -164,7 +259,7 @@ export function buildVerifiedLesson(config: LessonConfig): CurriculumLesson {
 
     const uci = `${moveResult.from}${moveResult.to}${moveResult.promotion || ''}`;
 
-    verifiedMoves.push({
+    verified.push({
       ply,
       san: moveResult.san,
       uci,
@@ -178,8 +273,31 @@ export function buildVerifiedLesson(config: LessonConfig): CurriculumLesson {
       hintSquare: input.hintSquare || moveResult.to,
       hintTheme: input.hintTheme,
       accept: input.accept,
+      alternatives,
+      frequency: input.frequency,
     });
   }
+
+  return { moves: verified, fenHistory };
+}
+
+/**
+ * Builds and strictly validates a CurriculumLesson using chess.js.
+ * Ensures 100% of moves, acceptance alternatives, opponent alternatives and their
+ * continuations, exercise solutions and refutation lines are legal. Fills in
+ * piece/square hints from the move itself when the author did not provide them,
+ * so a hint ladder never has to fall back to printing the move.
+ */
+export function buildVerifiedLesson(config: LessonConfig): CurriculumLesson {
+  const startFen = config.initialFen || 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
+
+  // 1. Process and verify every main line move (and, recursively, every branch)
+  const { moves: verifiedMoves, fenHistory } = verifySequence(startFen, config.moves, 1, {
+    lessonId: config.id,
+    targetColor: config.targetColor,
+    where: 'main line',
+  });
+  const chess = new Chess(fenHistory[fenHistory.length - 1]);
 
   if (config.startPly !== undefined && (config.startPly < 0 || config.startPly > verifiedMoves.length)) {
     throw new Error(`[Curriculum Builder] startPly ${config.startPly} is out of range in lesson '${config.id}'.`);
@@ -218,7 +336,8 @@ export function buildVerifiedLesson(config: LessonConfig): CurriculumLesson {
     });
   }
 
-  // 3. Process mistakes and traps: the attempted move and every refutation move must be legal
+  // 3. Process mistakes and traps: the attempted move and every refutation move must be legal.
+  //    `plyIndex` anchors to the main line only; a branch position needs an explicit `triggerFen`.
   const verifiedMistakes: CurriculumMistakeTrap[] = [];
   if (config.mistakesAndTraps) {
     for (const mInput of config.mistakesAndTraps) {
@@ -306,6 +425,19 @@ export function positionKey(fen: string): string {
   return fen.trim().split(/\s+/).slice(0, 4).join(' ');
 }
 
+/**
+ * Numbered SAN label for the move played `index` plies after `fromFen`,
+ * e.g. "3...Nf6" or "4.d3". Honours the FEN's side to move and move number.
+ */
+export function plyLabel(fromFen: string, index: number, san: string): string {
+  const fields = fromFen.trim().split(/\s+/);
+  const startTurn = fields[1] === 'b' ? 1 : 0;
+  const startNumber = Number.parseInt(fields[5] || '1', 10) || 1;
+  const halfMoves = startTurn + index;
+  const moveNumber = startNumber + Math.floor(halfMoves / 2);
+  return halfMoves % 2 === 0 ? `${moveNumber}.${san}` : `${moveNumber}...${san}`;
+}
+
 /** The first user decision of a lesson at or after its start ply. */
 export function firstUserDecision(lesson: CurriculumLesson): { index: number; move: CurriculumMove; fenBefore: string } | null {
   const start = lesson.startPly ?? 0;
@@ -316,4 +448,107 @@ export function firstUserDecision(lesson: CurriculumLesson): { index: number; mo
     }
   }
   return null;
+}
+
+export interface ReplyOption {
+  san: string;
+  weight: number;
+  /** Share of the weight among the scripted reply and its alternatives (0..1). */
+  share: number;
+  /** null for the scripted reply (the lesson continues on its own line). */
+  continuation: CurriculumMove[] | null;
+}
+
+/**
+ * The scripted reply and every alternative at an opponent move, with their weights
+ * (frequency, default 1) and shares. The scripted reply is always first.
+ */
+export function replyOptions(move: CurriculumMove): ReplyOption[] {
+  const options: Array<Omit<ReplyOption, 'share'>> = [{ san: move.san, weight: weightOf(move), continuation: null }];
+  for (const [san, continuation] of Object.entries(move.alternatives || {})) {
+    options.push({ san, weight: weightOf(continuation[0]), continuation });
+  }
+  const total = options.reduce((sum, o) => sum + o.weight, 0);
+  return options.map((o) => ({ ...o, share: total > 0 ? o.weight / total : o.san === move.san ? 1 : 0 }));
+}
+
+/**
+ * Weighted choice of the opponent's reply at a scripted opponent move: the scripted
+ * reply weighs its own `frequency` (default 1), each alternative weighs its first
+ * move's `frequency` (default 1). Pure: the same `rng` output always gives the same
+ * reply. A total weight of zero falls back to the scripted reply.
+ */
+export function chooseOpponentReply(
+  move: CurriculumMove,
+  rng: () => number
+): { san: string; continuation: CurriculumMove[] | null } {
+  const options = replyOptions(move);
+  const total = options.reduce((sum, o) => sum + o.weight, 0);
+  if (options.length === 1 || total <= 0) return { san: move.san, continuation: null };
+  const u = Math.min(Math.max(rng(), 0), 1 - Number.EPSILON);
+  let r = u * total;
+  for (const o of options) {
+    r -= o.weight;
+    if (r < 0) return { san: o.san, continuation: o.continuation };
+  }
+  const last = options[options.length - 1];
+  return { san: last.san, continuation: last.continuation };
+}
+
+/** Lesson id without its `lesson-` prefix, used as the `opening:` tag. */
+export function openingSlug(lessonId: string): string {
+  return lessonId.replace(/^lesson-/, '');
+}
+
+function sideName(turn: 'w' | 'b'): string {
+  return turn === 'w' ? 'White' : 'Black';
+}
+
+/**
+ * Every student decision of a lesson: the main line from `startPly` onward and every
+ * branch reachable from it, each with its path from `initialFen`, its reach
+ * probability (main line 1; a branch multiplies the reply shares along the path) and
+ * the tags the card store indexes on.
+ */
+export function enumerateDecisions(lesson: CurriculumLesson): DecisionSpec[] {
+  const out: DecisionSpec[] = [];
+  const start = lesson.startPly ?? 0;
+  const baseTags = [`lesson:${lesson.id}`, `family:${lesson.category}`, `opening:${openingSlug(lesson.id)}`];
+
+  const walk = (moves: CurriculumMove[], fenAtStart: string, pathPrefix: string[], reach: number, isMain: boolean) => {
+    let fen = fenAtStart;
+    const path = [...pathPrefix];
+    for (let i = 0; i < moves.length; i++) {
+      const move = moves[i];
+      const active = !isMain || i >= start;
+      const turn = new Chess(fen).turn();
+      if (active && move.isUserMove) {
+        const last = path.length > 0 ? plyLabel(lesson.initialFen, path.length - 1, path[path.length - 1]) : null;
+        out.push({
+          fen,
+          acceptedSan: [move.san, ...(move.accept?.san || []).filter((s) => s !== move.san)],
+          lessonId: lesson.id,
+          ply: i,
+          color: turn,
+          path: [...path],
+          tags: [...baseTags, `color:${turn}`],
+          title: last ? `${sideName(turn)} to move after ${last}` : `${sideName(turn)} to move from the start position`,
+          reachProb: reach,
+        });
+      }
+      if (active && !move.isUserMove && move.alternatives) {
+        for (const option of replyOptions(move)) {
+          if (!option.continuation) continue;
+          const alt = tryMove(fen, option.san);
+          if (!alt) continue; // cannot happen for a built lesson; the builder verified every key
+          walk(option.continuation, alt.fen, [...path, option.san], reach * option.share, false);
+        }
+      }
+      path.push(move.san);
+      fen = move.fenAfter || tryMove(fen, move.san)?.fen || fen;
+    }
+  };
+
+  walk(lesson.moves, lesson.initialFen, [], 1, true);
+  return out;
 }

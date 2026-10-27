@@ -30,6 +30,21 @@ export interface CurriculumMove {
   hintSquare?: string; // e.g. "d5" (derived from the move when not authored)
   hintTheme?: string; // e.g. "Double attack against f7 and c6"
   accept?: MoveAcceptance;
+  /**
+   * Opponent moves only. Replies the opponent may play instead of `san`, keyed
+   * by the alternative's SAN as chess.js prints it. Each value is the verified
+   * continuation after that alternative, starting with the student's reply and
+   * numbered on from the alternative's ply; the first move of a continuation
+   * carries the alternative's `frequency`. Continuations may branch again.
+   */
+  alternatives?: Record<string, CurriculumMove[]>;
+  /**
+   * Observed count of a reply in the student's archive (or an authored weight).
+   * On a scripted opponent move it weights the main reply against its
+   * `alternatives`; on the first move of an alternative's continuation it
+   * weights that alternative. Absent means no observation: weight 1.
+   */
+  frequency?: number;
 }
 
 export interface CurriculumExercise {
