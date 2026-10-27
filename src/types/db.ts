@@ -77,6 +77,83 @@ export interface StoredDiagnostic {
   recommendedBlackRepertoire: string;
 }
 
+/**
+ * One position card for the FSRS scheduler (CL-1).
+ * `id` is the canonical FEN key from `services/fenKey.ts`, so a position
+ * reached from several lessons or move orders is one card.
+ * Scheduling fields are the ts-fsrs `Card` flattened to JSON-safe numbers
+ * (`due` and `last_review` are epoch milliseconds, `state` is the ts-fsrs
+ * `State` enum value: 0 New, 1 Learning, 2 Review, 3 Relearning).
+ */
+export interface StoredCard {
+  id: string;
+  fen: string;
+  accepted: string[];
+  lessonIds: string[];
+  tags: string[];
+  ply: number;
+  reachProb: number;
+  color: 'w' | 'b';
+  title?: string;
+  due: number;
+  stability: number;
+  difficulty: number;
+  elapsed_days: number;
+  scheduled_days: number;
+  learning_steps: number;
+  reps: number;
+  lapses: number;
+  state: number;
+  last_review?: number;
+  responseStats: { n: number; meanMs: number };
+  createdAt: number;
+}
+
+/**
+ * One review of a card. The FSRS fields mirror the ts-fsrs `ReviewLog`
+ * (state and due are the values BEFORE the review; `rating` is the ts-fsrs
+ * `Rating` enum value: 1 Again, 2 Hard, 3 Good, 4 Easy). `id` is assigned by
+ * Dexie (`++id`).
+ */
+export interface StoredRevlog {
+  id?: number;
+  cardId: string;
+  rating: number;
+  state: number;
+  due: number;
+  stability: number;
+  difficulty: number;
+  elapsed_days: number;
+  last_elapsed_days: number;
+  scheduled_days: number;
+  learning_steps: number;
+  review: number;
+  responseMs?: number;
+  hintLevel?: number;
+  wrongSan?: string;
+  lessonId?: string;
+  sessionId?: string;
+}
+
+/** Placeholder for the post-game review pipeline (CL-3). */
+export interface StoredReview {
+  gameId: string;
+  reviewedAt: number;
+  criticalMoments: unknown[];
+}
+
+/** Placeholder for the opening-explorer snapshot cache (DC-6). */
+export interface StoredExplorerCache {
+  key: string;
+  fetchedAt: number;
+  payload: unknown;
+}
+
+/**
+ * JSON backup format.
+ * - version 1: games, repertoires, srsCards, diagnostics
+ * - version 2: adds `cards` and `revlog`. Version-1 files import unchanged.
+ */
 export interface DatabaseExportData {
   version: number;
   exportedAt: string;
@@ -84,4 +161,8 @@ export interface DatabaseExportData {
   repertoires?: StoredRepertoire[];
   srsCards?: StoredSrsCard[];
   diagnostics?: StoredDiagnostic[];
+  cards?: StoredCard[];
+  revlog?: StoredRevlog[];
 }
+
+export const DATABASE_EXPORT_VERSION = 2;

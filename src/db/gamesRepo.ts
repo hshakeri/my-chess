@@ -1,10 +1,12 @@
 import { ChessDatabase, db as defaultDb } from './database';
 import { PgnHandler } from '../engine/pgn';
-import type {
-  StoredGame,
-  GameFilter,
-  BatchInsertResult,
-  DatabaseExportData,
+import {
+  DATABASE_EXPORT_VERSION,
+  type StoredGame,
+  type GameFilter,
+  type BatchInsertResult,
+  type DatabaseExportData,
+  type StoredRevlog,
 } from '../types/db';
 
 /**
@@ -304,14 +306,18 @@ export class GamesRepository {
     const repertoires = await this.db.repertoires.toArray();
     const srsCards = await this.db.srs_cards.toArray();
     const diagnostics = await this.db.diagnostics.toArray();
+    const cards = await this.db.cards.toArray();
+    const revlog = await this.db.revlog.toArray();
 
     return {
-      version: 1,
+      version: DATABASE_EXPORT_VERSION,
       exportedAt: new Date().toISOString(),
       games,
       repertoires,
       srsCards,
       diagnostics,
+      cards,
+      revlog,
     };
   }
 
@@ -348,11 +354,46 @@ export class GamesRepository {
       await this.db.diagnostics.bulkPut(parsed.diagnostics);
     }
 
+    // Version 2 tables. A version-1 file simply has neither key.
+    if (Array.isArray(parsed.cards) && parsed.cards.length > 0) {
+      await this.db.cards.bulkPut(parsed.cards);
+    }
+    if (Array.isArray(parsed.revlog) && parsed.revlog.length > 0) {
+      await this.importRevlog(parsed.revlog);
+    }
+
     return {
       gamesAdded: result.added,
       gamesSkipped: result.duplicatesSkipped,
       version: parsed.version || 1,
     };
+  }
+
+  /**
+   * Revlog rows carry auto-increment ids that are only meaningful in the
+   * database that produced them, so they are re-added without their id and
+   * de-duplicated on the natural key (cardId, review timestamp). Importing the
+   * same backup twice therefore adds nothing.
+   */
+  private async importRevlog(rows: StoredRevlog[]): Promise<number> {
+    const cardIds = Array.from(new Set(rows.map((r) => r.cardId)));
+    const existing = cardIds.length
+      ? await this.db.revlog.where('cardId').anyOf(cardIds).toArray()
+      : [];
+    const seen = new Set(existing.map((r) => `${r.cardId}|${r.review}`));
+    const toAdd: StoredRevlog[] = [];
+    for (const row of rows) {
+      const key = `${row.cardId}|${row.review}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      const { id: _dropped, ...rest } = row;
+      void _dropped;
+      toAdd.push(rest);
+    }
+    if (toAdd.length > 0) {
+      await this.db.revlog.bulkAdd(toAdd);
+    }
+    return toAdd.length;
   }
 
   /**

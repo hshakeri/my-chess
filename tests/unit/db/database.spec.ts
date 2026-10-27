@@ -212,7 +212,7 @@ describe('Persistent Database & GamesRepo (IndexedDB via Dexie)', () => {
       expect(await repo.getGamesCount()).toBe(3);
 
       const exportedBackup = await repo.exportDatabaseJson();
-      expect(exportedBackup.version).toBe(1);
+      expect(exportedBackup.version).toBe(2);
       expect(exportedBackup.games.length).toBe(3);
       expect(exportedBackup.exportedAt).toBeDefined();
 
