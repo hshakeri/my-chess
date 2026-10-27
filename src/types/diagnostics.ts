@@ -38,6 +38,27 @@ export interface OpeningDeviation {
   impact?: PatternImpact;
   /** Date of the game as YYYY-MM-DD, taken from the PGN header when available. */
   gameDate?: string;
+  /** Name of the repertoire line the player left (repertoire-divergence deviations only). */
+  lineName?: string;
+}
+
+/**
+ * One repertoire leak: the same position (by its first four FEN fields) in
+ * which the player left the plan with the same move, across several games.
+ * `score` is the player's score in those games; `scoreOther` the score in the
+ * player's other games of the same colour.
+ */
+export interface RepertoireLeak {
+  fenKey: string;
+  fen: string;
+  playedSan: string;
+  bookSan: string;
+  lineName: string;
+  color: 'white' | 'black';
+  games: number;
+  score: number; // 0..1
+  scoreOther: number; // 0..1
+  deviations: OpeningDeviation[];
 }
 
 export interface PatternSummary {
@@ -103,8 +124,14 @@ export interface DiagnosticReport {
   };
   /** Recurring patterns with measured impact; keyLeaks above are the flattened deviations. */
   patterns?: PatternSummary[];
-  recommendedWhiteRepertoire: string; // e.g. "Italian Game & Anti-Scandinavian (2.exd5!)"
-  recommendedBlackRepertoire: string; // e.g. "Caro-Kann & King's Indian"
+  /**
+   * Positions where the player left the recommended repertoire, aggregated by
+   * (position, move) and sorted by games x score deficit, then by games.
+   */
+  repertoireLeaks: RepertoireLeak[];
+  /** The recommended plans' names, e.g. "Italian Game & Anti-Scandinavian Refutation (2.exd5!)". */
+  recommendedWhiteRepertoire: string;
+  recommendedBlackRepertoire: string; // e.g. "Caro-Kann & the c6-d5 Wall"
   whiteRepertoirePlan?: RepertoirePlan;
   blackRepertoirePlan?: RepertoirePlan;
   generatedAt?: number;

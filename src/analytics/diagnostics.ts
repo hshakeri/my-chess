@@ -6,10 +6,16 @@ import {
   OpeningStats,
   PatternImpact,
   PatternSummary,
+  RepertoireLeak,
+  RepertoirePlan,
 } from '../types/diagnostics';
 import {
   getRecommendedWhiteRepertoire,
   getRecommendedBlackRepertoire,
+  buildRepertoireTree,
+  fenKey,
+  findChildByFen,
+  RepertoireNode,
 } from './repertoire';
 import { CANONICAL_HOOT65_GAMES } from './canonicalGames';
 
@@ -20,17 +26,27 @@ import { CANONICAL_HOOT65_GAMES } from './canonicalGames';
  */
 export { CANONICAL_HOOT65_GAMES };
 
-export type PatternId = 'white-scandi-e5' | 'black-bg4-chase' | 'early-queen-sortie';
+export type PatternId =
+  | 'white-scandi-e5'
+  | 'black-bg4-chase'
+  | 'early-queen-sortie'
+  | 'blackburne-shilling-handling'
+  | 'mated-while-ahead'
+  | 'lost-on-time-while-ahead'
+  | 'repertoire-divergence';
+
+/** Patterns measured as a PatternSummary; repertoire divergences are aggregated separately as RepertoireLeaks. */
+export type DetectorPatternId = Exclude<PatternId, 'repertoire-divergence'>;
 
 interface PatternMeta {
-  id: PatternId;
+  id: DetectorPatternId;
   label: string;
   color: 'white' | 'black' | 'both';
   theoryVerdict: 'inferior' | 'neutral';
   description: string;
 }
 
-const PATTERN_META: Record<PatternId, PatternMeta> = {
+const PATTERN_META: Record<DetectorPatternId, PatternMeta> = {
   'white-scandi-e5': {
     id: 'white-scandi-e5',
     label: 'Scandinavian: 2.e5?! instead of 2.exd5',
@@ -55,7 +71,80 @@ const PATTERN_META: Record<PatternId, PatternMeta> = {
     description:
       'The queen left home within the first five moves while at least two minor pieces were still on their starting squares. A queen that comes out early becomes a target for developing moves (Nc3, Bd2, b4), and every retreat is a lost tempo. Develop knights and bishops first; the queen decides later.',
   },
+  'blackburne-shilling-handling': {
+    id: 'blackburne-shilling-handling',
+    label: 'Blackburne-Shilling: 4.Nxe5? instead of 4.Nxd4',
+    color: 'white',
+    theoryVerdict: 'inferior',
+    description:
+      'After 1.e4 e5 2.Nf3 Nc6 3.Bc4 Nd4 the e5 pawn is bait: 4.Nxe5? Qg5 attacks the e5 knight and g2 at once, and 5.Nxf7 Qxg2 6.Rf1 Qxe4+ 7.Be2 Nf3 is checkmate. Take the knight instead: 4.Nxd4 exd4 5.c3 hits the d4 pawn with the knight gone, or play 4.c3 first. Black has moved the same knight twice and left the e5 pawn undefended; the knight on d4, not the pawn, is the piece to take.',
+  },
+  'mated-while-ahead': {
+    id: 'mated-while-ahead',
+    label: 'Checkmated while two or more points ahead',
+    color: 'both',
+    theoryVerdict: 'neutral',
+    description:
+      'The game ended in checkmate while you were at least two points of material up on the final position. When ahead, the opponent\'s only hope is a direct attack on the king: before every move list the opponent\'s checks and captures, keep an escape square for the king, and trade pieces to take the attackers off the board.',
+  },
+  'lost-on-time-while-ahead': {
+    id: 'lost-on-time-while-ahead',
+    label: 'Lost on time while two or more points ahead',
+    color: 'both',
+    theoryVerdict: 'neutral',
+    description:
+      'The clock ran out while you were at least two points of material up. A won position on the board scores nothing when the flag falls: once ahead, simplify into a position you can play quickly, move at once when there is only one sensible move, and look at the clock before every move after move 30.',
+  },
 };
+
+const PIECE_VALUES: Record<string, number> = { p: 1, n: 3, b: 3, r: 5, q: 9, k: 0 };
+
+/** Material balance from `color`'s point of view in pawn units (queen 9, rook 5, minor 3, pawn 1). */
+export function materialBalance(chess: Chess, color: 'w' | 'b'): number {
+  let total = 0;
+  for (const row of chess.board()) {
+    for (const piece of row) {
+      if (!piece) continue;
+      total += (piece.color === color ? 1 : -1) * PIECE_VALUES[piece.type];
+    }
+  }
+  return total;
+}
+
+/** Replay a SAN list from the start position; `fensBefore[i]` is the position before ply i. Null on an illegal move. */
+function replayGame(moves: string[]): { chess: Chess; fensBefore: string[] } | null {
+  const chess = new Chess(START_FEN);
+  const fensBefore: string[] = [];
+  for (const raw of moves) {
+    fensBefore.push(chess.fen());
+    try {
+      chess.move(cleanSan(raw));
+    } catch {
+      return null;
+    }
+  }
+  return { chess, fensBefore };
+}
+
+/** 0-based index of the last ply played by `mover` in a game of `length` plies, or -1. */
+function lastPlyOf(length: number, mover: 'w' | 'b'): number {
+  const wanted = mover === 'w' ? 0 : 1;
+  for (let i = length - 1; i >= 0; i--) if (i % 2 === wanted) return i;
+  return -1;
+}
+
+function terminationOf(game: StoredGame): string | undefined {
+  return game.pgn?.match(/\[Termination "([^"]+)"\]/)?.[1];
+}
+
+function opponentOf(game: StoredGame, color: 'white' | 'black'): string {
+  return (color === 'white' ? game.black?.name : game.white?.name) || 'Opponent';
+}
+
+function pointsText(n: number): string {
+  return `${n} point${n === 1 ? '' : 's'} of material`;
+}
+
 
 const START_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
 
@@ -374,6 +463,206 @@ export class DiagnosticAnalyzer {
   }
 
   /**
+   * Blackburne-Shilling handling: as White after 1.e4 e5 2.Nf3 Nc6 3.Bc4 Nd4 the
+   * player took the bait with 4.Nxe5?. The book move 4.Nxd4 is legal by
+   * construction in the position after 3...Nd4.
+   */
+  public static detectBlackburneShillingHandling(game: StoredGame, moves: string[]): OpeningDeviation | null {
+    const prefix = ['e4', 'e5', 'Nf3', 'Nc6', 'Bc4', 'Nd4', 'Nxe5'];
+    if (moves.length < prefix.length) return null;
+    for (let i = 0; i < prefix.length; i++) if (cleanSan(moves[i]) !== prefix[i]) return null;
+    return {
+      gameId: displayGameId(game),
+      gameUrl: gameUrlOf(game),
+      gameDate: toDateString(game),
+      opponent: game.black?.name || 'Opponent',
+      playedColor: 'white',
+      ply: 7,
+      fen: 'r1bqkbnr/pppp1ppp/8/4p3/2BnP3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4',
+      playedSan: 'Nxe5',
+      bookSan: 'Nxd4',
+      evaluationDelta: '',
+      patternId: 'blackburne-shilling-handling',
+      description:
+        'After 3...Nd4 the e5 pawn is poisoned: 4.Nxe5? Qg5 hits the e5 knight and g2 at the same time, and 5.Nxf7 Qxg2 6.Rf1 Qxe4+ 7.Be2 Nf3 is checkmate. 4.Nxd4 exd4 5.c3 removes the knight and attacks the d4 pawn; 4.c3 also works.',
+    };
+  }
+
+  /**
+   * The player was checkmated while at least two points of material up on the
+   * final position (chess.js replays the whole game). The deviation points at the
+   * player's last move; no single book move is claimed.
+   */
+  public static detectMatedWhileAhead(game: StoredGame, moves: string[], color: 'white' | 'black'): OpeningDeviation | null {
+    if (this.getPlayerResult(game, color) !== 'loss') return null;
+    const replay = replayGame(moves);
+    if (!replay || !replay.chess.isCheckmate()) return null;
+    const mover: 'w' | 'b' = color === 'white' ? 'w' : 'b';
+    if (replay.chess.turn() !== mover) return null; // the mated side is the side to move
+    const material = materialBalance(replay.chess, mover);
+    if (material < 2) return null;
+    const last = lastPlyOf(moves.length, mover);
+    if (last < 0) return null;
+    const moveNo = Math.floor(moves.length / 2) + (moves.length % 2);
+    return {
+      gameId: displayGameId(game),
+      gameUrl: gameUrlOf(game),
+      gameDate: toDateString(game),
+      opponent: opponentOf(game, color),
+      playedColor: color,
+      ply: last + 1,
+      fen: replay.fensBefore[last],
+      playedSan: cleanSan(moves[last]),
+      evaluationDelta: '',
+      patternId: 'mated-while-ahead',
+      description: `You were checkmated on move ${moveNo} while ${pointsText(material)} ahead. In this position, before ${cleanSan(moves[last])}, the opponent's checks and captures needed an answer first: when ahead, every move starts with "what does the opponent threaten against my king?".`,
+    };
+  }
+
+  /**
+   * The player lost on the clock (PGN Termination mentions time) while at least
+   * two points of material up on the final position.
+   */
+  public static detectLostOnTimeWhileAhead(game: StoredGame, moves: string[], color: 'white' | 'black'): OpeningDeviation | null {
+    if (this.getPlayerResult(game, color) !== 'loss') return null;
+    const termination = terminationOf(game);
+    if (!termination || !/time/i.test(termination)) return null;
+    const replay = replayGame(moves);
+    if (!replay) return null;
+    const mover: 'w' | 'b' = color === 'white' ? 'w' : 'b';
+    const material = materialBalance(replay.chess, mover);
+    if (material < 2) return null;
+    const last = lastPlyOf(moves.length, mover);
+    if (last < 0) return null;
+    const moveNo = Math.floor(last / 2) + 1;
+    return {
+      gameId: displayGameId(game),
+      gameUrl: gameUrlOf(game),
+      gameDate: toDateString(game),
+      opponent: opponentOf(game, color),
+      playedColor: color,
+      ply: last + 1,
+      fen: replay.fensBefore[last],
+      playedSan: cleanSan(moves[last]),
+      evaluationDelta: '',
+      patternId: 'lost-on-time-while-ahead',
+      description: `The flag fell after your move ${moveNo} with ${pointsText(material)} on the board in your favour. A won position scores nothing on time: once ahead, trade down, play the obvious move at once, and check the clock before every move.`,
+    };
+  }
+
+  /**
+   * Walk the game down the repertoire tree (positions matched by their first
+   * four FEN fields, so transpositions count). Stop at the first move not in
+   * the tree: when it is the player's, report it with the tree's move as
+   * `bookSan`; when it is the opponent's, or the plan simply ends, it is not a leak.
+   */
+  public static detectRepertoireDivergence(
+    game: StoredGame,
+    tree: RepertoireNode,
+    color: 'white' | 'black',
+    opts: { lineNames?: Record<string, string> } = {}
+  ): OpeningDeviation | null {
+    const moves = game.movesSan || [];
+    const mover: 'w' | 'b' = color === 'white' ? 'w' : 'b';
+    const chess = new Chess(tree.fen);
+    let node = tree;
+
+    for (let i = 0; i < moves.length; i++) {
+      if (node.children.length === 0) return null; // the plan ends here
+      const fenBefore = chess.fen();
+      const turn = chess.turn();
+      let played;
+      try {
+        played = chess.move(cleanSan(moves[i]));
+      } catch {
+        return null; // corrupted move list
+      }
+      const next = findChildByFen(node, chess.fen());
+      if (next) {
+        node = next;
+        continue;
+      }
+      if (turn !== mover) return null; // the opponent left the plan
+
+      const book = node.children.find((c) => c.isStudentMove) || node.children[0];
+      const lineId = book.lineIds[0] || node.lineIds[0] || '';
+      const lineName = opts.lineNames?.[lineId] || lineId;
+      const moveNo = Math.floor(i / 2) + 1;
+      const label = turn === 'w' ? `${moveNo}.${played.san}` : `${moveNo}...${played.san}`;
+      const bookLabel = turn === 'w' ? `${moveNo}.${book.san}` : `${moveNo}...${book.san}`;
+      return {
+        gameId: displayGameId(game),
+        gameUrl: gameUrlOf(game),
+        gameDate: toDateString(game),
+        opponent: opponentOf(game, color),
+        playedColor: color,
+        ply: i + 1,
+        fen: fenBefore,
+        playedSan: played.san,
+        bookSan: book.san,
+        evaluationDelta: '',
+        patternId: 'repertoire-divergence',
+        lineName,
+        description: `You left the ${lineName} with ${label}; the plan is ${bookLabel}.${book.annotation ? ` ${book.annotation}` : ''}`,
+      };
+    }
+    return null;
+  }
+
+  /**
+   * Aggregate one divergence per game into leaks keyed by (position, played move),
+   * scored against the player's other games of the same colour, and sorted by
+   * games x score deficit, then by games.
+   */
+  private static aggregateRepertoireLeaks(
+    entries: Array<{ game: StoredGame; deviation: OpeningDeviation }>,
+    gamesByColor: Record<'white' | 'black', StoredGame[]>,
+    handle: string
+  ): RepertoireLeak[] {
+    const groups = new Map<string, Array<{ game: StoredGame; deviation: OpeningDeviation }>>();
+    for (const entry of entries) {
+      const key = `${entry.deviation.playedColor}|${fenKey(entry.deviation.fen)}|${entry.deviation.playedSan}`;
+      const list = groups.get(key) || [];
+      list.push(entry);
+      groups.set(key, list);
+    }
+
+    const leaks: RepertoireLeak[] = [];
+    for (const list of groups.values()) {
+      const first = list[0].deviation;
+      const ids = new Set(list.map((e) => e.game.id));
+      const withGames = list.map((e) => e.game);
+      const otherGames = gamesByColor[first.playedColor].filter((g) => !ids.has(g.id));
+      const impact: PatternImpact = {
+        gamesWith: withGames.length,
+        scoreWith: scoreOf(withGames, handle),
+        gamesWithout: otherGames.length,
+        scoreWithout: scoreOf(otherGames, handle),
+      };
+      const deltaText = formatImpact(impact);
+      const deviations = list
+        .map((e) => ({ ...e.deviation, impact, evaluationDelta: deltaText }))
+        .sort((a, b) => (b.gameDate || '').localeCompare(a.gameDate || ''));
+      leaks.push({
+        fenKey: fenKey(first.fen),
+        fen: first.fen,
+        playedSan: first.playedSan,
+        bookSan: first.bookSan || '',
+        lineName: first.lineName || '',
+        color: first.playedColor,
+        games: withGames.length,
+        score: impact.scoreWith,
+        scoreOther: impact.scoreWithout,
+        deviations,
+      });
+    }
+
+    const deficit = (l: RepertoireLeak) => l.games * Math.max(0, l.scoreOther - l.score);
+    leaks.sort((a, b) => deficit(b) - deficit(a) || b.games - a.games);
+    return leaks;
+  }
+
+  /**
    * Group games by their first six plies, sort by frequency, and compute score rates.
    */
   private static buildOpeningStats(games: StoredGame[], color: 'white' | 'black'): OpeningStats[] {
@@ -461,44 +750,54 @@ export class DiagnosticAnalyzer {
     const whiteTally = tally(whiteGames, 'white');
     const blackTally = tally(blackGames, 'black');
 
+    const whiteRepertoire = getRecommendedWhiteRepertoire();
+    const blackRepertoire = getRecommendedBlackRepertoire();
+    const whiteTree = buildRepertoireTree(whiteRepertoire);
+    const blackTree = buildRepertoireTree(blackRepertoire);
+    const lineNames: Record<string, string> = {};
+    for (const plan of [whiteRepertoire, blackRepertoire] as RepertoirePlan[]) {
+      for (const line of plan.lines) lineNames[line.id] = line.name;
+    }
+
     // Run detectors
-    const patternDeviations: Record<PatternId, OpeningDeviation[]> = {
-      'white-scandi-e5': [],
-      'black-bg4-chase': [],
-      'early-queen-sortie': [],
+    const patternDeviations = {} as Record<DetectorPatternId, OpeningDeviation[]>;
+    const patternGameIds = {} as Record<DetectorPatternId, Set<string>>;
+    for (const id of Object.keys(PATTERN_META) as DetectorPatternId[]) {
+      patternDeviations[id] = [];
+      patternGameIds[id] = new Set();
+    }
+    const record = (id: DetectorPatternId, g: StoredGame, dev: OpeningDeviation | null) => {
+      if (!dev) return;
+      patternDeviations[id].push(dev);
+      patternGameIds[id].add(g.id);
     };
-    const patternGameIds: Record<PatternId, Set<string>> = {
-      'white-scandi-e5': new Set(),
-      'black-bg4-chase': new Set(),
-      'early-queen-sortie': new Set(),
-    };
+    const divergences: Array<{ game: StoredGame; deviation: OpeningDeviation }> = [];
 
     for (const g of whiteGames) {
       const moves = g.movesSan || [];
-      const scandi = this.detectWhiteScandinavianLeak(g, moves);
-      if (scandi) {
-        patternDeviations['white-scandi-e5'].push(scandi);
-        patternGameIds['white-scandi-e5'].add(g.id);
-      }
-      const queen = this.detectEarlyQueenSortie(g, moves, 'white');
-      if (queen) {
-        patternDeviations['early-queen-sortie'].push(queen);
-        patternGameIds['early-queen-sortie'].add(g.id);
-      }
+      record('white-scandi-e5', g, this.detectWhiteScandinavianLeak(g, moves));
+      record('early-queen-sortie', g, this.detectEarlyQueenSortie(g, moves, 'white'));
+      record('blackburne-shilling-handling', g, this.detectBlackburneShillingHandling(g, moves));
+      record('mated-while-ahead', g, this.detectMatedWhileAhead(g, moves, 'white'));
+      record('lost-on-time-while-ahead', g, this.detectLostOnTimeWhileAhead(g, moves, 'white'));
+      const divergence = this.detectRepertoireDivergence(g, whiteTree, 'white', { lineNames });
+      if (divergence) divergences.push({ game: g, deviation: divergence });
     }
     for (const g of blackGames) {
       const moves = g.movesSan || [];
-      const bg4 = this.detectBlackBg4ChaseLeak(g, moves);
-      if (bg4) {
-        patternDeviations['black-bg4-chase'].push(bg4);
-        patternGameIds['black-bg4-chase'].add(g.id);
-      }
-      const queen = this.detectEarlyQueenSortie(g, moves, 'black');
-      if (queen) {
-        patternDeviations['early-queen-sortie'].push(queen);
-        patternGameIds['early-queen-sortie'].add(g.id);
-      }
+      record('black-bg4-chase', g, this.detectBlackBg4ChaseLeak(g, moves));
+      record('early-queen-sortie', g, this.detectEarlyQueenSortie(g, moves, 'black'));
+      record('mated-while-ahead', g, this.detectMatedWhileAhead(g, moves, 'black'));
+      record('lost-on-time-while-ahead', g, this.detectLostOnTimeWhileAhead(g, moves, 'black'));
+      const divergence = this.detectRepertoireDivergence(g, blackTree, 'black', { lineNames });
+      if (divergence) divergences.push({ game: g, deviation: divergence });
     }
+
+    const repertoireLeaks = this.aggregateRepertoireLeaks(
+      divergences,
+      { white: whiteGames, black: blackGames },
+      playerHandle
+    );
 
     // Measured impact per pattern: games with the pattern vs the player's other
     // games of the colour(s) the pattern applies to.
@@ -530,9 +829,6 @@ export class DiagnosticAnalyzer {
     const whiteLeaks = allDeviations.filter((d) => d.playedColor === 'white');
     const blackLeaks = allDeviations.filter((d) => d.playedColor === 'black');
 
-    const whiteRepertoire = getRecommendedWhiteRepertoire();
-    const blackRepertoire = getRecommendedBlackRepertoire();
-
     return {
       playerHandle,
       totalGamesAnalyzed: whiteGames.length + blackGames.length,
@@ -555,16 +851,28 @@ export class DiagnosticAnalyzer {
         openings: this.buildOpeningStats(blackGames, 'black'),
       },
       patterns,
-      // Recommendation headlines are reviewed in the repertoire-divergence work
-      // (roadmap CL-4); the Black plan will move from a King's Indian to the
-      // c6-d5 structures hoot65 already plays.
-      recommendedWhiteRepertoire: 'Italian Game & Anti-Scandinavian (2.exd5!)',
-      recommendedBlackRepertoire: 'Caro-Kann & King\'s Indian',
+      repertoireLeaks,
+      // The headlines are the plans' own names, so the view and the plan cannot drift apart
+      recommendedWhiteRepertoire: whiteRepertoire.name,
+      recommendedBlackRepertoire: blackRepertoire.name,
       whiteRepertoirePlan: whiteRepertoire,
       blackRepertoirePlan: blackRepertoire,
       generatedAt: Date.now(),
     };
   }
+}
+
+/**
+ * First divergence of a game from a repertoire tree; see
+ * DiagnosticAnalyzer.detectRepertoireDivergence.
+ */
+export function detectRepertoireDivergence(
+  game: StoredGame,
+  tree: RepertoireNode,
+  color: 'white' | 'black',
+  opts: { lineNames?: Record<string, string> } = {}
+): OpeningDeviation | null {
+  return DiagnosticAnalyzer.detectRepertoireDivergence(game, tree, color, opts);
 }
 
 /**
