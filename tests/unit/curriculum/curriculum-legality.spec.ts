@@ -7,6 +7,7 @@ import {
   getCurriculumLessonById,
 } from '../../../src/curriculum';
 import seedGamesRaw from '../../../src/data/seed_hoot65_games.json';
+import { CurriculumMove } from '../../../src/types/curriculum';
 
 describe('Curriculum Move Legality & Verification (chess.js)', () => {
   it('should have at least 10 comprehensive curriculum lessons across 5 categories', () => {
@@ -47,6 +48,93 @@ describe('Curriculum Move Legality & Verification (chess.js)', () => {
     }
 
     expect(totalMovesVerified).toBeGreaterThan(80);
+  });
+
+  it('walks every branch: each alternative key is legal for the opponent, each continuation move is legal and every fenAfter matches chess.js', () => {
+    let alternativesVerified = 0;
+    let branchMovesVerified = 0;
+    const lessonsWithBranches = new Set<string>();
+
+    const walk = (lessonId: string, moves: CurriculumMove[], fromFen: string, where: string) => {
+      const chess = new Chess(fromFen);
+      for (const move of moves) {
+        const fenBefore = chess.fen();
+        if (move.alternatives) {
+          expect(move.isUserMove, `${lessonId} ${where}: alternatives on a user move ${move.san}`).toBe(false);
+          for (const [altSan, continuation] of Object.entries(move.alternatives)) {
+            lessonsWithBranches.add(lessonId);
+            expect(new Chess(fenBefore).moves(), `${lessonId} ${where}: alternative '${altSan}' must be legal. FEN: ${fenBefore}`).toContain(altSan);
+            expect(altSan).not.toBe(move.san);
+            expect(continuation.length).toBeGreaterThan(0);
+            expect(continuation[0].isUserMove, `${lessonId} ${where}: branch ${altSan} must start with the student's reply`).toBe(true);
+            const branch = new Chess(fenBefore);
+            branch.move(altSan);
+            alternativesVerified++;
+            walk(lessonId, continuation, branch.fen(), `${where} > ${altSan}`);
+          }
+        }
+        expect(chess.moves(), `${lessonId} ${where}: move ${move.san} (ply ${move.ply}) must be legal. FEN: ${fenBefore}`).toContain(move.san);
+        const result = chess.move(move.san);
+        expect(chess.fen()).toBe(move.fenAfter);
+        expect(move.uci).toBe(`${result.from}${result.to}${result.promotion || ''}`);
+        if (move.isUserMove) {
+          expect(move.hintPiece, `${lessonId} ${where} ply ${move.ply}`).toBeTruthy();
+          expect(move.hintSquare, `${lessonId} ${where} ply ${move.ply}`).toMatch(/^[a-h][1-8]$/);
+        }
+        if (where !== 'main') branchMovesVerified++;
+      }
+    };
+
+    for (const lesson of allCurriculumLessons) walk(lesson.id, lesson.moves, lesson.initialFen, 'main');
+
+    expect(alternativesVerified).toBeGreaterThanOrEqual(11);
+    expect(branchMovesVerified).toBeGreaterThanOrEqual(50);
+    expect([...lessonsWithBranches].sort()).toEqual([
+      'lesson-caro-kann-discipline-drill',
+      'lesson-evans-gambit-destruction',
+      'lesson-scandinavian-refutation-drill',
+    ]);
+  });
+
+  it('seeds branch frequencies from the archive: the counts in the lesson data are the counts in the games', () => {
+    const archive = (seedGamesRaw as unknown as Array<{ white: { name: string }; black: { name: string }; movesSan: string[] }>);
+    const repliesAfter = (prefix: string[]): Record<string, number> => {
+      const counts: Record<string, number> = {};
+      for (const g of archive) {
+        if (g.white.name.toLowerCase() !== 'hoot65') continue;
+        if (g.movesSan.length <= prefix.length) continue;
+        if (prefix.some((san, i) => g.movesSan[i] !== san)) continue;
+        const reply = g.movesSan[prefix.length];
+        counts[reply] = (counts[reply] || 0) + 1;
+      }
+      return counts;
+    };
+    const evans = getCurriculumLessonById('lesson-evans-gambit-destruction')!;
+    const afterBc4 = repliesAfter(['e4', 'e5', 'Nf3', 'Nc6', 'Bc4']);
+    expect(afterBc4).toMatchObject({ h6: 16, Nf6: 12, Bc5: 11, Nd4: 5 });
+    const bc5 = evans.moves[5];
+    expect(bc5.san).toBe('Bc5');
+    expect(bc5.frequency).toBe(afterBc4.Bc5);
+    expect(bc5.alternatives!.Nf6[0].frequency).toBe(afterBc4.Nf6);
+    expect(bc5.alternatives!.Nd4[0].frequency).toBe(afterBc4.Nd4);
+    expect(bc5.alternatives!.h6[0].frequency).toBe(afterBc4.h6);
+    expect(repliesAfter(['e4', 'e5', 'Nf3', 'Nc6', 'Bc4', 'Bc5', 'b4'])).toEqual({ Bxb4: 7 });
+    expect(evans.moves[7].frequency).toBe(7);
+    expect(repliesAfter(['e4', 'e5', 'Nf3', 'Nc6', 'Bc4', 'Bc5', 'b4', 'Bxb4', 'c3', 'Bc5', 'd4', 'exd4', 'O-O'])).toEqual({ dxc3: 4 });
+    expect(evans.moves[13].alternatives!.dxc3[0].frequency).toBe(4);
+
+    const scandi = getCurriculumLessonById('lesson-scandinavian-refutation-drill')!;
+    expect(repliesAfter(['e4', 'd5', 'exd5'])).toEqual({ Qxd5: 2 });
+    expect(scandi.moves[3].frequency).toBe(2);
+    expect(repliesAfter(['e4', 'd5', 'exd5', 'Qxd5', 'Nc3'])).toEqual({ Qd8: 1, 'Qe6+': 1 });
+    expect(scandi.moves[5].alternatives!.Qd8[0].frequency).toBe(1);
+    expect(scandi.moves[5].alternatives!['Qe6+'][0].frequency).toBe(1);
+
+    // No archived game reached 2.d4 against the Caro-Kann, so no reply there carries a count
+    expect(repliesAfter(['e4', 'c6', 'd4'])).toEqual({});
+    const caro = getCurriculumLessonById('lesson-caro-kann-discipline-drill')!;
+    expect(caro.moves[5].frequency).toBeUndefined();
+    for (const continuation of Object.values(caro.moves[5].alternatives!)) expect(continuation[0].frequency).toBeUndefined();
   });
 
   it('should verify 100% of exercise solutions in all lessons are legal step-by-step', () => {
