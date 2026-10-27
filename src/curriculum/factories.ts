@@ -1,7 +1,7 @@
 import { Chess } from 'chess.js';
 import { CurriculumLesson } from '../types/curriculum';
 import { OpeningDeviation, RepertoireLine } from '../types/diagnostics';
-import { buildVerifiedLesson, MoveInput } from './builder';
+import { buildVerifiedLesson, findMoveAtPath, positionKey, MoveInput, MistakeTrapInput } from './builder';
 import { canonicalFenKey } from '../services/fenKey';
 
 /**
@@ -226,11 +226,32 @@ export function lessonFromDecision(
     for (const san of spec.path.slice(spec.path.length - contextPlies)) moves.push({ san, isUserMove: false });
   }
   const [main, ...alternatives] = spec.acceptedSan;
+  // The source lesson's own teaching for this decision (annotation, hints, feedback, arrows) travels with the card
+  const sourceMove = canReplay ? findMoveAtPath(source, [...spec.path, main]) : undefined;
   moves.push({
     san: main,
     isUserMove: true,
     accept: alternatives.length > 0 ? { san: alternatives } : undefined,
+    annotation: sourceMove?.annotation,
+    hintPiece: sourceMove?.hintPiece,
+    hintSquare: sourceMove?.hintSquare,
+    hintTheme: sourceMove?.hintTheme,
+    wrongMoveFeedback: sourceMove?.wrongMoveFeedback,
+    arrows: sourceMove?.arrows,
+    highlights: sourceMove?.highlights,
   });
+  const decisionKey = positionKey(spec.fen);
+  const mistakesAndTraps: MistakeTrapInput[] = (source?.commonMistakesAndTraps || [])
+    .filter((t) => positionKey(t.triggerFen) === decisionKey)
+    .map((t) => ({
+      triggerFen: t.triggerFen,
+      attemptedSan: t.attemptedSan,
+      isTrap: t.isTrap,
+      severity: t.severity,
+      explanatoryFeedback: t.explanatoryFeedback,
+      refutationSanList: t.refutationSanList,
+      punishmentSummary: t.punishmentSummary,
+    }));
 
   const turn = new Chess(spec.fen).turn();
   return buildVerifiedLesson({
@@ -250,5 +271,6 @@ export function lessonFromDecision(
     relevance: 'core',
     moves,
     exercises: [],
+    mistakesAndTraps,
   });
 }

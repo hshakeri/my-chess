@@ -207,7 +207,8 @@ describe('buildQueue', () => {
     expect(fresh.every((c) => c.state === STATE_NEW)).toBe(true);
     expect(reviews.every((c) => c.state !== STATE_NEW)).toBe(true);
     assertInterleaved(reviews);
-    assertInterleaved(fresh);
+    // New cards are spread across lessons (not families) before the cap; see sessionQueue-new-cards.spec.ts
+    expect(fresh.length).toBeLessThanOrEqual(8);
   });
 
   it('interleaveByFamily leaves a single family in priority order', () => {

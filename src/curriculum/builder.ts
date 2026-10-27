@@ -7,6 +7,8 @@ import {
   MoveAcceptance,
 } from '../types/curriculum';
 
+const START_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
+
 export interface MoveInput {
   san: string;
   annotation?: string;
@@ -124,6 +126,44 @@ function weightOf(move: CurriculumMove | undefined): number {
 function isUserMoveFor(turn: 'w' | 'b', targetColor: LessonConfig['targetColor'], input: MoveInput): boolean {
   if (input.isUserMove !== undefined) return input.isUserMove;
   return targetColor === 'black' ? turn === 'b' : turn === 'w';
+}
+
+/** Every legal move in `fen` that delivers checkmate, as chess.js prints it. */
+export function matingMoves(fen: string): string[] {
+  const probe = new Chess(fen);
+  const out: string[] = [];
+  for (const mv of probe.moves({ verbose: true })) {
+    probe.move(mv.san);
+    if (probe.isCheckmate()) out.push(mv.san);
+    probe.undo();
+  }
+  return out;
+}
+
+/**
+ * The lesson move reached by playing `path` from the lesson's initial position, following the main
+ * line and descending into an opponent alternative whenever the path takes it. Undefined when the
+ * path leaves the lesson tree.
+ */
+export function findMoveAtPath(lesson: CurriculumLesson, path: string[]): CurriculumMove | undefined {
+  let sequence: CurriculumMove[] = lesson.moves;
+  let index = 0;
+  let found: CurriculumMove | undefined;
+  for (const san of path) {
+    const move = sequence[index];
+    if (!move) return undefined;
+    if (move.san === san) {
+      found = move;
+      index += 1;
+      continue;
+    }
+    const branch = !move.isUserMove && move.alternatives ? move.alternatives[san] : undefined;
+    if (!branch) return undefined;
+    found = { ply: move.ply, san, isUserMove: false };
+    sequence = branch;
+    index = 0;
+  }
+  return found;
 }
 
 function tryMove(fen: string, san: string): { san: string; fen: string; from: string; to: string; piece: string; promotion?: string } | null {
@@ -529,6 +569,10 @@ export function enumerateDecisions(lesson: CurriculumLesson): DecisionSpec[] {
       const turn = new Chess(fen).turn();
       if (active && move.isUserMove) {
         const acceptedSan = [move.san, ...(move.accept?.san || []).filter((s) => s !== move.san)];
+        if (move.accept?.predicate === 'checkmate') {
+          // The card must accept every mate in the position, not only the scripted one
+          for (const san of matingMoves(fen)) if (!acceptedSan.includes(san)) acceptedSan.push(san);
+        }
         const lastSan = path.length > 0 ? path[path.length - 1] : null;
         // A recapture with the same SAN as the opponent's move would print the answer: use a neutral label then
         const last =
@@ -544,8 +588,8 @@ export function enumerateDecisions(lesson: CurriculumLesson): DecisionSpec[] {
           tags: [...baseTags, `color:${turn}`],
           title: last
             ? `${sideName(turn)} to move after ${last}`
-            : lastSan
-              ? `${sideName(turn)} to move (move ${moveNumber})`
+            : lastSan || fen !== START_FEN
+              ? `${sideName(turn)} to move (move ${lastSan ? moveNumber : Number(fen.split(' ')[5]) || moveNumber})`
               : `${sideName(turn)} to move from the start position`,
           reachProb: reach,
         });

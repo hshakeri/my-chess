@@ -48,6 +48,17 @@ interface DiagnosticsViewProps {
 
 const EMPTY_GAMES: StoredGame[] = [];
 
+// The archive array from App is stable while nothing changed, so the (about one second) analysis
+// runs once per archive, not once per visit to the tab.
+const reportCache = new WeakMap<StoredGame[], DiagnosticReport>();
+function cachedReport(games: StoredGame[]): DiagnosticReport {
+  const hit = reportCache.get(games);
+  if (hit) return hit;
+  const report = analyzeGames(games, 'hoot65');
+  reportCache.set(games, report);
+  return report;
+}
+
 function pct(score: number): string {
   return `${(score * 100).toFixed(1)}%`;
 }
@@ -90,7 +101,7 @@ export const DiagnosticsView: React.FC<DiagnosticsViewProps> = ({
 
   const games = propGames ?? EMPTY_GAMES;
 
-  const report: DiagnosticReport = useMemo(() => analyzeGames(games, 'hoot65'), [games]);
+  const report: DiagnosticReport = useMemo(() => cachedReport(games), [games]);
 
   const patterns: PatternSummary[] = report.patterns || [];
   const leakPatterns = patterns.filter((p) => p.isLeak);
@@ -397,7 +408,7 @@ export const DiagnosticsView: React.FC<DiagnosticsViewProps> = ({
                           <span className="text-slate-500"> · {leak.lineName}</span>
                         </div>
                         <div className="text-[11px] text-slate-400 mt-0.5">
-                          {leak.games} game{leak.games === 1 ? '' : 's'} as {leak.color}, score {pct(leak.score)} vs {pct(leak.scoreOther)} when you stayed on plan
+                          {leak.games} game{leak.games === 1 ? '' : 's'} as {leak.color}, score {pct(leak.score)} vs {pct(leak.scoreOther)} in your other games as {leak.color}
                         </div>
                       </button>
                       {onPracticeDeviation && first && (

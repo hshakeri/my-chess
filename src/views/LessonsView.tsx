@@ -65,6 +65,7 @@ interface ReviewSession {
   ratings: Record<CardRating, number>;
   current: StoredCard | null;
   sourceTitle: string | null;
+  sourceLessonId: string | null;
 }
 
 const RATING_LABELS: Record<CardRating, string> = { again: 'Again', hard: 'Hard', good: 'Good', easy: 'Easy' };
@@ -96,19 +97,39 @@ function resolveLine(
 ): CurriculumMove[] {
   if (!vary) return lesson.moves;
   const line: CurriculumMove[] = [];
-  for (let i = 0; i < lesson.moves.length; i++) {
-    const move = lesson.moves[i];
-    if (i >= startPly && !move.isUserMove && move.alternatives) {
-      const choice = chooseOpponentReply(move, rng);
-      if (choice.continuation) {
-        line.push({ ply: move.ply, san: choice.san, isUserMove: false, frequency: move.alternatives[choice.san]?.[0]?.frequency });
-        line.push(...choice.continuation);
-        return line;
+  // Walk a sequence; when an alternative is chosen, continue walking its continuation (branches can nest)
+  const walk = (sequence: CurriculumMove[], firstVariableIndex: number) => {
+    for (let i = 0; i < sequence.length; i++) {
+      const move = sequence[i];
+      if (i >= firstVariableIndex && !move.isUserMove && move.alternatives) {
+        const choice = chooseOpponentReply(move, rng);
+        if (choice.continuation) {
+          line.push({ ply: move.ply, san: choice.san, isUserMove: false, frequency: move.alternatives[choice.san]?.[0]?.frequency });
+          walk(choice.continuation, 0);
+          return;
+        }
       }
+      line.push(move);
     }
-    line.push(move);
-  }
+  };
+  walk(lesson.moves, startPly);
   return line;
+}
+
+// Concurrent mounts (React StrictMode mounts twice in development) share one in-flight preparation,
+// so the legacy history can never be replayed twice; once it has settled a later mount may run the
+// idempotent preparation again.
+let prepareCardsPromise: Promise<void> | null = null;
+function prepareCardsOnce(specsByLesson: Record<string, DecisionSpec[]>): Promise<void> {
+  if (!prepareCardsPromise) {
+    prepareCardsPromise = (async () => {
+      await CardService.migrateLegacy(specsByLesson);
+      await CardService.ensureCards(Object.values(specsByLesson).flat());
+    })().finally(() => {
+      prepareCardsPromise = null;
+    });
+  }
+  return prepareCardsPromise;
 }
 
 const OPPONENT_REPLY_MS = 400;
@@ -222,21 +243,31 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
     return byLesson;
   }, []);
 
+  // Pattern-library positions stay out of the daily queue until the student has actually studied them:
+  // a card is active once it belongs to a core lesson or has been reviewed at least once.
+  const coreLessonIds = useMemo(
+    () => new Set(allCurriculumLessons.filter((l) => l.relevance !== 'outside-repertoire').map((l) => l.id)),
+    []
+  );
+  const isActiveCard = useCallback(
+    (card: StoredCard) => card.reps > 0 || card.lessonIds.some((id) => coreLessonIds.has(id)),
+    [coreLessonIds]
+  );
+
   const refreshDue = useCallback(async () => {
     try {
-      setDueCards(await CardService.getDueCards());
+      setDueCards((await CardService.getDueCards()).filter(isActiveCard));
     } catch (err) {
       console.warn('Error reading due cards:', err);
     }
-  }, []);
+  }, [isActiveCard]);
 
   // Migrate the legacy per-lesson cards once, make sure every decision has a card, then count what is due
   useEffect(() => {
     let cancelled = false;
     (async () => {
       try {
-        await CardService.migrateLegacy(allSpecs);
-        await CardService.ensureCards(Object.values(allSpecs).flat());
+        await prepareCardsOnce(allSpecs);
       } catch (err) {
         console.warn('Error preparing review cards:', err);
       }
@@ -319,6 +350,7 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
   const markDecisionStart = useCallback(() => {
     decisionStartedAtRef.current = Date.now();
     firstWrongSanRef.current = null;
+    setHintLevel(0); // a hint opened during the opponent's reply must not count against the next decision
   }, []);
 
   const playOpponentMoveIfNeeded = useCallback(
@@ -434,6 +466,7 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
   const recordDecisionReview = useCallback(
     async (fenBefore: string, hintLevelUsed: number) => {
       const runId = runIdRef.current;
+      const sessionAtReview = session;
       const now = Date.now();
       const responseMs = Math.max(0, now - decisionStartedAtRef.current);
       const wrongSan = firstWrongSanRef.current;
@@ -460,10 +493,21 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
           responseMs,
           hintLevel: hintLevelUsed,
           wrongSan: wrongSan ?? undefined,
-          lessonId: currentLesson.id,
-          sessionId: session?.id,
+          lessonId: sessionAtReview?.sourceLessonId ?? currentLesson.id,
+          sessionId: sessionAtReview?.id,
         });
         await refreshDue();
+
+        // Session bookkeeping belongs to the session, not to the board run: it must not be lost when
+        // the next card opened before this write resolved
+        if (sessionAtReview) {
+          if (rating === 'again' && updated.due - now <= LEARNING_STEP_WINDOW_MS) {
+            sessionStepsRef.current.push(key, updated.due);
+          }
+          setSession((prev) =>
+            prev && prev.id === sessionAtReview.id ? { ...prev, ratings: { ...prev.ratings, [rating]: prev.ratings[rating] + 1 } } : prev
+          );
+        }
         if (runIdRef.current !== runId) return;
 
         setLessonCards((prev) => {
@@ -475,14 +519,6 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
         setReviewLog((log) => [...log, { key, rating, responseMs, dueIn }]);
         setSrsMessage(`${RATING_LABELS[rating]}: next review in ${dueIn}`);
         schedule(() => setSrsMessage(null), 4000);
-        if (session) {
-          // A failed card comes back within this session once its first learning step has passed;
-          // a card answered correctly waits for its own next review instead of being shown again now
-          if (rating === 'again' && updated.due - now <= LEARNING_STEP_WINDOW_MS) {
-            sessionStepsRef.current.push(key, updated.due);
-          }
-          setSession((prev) => (prev ? { ...prev, ratings: { ...prev.ratings, [rating]: prev.ratings[rating] + 1 } } : prev));
-        }
       } catch (err) {
         console.warn('Error recording the review:', err);
       }
@@ -742,14 +778,21 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
   // ---- Today's session: due cards one position at a time ----------------------------------
 
   const lessonForCard = useCallback(
-    (card: StoredCard): { lesson: CurriculumLesson; sourceTitle: string | null } => {
-      const source = allCurriculumLessons.find((l) => card.lessonIds.includes(l.id));
+    (card: StoredCard): { lesson: CurriculumLesson; sourceTitle: string | null; sourceLessonId: string | null } => {
+      // Prefer a core lesson as the source of context and teaching; the card keeps every accepted answer
+      const candidates = allCurriculumLessons.filter((l) => card.lessonIds.includes(l.id));
+      const source = candidates.find((l) => l.relevance !== 'outside-repertoire') ?? candidates[0];
       const spec = source ? allSpecs[source.id]?.find((d) => canonicalFenKey(d.fen) === card.id) : undefined;
-      const lesson = lessonFromDecision(
-        source,
-        spec ?? { fen: card.fen, acceptedSan: card.accepted, path: [], title: card.title, lessonId: card.lessonIds[0] ?? 'card' }
-      );
-      return { lesson, sourceTitle: source?.title ?? null };
+      const main = spec?.acceptedSan[0] ?? card.accepted[0];
+      const acceptedSan = [main, ...card.accepted.filter((san) => san !== main)];
+      const lesson = lessonFromDecision(source, {
+        fen: spec?.fen ?? card.fen,
+        acceptedSan,
+        path: spec?.path ?? [],
+        title: spec?.title ?? card.title,
+        lessonId: source?.id ?? card.lessonIds[0] ?? 'card',
+      });
+      return { lesson, sourceTitle: source?.title ?? null, sourceLessonId: source?.id ?? null };
     },
     [allSpecs]
   );
@@ -757,12 +800,12 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
   const openSessionCard = useCallback(
     (card: StoredCard, next: ReviewSession) => {
       try {
-        const { lesson, sourceTitle } = lessonForCard(card);
-        setSession({ ...next, current: card, sourceTitle });
+        const { lesson, sourceTitle, sourceLessonId } = lessonForCard(card);
+        setSession({ ...next, current: card, sourceTitle, sourceLessonId });
         setCurrentLesson(lesson);
       } catch (err) {
         console.warn('Could not build a review card lesson:', err);
-        setSession({ ...next, current: null, sourceTitle: null });
+        setSession({ ...next, current: null, sourceTitle: null, sourceLessonId: null });
       }
     },
     [lessonForCard]
@@ -771,7 +814,7 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
   const handleStartSession = async () => {
     const now = Date.now();
     try {
-      const due = await CardService.getDueCards(now);
+      const due = (await CardService.getDueCards(now)).filter(isActiveCard);
       const queue = buildQueue(due, { now, retrievability: (c) => CardService.retrievability(c, now) });
       if (queue.length === 0) return;
       sessionStepsRef.current = new LearningSteps();
@@ -783,6 +826,7 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
         ratings: { again: 0, hard: 0, good: 0, easy: 0 },
         current: null,
         sourceTitle: null,
+        sourceLessonId: null,
       });
     } catch (err) {
       console.warn('Could not start the review session:', err);
@@ -790,7 +834,7 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
   };
 
   const handleNextCard = async () => {
-    if (!session) return;
+    if (!session || !session.current) return;
     const now = Date.now();
     const steps = sessionStepsRef.current;
     const completed = session.completed + 1;
@@ -819,7 +863,7 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
           return;
         }
       }
-      setSession({ ...session, index: nextIndex, completed, current: null, sourceTitle: null });
+      setSession({ ...session, index: nextIndex, completed, current: null, sourceTitle: null, sourceLessonId: null });
     } catch (err) {
       console.warn('Could not advance the review session:', err);
     }
@@ -1124,7 +1168,7 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
                 position={position}
                 orientation={studentColor}
                 lastMove={lastMove}
-                interactive={!isLessonComplete && !isOpponentThinking && !isRollingBack && (phase !== 'line' || isStudentTurn)}
+                interactive={!isLessonComplete && !isOpponentThinking && !isRollingBack && !isLineHold && (phase !== 'line' || isStudentTurn)}
                 onMove={handleBoardMove}
                 getLegalMovesForSquare={(sq) => rulesRef.current.getLegalMovesForSquare(sq)}
                 arrows={boardArrows}
@@ -1248,7 +1292,7 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
                   type="button"
                   data-action="hint"
                   onClick={handleRevealHint}
-                  disabled={isLessonComplete || !hintTarget}
+                  disabled={isLessonComplete || !hintTarget || isOpponentThinking}
                   className="px-3 py-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-xs font-semibold flex items-center gap-1.5 transition-colors disabled:opacity-50"
                 >
                   <Lightbulb className="w-4 h-4 text-amber-400" />
@@ -1302,7 +1346,7 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
             )}
 
             {/* Session controls once a review card is answered */}
-            {isLessonComplete && session && (
+            {isLessonComplete && session?.current && (
               <div className="p-3.5 rounded-xl bg-amber-950/40 border border-amber-500/40 text-sm text-amber-100" data-section="session-card">
                 {session.sourceTitle && (
                   <p className="text-xs text-amber-200/90 mb-2">

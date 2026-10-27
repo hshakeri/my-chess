@@ -40,7 +40,7 @@ type ActiveTab = 'play' | 'database' | 'diagnostics' | 'lessons' | 'worksheets';
 const REPERTOIRE_LINE_TO_LESSON: Record<string, string> = {
   'white-scandi-refutation': 'lesson-scandinavian-refutation-drill',
   'white-italian-evans-gambit': 'lesson-evans-gambit-destruction',
-  'white-scotch-gambit': 'lesson-scotch-gambit-breakthrough',
+  // The Scotch line has no authored lesson on the plan's own move order: it is built from the line
 };
 
 const ADOPTED_REPERTOIRES_KEY = 'my_chess_adopted_repertoires_v1';

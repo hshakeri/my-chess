@@ -44,6 +44,8 @@ function rank(cards: StoredCard[], opts: BuildQueueOptions): Ranked[] {
     .sort((a, b) => {
       if (b.priority !== a.priority) return b.priority - a.priority;
       if (a.card.due !== b.card.due) return a.card.due - b.card.due;
+      // Earlier decisions of a line before later ones, then a stable order
+      if ((a.card.ply ?? 0) !== (b.card.ply ?? 0)) return (a.card.ply ?? 0) - (b.card.ply ?? 0);
       return a.card.id < b.card.id ? -1 : a.card.id > b.card.id ? 1 : 0;
     });
 }
@@ -55,11 +57,26 @@ function rank(cards: StoredCard[], opts: BuildQueueOptions): Ranked[] {
  * is left, which is the unavoidable tail.
  */
 export function interleaveByFamily(ranked: StoredCard[], priorityOf: (c: StoredCard) => number): StoredCard[] {
+  return interleaveBy(ranked, priorityOf, familyOf);
+}
+
+/** The lesson a card was first created for (its `lesson:` tag), used to spread new cards across lessons. */
+export function lessonOf(card: StoredCard): string {
+  const tag = (card.tags || []).find((t) => t.startsWith('lesson:'));
+  return tag ? tag.slice('lesson:'.length) : card.lessonIds?.[0] ?? '';
+}
+
+/** Round-robin across the groups `keyOf` assigns, groups ordered by their most urgent card. */
+export function interleaveBy(
+  ranked: StoredCard[],
+  priorityOf: (c: StoredCard) => number,
+  keyOf: (c: StoredCard) => string
+): StoredCard[] {
   const families: string[] = [];
   const buckets = new Map<string, StoredCard[]>();
   const sorted = [...ranked].sort((a, b) => priorityOf(b) - priorityOf(a));
   for (const card of sorted) {
-    const fam = familyOf(card);
+    const fam = keyOf(card);
     if (!buckets.has(fam)) {
       buckets.set(fam, []);
       families.push(fam);
@@ -96,17 +113,18 @@ export function buildQueue(cards: StoredCard[], opts: BuildQueueOptions): Stored
   const seasoned = due.filter((c) => c.state !== STATE_NEW);
 
   const rankedReviews = rank(seasoned, opts).slice(0, maxReviews);
-  const rankedNew = rank(fresh, opts).slice(0, maxNew);
+  const rankedNew = rank(fresh, opts);
 
   const priorities = new Map<string, number>();
   for (const r of [...rankedReviews, ...rankedNew]) priorities.set(r.card.id, r.priority);
   const priorityOf = (c: StoredCard) => priorities.get(c.id) ?? 0;
 
   // Overdue reviews always come before new material: a New card has retrievability 0 and would
-  // otherwise outrank every review that is days late.
+  // otherwise outrank every review that is days late. New cards are spread across lessons before
+  // the daily cap is applied, so a first session does not consist of one lesson's decisions.
   return [
     ...interleaveByFamily(rankedReviews.map((r) => r.card), priorityOf),
-    ...interleaveByFamily(rankedNew.map((r) => r.card), priorityOf),
+    ...interleaveBy(rankedNew.map((r) => r.card), priorityOf, lessonOf).slice(0, maxNew),
   ];
 }
 

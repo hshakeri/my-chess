@@ -175,6 +175,11 @@ describe('LessonsView interactions (jsdom)', () => {
     await waitFor(() => expect(document.querySelector('[data-section="session-summary"]')).toBeTruthy());
     expect(document.querySelector('[data-section="session-summary"]')?.textContent).toMatch(/1 card reviewed: 0 again, 0 hard, 1 good, 0 easy/);
     expect(document.querySelector('[data-due-count]')?.getAttribute('data-due-count')).toBe('0');
+    // No further "Next card" once the session is over: the count cannot be inflated
+    expect(document.querySelector('button[data-action="next-card"]')).toBeNull();
+    // The review was logged under the source lesson, not the ad-hoc card lesson
+    const log = await db.revlog.where('cardId').equals(STALEMATE_KEY).toArray();
+    expect(log.at(-1)?.lessonId).toBe('lesson-stalemate-catastrophes');
 
     fireEvent.click(document.querySelector('[data-section="session-summary"] button[data-action="end-session"]')!);
     await waitFor(() => expect(document.querySelector('[data-section="session-summary"]')).toBeNull());
