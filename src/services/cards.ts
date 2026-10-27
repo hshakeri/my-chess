@@ -423,26 +423,37 @@ export class CardService {
     const legacyRows = await db.srs_cards.toArray();
     let migrated = 0;
 
+    // Two lessons can share a position (a transposition or the same start decision): collect every
+    // lesson's history per card first, then replay the merged, chronological list once per card.
+    const historyByCard = new Map<string, Array<LegacyHistoryItem & { lessonId: string }>>();
     for (const row of legacyRows) {
       const specs = specsByLesson[row.id];
       if (!specs || specs.length === 0) continue;
 
       const cards = await CardService.ensureCards(specs, now);
       const history = historyByLesson.get(row.id) ?? [];
-
       for (const card of cards) {
-        let current = await db.cards.get(card.id);
-        if (!current || current.reps > 0) continue;
-        for (const item of history) {
-          current = await CardService.review(current.id, legacyGradeToRating(item.grade), {
-            now: item.timestamp,
-            hintLevel: item.hintLevel,
-            lessonId: row.id,
-            sessionId: 'legacy-migration',
-          });
-        }
+        const list = historyByCard.get(card.id) ?? [];
+        for (const item of history) list.push({ ...item, lessonId: row.id });
+        historyByCard.set(card.id, list);
       }
       migrated++;
+    }
+
+    for (const [cardId, items] of historyByCard) {
+      let current = await db.cards.get(cardId);
+      if (!current || current.reps > 0 || items.length === 0) continue;
+      const merged = items
+        .sort((a, b) => a.timestamp - b.timestamp)
+        .filter((item, i, arr) => i === 0 || item.timestamp !== arr[i - 1].timestamp || item.grade !== arr[i - 1].grade);
+      for (const item of merged) {
+        current = await CardService.review(current.id, legacyGradeToRating(item.grade), {
+          now: item.timestamp,
+          hintLevel: item.hintLevel,
+          lessonId: item.lessonId,
+          sessionId: 'legacy-migration',
+        });
+      }
     }
 
     if (storage) {

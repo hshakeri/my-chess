@@ -219,6 +219,11 @@ function verifySequence(
           `[Curriculum Builder] 'alternatives' are only allowed on opponent moves (ply ${ply}, ${ctx.where}, lesson '${ctx.lessonId}').`
         );
       }
+      if (Object.keys(input.alternatives).length === 0) {
+        throw new Error(
+          `[Curriculum Builder] 'alternatives' must not be empty (ply ${ply}, ${ctx.where}, lesson '${ctx.lessonId}').`
+        );
+      }
       alternatives = {};
       for (const [altKey, continuation] of Object.entries(input.alternatives)) {
         const alt = tryMove(fenBefore, altKey);
@@ -523,16 +528,25 @@ export function enumerateDecisions(lesson: CurriculumLesson): DecisionSpec[] {
       const active = !isMain || i >= start;
       const turn = new Chess(fen).turn();
       if (active && move.isUserMove) {
-        const last = path.length > 0 ? plyLabel(lesson.initialFen, path.length - 1, path[path.length - 1]) : null;
+        const acceptedSan = [move.san, ...(move.accept?.san || []).filter((s) => s !== move.san)];
+        const lastSan = path.length > 0 ? path[path.length - 1] : null;
+        // A recapture with the same SAN as the opponent's move would print the answer: use a neutral label then
+        const last =
+          lastSan && !acceptedSan.includes(lastSan) ? plyLabel(lesson.initialFen, path.length - 1, lastSan) : null;
+        const moveNumber = Math.floor(path.length / 2) + 1;
         out.push({
           fen,
-          acceptedSan: [move.san, ...(move.accept?.san || []).filter((s) => s !== move.san)],
+          acceptedSan,
           lessonId: lesson.id,
           ply: i,
           color: turn,
           path: [...path],
           tags: [...baseTags, `color:${turn}`],
-          title: last ? `${sideName(turn)} to move after ${last}` : `${sideName(turn)} to move from the start position`,
+          title: last
+            ? `${sideName(turn)} to move after ${last}`
+            : lastSan
+              ? `${sideName(turn)} to move (move ${moveNumber})`
+              : `${sideName(turn)} to move from the start position`,
           reachProb: reach,
         });
       }

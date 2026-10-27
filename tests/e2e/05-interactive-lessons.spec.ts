@@ -86,35 +86,35 @@ test.describe('05. Interactive Lessons, Feedback Loops & Spaced Repetition (F16 
     await expect(hint).not.toContainText('exd5');
   });
 
-  test('Spaced repetition: grading is gated until the lesson is complete, inferred from the run, and persists across reload', async ({ page }) => {
-    // Grade buttons are disabled before any lesson is completed
-    const goodBtn = page.locator('[data-grade="4"]').first();
-    await expect(goodBtn).toBeDisabled();
+  test('Spaced repetition: each decision is scheduled on its own card as it is played, and the schedule persists across reload', async ({ page }) => {
+    // No self-grade bar: the rating is inferred from the run
+    await expect(page.locator('[data-grade]')).toHaveCount(0);
 
-    // Every card starts due today (the count appears once the cards have been seeded and counted)
+    // Every card starts due today (the count appears once the cards have been created and counted)
     const dueBtn = page.locator('button[data-action="review-due"]');
     await expect(dueBtn).toContainText(/Due today: [1-9]\d*/);
     const dueBefore = Number((await dueBtn.textContent())!.match(/\d+/)![0]);
 
     // Complete the one-move stalemate lesson: 1.Qd8# from d6, then its exercise, then finish
     await page.locator('[data-lesson-id="lesson-stalemate-catastrophes"]').click();
+    await expect(page.locator('[data-lesson-cards]')).toHaveAttribute('data-lesson-cards', '1');
     await expect(page.locator('[data-square="d6"] img[alt="White q"]')).toBeVisible();
     await page.locator('[data-square="d6"]').click();
     await page.locator('[data-square="d8"]').click();
     await expect(page.locator('text=/Correct|Well done|Great move/i').first()).toBeVisible({ timeout: 5000 });
 
+    // The decision was reviewed the moment it was played: a clean first try is Good
+    await expect(page.locator('[data-review-log] [data-rating="good"]')).toHaveCount(1);
+    await expect(page.locator('[data-srs-message]')).toContainText(/Good: next review in/);
+
     await expect(page.locator('[data-exercise]')).toBeVisible();
     await page.locator('[data-square="d6"]').click();
     await page.locator('[data-square="d8"]').click();
     await page.locator('button[data-action="next-exercise"]').click();
-
-    // Now the lesson is complete: a clean run suggests "Easy" and every lower grade is allowed
     await expect(page.getByText('Lesson Completed!')).toBeVisible();
-    await expect(page.getByText(/Suggested from this run: Easy/)).toBeVisible();
-    await expect(goodBtn).toBeEnabled();
-    await goodBtn.click();
-    await expect(page.locator('[data-srs-message]')).toContainText(/Rated Good: Scheduled next review in 1 day/);
-    await expect(goodBtn).toBeDisabled();
+    // The exercise is not a card: still exactly one review this run
+    await expect(page.locator('[data-review-log] [data-rating]')).toHaveCount(1);
+    await expect(page.locator('[data-section="srs"]')).toContainText('1 decision scheduled this run: 1 good.');
 
     // Reload: the review survives in IndexedDB, so the card is no longer due and the queue is one shorter
     await page.reload();
@@ -122,9 +122,68 @@ test.describe('05. Interactive Lessons, Feedback Loops & Spaced Repetition (F16 
     await lessonTab.click();
     await expect(page.locator('button[data-action="review-due"]')).toContainText(`Due today: ${dueBefore - 1}`);
     await page.locator('[data-lesson-id="lesson-stalemate-catastrophes"]').click();
-    await expect(page.locator('[data-section="srs"]')).toContainText('Complete the lesson to record a review.');
-    await expect(page.locator('[data-section="srs"]')).not.toContainText('This lesson is due');
     await expect(page.locator('[data-lesson-id="lesson-stalemate-catastrophes"]')).not.toContainText(/\bdue\b/);
+    await expect(page.locator('[data-section="srs"]')).toContainText('Each decision you play is scheduled on its own card');
+  });
+
+  test("Today's session presents due positions one at a time and can be ended", async ({ page }) => {
+    const dueBtn = page.locator('button[data-action="review-due"]');
+    await expect(dueBtn).toContainText(/Due today: [1-9]\d*/);
+    const due = Number((await dueBtn.textContent())!.match(/\d+/)![0]);
+
+    await dueBtn.click();
+    // The session is capped (at most 8 new cards and 30 reviews per day), so it holds at most `due` cards
+    await expect(page.locator('[data-session-progress]')).toContainText(/card 1 of [1-9]\d*/);
+    const total = Number((await page.locator('[data-session-progress]').textContent())!.match(/of (\d+)/)![1]);
+    expect(total).toBeLessThanOrEqual(due);
+    // A review card shows a position to solve, not a lesson title or the lesson tree
+    await expect(page.locator('[data-square="e4"]').first()).toBeVisible();
+    await expect(page.locator('[data-tree="lesson"]')).toHaveCount(0);
+    await expect(page.locator('h3').first()).toContainText(/to move/);
+    await expect(dueBtn).toBeDisabled();
+
+    await page.locator('button[data-action="end-session"]').first().click();
+    await expect(page.locator('[data-session-progress]')).toHaveCount(0);
+    await expect(page.locator('[data-tree="lesson"]')).toBeVisible();
+  });
+
+  test('Opponent branches: the lesson tree lists the archive replies and the walk-through follows one of them', async ({ page }) => {
+    await page.locator('[data-lesson-id="lesson-evans-gambit-destruction"]').click();
+    const tree = page.locator('[data-tree="lesson"]');
+    await expect(tree).toBeVisible();
+    // After 3.Bc4 the archive's replies are branches with their shares
+    await expect(tree.locator('[data-node="Nd4"][data-branch="true"]')).toHaveCount(1);
+    await expect(tree.locator('[data-node="Nf6"][data-branch="true"]')).toHaveCount(1);
+    await expect(tree.locator('[data-share]').first()).toBeVisible();
+
+    // Play 1.e4 e5 2.Nf3 Nc6 3.Bc4: the reply is one of the known branches or the main line
+    await page.locator('[data-square="e2"]').click();
+    await page.locator('[data-square="e4"]').click();
+    await expect(page.locator('[data-square="e5"] img')).toBeVisible({ timeout: 3000 });
+    await page.locator('[data-square="g1"]').click();
+    await page.locator('[data-square="f3"]').click();
+    await expect(page.locator('[data-square="c6"] img')).toBeVisible({ timeout: 3000 });
+    await page.locator('[data-square="f1"]').click();
+    await page.locator('[data-square="c4"]').click();
+    // The first walk-through follows the scripted main line, so the reply is 3...Bc5 and the tree marks it
+    const replyNode = page.locator('[data-tree="lesson"] [data-current="true"][data-role="opponent"]');
+    await expect(replyNode).toHaveCount(1, { timeout: 3000 });
+    await expect(replyNode).toHaveAttribute('data-node', 'Bc5');
+    await expect(page.locator('[data-tree="lesson"] [data-current="true"]')).toHaveCount(1);
+
+    // A restart re-rolls the opponent's replies by frequency: whatever comes after 3.Bc4 is a known reply
+    await page.locator('button[data-action="restart"]').click();
+    await expect(page.locator('[data-square="e2"] img[alt="White p"]')).toBeVisible();
+    await page.locator('[data-square="e2"]').click();
+    await page.locator('[data-square="e4"]').click();
+    await expect(page.locator('[data-square="e5"] img')).toBeVisible({ timeout: 3000 });
+    await page.locator('[data-square="g1"]').click();
+    await page.locator('[data-square="f3"]').click();
+    await expect(page.locator('[data-square="c6"] img')).toBeVisible({ timeout: 3000 });
+    await page.locator('[data-square="f1"]').click();
+    await page.locator('[data-square="c4"]').click();
+    await expect(replyNode).toHaveCount(1, { timeout: 3000 });
+    expect(['Bc5', 'Nf6', 'Nd4', 'h6', 'd6', 'f5']).toContain(await replyNode.getAttribute('data-node'));
   });
 
   test('Switching lesson during the exercise phase starts the new lesson cleanly on its own line', async ({ page }) => {
@@ -139,7 +198,7 @@ test.describe('05. Interactive Lessons, Feedback Loops & Spaced Repetition (F16 
     await expect(page.locator('[data-square="e2"] img[alt="White p"]')).toBeVisible();
     await expect(page.locator('[data-exercise]')).toHaveCount(0);
     await expect(page.getByText('Lesson Completed!')).toHaveCount(0);
-    await expect(page.locator('[data-grade="4"]')).toBeDisabled();
+    await expect(page.locator('[data-review-log] [data-rating]')).toHaveCount(0);
     await page.locator('[data-square="e2"]').click();
     await page.locator('[data-square="e4"]').click();
     await expect(page.locator('.correct-feedback')).toBeVisible();

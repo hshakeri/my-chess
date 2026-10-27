@@ -111,19 +111,24 @@ export function materialBalance(chess: Chess, color: 'w' | 'b'): number {
   return total;
 }
 
-/** Replay a SAN list from the start position; `fensBefore[i]` is the position before ply i. Null on an illegal move. */
-function replayGame(moves: string[]): { chess: Chess; fensBefore: string[] } | null {
+/**
+ * Replay a SAN list from the start position. Only the position before the last ply played by
+ * `mover` is kept (the one a result-based finding cites), so a replay costs one FEN string instead
+ * of one per ply. Null on an illegal move.
+ */
+function replayGame(moves: string[], mover: 'w' | 'b'): { chess: Chess; fenBeforeLast: string } | null {
   const chess = new Chess(START_FEN);
-  const fensBefore: string[] = [];
-  for (const raw of moves) {
-    fensBefore.push(chess.fen());
+  const last = lastPlyOf(moves.length, mover);
+  let fenBeforeLast = START_FEN;
+  for (let i = 0; i < moves.length; i++) {
+    if (i === last) fenBeforeLast = chess.fen();
     try {
-      chess.move(cleanSan(raw));
+      chess.move(cleanSan(moves[i]));
     } catch {
       return null;
     }
   }
-  return { chess, fensBefore };
+  return { chess, fenBeforeLast };
 }
 
 /** 0-based index of the last ply played by `mover` in a game of `length` plies, or -1. */
@@ -495,9 +500,11 @@ export class DiagnosticAnalyzer {
    */
   public static detectMatedWhileAhead(game: StoredGame, moves: string[], color: 'white' | 'black'): OpeningDeviation | null {
     if (this.getPlayerResult(game, color) !== 'loss') return null;
-    const replay = replayGame(moves);
-    if (!replay || !replay.chess.isCheckmate()) return null;
+    // Only a game that ended in mate needs replaying: SAN marks the mating move with '#'
+    if (moves.length === 0 || !moves[moves.length - 1].includes('#')) return null;
     const mover: 'w' | 'b' = color === 'white' ? 'w' : 'b';
+    const replay = replayGame(moves, mover);
+    if (!replay || !replay.chess.isCheckmate()) return null;
     if (replay.chess.turn() !== mover) return null; // the mated side is the side to move
     const material = materialBalance(replay.chess, mover);
     if (material < 2) return null;
@@ -511,7 +518,7 @@ export class DiagnosticAnalyzer {
       opponent: opponentOf(game, color),
       playedColor: color,
       ply: last + 1,
-      fen: replay.fensBefore[last],
+      fen: replay.fenBeforeLast,
       playedSan: cleanSan(moves[last]),
       evaluationDelta: '',
       patternId: 'mated-while-ahead',
@@ -526,10 +533,11 @@ export class DiagnosticAnalyzer {
   public static detectLostOnTimeWhileAhead(game: StoredGame, moves: string[], color: 'white' | 'black'): OpeningDeviation | null {
     if (this.getPlayerResult(game, color) !== 'loss') return null;
     const termination = terminationOf(game);
-    if (!termination || !/time/i.test(termination)) return null;
-    const replay = replayGame(moves);
-    if (!replay) return null;
+    // Chess.com writes '<username> won on time'; strip the username so a handle containing 'time' cannot match
+    if (!termination || !/\b(won on time|timeout)\b/i.test(termination.replace(/^\S+\s+/, ''))) return null;
     const mover: 'w' | 'b' = color === 'white' ? 'w' : 'b';
+    const replay = replayGame(moves, mover);
+    if (!replay) return null;
     const material = materialBalance(replay.chess, mover);
     if (material < 2) return null;
     const last = lastPlyOf(moves.length, mover);
@@ -542,7 +550,7 @@ export class DiagnosticAnalyzer {
       opponent: opponentOf(game, color),
       playedColor: color,
       ply: last + 1,
-      fen: replay.fensBefore[last],
+      fen: replay.fenBeforeLast,
       playedSan: cleanSan(moves[last]),
       evaluationDelta: '',
       patternId: 'lost-on-time-while-ahead',

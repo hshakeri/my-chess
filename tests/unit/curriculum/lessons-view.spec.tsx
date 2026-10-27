@@ -33,14 +33,22 @@ describe('LessonsView Component', () => {
     expect(html).toContain('Pattern Library (8)');
   });
 
-  it('renders the review-due control and gates the grade bar until the lesson is complete', () => {
+  it('renders the session control and explains per-decision scheduling instead of a self-grade bar', () => {
     const html = renderToString(<LessonsView />);
 
     expect(html).toContain('data-action="review-due"');
-    expect(html).toContain('Complete the lesson to record a review.');
-    // All four grade buttons exist but are disabled before completion
-    const disabledGrades = html.match(/data-grade="[1345]"[^>]*disabled=""/g) || [];
-    expect(disabledGrades.length).toBe(4);
+    expect(html).toContain('Each decision you play is scheduled on its own card');
+    expect(html).toContain('data-review-log');
+    // No self-reported grade buttons any more: the rating is inferred from the run
+    expect(html).not.toContain('data-grade=');
+  });
+
+  it('renders the lesson tree with the main line and the opponent branches', () => {
+    const html = renderToString(<LessonsView initialLessonId="lesson-evans-gambit-destruction" />);
+
+    expect(html).toContain('data-tree="lesson"');
+    expect(html).toContain('data-branches="true"');
+    expect(html).toContain('data-node="Nd4"');
   });
 
   it('displays visible book source attribution text matching required curriculum authors', () => {
@@ -70,14 +78,11 @@ describe('LessonsView Component', () => {
     expect(html).toContain('Hint');
   });
 
-  it('includes SuperMemo-2 (SM-2) spaced repetition rating buttons including Good (data-grade 4)', () => {
+  it('labels the scheduler as FSRS (deliberate change from the SM-2 / Leitner label)', () => {
     const html = renderToString(<LessonsView />);
 
-    expect(html).toContain('Spaced Repetition Review (SM-2 / Leitner Box)');
-    expect(html).toContain('data-grade="1"');
-    expect(html).toContain('data-grade="3"');
-    expect(html).toContain('data-grade="4"');
-    expect(html).toContain('data-grade="5"');
-    expect(html).toContain('>Good<');
+    expect(html).toContain('Spaced Repetition Review (FSRS)');
+    expect(html).toContain('Spaced Repetition (FSRS)');
+    expect(html).not.toContain('SM-2');
   });
 });

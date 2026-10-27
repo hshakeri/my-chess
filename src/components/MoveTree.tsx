@@ -17,8 +17,24 @@ const samePath = (a: string[], b: string[]): boolean => a.length === b.length &&
 const startsWith = (path: string[], prefix: string[]): boolean =>
   prefix.length <= path.length && prefix.every((san, i) => san === path[i]);
 
-const Share: React.FC<{ value: number }> = ({ value }) => {
-  const pct = Math.round(value * 100);
+/** Whole-number percentages that sum to 100 across a sibling group (largest remainder; ties by order). */
+export function sharePercents(shares: number[]): number[] {
+  const raw = shares.map((s) => (Number.isFinite(s) ? Math.max(0, s) * 100 : 0));
+  const floors = raw.map((v) => Math.floor(v));
+  let remainder = 100 - floors.reduce((a, b) => a + b, 0);
+  // Fractions are compared at nanopercent resolution so an exact tie (e.g. 5/44 vs 16/44) breaks by order, not by float noise
+  const byFraction = raw
+    .map((v, i) => ({ i, frac: Math.round((v - floors[i]) * 1e9) }))
+    .sort((a, b) => b.frac - a.frac || a.i - b.i);
+  for (const { i } of byFraction) {
+    if (remainder <= 0) break;
+    floors[i] += 1;
+    remainder -= 1;
+  }
+  return floors;
+}
+
+const Share: React.FC<{ pct: number }> = ({ pct }) => {
   return (
     <span data-share={pct} className="ml-1 text-[10px] font-mono text-slate-400 tabular-nums" title="Share of replies">
       {`${pct}%`}
@@ -66,6 +82,7 @@ export const MoveTree: React.FC<MoveTreeProps> = ({ lesson, currentPath, onSelec
         const current = samePath(path, currentPath);
         const isPrefix = root && i < startPly;
         const options = move.alternatives ? replyOptions(move) : null;
+        const pcts = options ? sharePercents(options.map((o) => o.share)) : null;
         return (
           <li
             key={pathKey(path)}
@@ -83,10 +100,10 @@ export const MoveTree: React.FC<MoveTreeProps> = ({ lesson, currentPath, onSelec
             >
               {plyLabel(lesson.initialFen, before.length, move.san)}
             </button>
-            {options && <Share value={options[0].share} />}
+            {options && pcts && <Share pct={pcts[0]} />}
             {options && (
               <ul data-branches="true" className="ml-3 mt-0.5 space-y-0.5">
-                {options.slice(1).map((opt) => {
+                {options.slice(1).map((opt, altIndex) => {
                   const altPath = [...before, opt.san];
                   const open = isExpanded(altPath);
                   const altCurrent = samePath(altPath, currentPath);
@@ -118,7 +135,7 @@ export const MoveTree: React.FC<MoveTreeProps> = ({ lesson, currentPath, onSelec
                       >
                         {plyLabel(lesson.initialFen, before.length, opt.san)}
                       </button>
-                      <Share value={opt.share} />
+                      <Share pct={pcts ? pcts[altIndex + 1] : 0} />
                       {open && opt.continuation && renderSequence(opt.continuation, altPath, false)}
                     </li>
                   );

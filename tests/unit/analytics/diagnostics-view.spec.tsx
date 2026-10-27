@@ -87,6 +87,17 @@ describe('DiagnosticsView Component', () => {
     expect(scandiHtml).toContain('no other white games to compare against yet');
   });
 
+  it('lists where the games left the repertoire, with the book move, grouped by position', () => {
+    const html = render();
+    const section = html.slice(html.indexOf('data-section="repertoire-leaks"'));
+    expect(section).toContain('Where you leave the repertoire');
+    // The four Scandinavian 2.e5?! games are one leak: ply 3, e5 instead of exd5
+    expect(section).toContain('data-repertoire-leak="e5"');
+    expect(section).toContain('Ply 3: e5?!');
+    expect(section).toContain('exd5!');
+    expect(section).toContain('4 games as white');
+  });
+
   it('displays tailored repertoire recommendation titles', () => {
     const html = render();
 

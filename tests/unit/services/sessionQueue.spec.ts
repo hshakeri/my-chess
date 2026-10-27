@@ -172,7 +172,11 @@ describe('buildQueue', () => {
     ];
     const queue = buildQueue(cards, { now: NOW, retrievability: R });
     expect(queue).toHaveLength(6);
-    assertInterleaved(queue);
+    // Overdue reviews always precede new material; interleaving holds within each segment
+    const firstNew = queue.findIndex((c) => c.state === STATE_NEW);
+    expect(queue.slice(firstNew).every((c) => c.state === STATE_NEW)).toBe(true);
+    assertInterleaved(queue.slice(0, firstNew));
+    assertInterleaved(queue.slice(firstNew));
   });
 
   it('interleaving holds for a large mixed set', () => {
@@ -197,7 +201,13 @@ describe('buildQueue', () => {
     const queue = buildQueue(cards, { now: NOW, retrievability: R, maxReviews: 30, maxNew: 8 });
     expect(queue.length).toBeLessThanOrEqual(38);
     expect(new Set(queue.map((c) => c.id)).size).toBe(queue.length);
-    assertInterleaved(queue);
+    const firstNew = queue.findIndex((c) => c.state === STATE_NEW);
+    const reviews = firstNew === -1 ? queue : queue.slice(0, firstNew);
+    const fresh = firstNew === -1 ? [] : queue.slice(firstNew);
+    expect(fresh.every((c) => c.state === STATE_NEW)).toBe(true);
+    expect(reviews.every((c) => c.state !== STATE_NEW)).toBe(true);
+    assertInterleaved(reviews);
+    assertInterleaved(fresh);
   });
 
   it('interleaveByFamily leaves a single family in priority order', () => {

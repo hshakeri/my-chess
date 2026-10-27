@@ -2,6 +2,7 @@ import { Chess } from 'chess.js';
 import { CurriculumLesson } from '../types/curriculum';
 import { OpeningDeviation, RepertoireLine } from '../types/diagnostics';
 import { buildVerifiedLesson, MoveInput } from './builder';
+import { canonicalFenKey } from '../services/fenKey';
 
 /**
  * Lesson factories for the diagnose-to-drill loop (roadmap CL-4): a deviation
@@ -80,7 +81,10 @@ export function lessonFromDeviation(dev: OpeningDeviation, opts: DeviationLesson
   }
 
   const moveNo = Math.floor((dev.ply - 1) / 2) + 1;
-  const title = opts.title ?? `Repertoire drill: move ${moveNo} as ${colorName(dev.playedColor)} vs ${dev.opponent}`;
+  const withOpponent = `Repertoire drill: move ${moveNo} as ${colorName(dev.playedColor)} vs ${dev.opponent}`;
+  // An opponent handle that happens to spell the answer must not leak it into the title
+  const title =
+    opts.title ?? (mentionsMove(withOpponent, bookSan) ? `Repertoire drill: move ${moveNo} as ${colorName(dev.playedColor)}` : withOpponent);
   if (mentionsMove(title, bookSan)) {
     throw new Error(`[Curriculum Factory] The drill title must not print the answer ('${bookSan}').`);
   }
@@ -166,6 +170,83 @@ export function lessonFromRepertoireLine(
     targetColor: color,
     targetRatingBand: 'intermediate',
     startPly: opts.startPly ?? 0,
+    relevance: 'core',
+    moves,
+    exercises: [],
+  });
+}
+
+/** The part of a decision a review card needs: the position, the accepted answers and how the lesson got there. */
+export interface DecisionLike {
+  fen: string;
+  acceptedSan: string[];
+  /** SAN moves from the source lesson's initial position to `fen` (empty when unknown). */
+  path: string[];
+  title?: string;
+  lessonId: string;
+}
+
+export interface DecisionLessonOptions {
+  /** How many plies before the decision are replayed on the board as context (default 4). */
+  contextPlies?: number;
+  id?: string;
+}
+
+/**
+ * A one-decision review card as a lesson. When the source lesson and the path are known,
+ * the last few plies before the decision are replayed automatically so the position arrives
+ * with its context (the over-the-board cue), then the student must find the move; otherwise
+ * the bare position is shown. The title is the decision's answer-free label.
+ */
+export function lessonFromDecision(
+  source: CurriculumLesson | undefined,
+  spec: DecisionLike,
+  opts: DecisionLessonOptions = {}
+): CurriculumLesson {
+  if (spec.acceptedSan.length === 0) {
+    throw new Error(`[Curriculum Factory] A review card for lesson '${spec.lessonId}' has no accepted move.`);
+  }
+  const key = canonicalFenKey(spec.fen);
+  const contextPlies = Math.max(0, Math.min(opts.contextPlies ?? 4, spec.path.length));
+  const canReplay = !!source && spec.path.length > 0;
+
+  let initialFen = spec.fen;
+  const moves: MoveInput[] = [];
+  if (canReplay) {
+    const chess = new Chess(source.initialFen);
+    const prefix = spec.path.slice(0, spec.path.length - contextPlies);
+    for (const san of prefix) {
+      try {
+        chess.move(san);
+      } catch {
+        throw new Error(`[Curriculum Factory] Illegal context move '${san}' on the path of lesson '${source.id}'.`);
+      }
+    }
+    initialFen = chess.fen();
+    for (const san of spec.path.slice(spec.path.length - contextPlies)) moves.push({ san, isUserMove: false });
+  }
+  const [main, ...alternatives] = spec.acceptedSan;
+  moves.push({
+    san: main,
+    isUserMove: true,
+    accept: alternatives.length > 0 ? { san: alternatives } : undefined,
+  });
+
+  const turn = new Chess(spec.fen).turn();
+  return buildVerifiedLesson({
+    id: opts.id ?? `card-lesson-${key.replace(/[^A-Za-z0-9]/g, '_')}`,
+    title: spec.title ?? `${turn === 'w' ? 'White' : 'Black'} to move`,
+    subtitle: canReplay ? 'Review card: the line is replayed, then find the move' : 'Review card: find the move',
+    category: 'weakness_drill',
+    sourceBook: source?.sourceBook ?? 'Review cards',
+    author: source?.author ?? 'hoot65 diagnostic analysis',
+    eco: source?.eco,
+    initialFen,
+    description: 'A position from your own study, scheduled by how well you recalled it last time.',
+    thematicObjective: source?.thematicObjective,
+    keyTacticalMotif: source?.keyTacticalMotif,
+    targetColor: turn === 'w' ? 'white' : 'black',
+    targetRatingBand: source?.targetRatingBand ?? 'intermediate',
     relevance: 'core',
     moves,
     exercises: [],

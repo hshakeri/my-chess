@@ -271,8 +271,8 @@ export function getRecommendedBlackRepertoire(): RepertoirePlan {
     8: { commentary: 'Take the pawn now that Nc3 is played. White spends a move on 5.a4 to stop ...b5 holding it; otherwise 5...b5 is available.', tacticalMotif: 'Central capture', isKeyMove: true },
     10: { commentary: 'The bishop comes out before ...e6, the Caro-Kann idea in a Slav shape. a4 has given up the b4 square, which the f8 bishop will use.', isKeyMove: true },
     12: { commentary: 'Now ...e6 shuts nothing in: the bishop is already outside the pawn chain.' },
-    14: { commentary: 'The bishop develops with tempo on the b4 square that a4 gave away and pins the c3 knight against the king on e1 (d2 is empty).', tacticalMotif: 'Pin on the c3 knight', isKeyMove: true },
-    16: { commentary: 'Castled with every minor piece developed and no pawn weaknesses; ...Nbd7 and ...Bg6 (if the bishop is hit) come next.', isKeyMove: true }
+    14: { commentary: 'The bishop comes to the b4 square that a4 gave away and pins the c3 knight against the king on e1 (d2 is empty).', tacticalMotif: 'Pin on the c3 knight', isKeyMove: true },
+    16: { commentary: 'Castled with both bishops and the f6 knight developed and no pawn weaknesses; ...Nbd7 and ...Bg6 (if the bishop is hit) come next.', isKeyMove: true }
   };
 
   const slavLine: RepertoireLine = {

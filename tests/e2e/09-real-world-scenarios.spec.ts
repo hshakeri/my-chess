@@ -118,7 +118,8 @@ test.describe('09. Tier 4 Real-World User Scenarios (Journeys 1 - 15)', () => {
     const view = page.locator('.diagnostics-view, [data-view="diagnostics"]').first();
     // Flags White Scandinavian 2.e5?! citing game ID
     await expect(view.getByText(/Scandinavian|2\.e5/i).first()).toBeVisible();
-    await expect(view.getByText(/185031553576|185035281692|184582182704|171000270176/).first()).toBeVisible();
+    // The archive is read from IndexedDB and analysed in the browser: allow for that on a slow runner
+    await expect(view.getByText(/185031553576|185035281692|184582182704|171000270176/).first()).toBeVisible({ timeout: 15000 });
 
     // Flags the Black early-queen habit citing real game IDs
     await expect(view.getByText(/171894388406|185129553252|168910457740|185346239794/).first()).toBeVisible();
@@ -128,11 +129,19 @@ test.describe('09. Tier 4 Real-World User Scenarios (Journeys 1 - 15)', () => {
     const diagTab = page.locator('button:has-text("Opening Diagnostics"), [data-tab="diagnostics"]').first();
     await diagTab.click();
 
-    const adoptBtn = page.locator('button[data-action="adopt-repertoire"], button:has-text("Adopt")').first();
-    if (await adoptBtn.isVisible()) {
-      await adoptBtn.click();
-      await expect(page.getByText(/Adopted|Saved|Active/i).first()).toBeVisible({ timeout: 5000 });
-    }
+    const view = page.locator('.diagnostics-view, [data-view="diagnostics"]').first();
+    await view.getByText('Tailored Opening Repertoires').click();
+    const adoptBtn = page.locator('button[data-action="adopt-repertoire"]').first();
+    await expect(adoptBtn).toHaveAttribute('data-adopted', 'false');
+    await adoptBtn.click();
+
+    // Adopting opens the plan's first line as a lesson, and the choice is remembered
+    await expect(page.locator('.lessons-view, [data-view="lessons"]').first()).toBeVisible();
+    await expect(page.locator('[data-square="d5"] img')).toBeVisible();
+    await diagTab.click();
+    await view.getByText('Tailored Opening Repertoires').click();
+    await expect(page.locator('button[data-action="adopt-repertoire"]').first()).toHaveAttribute('data-adopted', 'true');
+    await expect(page.locator('button[data-action="adopt-repertoire"]').first()).toContainText('Adopted');
   });
 
   test('Scenario 6: Interactive Step-by-Step Opening Drill with feedback loop', async ({ page }) => {
@@ -157,21 +166,19 @@ test.describe('09. Tier 4 Real-World User Scenarios (Journeys 1 - 15)', () => {
     const lessonTab = page.locator('button:has-text("Interactive Lessons"), [data-tab="lessons"]').first();
     await lessonTab.click();
 
-    // Grading is gated until a lesson is actually completed
-    const ratingBtn = page.locator('[data-grade="4"]').first();
-    await expect(ratingBtn).toBeDisabled();
+    // The rating is inferred per decision as the lesson is played; there is no self-grade bar
+    await expect(page.locator('[data-grade]')).toHaveCount(0);
 
     await page.locator('[data-lesson-id="lesson-stalemate-catastrophes"]').click();
     await page.locator('[data-square="d6"]').click();
     await page.locator('[data-square="d8"]').click();
+    await expect(page.locator('[data-review-log] [data-rating]')).toHaveCount(1);
+    await expect(page.locator('[data-srs-message]')).toContainText(/next review in/);
     await expect(page.locator('[data-exercise]')).toBeVisible();
     await page.locator('[data-square="d6"]').click();
     await page.locator('[data-square="d8"]').click();
     await page.locator('button[data-action="next-exercise"]').click();
-
-    await expect(ratingBtn).toBeEnabled();
-    await ratingBtn.click();
-    await expect(page.locator('[data-srs-message]')).toContainText(/Scheduled next review/);
+    await expect(page.getByText('Lesson Completed!')).toBeVisible();
   });
 
   test('Scenario 8: Printable Worksheet Generation for Physical Board Practice', async ({ page }) => {

@@ -100,9 +100,14 @@ export function buildQueue(cards: StoredCard[], opts: BuildQueueOptions): Stored
 
   const priorities = new Map<string, number>();
   for (const r of [...rankedReviews, ...rankedNew]) priorities.set(r.card.id, r.priority);
+  const priorityOf = (c: StoredCard) => priorities.get(c.id) ?? 0;
 
-  const selected = [...rankedReviews, ...rankedNew].map((r) => r.card);
-  return interleaveByFamily(selected, (c) => priorities.get(c.id) ?? 0);
+  // Overdue reviews always come before new material: a New card has retrievability 0 and would
+  // otherwise outrank every review that is days late.
+  return [
+    ...interleaveByFamily(rankedReviews.map((r) => r.card), priorityOf),
+    ...interleaveByFamily(rankedNew.map((r) => r.card), priorityOf),
+  ];
 }
 
 export interface LearningStepEntry {

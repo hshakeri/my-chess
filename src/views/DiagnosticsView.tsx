@@ -23,6 +23,7 @@ import {
   PatternSummary,
   RepertoirePlan,
   RepertoireLine,
+  RepertoireLeak,
 } from '../types/diagnostics';
 import { analyzeGames } from '../analytics/diagnostics';
 import {
@@ -38,6 +39,11 @@ interface DiagnosticsViewProps {
   isLoadingGames?: boolean;
   onNavigateToGame?: (gameId: string) => void;
   onNavigateToLesson?: (repertoireId: string, lineId?: string) => void;
+  /** Turn a deviation from the repertoire into a one-decision drill in the Lessons tab. */
+  onPracticeDeviation?: (deviation: OpeningDeviation) => void;
+  /** Adopt a repertoire plan as the active study plan. */
+  onAdoptRepertoire?: (plan: RepertoirePlan) => void;
+  adoptedRepertoireIds?: string[];
 }
 
 const EMPTY_GAMES: StoredGame[] = [];
@@ -69,6 +75,9 @@ export const DiagnosticsView: React.FC<DiagnosticsViewProps> = ({
   isLoadingGames = false,
   onNavigateToGame,
   onNavigateToLesson,
+  onPracticeDeviation,
+  onAdoptRepertoire,
+  adoptedRepertoireIds = [],
 }) => {
   const [activeTab, setActiveTab] = useState<'leaks' | 'repertoires' | 'openings'>('leaks');
   const [leakFilter, setLeakFilter] = useState<'all' | 'white' | 'black' | string>('all');
@@ -88,20 +97,24 @@ export const DiagnosticsView: React.FC<DiagnosticsViewProps> = ({
 
   // The decision point shows the picked leak, falling back to the first leak of the report.
   // Derived rather than effect-driven so the very first render already carries the board and arrows.
+  const repertoireLeaks: RepertoireLeak[] = report.repertoireLeaks || [];
   const allLeaks = useMemo(
-    () => [...report.whiteStats.keyLeaks, ...report.blackStats.keyLeaks],
-    [report]
+    () => [
+      ...report.whiteStats.keyLeaks,
+      ...report.blackStats.keyLeaks,
+      ...repertoireLeaks.flatMap((l) => l.deviations),
+    ],
+    [report, repertoireLeaks]
   );
   const selectedLeak: OpeningDeviation | null =
     (pickedLeak && allLeaks.find((l) => l.gameId === pickedLeak.gameId && l.ply === pickedLeak.ply)) ||
     allLeaks[0] ||
     null;
 
+  const blackRepertoire: RepertoirePlan = report.blackRepertoirePlan || getRecommendedBlackRepertoire();
   const activeRepertoire: RepertoirePlan = useMemo(() => {
-    return selectedRepColor === 'white'
-      ? report.whiteRepertoirePlan || getRecommendedWhiteRepertoire()
-      : report.blackRepertoirePlan || getRecommendedBlackRepertoire();
-  }, [selectedRepColor, report]);
+    return selectedRepColor === 'white' ? report.whiteRepertoirePlan || getRecommendedWhiteRepertoire() : blackRepertoire;
+  }, [selectedRepColor, report, blackRepertoire]);
 
   const activeLine: RepertoireLine = useMemo(() => {
     const found = activeRepertoire.lines.find((l) => l.id === selectedLineId);
@@ -336,6 +349,73 @@ export const DiagnosticsView: React.FC<DiagnosticsViewProps> = ({
                 </div>
               );
             })}
+          </div>
+
+          {/* Where the games left the repertoire: the first student move off the plan, grouped by position */}
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-3" data-section="repertoire-leaks">
+            <div className="flex items-center justify-between gap-3 flex-wrap">
+              <div>
+                <h3 className="text-base font-bold text-white flex items-center gap-2">
+                  <Shield className="w-4 h-4 text-indigo-400" />
+                  Where you leave the repertoire
+                </h3>
+                <p className="text-xs text-slate-400 mt-0.5">
+                  The first move of yours that leaves the plan, grouped by position and ranked by how often it happens and
+                  what it costs. The opponent leaving the plan first is not counted against you.
+                </p>
+              </div>
+              <span className="text-xs text-slate-500" data-stat="repertoire-leaks">
+                {repertoireLeaks.length} position{repertoireLeaks.length === 1 ? '' : 's'}
+              </span>
+            </div>
+            {repertoireLeaks.length === 0 ? (
+              <p className="text-sm text-slate-400">No game of yours has left the plan at a move of yours yet.</p>
+            ) : (
+              <ul className="divide-y divide-slate-800">
+                {repertoireLeaks.slice(0, 8).map((leak) => {
+                  const first = leak.deviations[0];
+                  const isSelected = !!selectedLeak && leak.deviations.some((d) => d.gameId === selectedLeak.gameId && d.ply === selectedLeak.ply);
+                  return (
+                    <li
+                      key={`${leak.fenKey}|${leak.playedSan}`}
+                      data-repertoire-leak={leak.playedSan}
+                      data-leak-color={leak.color}
+                      className={`py-2.5 flex items-center justify-between gap-3 flex-wrap ${isSelected ? 'bg-indigo-950/20' : ''}`}
+                    >
+                      <button
+                        type="button"
+                        onClick={() => first && setSelectedLeak(first)}
+                        className="text-left flex-1 min-w-[240px]"
+                        title="Show this position on the decision board"
+                      >
+                        <div className="text-sm text-white">
+                          <span className="font-mono text-rose-300 font-semibold">
+                            Ply {first?.ply}: {leak.playedSan}?!
+                          </span>{' '}
+                          <span className="text-slate-400">instead of</span>{' '}
+                          <span className="font-mono text-emerald-300 font-semibold">{leak.bookSan}!</span>
+                          <span className="text-slate-500"> · {leak.lineName}</span>
+                        </div>
+                        <div className="text-[11px] text-slate-400 mt-0.5">
+                          {leak.games} game{leak.games === 1 ? '' : 's'} as {leak.color}, score {pct(leak.score)} vs {pct(leak.scoreOther)} when you stayed on plan
+                        </div>
+                      </button>
+                      {onPracticeDeviation && first && (
+                        <button
+                          type="button"
+                          data-action="practice-deviation"
+                          onClick={() => onPracticeDeviation(first)}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-xs font-semibold text-white transition-colors"
+                        >
+                          <GraduationCap className="w-3.5 h-3.5" />
+                          Practice this
+                        </button>
+                      )}
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
@@ -597,7 +677,7 @@ export const DiagnosticsView: React.FC<DiagnosticsViewProps> = ({
               </span>
               <div>
                 <div className="text-left">Black Repertoire</div>
-                <div className="text-xs text-indigo-400 font-normal">Disciplined Caro-Kann & King&apos;s Indian</div>
+                <div className="text-xs text-indigo-400 font-normal">{blackRepertoire.name}</div>
               </div>
             </button>
           </div>
@@ -613,6 +693,22 @@ export const DiagnosticsView: React.FC<DiagnosticsViewProps> = ({
               </div>
 
               <div className="flex items-center gap-2">
+                {onAdoptRepertoire && (
+                  <button
+                    onClick={() => onAdoptRepertoire(activeRepertoire)}
+                    data-action="adopt-repertoire"
+                    data-adopted={adoptedRepertoireIds.includes(activeRepertoire.id) ? 'true' : 'false'}
+                    className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold transition-colors shadow-sm ${
+                      adoptedRepertoireIds.includes(activeRepertoire.id)
+                        ? 'bg-emerald-700/60 text-emerald-200 border border-emerald-500/50'
+                        : 'bg-emerald-600 hover:bg-emerald-500 text-white'
+                    }`}
+                    title="Make this plan your active study plan and open its first lesson"
+                  >
+                    <CheckCircle2 className="w-4 h-4" />
+                    {adoptedRepertoireIds.includes(activeRepertoire.id) ? 'Adopted' : 'Adopt Repertoire'}
+                  </button>
+                )}
                 {onNavigateToLesson && (
                   <button
                     onClick={() => onNavigateToLesson(activeRepertoire.id, activeLine.id)}

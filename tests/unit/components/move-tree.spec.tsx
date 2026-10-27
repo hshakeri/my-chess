@@ -42,15 +42,17 @@ describe('MoveTree (SSR)', () => {
 
   it('shows each reply share as a small percentage next to the scripted reply and its alternatives', () => {
     const html = renderToString(<MoveTree lesson={evansGambitDestruction} currentPath={[]} />);
-    // 3.Bc4: Bc5 11, Nf6 12, Nd4 5, h6 16 of 44
+    // 3.Bc4: Bc5 11, Nf6 12, Nd4 5, h6 16 of 44 -> 25.0, 27.3, 11.4, 36.4: the shares are rounded so the
+    // group sums to 100 (largest remainder, ties by order), so Nd4 takes the spare point
     expect(html).toContain('data-share="25"');
     expect(html).toContain('>25%<');
     expect(html).toContain('>27%<');
-    expect(html).toContain('>11%<');
+    expect(html).toContain('>12%<');
     expect(html).toContain('>36%<');
-    // 4.b4: Bxb4 7 of 7 against the unobserved ...Bb6
+    // 4.b4: Bxb4 7 of 7 against the unobserved ...Bb6 (87.5 / 12.5 -> 88 / 12, summing to 100)
     expect(html).toContain('>88%<');
-    expect(html).toContain('>13%<');
+    expect(html).toContain('>12%<');
+    expect(html).not.toContain('>13%<');
     // A move without alternatives has no share
     expect(nodeTag(html, 'e4 e5')).toBeDefined();
     expect(html.split('data-node="e5"')[1].split('</li>')[0]).not.toContain('data-share');

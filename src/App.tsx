@@ -22,6 +22,10 @@ import { LessonsView } from './views/LessonsView';
 import { WorksheetsView } from './views/WorksheetsView';
 import { gamesRepo } from './db/gamesRepo';
 import { StoredGame } from './types/db';
+import { CurriculumLesson } from './types/curriculum';
+import { OpeningDeviation, RepertoirePlan } from './types/diagnostics';
+import { getRepertoireById } from './analytics/repertoire';
+import { lessonFromDeviation, lessonFromRepertoireLine } from './curriculum/factories';
 import seedGamesRaw from './data/seed_hoot65_games.json';
 
 const seedGames = seedGamesRaw as unknown as StoredGame[];
@@ -35,22 +39,46 @@ type ActiveTab = 'play' | 'database' | 'diagnostics' | 'lessons' | 'worksheets';
  */
 const REPERTOIRE_LINE_TO_LESSON: Record<string, string> = {
   'white-scandi-refutation': 'lesson-scandinavian-refutation-drill',
-  'white-italian-giuoco-piano': 'lesson-evans-gambit-destruction',
+  'white-italian-evans-gambit': 'lesson-evans-gambit-destruction',
   'white-scotch-gambit': 'lesson-scotch-gambit-breakthrough',
 };
+
+const ADOPTED_REPERTOIRES_KEY = 'my_chess_adopted_repertoires_v1';
+
+function readAdoptedRepertoires(): string[] {
+  try {
+    const raw = window.localStorage.getItem(ADOPTED_REPERTOIRES_KEY);
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? parsed.filter((x): x is string => typeof x === 'string') : [];
+  } catch {
+    return [];
+  }
+}
 
 export const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<ActiveTab>('play');
 
   // Live game archive from IndexedDB (seeded on first run), shared with Diagnostics
   const [dbGames, setDbGames] = useState<StoredGame[] | null>(null);
-  const [pendingLessonId, setPendingLessonId] = useState<string | null>(null);
+  // A lesson handed over from Diagnostics: an authored one by id, or one built on the fly
+  const [pendingLesson, setPendingLesson] = useState<{ id?: string; lesson?: CurriculumLesson } | null>(null);
+  const [adoptedRepertoireIds, setAdoptedRepertoireIds] = useState<string[]>(() =>
+    typeof window === 'undefined' ? [] : readAdoptedRepertoires()
+  );
 
   const loadGames = useCallback(async () => {
     try {
       await gamesRepo.seedIfEmpty(seedGames);
       const all = await gamesRepo.getAllGames();
-      setDbGames(all);
+      // Keep the same array when nothing changed so the diagnostics report is not recomputed on every tab switch
+      setDbGames((prev) =>
+        prev &&
+        prev.length === all.length &&
+        prev[0]?.id === all[0]?.id &&
+        prev[prev.length - 1]?.id === all[all.length - 1]?.id
+          ? prev
+          : all
+      );
     } catch (err) {
       console.warn('Could not load the game archive from IndexedDB:', err);
       setDbGames((prev) => prev ?? []);
@@ -68,14 +96,59 @@ export const App: React.FC = () => {
 
   // A manual tab click clears any lesson hand-off so the Lessons tab opens on its default again
   const selectTab = useCallback((tab: ActiveTab) => {
-    setPendingLessonId(null);
+    setPendingLesson(null);
     setActiveTab(tab);
   }, []);
 
-  const handleNavigateToLesson = useCallback((_repertoireId: string, lineId?: string) => {
-    setPendingLessonId(lineId ? REPERTOIRE_LINE_TO_LESSON[lineId] || null : null);
+  // A repertoire line opens its authored lesson when one exists, otherwise a lesson built from the line itself
+  const handleNavigateToLesson = useCallback((repertoireId: string, lineId?: string) => {
+    const authored = lineId ? REPERTOIRE_LINE_TO_LESSON[lineId] : undefined;
+    if (authored) {
+      setPendingLesson({ id: authored });
+    } else {
+      const plan = getRepertoireById(repertoireId);
+      const line = plan?.lines.find((l) => l.id === lineId);
+      let lesson: CurriculumLesson | undefined;
+      if (plan && line) {
+        try {
+          lesson = lessonFromRepertoireLine(line, plan.color);
+        } catch (err) {
+          console.warn('Could not build a lesson from the repertoire line:', err);
+        }
+      }
+      setPendingLesson(lesson ? { lesson } : null);
+    }
     setActiveTab('lessons');
   }, []);
+
+  // A deviation from the plan becomes a one-decision drill at that very position
+  const handlePracticeDeviation = useCallback((deviation: OpeningDeviation) => {
+    try {
+      setPendingLesson({ lesson: lessonFromDeviation(deviation) });
+    } catch (err) {
+      console.warn('Could not build a drill from the deviation:', err);
+      setPendingLesson(null);
+    }
+    setActiveTab('lessons');
+  }, []);
+
+  // Adopting a plan remembers it and opens its first line as a lesson
+  const handleAdoptRepertoire = useCallback(
+    (plan: RepertoirePlan) => {
+      setAdoptedRepertoireIds((prev) => {
+        const next = prev.includes(plan.id) ? prev : [...prev.filter((id) => getRepertoireById(id)?.color !== plan.color), plan.id];
+        try {
+          window.localStorage.setItem(ADOPTED_REPERTOIRES_KEY, JSON.stringify(next));
+        } catch {
+          // Private mode or quota: the choice still applies for this session
+        }
+        return next;
+      });
+      const first = plan.lines[0];
+      if (first) handleNavigateToLesson(plan.id, first.id);
+    },
+    [handleNavigateToLesson]
+  );
 
   // Rules Engine instance (ref preserved across re-renders)
   const rulesRef = useRef<RulesEngine>(new RulesEngine());
@@ -473,11 +546,16 @@ export const App: React.FC = () => {
             games={dbGames ?? undefined}
             isLoadingGames={dbGames === null}
             onNavigateToLesson={handleNavigateToLesson}
+            onPracticeDeviation={handlePracticeDeviation}
+            onAdoptRepertoire={handleAdoptRepertoire}
+            adoptedRepertoireIds={adoptedRepertoireIds}
           />
         )}
 
         {/* Tab 4: Interactive Lessons */}
-        {activeTab === 'lessons' && <LessonsView initialLessonId={pendingLessonId ?? undefined} />}
+        {activeTab === 'lessons' && (
+          <LessonsView initialLessonId={pendingLesson?.id} initialLesson={pendingLesson?.lesson} />
+        )}
 
         {/* Tab 5: Printable Worksheets */}
         {activeTab === 'worksheets' && <WorksheetsView />}

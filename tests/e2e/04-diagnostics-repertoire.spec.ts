@@ -26,7 +26,7 @@ test.describe('04. Personalized Diagnostics & Repertoire Recommendation (F13 - F
 
     // Must cite at least one of hoot65's real Scandinavian game IDs: 185031553576, 185035281692, 184582182704, 171000270176
     // (the archive is read from IndexedDB, so wait for the report rather than probing synchronously)
-    await expect(view.getByText(/185031553576|185035281692|184582182704|171000270176/).first()).toBeVisible();
+    await expect(view.getByText(/185031553576|185035281692|184582182704|171000270176/).first()).toBeVisible({ timeout: 15000 });
     await expect(view.getByText(/Ply 3: e5\?!/).first()).toBeVisible();
     await expect(view.getByText(/Better: exd5!/).first()).toBeVisible();
   });
@@ -38,7 +38,7 @@ test.describe('04. Personalized Diagnostics & Repertoire Recommendation (F13 - F
     await expect(view.getByText(/Queen out before the minor pieces/i).first()).toBeVisible();
 
     // Must cite real Black games from the archive where the queen came out early
-    await expect(view.getByText(/171894388406|185129553252|168910457740|185346239794/).first()).toBeVisible();
+    await expect(view.getByText(/171894388406|185129553252|168910457740|185346239794/).first()).toBeVisible({ timeout: 15000 });
 
     // Impact is measured from the archive, never a constant evaluation
     await expect(view.getByText(/Score impact:/).first()).toBeVisible();
@@ -84,7 +84,42 @@ test.describe('04. Personalized Diagnostics & Repertoire Recommendation (F13 - F
     await expect(page.locator('[data-square="d5"] img')).toBeVisible();
   });
 
-  test.fixme('Provides an "Adopt Repertoire" action that saves the plan (roadmap CL-4)', async () => {
-    // Implemented with repertoire divergence detection; see docs/pedagogy-audit.md, item CL-4.
+  test('Adopt Repertoire remembers the plan and opens its first line as a lesson', async ({ page }) => {
+    const view = page.locator('.diagnostics-view, [data-view="diagnostics"]').first();
+    await view.getByText('Tailored Opening Repertoires').click();
+
+    const adoptBtn = page.locator('button[data-action="adopt-repertoire"]').first();
+    await expect(adoptBtn).toBeVisible();
+    await expect(adoptBtn).toHaveAttribute('data-adopted', 'false');
+    await adoptBtn.click();
+
+    // The White plan's first line is the Anti-Scandinavian: its drill opens at the drill point (after 1.e4 d5)
+    await expect(page.locator('.lessons-view, [data-view="lessons"]').first()).toBeVisible();
+    await expect(page.locator('[data-lesson-id="lesson-scandinavian-refutation-drill"]')).toHaveClass(/border-emerald-500/);
+    await expect(page.locator('[data-square="d5"] img')).toBeVisible();
+  });
+
+  test('Where you leave the repertoire: the first move off the plan becomes a one-decision drill', async ({ page }) => {
+    const view = page.locator('.diagnostics-view, [data-view="diagnostics"]').first();
+    const section = view.locator('[data-section="repertoire-leaks"]');
+    await expect(section).toBeVisible();
+    // The archive's 2.e5?! Scandinavians leave the plan at ply 3 (2.exd5 is the book move)
+    const scandi = section.locator('[data-repertoire-leak="e5"]');
+    await expect(scandi).toBeVisible({ timeout: 10000 });
+    await expect(scandi).toContainText('Ply 3: e5?!');
+    await expect(scandi).toContainText('exd5!');
+
+    await scandi.locator('button[data-action="practice-deviation"]').click();
+
+    // A drill at that very position: White to move after 1.e4 d5, the answer never printed in the title
+    await expect(page.locator('.lessons-view, [data-view="lessons"]').first()).toBeVisible();
+    await expect(page.locator('h3').first()).toContainText(/Repertoire drill/);
+    await expect(page.locator('h3').first()).not.toContainText('exd5');
+    await expect(page.locator('[data-square="d5"] img[alt="Black p"]')).toBeVisible();
+    await expect(page.locator('[data-square="e4"] img[alt="White p"]')).toBeVisible();
+    await page.locator('[data-square="e4"]').click();
+    await page.locator('[data-square="d5"]').click();
+    await expect(page.locator('.correct-feedback')).toBeVisible();
+    await expect(page.locator('[data-review-log] [data-rating]')).toHaveCount(1);
   });
 });

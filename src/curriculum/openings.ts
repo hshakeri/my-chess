@@ -193,7 +193,7 @@ export const evansGambitDestruction: CurriculumLesson = buildVerifiedLesson({
             isUserMove: true,
             frequency: 12,
             annotation:
-              'The Two Knights Defence. 4.d3 keeps every pawn defended and sets up the quiet Italian plan: c3, O-O, Re1 and Nbd2, with d4 later.',
+              'The Two Knights Defence. 4.d3 keeps e4 defended by a pawn and sets up the quiet Italian plan: c3, O-O, Re1 and Nbd2, with d4 later.',
             hintTheme: 'Defend e4 and keep the structure',
             wrongMoveFeedback: {
               d4: '4.d4 was your choice in 10 of these 12 games. It is playable, but after 4...exd4 White has given a pawn and must know the gambit lines; 4.d3 keeps the material and the same attacking setup.',
