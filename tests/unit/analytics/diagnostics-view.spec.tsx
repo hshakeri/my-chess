@@ -91,7 +91,7 @@ describe('DiagnosticsView Component', () => {
     const html = render();
 
     expect(html).toContain('Italian Game &amp; Anti-Scandinavian');
-    expect(html).toContain('Caro-Kann &amp; King&#x27;s Indian');
+    expect(html).toContain('Caro-Kann &amp; the c6-d5 Wall');
   });
 
   it('renders the shared 2D chessboard for the decision point with played and better-move arrows', () => {
