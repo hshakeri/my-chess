@@ -186,6 +186,30 @@ describe('LessonsView interactions (jsdom)', () => {
     expect(document.querySelector('h3')?.textContent).toMatch(/Legal/);
   });
 
+  it('clicking a node of the lesson tree jumps to that position, branches included', async () => {
+    render(<LessonsView initialLessonId="lesson-evans-gambit-destruction" />);
+    await waitFor(() => expect(sq('e2').querySelector('img[alt="White p"]')).toBeTruthy());
+
+    // The Blackburne-Shilling branch after 3.Bc4: the board shows the knight on d4, White to move
+    const node = document.querySelector('[data-tree="lesson"] [data-node="Nd4"] button[data-action="select-node"]') as HTMLButtonElement;
+    expect(node).toBeTruthy();
+    fireEvent.click(node);
+    await waitFor(() => expect(sq('d4').querySelector('img[alt="Black n"]')).toBeTruthy());
+    expect(sq('c4').querySelector('img[alt="White b"]')).toBeTruthy();
+    expect(screen.getByText(/Your turn: find White/)).toBeTruthy();
+    expect(document.querySelector('[data-tree="lesson"] [data-current="true"]')?.getAttribute('data-node')).toBe('Nd4');
+
+    // The branch's own answer is graded there: 4.Nxd4 is the lesson's move
+    clickMove('f3', 'd4');
+    await waitFor(() => expect(document.querySelector('.correct-feedback')).toBeTruthy());
+
+    // Jumping back to a main-line node after the student's move lets the opponent reply first
+    const e4 = document.querySelector('[data-tree="lesson"] [data-node="e4"] button[data-action="select-node"]') as HTMLButtonElement;
+    fireEvent.click(e4);
+    await waitFor(() => expect(sq('e5').querySelector('img[alt="Black p"]')).toBeTruthy(), { timeout: 3000 });
+    expect(sq('d4').querySelector('img')).toBeNull();
+  });
+
   it('a hand-off to a pattern-library lesson opens the Pattern Library list so the card is visible', async () => {
     render(<LessonsView initialLessonId="lesson-scotch-gambit-breakthrough" />);
     expect(card('lesson-scotch-gambit-breakthrough')).toBeTruthy();

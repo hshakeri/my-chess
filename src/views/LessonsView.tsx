@@ -116,6 +116,32 @@ function resolveLine(
   return line;
 }
 
+/**
+ * The line that runs through `path` (main line, descending into an opponent alternative wherever the
+ * path takes one) followed by the rest of that branch; null when the path leaves the lesson tree.
+ */
+function lineForPath(lesson: CurriculumLesson, path: string[]): CurriculumMove[] | null {
+  const line: CurriculumMove[] = [];
+  let sequence: CurriculumMove[] = lesson.moves;
+  let index = 0;
+  for (const san of path) {
+    const move = sequence[index];
+    if (!move) return null;
+    if (move.san === san) {
+      line.push(move);
+      index += 1;
+      continue;
+    }
+    const branch = !move.isUserMove && move.alternatives ? move.alternatives[san] : undefined;
+    if (!branch) return null;
+    line.push({ ply: move.ply, san, isUserMove: false, frequency: branch[0]?.frequency });
+    sequence = branch;
+    index = 0;
+  }
+  line.push(...sequence.slice(index));
+  return line;
+}
+
 // Concurrent mounts (React StrictMode mounts twice in development) share one in-flight preparation,
 // so the legacy history can never be replayed twice; once it has settled a later mount may run the
 // idempotent preparation again.
@@ -379,11 +405,13 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
   );
 
   const setupLessonBoard = useCallback(
-    (lesson: CurriculumLesson, targetPly?: number, opts: { vary?: boolean } = {}) => {
+    (lesson: CurriculumLesson, targetPly?: number, opts: { vary?: boolean; path?: string[] } = {}) => {
       clearTimers();
       const rules = new RulesEngine(lesson.initialFen);
-      const startPly = targetPly !== undefined ? targetPly : lesson.startPly ?? 0;
-      const line = resolveLine(lesson, startPly, opts.vary ?? false);
+      // A click on the tree jumps to that node: the line is the branch the path runs through
+      const jumped = opts.path ? lineForPath(lesson, opts.path) : null;
+      const startPly = jumped ? opts.path!.length : targetPly !== undefined ? targetPly : lesson.startPly ?? 0;
+      const line = jumped ?? resolveLine(lesson, startPly, opts.vary ?? false);
       for (let i = 0; i < startPly && i < line.length; i++) {
         rules.makeMove(line[i].san);
       }
@@ -1007,7 +1035,7 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* Left Column: Course Filter & Lesson Cards */}
-        <div className="lg:col-span-5 flex flex-col gap-4">
+        <div className="lg:col-span-3 flex flex-col gap-4">
           <div className="flex items-center gap-1.5 overflow-x-auto pb-1 custom-scrollbar">
             <button
               type="button"
@@ -1115,8 +1143,10 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
           </div>
         </div>
 
-        {/* Right Column: Board, feedback and review */}
-        <div className="lg:col-span-7 flex flex-col gap-4">
+        {/* Right Column: board with its controls, and beside it the tree, feedback and review */}
+        <div className="lg:col-span-9">
+          <div className="grid grid-cols-1 xl:grid-cols-12 gap-4 items-start">
+            <div className="xl:col-span-7 flex flex-col gap-4" data-section="board-column">
           {/* Active Lesson Header */}
           <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-sm">
             <div className="flex items-center justify-between gap-3 flex-wrap">
@@ -1184,8 +1214,65 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
             </div>
           </div>
 
+            {/* Toolbar */}
+            <div className="bg-slate-900 border border-slate-800 rounded-xl p-3 flex flex-wrap items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  data-action="hint"
+                  onClick={handleRevealHint}
+                  disabled={isLessonComplete || !hintTarget || isOpponentThinking}
+                  className="px-3 py-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-xs font-semibold flex items-center gap-1.5 transition-colors disabled:opacity-50"
+                >
+                  <Lightbulb className="w-4 h-4 text-amber-400" />
+                  <span>Hint {hintLevel > 0 ? `(${hintLevel}/3)` : ''}</span>
+                </button>
+
+                <div className="text-xs text-slate-400 pl-2 border-l border-slate-800">
+                  Move <strong className="text-white">{Math.min(currentPlyIndex, activeLine.length)}</strong> of {activeLine.length}
+                </div>
+                {(runStats.mistakes > 0 || runStats.hintLevel > 0) && (
+                  <div className="text-[11px] text-slate-500 pl-2 border-l border-slate-800" data-run-stats>
+                    {runStats.mistakes} slip{runStats.mistakes === 1 ? '' : 's'}, hint level {runStats.hintLevel}
+                    {attemptsThisDecision > 0 && !isLessonComplete ? ` · attempt ${attemptsThisDecision + 1} here` : ''}
+                  </div>
+                )}
+              </div>
+
+              {isLessonComplete ? (
+                <div className="flex items-center gap-2 text-xs font-semibold text-emerald-400 bg-emerald-950/60 border border-emerald-500/30 px-3 py-1.5 rounded-lg">
+                  <Sparkles className="w-4 h-4" />
+                  <span>Lesson Completed! Every decision has been scheduled.</span>
+                </div>
+              ) : (
+                <div className="text-xs text-slate-400">
+                  {phase === 'exercises' ? (
+                    <span className="text-indigo-300 font-semibold">Exercise: {sideName(position.turn)} to move</span>
+                  ) : isLineHold ? (
+                    <span className="text-emerald-400 font-semibold" data-state="line-complete">
+                      Line complete! Loading the exercise…
+                    </span>
+                  ) : currentExpectedMove?.isUserMove ? (
+                    <span className="text-emerald-400 font-semibold flex items-center gap-1">
+                      Your turn: find {sideName(position.turn)}&apos;s move
+                    </span>
+                  ) : (
+                    <span className="text-slate-400">{sideName(position.turn)}&apos;s turn</span>
+                  )}
+                </div>
+              )}
+            </div>
+            </div>
+
+            <div className="xl:col-span-5 flex flex-col gap-3" data-section="side-panel">
           {/* The lesson tree: main line and the opponent's alternatives, with the current path marked */}
-          {!isSessionLesson && <MoveTree lesson={currentLesson} currentPath={treePath} />}
+          {!isSessionLesson && (
+            <MoveTree
+              lesson={currentLesson}
+              currentPath={treePath}
+              onSelectPath={(path) => setupLessonBoard(currentLesson, undefined, { path })}
+            />
+          )}
 
           {/* Exercise prompt */}
           {phase === 'exercises' && currentExercise && (
@@ -1212,8 +1299,6 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
             </div>
           )}
 
-          {/* Feedback */}
-          <div className="flex flex-col gap-3">
             {wrongFeedback && (
               <div
                 className="wrong-move-feedback p-3.5 rounded-xl bg-red-950/80 border border-red-500/50 text-red-200 text-sm font-medium flex items-start gap-2.5 shadow-lg animate-fadeIn"
@@ -1284,55 +1369,6 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
                 )}
               </div>
             )}
-
-            {/* Toolbar */}
-            <div className="bg-slate-900 border border-slate-800 rounded-xl p-3 flex flex-wrap items-center justify-between gap-3">
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  data-action="hint"
-                  onClick={handleRevealHint}
-                  disabled={isLessonComplete || !hintTarget || isOpponentThinking}
-                  className="px-3 py-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-xs font-semibold flex items-center gap-1.5 transition-colors disabled:opacity-50"
-                >
-                  <Lightbulb className="w-4 h-4 text-amber-400" />
-                  <span>Hint {hintLevel > 0 ? `(${hintLevel}/3)` : ''}</span>
-                </button>
-
-                <div className="text-xs text-slate-400 pl-2 border-l border-slate-800">
-                  Move <strong className="text-white">{Math.min(currentPlyIndex, activeLine.length)}</strong> of {activeLine.length}
-                </div>
-                {(runStats.mistakes > 0 || runStats.hintLevel > 0) && (
-                  <div className="text-[11px] text-slate-500 pl-2 border-l border-slate-800" data-run-stats>
-                    {runStats.mistakes} slip{runStats.mistakes === 1 ? '' : 's'}, hint level {runStats.hintLevel}
-                    {attemptsThisDecision > 0 && !isLessonComplete ? ` · attempt ${attemptsThisDecision + 1} here` : ''}
-                  </div>
-                )}
-              </div>
-
-              {isLessonComplete ? (
-                <div className="flex items-center gap-2 text-xs font-semibold text-emerald-400 bg-emerald-950/60 border border-emerald-500/30 px-3 py-1.5 rounded-lg">
-                  <Sparkles className="w-4 h-4" />
-                  <span>Lesson Completed! Every decision has been scheduled.</span>
-                </div>
-              ) : (
-                <div className="text-xs text-slate-400">
-                  {phase === 'exercises' ? (
-                    <span className="text-indigo-300 font-semibold">Exercise: {sideName(position.turn)} to move</span>
-                  ) : isLineHold ? (
-                    <span className="text-emerald-400 font-semibold" data-state="line-complete">
-                      Line complete! Loading the exercise…
-                    </span>
-                  ) : currentExpectedMove?.isUserMove ? (
-                    <span className="text-emerald-400 font-semibold flex items-center gap-1">
-                      Your turn: find {sideName(position.turn)}&apos;s move
-                    </span>
-                  ) : (
-                    <span className="text-slate-400">{sideName(position.turn)}&apos;s turn</span>
-                  )}
-                </div>
-              )}
-            </div>
 
             {/* Lesson takeaway, revealed on completion so titles never spoil the answer */}
             {isLessonComplete && currentLesson.thematicObjective && (
@@ -1421,6 +1457,7 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
                   </span>
                 ))}
               </div>
+            </div>
             </div>
           </div>
         </div>

@@ -186,6 +186,26 @@ test.describe('05. Interactive Lessons, Feedback Loops & Spaced Repetition (F16 
     expect(['Bc5', 'Nf6', 'Nd4', 'h6', 'd6', 'f5']).toContain(await replyNode.getAttribute('data-node'));
   });
 
+  test('The lesson tree sits beside the board and clicking a node jumps to that position', async ({ page }) => {
+    await page.locator('[data-lesson-id="lesson-evans-gambit-destruction"]').click();
+    const board = page.locator('[data-section="board-column"]');
+    const side = page.locator('[data-section="side-panel"]');
+    await expect(board).toBeVisible();
+    await expect(side.locator('[data-tree="lesson"]')).toBeVisible();
+    // Side by side on a desktop viewport: the panel starts to the right of the board column
+    const b = (await board.boundingBox())!;
+    const s = (await side.boundingBox())!;
+    expect(s.x).toBeGreaterThan(b.x + b.width - 1);
+
+    await side.locator('[data-node="Nd4"] button[data-action="select-node"]').click();
+    await expect(page.locator('[data-square="d4"] img[alt="Black n"]')).toBeVisible();
+    await expect(page.locator('[data-tree="lesson"] [data-current="true"]')).toHaveAttribute('data-node', 'Nd4');
+    await expect(page.getByText(/Your turn: find White/)).toBeVisible();
+    await page.locator('[data-square="f3"]').click();
+    await page.locator('[data-square="d4"]').click();
+    await expect(page.locator('.correct-feedback')).toBeVisible();
+  });
+
   test('Switching lesson during the exercise phase starts the new lesson cleanly on its own line', async ({ page }) => {
     await page.locator('[data-lesson-id="lesson-stalemate-catastrophes"]').click();
     await page.locator('[data-square="d6"]').click();
