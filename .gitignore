@@ -42,3 +42,6 @@ playwright/.cache/
 
 # Harness-managed git worktrees for parallel agents
 .claude/worktrees/
+
+# Generated printable lesson book (HTML/PDF), never tracked
+book/
