@@ -11,7 +11,8 @@
     "test:unit": "vitest run tests/unit",
     "test:e2e": "playwright test",
     "test:all": "vitest run tests/unit && playwright test",
-    "book": "tsx scripts/lesson-book.ts"
+    "book": "tsx scripts/lesson-book.ts",
+    "book:pdf": "node scripts/lesson-book-pdf.mjs"
   },
   "dependencies": {
     "chess.js": "^1.4.0",

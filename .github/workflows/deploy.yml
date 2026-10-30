@@ -34,6 +34,14 @@ jobs:
       - name: Build static site
         run: npm run build
 
+      - name: Build the printable lesson book (HTML + PDF, generated at deploy time, never tracked)
+        run: |
+          npx playwright install --with-deps chromium
+          npm run book
+          npm run book:pdf
+          mkdir -p dist/book
+          cp book/lesson-book.html book/lesson-book.pdf dist/book/
+
       - name: Upload GitHub Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
