@@ -108,7 +108,7 @@ test.describe('09. Tier 4 Real-World User Scenarios (Journeys 1 - 15)', () => {
     await syncBtn.click();
 
     // Sync notification appears
-    await expect(page.getByText(/sync|games|complete/i).first()).toBeVisible({ timeout: 10000 });
+    await expect(page.locator('[data-view="database"]').getByText(/sync|games|complete/i).first()).toBeVisible({ timeout: 10000 });
   });
 
   test('Scenario 4: Weakness Detection on hoot65 Archives', async ({ page }) => {

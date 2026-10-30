@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useId } from 'react';
+import React, { useState, useMemo, useId, useEffect } from 'react';
 import {
   Square,
   PieceInfo,
@@ -69,6 +69,16 @@ export const Chessboard: React.FC<ChessboardProps> = ({
   className = '',
 }) => {
   const overlayId = useId().replace(/:/g, '');
+  // Pieces are dragged with a mouse; on touch screens they move by tapping (no HTML5 drag)
+  const [canDrag, setCanDrag] = useState<boolean>(false);
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return;
+    const mq = window.matchMedia('(pointer: fine)');
+    const update = () => setCanDrag(mq.matches);
+    update();
+    mq.addEventListener?.('change', update);
+    return () => mq.removeEventListener?.('change', update);
+  }, []);
   const [selectedSquare, setSelectedSquare] = useState<Square | null>(null);
   const [draggedSquare, setDraggedSquare] = useState<Square | null>(null);
   const [pendingPromotion, setPendingPromotion] = useState<{
@@ -233,7 +243,7 @@ export const Chessboard: React.FC<ChessboardProps> = ({
   };
 
   return (
-    <div className={`relative aspect-square max-w-[560px] w-full select-none ${className}`}>
+    <div className={`relative aspect-square max-w-[560px] w-full select-none touch-manipulation ${className}`}>
       {/* 8x8 Grid */}
       <div className="grid grid-cols-8 grid-rows-8 w-full h-full rounded-md overflow-hidden shadow-2xl border-2 border-slate-700/80 bg-slate-800">
         {displayRanks.map((rank, rankIdx) =>
@@ -312,7 +322,7 @@ export const Chessboard: React.FC<ChessboardProps> = ({
                 {/* Piece Image */}
                 {piece && (
                   <div
-                    draggable={interactive && piece.color === position.turn}
+                    draggable={canDrag && interactive && piece.color === position.turn}
                     onDragStart={(e) => handleDragStart(e, square)}
                     onDragEnd={handleDragEnd}
                     className={`w-full h-full p-0.5 flex items-center justify-center transition-transform ${

@@ -69,7 +69,7 @@ test.describe('03. Chess.com Sync, Dexie DB & Game Replay (F07 - F12)', () => {
     await syncBtn.click();
 
     // Verify sync status or toast
-    await expect(page.locator('text=/sync|Syncing|added|games|complete/i').first()).toBeVisible({ timeout: 10000 });
+    await expect(page.locator('[data-view="database"]').locator('text=/sync|Syncing|added|games|complete/i').first()).toBeVisible({ timeout: 10000 });
   });
 
   test('Filters games by Color, Result, and search terms', async ({ page }) => {

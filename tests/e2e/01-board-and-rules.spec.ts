@@ -259,3 +259,42 @@ test.describe('01. 2D Chessboard & Rules Engine (F01 - F04)', () => {
     await expect(page.locator('text=Invalid FEN')).toBeVisible();
   });
 });
+
+test.describe('01b. Phone play (iPhone viewport)', () => {
+  test.use({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
+
+  test('Shows a compact engine strip above the board, taps move pieces, and the engine answers', async ({ page }) => {
+    await page.goto('/');
+    const strip = page.locator('[data-section="mobile-engine-strip"]');
+    await expect(strip).toBeVisible();
+    const board = page.locator('[data-square="a8"]').first();
+    const stripBox = (await strip.boundingBox())!;
+    const boardBox = (await board.boundingBox())!;
+    expect(stripBox.y).toBeLessThan(boardBox.y);
+    // No horizontal page scroll
+    const widths = await page.evaluate(() => ({ doc: document.documentElement.scrollWidth, win: window.innerWidth }));
+    expect(widths.doc).toBeLessThanOrEqual(widths.win);
+    // The tab bar is scrollable and uses short labels
+    await expect(page.locator('[data-tab="lessons"]')).toContainText('Lessons');
+
+    await page.locator('[data-square="e2"]').tap();
+    await page.locator('[data-square="e4"]').tap();
+    await expect(page.locator('[data-square="e4"] img')).toBeVisible();
+    await expect(strip.locator('[data-mobile-status]')).toContainText(/Maia to move|Thinking/);
+    await expect(page.locator('button[data-ply="2"]').first()).toBeVisible({ timeout: 15000 });
+    await expect(strip.locator('[data-mobile-status]')).toContainText('Your move');
+  });
+
+  test('Choosing to play Black turns the board and lets Maia open', async ({ page }) => {
+    await page.goto('/');
+    await page.locator('[data-mobile-engine-color="w"]').tap();
+    // Black's pieces are now at the bottom and White (Maia) opens
+    const a1 = (await page.locator('[data-square="a1"]').boundingBox())!;
+    const a8 = (await page.locator('[data-square="a8"]').boundingBox())!;
+    expect(a8.y).toBeGreaterThan(a1.y);
+    await expect(page.locator('button[data-ply="1"]').first()).toBeVisible({ timeout: 15000 });
+    await page.locator('[data-square="c7"]').tap();
+    await page.locator('[data-square="c6"]').tap();
+    await expect(page.locator('.move-list-panel').getByText('c6')).toBeVisible();
+  });
+});

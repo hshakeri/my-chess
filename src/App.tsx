@@ -161,7 +161,13 @@ export const App: React.FC = () => {
   const [orientation, setOrientation] = useState<PieceColor>('w');
 
   // Engine state
-  const [engineColor, setEngineColor] = useState<'w' | 'b' | 'none'>('b');
+  const [engineColor, setEngineColorState] = useState<'w' | 'b' | 'none'>('b');
+  // Choosing the engine's colour also turns the board so the student's pieces are at the bottom
+  const setEngineColor = useCallback((color: 'w' | 'b' | 'none') => {
+    setEngineColorState(color);
+    if (color === 'w') setOrientation('b');
+    else if (color === 'b') setOrientation('w');
+  }, []);
   const [elo, setElo] = useState<HumanElo>(1500);
   const [isThinking, setIsThinking] = useState(false);
   const [tierUsed, setTierUsed] = useState<'human_opening_book' | 'maia_neural' | 'heuristic_fallback' | undefined>(undefined);
@@ -376,14 +382,14 @@ export const App: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col bg-slate-950 text-slate-100 font-sans">
       {/* Top Navigation Bar */}
-      <header className="no-print print:hidden app-navbar border-b border-slate-800 bg-slate-900/90 backdrop-blur sticky top-0 z-40 px-4 py-2.5">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
+      <header className="no-print print:hidden app-navbar border-b border-slate-800 bg-slate-900/90 backdrop-blur sticky top-0 z-40 px-3 sm:px-4 py-2">
+        <div className="max-w-7xl mx-auto flex items-center justify-between gap-2">
           {/* Logo & App Title */}
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-600/30 font-bold text-white text-lg">
               ♟
             </div>
-            <div>
+            <div className="hidden sm:block">
               <h1 className="text-base font-bold text-white tracking-tight flex items-center gap-2">
                 My Chess <span className="text-[10px] uppercase font-semibold px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Coach</span>
               </h1>
@@ -394,20 +400,21 @@ export const App: React.FC = () => {
           </div>
 
           {/* Navigation Tabs */}
-          <nav className="flex items-center space-x-1 overflow-x-auto custom-scrollbar">
+          <nav className="flex items-center flex-nowrap gap-1 overflow-x-auto custom-scrollbar min-w-0" aria-label="Sections">
             <button
               type="button"
               data-tab="play"
               data-tab-nav="play"
               onClick={() => selectTab('play')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+              className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap shrink-0 transition-colors ${
                 activeTab === 'play'
                   ? 'bg-emerald-600 text-white shadow-sm'
                   : 'text-slate-300 hover:text-white hover:bg-slate-800'
               }`}
             >
               <Gamepad2 className="w-4 h-4" />
-              <span>Play vs Maia</span>
+              <span className="hidden sm:inline">Play vs Maia</span>
+              <span className="sm:hidden">Play</span>
             </button>
 
             <button
@@ -415,14 +422,15 @@ export const App: React.FC = () => {
               data-tab="database"
               data-tab-nav="database"
               onClick={() => selectTab('database')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+              className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap shrink-0 transition-colors ${
                 activeTab === 'database'
                   ? 'bg-emerald-600 text-white shadow-sm'
                   : 'text-slate-300 hover:text-white hover:bg-slate-800'
               }`}
             >
               <Database className="w-4 h-4" />
-              <span>Game Database</span>
+              <span className="hidden sm:inline">Game Database</span>
+              <span className="sm:hidden">Games</span>
             </button>
 
             <button
@@ -430,14 +438,15 @@ export const App: React.FC = () => {
               data-tab="diagnostics"
               data-tab-nav="diagnostics"
               onClick={() => selectTab('diagnostics')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+              className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap shrink-0 transition-colors ${
                 activeTab === 'diagnostics'
                   ? 'bg-emerald-600 text-white shadow-sm'
                   : 'text-slate-300 hover:text-white hover:bg-slate-800'
               }`}
             >
               <Activity className="w-4 h-4" />
-              <span>Opening Diagnostics</span>
+              <span className="hidden sm:inline">Opening Diagnostics</span>
+              <span className="sm:hidden">Diagnostics</span>
             </button>
 
             <button
@@ -445,14 +454,15 @@ export const App: React.FC = () => {
               data-tab="lessons"
               data-tab-nav="lessons"
               onClick={() => selectTab('lessons')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+              className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap shrink-0 transition-colors ${
                 activeTab === 'lessons'
                   ? 'bg-emerald-600 text-white shadow-sm'
                   : 'text-slate-300 hover:text-white hover:bg-slate-800'
               }`}
             >
               <GraduationCap className="w-4 h-4" />
-              <span>Interactive Lessons</span>
+              <span className="hidden sm:inline">Interactive Lessons</span>
+              <span className="sm:hidden">Lessons</span>
             </button>
 
             <button
@@ -460,14 +470,15 @@ export const App: React.FC = () => {
               data-tab="worksheets"
               data-tab-nav="worksheets"
               onClick={() => selectTab('worksheets')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+              className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap shrink-0 transition-colors ${
                 activeTab === 'worksheets'
                   ? 'bg-emerald-600 text-white shadow-sm'
                   : 'text-slate-300 hover:text-white hover:bg-slate-800'
               }`}
             >
               <Printer className="w-4 h-4" />
-              <span>Printable Worksheets</span>
+              <span className="hidden sm:inline">Printable Worksheets</span>
+              <span className="sm:hidden">Worksheets</span>
             </button>
           </nav>
         </div>
@@ -479,6 +490,60 @@ export const App: React.FC = () => {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
             {/* Left Column: 2D Chessboard & Board Controls */}
             <div className="lg:col-span-7 flex flex-col items-center gap-3">
+              {/* On a phone the engine panel sits below the board, so the essentials ride above it */}
+              <div
+                className="lg:hidden w-full max-w-[560px] bg-slate-800/90 border border-slate-700 rounded-lg px-2.5 py-2 flex items-center justify-between gap-2 text-xs"
+                data-section="mobile-engine-strip"
+              >
+                <div className="flex items-center gap-1 min-w-0">
+                  <span className="text-slate-400 shrink-0">You play</span>
+                  <div className="flex rounded-md bg-slate-900 p-0.5 border border-slate-700">
+                    {(
+                      [
+                        { c: 'b', label: 'White' },
+                        { c: 'w', label: 'Black' },
+                        { c: 'none', label: 'Both' },
+                      ] as Array<{ c: 'w' | 'b' | 'none'; label: string }>
+                    ).map((o) => (
+                      <button
+                        key={o.c}
+                        type="button"
+                        data-mobile-engine-color={o.c}
+                        onClick={() => setEngineColor(o.c)}
+                        className={`px-2 py-1 rounded font-medium ${
+                          engineColor === o.c ? 'bg-slate-700 text-white' : 'text-slate-400'
+                        }`}
+                      >
+                        {o.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <select
+                  data-select="elo-mobile"
+                  value={elo}
+                  onChange={(e) => setElo(Number(e.target.value) as HumanElo)}
+                  className="bg-slate-900 border border-slate-700 rounded-md py-1 px-1.5 text-xs text-white"
+                  aria-label="Engine rating"
+                >
+                  {[1100, 1300, 1500, 1700, 1900].map((v) => (
+                    <option key={v} value={v}>
+                      {v}
+                    </option>
+                  ))}
+                </select>
+                <span className="text-[11px] shrink-0" data-mobile-status>
+                  {isThinking ? (
+                    <span className="text-emerald-300">Thinking…</span>
+                  ) : engineColor === 'none' ? (
+                    <span className="text-slate-400">Free play</span>
+                  ) : displayPosition.turn === engineColor ? (
+                    <span className="text-amber-300">Maia to move</span>
+                  ) : (
+                    <span className="text-emerald-300">Your move</span>
+                  )}
+                </span>
+              </div>
               <Chessboard
                 board={displayBoard}
                 position={displayPosition}
