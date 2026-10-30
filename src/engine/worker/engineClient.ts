@@ -44,16 +44,21 @@ export class EngineClient {
     }
   }
 
-  private initDirectEngine(): void {
+  private initDirectEngine(loadModel = true): void {
     if (!this.directEngine) {
       this.directEngine = new HybridEngine();
-      this.directEngine.initMaia().then((loaded) => {
-        this.modelLoaded = loaded;
-        this.notifyStatus(loaded);
-      }).catch(() => {
-        this.modelLoaded = false;
-        this.notifyStatus(false);
-      });
+      // The main-thread engine answers from the opening book and the heuristic search at once;
+      // the neural model is only loaded here when the worker is gone for good, never as a
+      // side effect of one slow reply (on a phone that download would freeze the page).
+      if (loadModel) {
+        this.directEngine.initMaia().then((loaded) => {
+          this.modelLoaded = loaded;
+          this.notifyStatus(loaded);
+        }).catch(() => {
+          this.modelLoaded = false;
+          this.notifyStatus(false);
+        });
+      }
     }
   }
 
@@ -84,15 +89,18 @@ export class EngineClient {
 
     if (this.worker) {
       return new Promise<EngineResponse>((resolve) => {
-        // Fallback timeout in case worker hangs
+        // Fallback timeout in case the worker is slow (a phone compiling the neural runtime) or hung:
+        // answer from the book or the heuristic search on the main thread instead of leaving the
+        // player waiting, without pulling the model onto the main thread.
         const timeout = setTimeout(() => {
           if (this.pendingCallbacks.has(id)) {
             this.pendingCallbacks.delete(id);
-            // Run fallback directly
-            this.initDirectEngine();
-            this.directEngine!.processRequest(fullReq).then(resolve);
+            this.initDirectEngine(false);
+            this.directEngine!.processRequest({ ...fullReq, options: { ...fullReq.options, forceFallback: true } })
+              .then(resolve)
+              .catch(() => resolve({ type: 'error', id, bestMoveSan: '', bestMoveUci: '', candidateMoves: [], tierUsed: 'heuristic_fallback', error: 'Engine unavailable' } as EngineResponse));
           }
-        }, 8000);
+        }, 4000);
 
         this.pendingCallbacks.set(id, (res) => {
           clearTimeout(timeout);

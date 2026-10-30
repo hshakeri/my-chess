@@ -233,3 +233,30 @@ test.describe('05. Interactive Lessons, Feedback Loops & Spaced Repetition (F16 
     await expect(page.getByText(/Your turn: find Black/)).toBeVisible();
   });
 });
+
+test.describe('05b. Lessons on a phone (iPhone viewport)', () => {
+  test.use({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
+
+  test('The lesson picker sits above the board and an opening drill can be played by tapping', async ({ page }) => {
+    await page.goto('/');
+    await page.locator('[data-tab="lessons"]').tap();
+    await expect(page.locator('.lessons-view, [data-view="lessons"]').first()).toBeVisible({ timeout: 10000 });
+
+    const picker = page.locator('select[data-select="lesson-mobile"]');
+    await expect(picker).toBeVisible();
+    // The card list is hidden on a phone; the picker replaces it
+    await expect(page.locator('[data-lesson-id="lesson-evans-gambit-destruction"]')).toBeHidden();
+    const pickerBox = (await picker.boundingBox())!;
+    const boardBox = (await page.locator('[data-square="a8"]').boundingBox())!;
+    expect(pickerBox.y).toBeLessThan(boardBox.y);
+    const widths = await page.evaluate(() => ({ doc: document.documentElement.scrollWidth, win: window.innerWidth }));
+    expect(widths.doc).toBeLessThanOrEqual(widths.win);
+
+    await picker.selectOption('lesson-scandinavian-refutation-drill');
+    await expect(page.locator('[data-square="d5"] img[alt="Black p"]')).toBeVisible();
+    await page.locator('[data-square="e4"]').tap();
+    await page.locator('[data-square="d5"]').tap();
+    await expect(page.locator('.correct-feedback')).toBeVisible({ timeout: 5000 });
+    await expect(page.locator('[data-square="d5"] img[alt="Black q"]')).toBeVisible({ timeout: 3000 });
+  });
+});

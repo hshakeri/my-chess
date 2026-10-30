@@ -1034,8 +1034,8 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        {/* Left Column: Course Filter & Lesson Cards */}
-        <div className="lg:col-span-3 flex flex-col gap-4">
+        {/* Left Column: Course Filter & Lesson Cards (on a phone a picker above the board replaces it) */}
+        <div className="hidden lg:flex lg:col-span-3 flex-col gap-4">
           <div className="flex items-center gap-1.5 overflow-x-auto pb-1 custom-scrollbar">
             <button
               type="button"
@@ -1147,6 +1147,40 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
         <div className="lg:col-span-9">
           <div className="grid grid-cols-1 xl:grid-cols-12 gap-4 items-start">
             <div className="xl:col-span-7 flex flex-col gap-4" data-section="board-column">
+              {/* Phone: choose the lesson here so the board stays on screen */}
+              <label className="lg:hidden flex items-center gap-2 text-xs text-slate-400">
+                <span className="shrink-0">Lesson</span>
+                <select
+                  data-select="lesson-mobile"
+                  value={isAdHocLesson ? currentLesson.id : currentLesson.id}
+                  onChange={(e) => {
+                    const picked = allCurriculumLessons.find((l) => l.id === e.target.value);
+                    if (picked) handleSelectLesson(picked);
+                  }}
+                  className="flex-1 min-w-0 bg-slate-900 border border-slate-700 rounded-lg px-2 py-2 text-sm text-white"
+                >
+                  {isAdHocLesson && <option value={currentLesson.id}>{currentLesson.title}</option>}
+                  {curriculumCourses.map((c) => (
+                    <optgroup key={c.id} label={courseLabel(c.category)}>
+                      {c.lessons
+                        .filter((l) => l.relevance !== 'outside-repertoire')
+                        .map((l) => (
+                          <option key={l.id} value={l.id}>
+                            {l.title}
+                            {dueLessonIds.has(l.id) ? ' (due)' : ''}
+                          </option>
+                        ))}
+                    </optgroup>
+                  ))}
+                  <optgroup label="Pattern Library">
+                    {patternLibrary.map((l) => (
+                      <option key={l.id} value={l.id}>
+                        {l.title}
+                      </option>
+                    ))}
+                  </optgroup>
+                </select>
+              </label>
           {/* Active Lesson Header */}
           <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-sm">
             <div className="flex items-center justify-between gap-3 flex-wrap">
