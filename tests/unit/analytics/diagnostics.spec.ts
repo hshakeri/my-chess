@@ -394,8 +394,8 @@ describe('Repertoire divergence (CL-4)', () => {
   it('is not a leak when the opponent leaves the plan first, when the plan ends, or when the move list is corrupt', () => {
     // 1.e4 c6 2.f4: White left the plan before hoot65 could
     expect(detectRepertoireDivergence(byId('171894388406'), blackTree, 'black', { lineNames })).toBeNull();
-    // 1.c4 is not in the Black plan at all: the opponent diverged at ply 1
-    expect(detectRepertoireDivergence(synthetic(['c4', 'e5'], 'black'), blackTree, 'black')).toBeNull();
+    // 1.b4 is not in the Black plan at all: the opponent diverged at ply 1 (1.c4 and 1.Nf3 are now in it)
+    expect(detectRepertoireDivergence(synthetic(['b4', 'e5'], 'black'), blackTree, 'black')).toBeNull();
     // A game that follows the Scandinavian line to its end and plays on is inside the plan
     const scandiLine = white.lines.find((l) => l.id === 'white-scandi-refutation')!;
     const end = new Chess(scandiLine.moves[scandiLine.moves.length - 1].fen);
@@ -495,7 +495,8 @@ describe('Repertoire divergence (CL-4)', () => {
     expect(castled.games).toBe(3);
 
     // 1...d6 (41 games) scored about the same as the other Black games, so it sorts below the costly leaks
-    const pirc = leaks.find((l) => l.color === 'black' && l.playedSan === 'd6' && l.bookSan === 'c6')!;
+    // Selected by position: 1.c4 d6 (one game, book 1...c6) is a second d6-for-c6 leak since 1.c4 joined the plan
+    const pirc = leaks.find((l) => l.color === 'black' && l.playedSan === 'd6' && l.bookSan === 'c6' && l.fenKey === fenKey(fenAfter(['e4'])))!;
     expect(pirc.games).toBe(41);
     expect(leaks.indexOf(pirc)).toBeGreaterThan(leaks.indexOf(scandi));
 

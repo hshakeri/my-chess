@@ -375,19 +375,67 @@ export function getRecommendedBlackRepertoire(): RepertoirePlan {
     pgn: toPgn(nf3SlavMoves)
   };
 
-  const lines = [advanceLine, classicalLine, slavLine, londonLine, nf3LondonLine, nf3SlavLine];
+  // Line 7: the wall against 1.c4, the main line of lesson-black-wall-vs-flank
+  const englishMoves = ['c4', 'c6', 'b3', 'd5', 'Bb2', 'Nf6', 'Nf3', 'Bf5', 'e3', 'e6', 'Be2', 'Nbd7', 'O-O', 'Bd6'];
+  const englishAnnotations: Record<number, { commentary?: string; annotation?: string; tacticalMotif?: string; isKeyMove?: boolean }> = {
+    2: { commentary: 'The c-pawn first: if White takes on d5 later, ...cxd5 keeps a pawn there.', isKeyMove: true },
+    4: { commentary: 'Now ...d5, supported by the c6 pawn.' },
+    8: { commentary: 'Bishop out before ...e6, as against the London and the Slav; from f5 it watches c2, d3 and e4.', isKeyMove: true },
+    10: { commentary: 'Now ...e6 shuts nothing in: the bishop is already outside.' },
+    14: { commentary: 'The bishop aims at h2 next to the castled king; castle next. White never played d4, and the plan did not change.', isKeyMove: true }
+  };
+
+  const englishLine: RepertoireLine = {
+    id: 'black-wall-vs-english',
+    name: 'The c6-d5 wall vs 1.c4',
+    eco: 'A11',
+    movesSan: englishMoves,
+    description: 'Against the English Black plays ...c6 first and ...d5 next, so that cxd5 is answered by ...cxd5. After 2.Nc3 d5 3.d4 Nf6 the game is the Slav; without d4 the plan does not change: ...Nf6, ...Bf5 before ...e6, ...Nbd7, ...Bd6 and castle.',
+    keyIdeas: [
+      '1...c6 first, so cxd5 is answered by ...cxd5',
+      '...Bf5 before ...e6, as in every wall line',
+      '2.Nc3 d5 3.d4 Nf6 is the Slav by transposition'
+    ],
+    moves: buildMoveChain(englishMoves, initialFen, englishAnnotations),
+    pgn: toPgn(englishMoves)
+  };
+
+  // Line 8: 1.Nf3 c6 2.d4 d5, the position of 1.d4 d5 2.Nf3 c6 (lines 5 and 6 continue from it)
+  const retiMoves = ['Nf3', 'c6', 'd4', 'd5'];
+  const retiAnnotations: Record<number, { commentary?: string; annotation?: string; tacticalMotif?: string; isKeyMove?: boolean }> = {
+    2: { commentary: 'The same first move as against 1.c4; ...d5 comes next. After 2.e4 d5 it is the Caro-Kann.', isKeyMove: true },
+    4: { commentary: 'The same position as 1.d4 d5 2.Nf3 c6: 3.Bf4 leads to the London line, 3.c4 to the Slav.', isKeyMove: true }
+  };
+
+  const retiLine: RepertoireLine = {
+    id: 'black-wall-vs-reti',
+    name: 'The c6-d5 wall vs 1.Nf3',
+    eco: 'D02',
+    movesSan: retiMoves,
+    description: 'Against 1.Nf3 Black plays 1...c6 and 2...d5 as well. After 2.d4 the position is 1.d4 d5 2.Nf3 c6, so the London and Slav lines take over; after 2.e4 it is the Caro-Kann against 2.Nf3.',
+    keyIdeas: [
+      '1...c6 against 1.Nf3 too',
+      '2.d4 d5 transposes to the 2.Nf3 lines against 1.d4',
+      '2.e4 d5 is the Caro-Kann'
+    ],
+    moves: buildMoveChain(retiMoves, initialFen, retiAnnotations),
+    pgn: toPgn(retiMoves)
+  };
+
+  const lines = [advanceLine, classicalLine, slavLine, londonLine, nf3LondonLine, nf3SlavLine, englishLine, retiLine];
 
   return {
     id: 'repertoire-black-caro-kann-wall',
     color: 'black',
     name: 'Caro-Kann & the c6-d5 Wall',
-    description: 'One structure for Black against everything: the pawns go to c6 and d5, the light-squared bishop comes out to f5 before ...e6, and the queen stays home until the minor pieces are out. Against 1.e4 that is the disciplined Caro-Kann (3...Bf5 and 4...Bf5, never a premature ...Bg4); against 1.d4 the same wall gives the Slav after 2.c4 and a Caro-style set-up against the London and 2.Nf3.',
-    targetOpponentResponses: ['1.e4 (Caro-Kann Defence)', '1.d4 2.c4 (Slav Defence)', '1.d4 2.Bf4 or 2.Nf3 (London and quiet systems)'],
+    description: 'One structure for Black against everything: the pawns go to c6 and d5, the light-squared bishop comes out to f5 before ...e6, and the queen stays home until the minor pieces are out. Against 1.e4 that is the disciplined Caro-Kann (3...Bf5 and 4...Bf5, never a premature ...Bg4); against 1.d4 the same wall gives the Slav after 2.c4 and a Caro-style set-up against the London and 2.Nf3; against 1.c4 and 1.Nf3 Black plays ...c6 first and ...d5 next.',
+    targetOpponentResponses: ['1.e4 (Caro-Kann Defence)', '1.d4 2.c4 (Slav Defence)', '1.d4 2.Bf4 or 2.Nf3 (London and quiet systems)', '1.c4 and 1.Nf3 (...c6 first, then ...d5)'],
     keyThemes: [
       'Pawns on c6 and d5 against every first move; the light-squared bishop goes to f5 before ...e6',
       'Against the Advance 3.e5 play 3...Bf5, not ...Bg4; against 3.Nc3 take on e4 and play 4...Bf5',
       'Slav after 2.c4: ...c6, ...Nf6, ...dxc4 and ...Bf5 once 5.a4 has stopped ...b5',
-      'London and 2.Nf3: ...Bf5 to trade the light-squared bishops, then ...Qb6 hits the loose b2 pawn'
+      'London and 2.Nf3: ...Bf5 to trade the light-squared bishops, then ...Qb6 hits the loose b2 pawn',
+      '1.c4 and 1.Nf3: ...c6 first, then ...d5; d4 leads into the Slav and London lines, and without d4 the plan is unchanged'
     ],
     rootFen: initialFen,
     lines,

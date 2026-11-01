@@ -8,7 +8,8 @@ import { buildVerifiedLesson } from './builder';
  *
  * Archive weights. Against 1.d4 hoot65 answered 1...Nf6 in 29 of 30 games, so White's second
  * and third moves are counted from those games: the London, 2.c4 and 2.Nc3 players are the same
- * opponents whatever Black's first move is. Counts against 1.e4 c6 are exact (67 games).
+ * opponents whatever Black's first move is. Counts against 1.e4 c6 are exact (67 games). Against
+ * 1.c4 and 1.Nf3 (6 games, 1...Nf6 in 4 of them) White's second move is counted the same way.
  */
 
 const SOURCE = {
@@ -80,7 +81,12 @@ export const slavWallLesson: CurriculumLesson = buildVerifiedLesson({
       frequency: 4,
       alternatives: {
         Nf3: [
-          { san: 'Nf6', isUserMove: true, frequency: 1, annotation: 'Develop and defend d5 a second time.' },
+          {
+            san: 'Nf6',
+            isUserMove: true,
+            frequency: 1,
+            annotation: 'Develop the knight. With the c6 pawn and the queen, d5 now has three defenders.',
+          },
           { san: 'Nc3', isUserMove: false, annotation: 'The main-line position by another move order.' },
           { san: 'dxc4', isUserMove: true, annotation: 'Take on c4, as in the main line.' },
         ],
@@ -93,7 +99,7 @@ export const slavWallLesson: CurriculumLesson = buildVerifiedLesson({
           { san: 'Nf3', isUserMove: false },
           { san: 'Nf6', isUserMove: true, annotation: 'Develop and guard d5.' },
           { san: 'Nc3', isUserMove: false },
-          { san: 'Nc6', isUserMove: true, annotation: 'The second knight also guards d5.' },
+          { san: 'Nc6', isUserMove: true, annotation: 'Develop the second knight; it covers d4 and e5.' },
           { san: 'Bf4', isUserMove: false },
           {
             san: 'Bf5',
@@ -107,7 +113,8 @@ export const slavWallLesson: CurriculumLesson = buildVerifiedLesson({
     {
       san: 'Nf6',
       isUserMove: true,
-      annotation: 'Develop the knight; it guards d5 a second time.',
+      annotation:
+        'Develop the knight. d5 is attacked twice (the c4 pawn and the c3 knight) and now defended three times (the c6 pawn, the f6 knight and the queen).',
     },
     { san: 'Nf3', isUserMove: false },
     {
@@ -804,10 +811,195 @@ export const caroKannClassicalLesson: CurriculumLesson = buildVerifiedLesson({
   ],
 });
 
+export const wallVsFlankLesson: CurriculumLesson = buildVerifiedLesson({
+  ...SOURCE,
+  id: 'lesson-black-wall-vs-flank',
+  title: 'The Wall Against 1.c4 and 1.Nf3',
+  subtitle: '...c6 first, then ...d5: most lines turn into a Slav, a London or a Caro-Kann, and the rest keep the same plan',
+  category: 'opening',
+  eco: 'A11',
+  targetColor: 'black',
+  targetRatingBand: 'intermediate',
+  relevance: 'core',
+  description:
+    '1.c4 and 1.Nf3 came up in 6 of your 151 Black games: 2.5 points from the 4 against 1.c4, none from the 2 against 1.Nf3. Answer both with the wall, c-pawn first: ...c6, then ...d5. In this lesson d4 leads into the Slav and London lessons, 1.Nf3 c6 2.e4 d5 is the Caro-Kann, and without d4 the plan stays the same: bishop to f5 before ...e6, then ...Nbd7, ...Bd6 and castle. Twice you met 1.c4 Nf6 2.Nc3 c6 3.d4 and played 3...Qa5; 3...d5 there is the Slav.',
+  thematicObjective:
+    '...c6, then ...d5. Against d4 or e4 follow the Slav, London or Caro-Kann lesson. Otherwise ...Nf6, ...Bf5 before ...e6, ...Nbd7, ...Bd6 and castle.',
+  keyTacticalMotif: 'Transposition into known lines; the f5 bishop\'s diagonal to c2, d3 and e4',
+  moves: [
+    {
+      san: 'c4',
+      isUserMove: false,
+      // White's first move in hoot65's Black games: 1.e4 108, 1.d4 30, 1.c4 4, 1.Nf3 2, 1.b4 2, five others once each.
+      frequency: 4,
+      annotation: 'The English Opening: the c-pawn controls d5 from the side.',
+      alternatives: {
+        Nf3: [
+          {
+            san: 'c6',
+            isUserMove: true,
+            frequency: 2,
+            annotation:
+              'The same first move. ...d5 comes next, and White\'s second move decides which wall lesson the game turns into.',
+            hintTheme: 'Same structure against everything',
+          },
+          {
+            san: 'd4',
+            isUserMove: false,
+            // After 1.Nf3 (1...c6 once, 1...Nf6 once) White played 2.d4 both times.
+            frequency: 2,
+            alternatives: {
+              e4: [
+                {
+                  san: 'd5',
+                  isUserMove: true,
+                  annotation:
+                    'This is the Caro-Kann against 2.Nf3, the same position as 1.e4 c6 2.Nf3 d5; the ...Bg4 lesson continues from here.',
+                },
+              ],
+            },
+          },
+          {
+            san: 'd5',
+            isUserMove: true,
+            annotation:
+              'The same position as 1.d4 d5 2.Nf3 c6. If the bishop comes to f4, the London lesson takes over; if the c-pawn comes to c4, the Slav lesson.',
+            hintTheme: 'Claim the centre',
+          },
+        ],
+      },
+    },
+    {
+      san: 'c6',
+      isUserMove: true,
+      annotation: 'Prepare ...d5. If White then takes on d5, the c-pawn takes back and a pawn stays on d5.',
+      hintTheme: 'Build the wall from the c-pawn',
+      wrongMoveFeedback: {
+        Nf6: '1...Nf6 was your move in 3 of these 4 games. It is playable, but the wall starts with the c-pawn: with c6 in place, cxd5 is answered by ...cxd5 and a pawn stays on d5. Against herbimbim, 1...Nf6 2.b3 d5 3.cxd5 Nxd5 left no black pawn in the centre.',
+        d5: '1...d5 lets White take at once: 2.cxd5 Qxd5 3.Nc3 hits the queen and gains a move. Play ...c6 first, so cxd5 is answered by ...cxd5.',
+        d6: '1...d6 stops one square short. The wall needs pawns on c6 and d5.',
+      },
+    },
+    {
+      san: 'b3',
+      isUserMove: false,
+      // White's second move after 1.c4: 2.Nc3 2 and 2.b3 2 (after 1...Nf6 and 1...d6).
+      frequency: 2,
+      annotation: 'White prepares Bb2, aiming the bishop down the long diagonal.',
+      alternatives: {
+        Nc3: [
+          { san: 'd5', isUserMove: true, frequency: 2, annotation: 'The same move: c6 supports d5.' },
+          {
+            san: 'd4',
+            isUserMove: false,
+            // After 1.c4 Nf6 2.Nc3 c6 White played 3.d4 both times.
+            frequency: 2,
+            annotation: 'White plays d4 after all.',
+            alternatives: {
+              cxd5: [
+                {
+                  san: 'cxd5',
+                  isUserMove: true,
+                  annotation: 'Take back with the c-pawn: a pawn stays on d5, and the c8 bishop\'s diagonal is open.',
+                  hintTheme: 'Keep a pawn on d5',
+                  wrongMoveFeedback: {
+                    Qxd5: '3...Qxd5 puts the queen on a square the c3 knight attacks: 4.Nxd5 wins it for a knight. Take with the c-pawn.',
+                  },
+                },
+                { san: 'd4', isUserMove: false },
+                { san: 'Nf6', isUserMove: true, annotation: 'Develop and guard d5.' },
+                { san: 'Nf3', isUserMove: false },
+                { san: 'Nc6', isUserMove: true, annotation: 'Develop the second knight; it covers d4 and e5.' },
+                { san: 'Bf4', isUserMove: false },
+                {
+                  san: 'Bf5',
+                  isUserMove: true,
+                  annotation:
+                    'Bishop out before ...e6. This is the Exchange Slav, the same position as 1.d4 d5 2.c4 c6 3.cxd5 cxd5 4.Nf3 Nf6 5.Nc3 Nc6 6.Bf4 Bf5.',
+                  hintTheme: 'Bishop out before ...e6',
+                },
+              ],
+            },
+          },
+          {
+            san: 'Nf6',
+            isUserMove: true,
+            annotation:
+              'This is the Slav, the same position as 1.d4 d5 2.c4 c6 3.Nc3 Nf6, and the Slav lesson continues from here. Twice you were one move from it, after 1.c4 Nf6 2.Nc3 c6 3.d4, and played 3...Qa5; 3...d5 would have reached it.',
+          },
+        ],
+      },
+    },
+    {
+      san: 'd5',
+      isUserMove: true,
+      annotation: 'Now ...d5. The c6 pawn supports it, so if White takes, ...cxd5 keeps a pawn there.',
+      hintTheme: 'Claim the centre',
+    },
+    { san: 'Bb2', isUserMove: false },
+    {
+      san: 'Nf6',
+      isUserMove: true,
+      annotation:
+        'Develop the knight. d5 is attacked once, by the c4 pawn, and defended three times: by the c6 pawn, the f6 knight and the queen.',
+    },
+    { san: 'Nf3', isUserMove: false },
+    {
+      san: 'Bf5',
+      isUserMove: true,
+      annotation:
+        'Bishop out before ...e6, the same move as against the London and the Slav. From f5 it watches c2, d3 and e4.',
+      hintTheme: 'Bishop out before ...e6',
+      arrows: [{ from: 'f5', to: 'c2', color: 'blue' }],
+      wrongMoveFeedback: {
+        e6: '4...e6 shuts the c8 bishop in behind its own pawns. Bring it to f5 first; ...e6 comes next move.',
+        Bg4: '4...Bg4 is playable too. The course puts the bishop on f5 in every wall line, so one plan covers them all.',
+      },
+    },
+    { san: 'e3', isUserMove: false },
+    {
+      san: 'e6',
+      isUserMove: true,
+      annotation: 'Now ...e6 shuts nothing in: the bishop is already outside, and the f8 bishop\'s diagonal opens.',
+    },
+    { san: 'Be2', isUserMove: false },
+    {
+      san: 'Nbd7',
+      isUserMove: true,
+      annotation: 'The knight goes to d7, keeping c6 for the pawn.',
+    },
+    { san: 'O-O', isUserMove: false },
+    {
+      san: 'Bd6',
+      isUserMove: true,
+      annotation:
+        'Develop the bishop to d6, where it aims at h2 next to the castled king. ...Be7, the London square, is fine too; there the f4 bishop covers d6, here nothing does. Castle next: the wall is intact, and White never played d4.',
+      hintTheme: 'Develop the last minor piece',
+      arrows: [{ from: 'd6', to: 'h2', color: 'red' }],
+      accept: { san: ['Be7'] },
+    },
+  ],
+  exercises: [
+    {
+      id: 'ex-flank-wall-loose-bishop',
+      title: 'Opposing the Bishop',
+      // 1.c4 c6 2.b3 d5 3.Bb2 Nf6 4.Nf3 Bf5 5.e3 e6 6.Bd3
+      fen: 'rn1qkb1r/pp3ppp/2p1pn2/3p1b2/2P5/1P1BPN2/PB1P1PPP/RN1QK2R b KQkq - 1 6',
+      turn: 'b',
+      difficultyRating: 1,
+      prompt: 'Black to play. White wants to trade bishops, as in the London, and played 6.Bd3. What does Black play?',
+      solutionSan: ['Bxd3'],
+      explanation:
+        '6...Bxd3 wins a bishop. In the London the c2 pawn and the queen guard d3; here the c-pawn has gone to c4 and the pawn on d2 blocks the queen, so nothing defends it. When a bishop offers a trade, count its defenders first: sometimes it is simply loose.',
+    },
+  ],
+});
+
 export const blackRepertoireLessons: CurriculumLesson[] = [
   londonWallLesson,
   slavWallLesson,
   wallVsNc3Bg5Lesson,
+  wallVsFlankLesson,
   caroKannAdvanceLesson,
   caroKannBg4TimingLesson,
   caroKannClassicalLesson,

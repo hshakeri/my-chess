@@ -90,13 +90,14 @@ describe('Curriculum Move Legality & Verification (chess.js)', () => {
     expect(alternativesVerified).toBeGreaterThanOrEqual(11);
     expect(branchMovesVerified).toBeGreaterThanOrEqual(50);
     // The opening study order (docs/handoff-prompt.md) added the Blackburne-Shilling drill, the Alapin
-    // and the six Black repertoire lessons, all with archive-weighted branches.
+    // and the seven Black repertoire lessons, all with archive-weighted branches.
     expect([...lessonsWithBranches].sort()).toEqual([
       'lesson-alapin-sicilian-centre',
       'lesson-black-caro-bg4-timing',
       'lesson-black-caro-kann-advance',
       'lesson-black-caro-kann-classical',
       'lesson-black-slav-wall',
+      'lesson-black-wall-vs-flank',
       'lesson-black-wall-vs-london',
       'lesson-black-wall-vs-nc3-bg5',
       'lesson-blackburne-shilling-drill',

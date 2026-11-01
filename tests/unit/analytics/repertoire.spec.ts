@@ -145,7 +145,15 @@ describe('Repertoire Engine & Tailored Repertoire Generator', () => {
       expect(lineIds).toContain('black-wall-vs-london');
       expect(lineIds).toContain('black-wall-vs-nf3-bf4');
       expect(lineIds).toContain('black-wall-vs-nf3-c4');
+      expect(lineIds).toContain('black-wall-vs-english');
+      expect(lineIds).toContain('black-wall-vs-reti');
       expect(lineIds).not.toContain('black-kings-indian-defense');
+
+      // Against 1.c4 and 1.Nf3 the c-pawn goes first and ...d5 follows
+      for (const line of rep.lines.filter((l) => l.movesSan[0] === 'c4' || l.movesSan[0] === 'Nf3')) {
+        expect(line.movesSan[1]).toBe('c6');
+        expect(line.movesSan[3]).toBe('d5');
+      }
 
       // Against 1.d4 every line answers 1...d5 and puts a pawn on c6 by move three
       for (const line of rep.lines.filter((l) => l.movesSan[0] === 'd4')) {
@@ -253,7 +261,8 @@ describe('Repertoire Engine & Tailored Repertoire Generator', () => {
       expect(whiteTree.isStudentMove).toBe(false);
       expect(whiteTree.lineIds).toEqual(white.lines.map((l) => l.id));
       expect(whiteTree.children.map((c) => c.san)).toEqual(['e4']);
-      expect(blackTree.children.map((c) => c.san).sort()).toEqual(['d4', 'e4']);
+      // The wall lesson against the flank openings added 1.c4 and 1.Nf3 to the Black plan
+      expect(blackTree.children.map((c) => c.san).sort()).toEqual(['Nf3', 'c4', 'd4', 'e4']);
     });
 
     it('every node\'s fen is the parent\'s fen plus its san, replayed with chess.js, and isStudentMove follows the side to move', () => {
@@ -299,6 +308,15 @@ describe('Repertoire Engine & Tailored Repertoire Generator', () => {
       expect(slavViaC4.lineIds).toEqual(expect.arrayContaining(['black-slav-wall', 'black-wall-vs-nf3-c4']));
       // Past the transposition the 2.c4 line continues to the end
       expect(pathNode(slavViaNf3, ['Nc3', 'dxc4', 'a4', 'Bf5', 'e3', 'e6', 'Bxc4', 'Bb4', 'O-O', 'O-O']).children).toEqual([]);
+
+      // 1.Nf3 c6 2.d4 d5 is 1.d4 d5 2.Nf3 c6: the two entry nodes (last moves d5 and c6) share the
+      // position's continuations and lines, so the London and Slav lines follow from both
+      const viaReti = pathNode(blackTree, ['Nf3', 'c6', 'd4', 'd5']);
+      const viaD4 = pathNode(blackTree, ['d4', 'd5', 'Nf3', 'c6']);
+      expect(viaReti.children).toBe(viaD4.children);
+      expect(viaReti.lineIds).toBe(viaD4.lineIds);
+      expect(viaReti.lineIds).toEqual(expect.arrayContaining(['black-wall-vs-reti', 'black-wall-vs-nf3-bf4', 'black-wall-vs-nf3-c4']));
+      expect(viaReti.children.map((c) => c.san).sort()).toEqual(['Bf4', 'c4']);
 
       const totalPlies = black.lines.reduce((n, l) => n + l.moves.length, 0);
       expect(uniqueNodes(blackTree).size - 1).toBeLessThan(totalPlies);

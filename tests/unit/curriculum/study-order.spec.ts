@@ -48,8 +48,9 @@ const moveAt = (l: CurriculumLesson, path: string[]): CurriculumMove => {
       index += 1;
       continue;
     }
+    // A branch continuation starts with the student's reply, the next move on the path
     sequence = m.alternatives![san];
-    index = 1;
+    index = 0;
   }
   const m = sequence[index];
   expect(m?.san, path.join(' ')).toBe(last);
@@ -177,6 +178,34 @@ describe('Opening study order: archive weights', () => {
     expect(moveAt(advance, ['e4', 'c6', 'd4', 'd5', 'e5', 'Bf5', 'Nf3']).alternatives!.Bd3[0].frequency).toBe(3);
     expect(moveAt(advance, ['e4', 'c6', 'd4', 'd5', 'e5', 'Bf5', 'Nf3', 'e6', 'c3']).frequency).toBe(2);
   });
+
+  it('weights the 1.c4 and 1.Nf3 lesson by White\'s moves in those six games', () => {
+    expect(repliesAfter('black', [])).toEqual({ e4: 108, d4: 30, c4: 4, Nf3: 2, b4: 2, e3: 1, d3: 1, Nc3: 1, b3: 1, g4: 1 });
+    // White's second move whatever Black answered (1...Nf6 in four of the six games)
+    const secondMove = (first: string) => {
+      const counts: Record<string, number> = {};
+      for (const reply of Object.keys(repliesAfter('black', [first]))) {
+        for (const [san, n] of Object.entries(repliesAfter('black', [first, reply]))) counts[san] = (counts[san] || 0) + n;
+      }
+      return counts;
+    };
+    expect(repliesAfter('black', ['c4'])).toEqual({ Nf6: 3, d6: 1 });
+    expect(secondMove('c4')).toEqual({ Nc3: 2, b3: 2 });
+    expect(secondMove('Nf3')).toEqual({ d4: 2 });
+    expect(repliesAfter('black', ['c4', 'Nf6', 'Nc3', 'c6'])).toEqual({ d4: 2 });
+    // The description's 3...Qa5, one move short of the Slav
+    expect(repliesAfter('black', ['c4', 'Nf6', 'Nc3', 'c6', 'd4'])).toEqual({ Qa5: 2 });
+
+    const flank = lesson('lesson-black-wall-vs-flank');
+    const c4 = moveAt(flank, ['c4']);
+    expect(c4.frequency).toBe(4);
+    expect(c4.alternatives!.Nf3[0].frequency).toBe(2);
+    expect(moveAt(flank, ['Nf3', 'c6', 'd4']).frequency).toBe(2);
+    const b3 = moveAt(flank, ['c4', 'c6', 'b3']);
+    expect(b3.frequency).toBe(2);
+    expect(b3.alternatives!.Nc3[0].frequency).toBe(2);
+    expect(moveAt(flank, ['c4', 'c6', 'Nc3', 'd5', 'd4']).frequency).toBe(2);
+  });
 });
 
 describe('Opening study order: the facts the lessons state', () => {
@@ -228,6 +257,57 @@ describe('Opening study order: the facts the lessons state', () => {
     expect(blackQueen).toEqual(['Qd7', 'Qxb5']);
   });
 
+  it('the wall lessons count the defenders of d5 correctly', () => {
+    const slav = play('d4 d5 c4 c6 Nc3 Nf6');
+    expect(slav.attackers('d5' as Square, 'w').sort()).toEqual(['c3', 'c4']);
+    expect(slav.attackers('d5' as Square, 'b').sort()).toEqual(['c6', 'd8', 'f6']);
+    expect(play('d4 d5 c4 c6 Nf3 Nf6').attackers('d5' as Square, 'b').sort()).toEqual(['c6', 'd8', 'f6']);
+    const english = play('c4 c6 b3 d5 Bb2 Nf6');
+    expect(english.attackers('d5' as Square, 'w')).toEqual(['c4']);
+    expect(english.attackers('d5' as Square, 'b').sort()).toEqual(['c6', 'd8', 'f6']);
+    // In the Exchange Slav ...Nc6 covers d4 and e5, not d5
+    for (const line of ['d4 d5 c4 c6 cxd5 cxd5 Nf3 Nf6 Nc3 Nc6', 'c4 c6 Nc3 d5 cxd5 cxd5 d4 Nf6 Nf3 Nc6']) {
+      const c = play(line);
+      expect(c.attackers('d5' as Square, 'b')).not.toContain('c6');
+      expect(c.attackers('d4' as Square, 'b')).toContain('c6');
+      expect(c.attackers('e5' as Square, 'b')).toContain('c6');
+    }
+  });
+
+  it('the 1.c4 and 1.Nf3 lesson transposes where it says and states only what the board shows', () => {
+    const same = (a: string, b: string) => expect(positionKey(play(a).fen()), `${a} = ${b}`).toBe(positionKey(play(b).fen()));
+    same('c4 c6 Nc3 d5 d4 Nf6', 'd4 d5 c4 c6 Nc3 Nf6');
+    same('c4 Nf6 Nc3 c6 d4 d5', 'd4 d5 c4 c6 Nc3 Nf6');
+    same('c4 c6 Nc3 d5 cxd5 cxd5 d4 Nf6 Nf3 Nc6 Bf4 Bf5', 'd4 d5 c4 c6 cxd5 cxd5 Nf3 Nf6 Nc3 Nc6 Bf4 Bf5');
+    same('Nf3 c6 d4 d5', 'd4 d5 Nf3 c6');
+    same('Nf3 c6 e4 d5', 'e4 c6 Nf3 d5');
+
+    // From f5 the bishop watches c2, d3 and e4; ...Bd6 aims at h2
+    const bf5 = play('c4 c6 b3 d5 Bb2 Nf6 Nf3 Bf5');
+    for (const sq of ['c2', 'd3', 'e4']) expect(bf5.attackers(sq as Square, 'b')).toContain('f5');
+    expect(play('c4 c6 b3 d5 Bb2 Nf6 Nf3 Bf5 e3 e6 Be2 Nbd7 O-O Bd6').attackers('h2' as Square, 'b')).toEqual(['d6']);
+    // d6 is free here; in the London the f4 bishop covers it when Black plays ...Be7
+    expect(play('c4 c6 b3 d5 Bb2 Nf6 Nf3 Bf5 e3 e6 Be2 Nbd7 O-O').attackers('d6' as Square, 'w')).toEqual([]);
+    expect(play('d4 d5 Bf4 c6 e3 Bf5 Nf3 e6 Bd3 Bxd3 Qxd3 Qb6 b3 Nf6 O-O Nbd7 c4').attackers('d6' as Square, 'w')).toEqual(['f4']);
+
+    // 6.Bd3 is loose: the c-pawn is on c4 and the d2 pawn blocks the queen. In the London c2 and d1 guard d3
+    const loose = play('c4 c6 b3 d5 Bb2 Nf6 Nf3 Bf5 e3 e6 Bd3');
+    expect(loose.attackers('d3' as Square, 'w')).toEqual([]);
+    expect(loose.get('d2' as Square)?.type).toBe('p');
+    expect(play('d4 d5 Bf4 c6 e3 Bf5 Nf3 e6 Bd3').attackers('d3' as Square, 'w').sort()).toEqual(['c2', 'd1']);
+
+    // The wrong-move feedback: 1...d5 2.cxd5 Qxd5 3.Nc3 and 3...Qxd5 in the 2.Nc3 branch both put the queen on a knight's square
+    expect(play('c4 d5 cxd5 Qxd5 Nc3').attackers('d5' as Square, 'w')).toEqual(['c3']);
+    expect(play('c4 c6 Nc3 d5 cxd5 Qxd5').attackers('d5' as Square, 'w')).toEqual(['c3']);
+    // 1...Nf6 2.b3 d5 3.cxd5 Nxd5 against herbimbim left no black pawn on d4, d5, e4 or e5
+    expect(archive.some((g) => g.url?.endsWith('/185135374698') && g.movesSan.slice(0, 6).join(' ') === 'c4 Nf6 b3 d5 cxd5 Nxd5')).toBe(true);
+    const herbimbim = play('c4 Nf6 b3 d5 cxd5 Nxd5');
+    for (const sq of ['d4', 'd5', 'e4', 'e5']) {
+      const p = herbimbim.get(sq as Square);
+      expect(p?.type === 'p' && p.color === 'b').toBe(false);
+    }
+  });
+
   it('every new exercise has one clearly best answer that wins material or mates', () => {
     const ids = [
       'ex-italian-h6-bishop',
@@ -243,6 +323,7 @@ describe('Opening study order: the facts the lessons state', () => {
       'ex-advance-queen-on-b-file',
       'ex-caro-qa4-check',
       'ex-classical-open-diagonal',
+      'ex-flank-wall-loose-bishop',
     ];
     const exercises = allCurriculumLessons.flatMap((l) => l.exercises);
     for (const id of ids) {
@@ -279,6 +360,7 @@ describe('Opening study order: lessons, courses and the repertoire plan agree', 
       'lesson-black-caro-kann-advance',
       'lesson-black-caro-kann-classical',
       'lesson-black-slav-wall',
+      'lesson-black-wall-vs-flank',
       'lesson-black-wall-vs-london',
       'lesson-black-wall-vs-nc3-bg5',
     ]);

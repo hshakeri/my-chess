@@ -13,4 +13,6 @@ export const REPERTOIRE_LINE_TO_LESSON: Record<string, string> = {
   'black-wall-vs-london': 'lesson-black-wall-vs-london',
   'black-wall-vs-nf3-bf4': 'lesson-black-wall-vs-london',
   'black-wall-vs-nf3-c4': 'lesson-black-slav-wall',
+  'black-wall-vs-english': 'lesson-black-wall-vs-flank',
+  'black-wall-vs-reti': 'lesson-black-wall-vs-flank',
 };

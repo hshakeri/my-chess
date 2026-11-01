@@ -54,12 +54,12 @@ export const curriculumCourses: ChessCurriculumCourse[] = [
   {
     id: 'course-black-repertoire',
     title: 'Black Repertoire: Caro-Kann & the c6-d5 Wall',
-    subtitle: 'One structure against 1.e4 and 1.d4: pawns on c6 and d5, the bishop out before ...e6',
+    subtitle: 'One structure against 1.e4, 1.d4, 1.c4 and 1.Nf3: pawns on c6 and d5, the bishop out before ...e6',
     category: 'black_repertoire',
     targetColor: 'black',
     targetRatingBand: 'intermediate',
     description:
-      'The lines hoot65 reaches as Black, weighted by his own games: the wall against the London, 2.c4, 2.Nc3 and 2.Bg5, and the Caro-Kann against the Advance, the Classical, and 2.Nf3 or 2.Nc3 with the question of when ...Bg4 is safe.',
+      'The lines hoot65 reaches as Black, weighted by his own games: the wall against the London, 2.c4, 2.Nc3 and 2.Bg5, the same wall against 1.c4 and 1.Nf3, and the Caro-Kann against the Advance, the Classical, and 2.Nf3 or 2.Nc3 with the question of when ...Bg4 is safe.',
     sourceAttribution: {
       bookTitle: 'Chess.com Live Archive',
       author: 'hoot65 Diagnostic Analysis',
