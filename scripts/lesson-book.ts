@@ -365,7 +365,7 @@ chapters.push(renderPlan(getRecommendedBlackRepertoire(), ++n));
 chapters.push(partHead('Part III · Pattern library', 'Openings you do not play, kept for the patterns in them.'));
 for (const lesson of library) chapters.push(renderLesson(lesson, ++n));
 
-// The key: a page of its own (so no answer is printed on the back of a practice page), two columns of run-in entries
+// The key starts a new page (printed double-sided, that can be the back of the last practice page); two columns of run-in entries
 toc.push({ heading: 'Answer key', id: 'key', no: '', title: 'Answer key' });
 let key = `<section class="key new-page" id="key"><h1>Answer key</h1><div class="key-body">`;
 let currentChapter = '';
