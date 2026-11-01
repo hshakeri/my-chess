@@ -24,8 +24,9 @@ also runs on every push to another branch).
 - `npm run build` must pass (`tsc && vite build`). Base path is `/my-chess/`.
 - Never commit a PDF: `.gitignore` excludes `*.pdf` and `book/`; run `git ls-files "*.pdf"` before
   every commit and expect no output. The printable lesson book is generated at deploy time
-  (`npm run book` writes `book/lesson-book.html`, `npm run book:pdf` renders it) and served at
-  https://hshakeri.github.io/my-chess/book/lesson-book.pdf.
+  (`npm run book` writes `book/lesson-book.html`, `npm run book:pdf` renders it on US Letter, or A4
+  with `BOOK_PAPER=a4`) and served at https://hshakeri.github.io/my-chess/book/lesson-book.pdf.
+  Branch CI builds it too and keeps the PDF as the `lesson-book` artifact for 7 days.
 - Every lesson FEN and move is validated by `buildVerifiedLesson` in `src/curriculum/builder.ts`;
   never claim a chess fact in lesson text that you did not replay with chess.js.
 - Lesson titles never print the answer. Opponent branches use `alternatives` on opponent moves with
@@ -127,9 +128,18 @@ Status (2026-11-01): White 1-5 and Black 1-4 and 6 are done (Black 5 needs no ne
   was not, and 12 where nothing was in danger until hoot65's own move left a piece to take. Each
   accepts every move that keeps (or wins) the material, plays out the capture after the game move,
   and has its own review card. They open the study path as three rows of numbered tiles ("From Your
-  Games" course), print as three chapters of diagrams in the book, and
+  Games" course), print as three one-page chapters of 12 diagrams in the book, and
   `tests/unit/curriculum/game-drills.spec.ts` works out every fact their text states. Re-run the scan
   and `pick` as new games come in.
+- Lesson book print layout (2026-11-01): 48 US Letter pages (46 on A4) instead of 86 A4 pages, with
+  the same 351 answers. Title and contents share page 1, and the contents carry page numbers:
+  `npm run book:pdf` renders twice and reads where each chapter landed from the first PDF's
+  bookmarks (it fails if a chapter has no bookmark or moves). Chapters run on instead of opening a
+  page; each drill set is one page of 12 diagrams; the key is two columns of run-in answers (3 pages,
+  not 10). Diagrams are SVG drawings with the app's piece set (`public/pieces`), so macOS and the
+  Linux runner print the same pieces; the fonts are Times New Roman and Arial, whose metric twins
+  Liberation Serif and Sans the runner has, so pages break the same way there. All text is black
+  and dark squares are a light grey: by Ghostscript's ink estimate the book takes 26% less ink.
 Next: the roadmap below.
 
 ## Roadmap items not yet built (see `docs/pedagogy-audit.md` Section 7)

@@ -37,6 +37,21 @@ jobs:
       - name: Browser tests (Playwright)
         run: npx playwright test
 
+      # On main the deploy's build job makes the book; on a branch, build it here so a broken book never reaches main
+      - name: Build the printable lesson book
+        if: github.ref != 'refs/heads/main'
+        run: |
+          npm run book
+          npm run book:pdf
+
+      - name: Keep the lesson book PDF of a branch run
+        if: github.ref != 'refs/heads/main'
+        uses: actions/upload-artifact@v4
+        with:
+          name: lesson-book
+          path: book/lesson-book.pdf
+          retention-days: 7
+
       - name: Keep the Playwright report of a failed run
         if: failure()
         uses: actions/upload-artifact@v4
