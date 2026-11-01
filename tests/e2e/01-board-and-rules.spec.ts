@@ -4,10 +4,7 @@ test.describe('01. 2D Chessboard & Rules Engine (F01 - F04)', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
     // Ensure we are on the Play tab
-    const playTab = page.locator('button:has-text("Play vs Maia"), [data-tab="play"]').first();
-    if (await playTab.isVisible()) {
-      await playTab.click();
-    }
+    await page.locator('[data-tab="play"]').click();
     // Wait for the chessboard to be visible
     await expect(page.locator('[data-square="e4"]').first()).toBeVisible({ timeout: 10000 });
   });
@@ -50,10 +47,7 @@ test.describe('01. 2D Chessboard & Rules Engine (F01 - F04)', () => {
 
   test('Executes click-to-move, displays legal move targets, and records live SAN', async ({ page }) => {
     // Turn off engine auto-play for testing pure board moves
-    const offBtn = page.locator('button[data-engine-color="none"], button:has-text("Off")').first();
-    if (await offBtn.isVisible()) {
-      await offBtn.click();
-    }
+    await page.locator('button[data-engine-color="none"]').click();
 
     // Click white pawn at e2
     await page.locator('[data-square="e2"]').click();
@@ -76,8 +70,7 @@ test.describe('01. 2D Chessboard & Rules Engine (F01 - F04)', () => {
 
   test('Correctly highlights King when placed in Check', async ({ page }) => {
     // Turn off engine
-    const offBtn = page.locator('button[data-engine-color="none"]').first();
-    if (await offBtn.isVisible()) await offBtn.click();
+    await page.locator('button[data-engine-color="none"]').click();
 
     // Load position where Black is 1 move away from delivering check:
     // Setup modal
@@ -98,8 +91,7 @@ test.describe('01. 2D Chessboard & Rules Engine (F01 - F04)', () => {
 
   test('Validates Castling rights and automatically moves the Rook', async ({ page }) => {
     // Turn off engine
-    const offBtn = page.locator('button[data-engine-color="none"]').first();
-    if (await offBtn.isVisible()) await offBtn.click();
+    await page.locator('button[data-engine-color="none"]').click();
 
     // Load position ready for White kingside castling
     const setupBtn = page.locator('button[data-action="setup-position"]').first();
@@ -126,8 +118,7 @@ test.describe('01. 2D Chessboard & Rules Engine (F01 - F04)', () => {
   });
 
   test('Handles En Passant pawn capture correctly', async ({ page }) => {
-    const offBtn = page.locator('button[data-engine-color="none"]').first();
-    if (await offBtn.isVisible()) await offBtn.click();
+    await page.locator('button[data-engine-color="none"]').click();
 
     // Load position where White pawn on e5, Black plays d7-d5 enabling en passant on d6
     const setupBtn = page.locator('button[data-action="setup-position"]').first();
@@ -156,8 +147,7 @@ test.describe('01. 2D Chessboard & Rules Engine (F01 - F04)', () => {
   });
 
   test('Pawn promotion triggers modal and promotes to selected piece', async ({ page }) => {
-    const offBtn = page.locator('button[data-engine-color="none"]').first();
-    if (await offBtn.isVisible()) await offBtn.click();
+    await page.locator('button[data-engine-color="none"]').click();
 
     // Load position with White pawn on e7 ready to promote on e8
     const setupBtn = page.locator('button[data-action="setup-position"]').first();
@@ -189,8 +179,7 @@ test.describe('01. 2D Chessboard & Rules Engine (F01 - F04)', () => {
   });
 
   test('Detects terminal Checkmate and displays game over status', async ({ page }) => {
-    const offBtn = page.locator('button[data-engine-color="none"]').first();
-    if (await offBtn.isVisible()) await offBtn.click();
+    await page.locator('button[data-engine-color="none"]').click();
 
     // Load position 1 move before Scholar\'s Mate (White Queen on h5 ready for Qxf7#)
     const setupBtn = page.locator('button[data-action="setup-position"]').first();
@@ -227,8 +216,7 @@ test.describe('01. 2D Chessboard & Rules Engine (F01 - F04)', () => {
   });
 
   test('Takeback undoes last move and restores previous position', async ({ page }) => {
-    const offBtn = page.locator('button[data-engine-color="none"]').first();
-    if (await offBtn.isVisible()) await offBtn.click();
+    await page.locator('button[data-engine-color="none"]').click();
 
     // Play 1. e4
     await page.locator('[data-square="e2"]').click();

@@ -1,7 +1,17 @@
 import { test, expect } from '@playwright/test';
+import { readFileSync } from 'node:fs';
 
 test.describe('09. Tier 4 Real-World User Scenarios (Journeys 1 - 15)', () => {
+  let unmocked: string[] = [];
+
   test.beforeEach(async ({ page }) => {
+    // Every Chess.com request the tests do not mock is answered 404 and recorded, so no test reaches the live API
+    unmocked = [];
+    await page.route('https://api.chess.com/**', async (route) => {
+      unmocked.push(route.request().url());
+      await route.fulfill({ status: 404, headers: { 'Access-Control-Allow-Origin': '*' }, body: '' });
+    });
+
     // Intercept network routes for Chess.com endpoints
     await page.route('https://api.chess.com/pub/player/hoot65/games/archives', async (route) => {
       await route.fulfill({
@@ -14,6 +24,15 @@ test.describe('09. Tier 4 Real-World User Scenarios (Journeys 1 - 15)', () => {
             'https://api.chess.com/pub/player/hoot65/games/2026/10',
           ],
         }),
+      });
+    });
+
+    await page.route('https://api.chess.com/pub/player/hoot65/games/2026/09', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        headers: { 'Access-Control-Allow-Origin': '*' },
+        body: JSON.stringify({ games: [] }),
       });
     });
 
@@ -41,9 +60,12 @@ test.describe('09. Tier 4 Real-World User Scenarios (Journeys 1 - 15)', () => {
     await page.goto('/');
   });
 
+  test.afterEach(() => {
+    expect(unmocked, 'Chess.com requests without a mock').toEqual([]);
+  });
+
   test('Scenario 1: Full Game vs Maia 1100 as White with move takeback and PGN export', async ({ page }) => {
-    const playTab = page.locator('button:has-text("Play vs Maia"), [data-tab="play"]').first();
-    if (await playTab.isVisible()) await playTab.click();
+    await page.locator('[data-tab="play"]').click();
 
     // Select Maia 1100 Elo
     await page.locator('select[data-select="elo"]').selectOption('1100');
@@ -58,23 +80,23 @@ test.describe('09. Tier 4 Real-World User Scenarios (Journeys 1 - 15)', () => {
     const ply2 = page.locator('button[data-ply="2"]').first();
     await expect(ply2).toBeVisible({ timeout: 15000 });
 
+    // Export PGN downloads the game so far
+    const downloadPromise = page.waitForEvent('download');
+    await page.locator('button[data-action="export-pgn"]').first().click();
+    const download = await downloadPromise;
+    expect(download.suggestedFilename()).toMatch(/^game_\d+\.pgn$/);
+    expect(readFileSync(await download.path(), 'utf8')).toMatch(/1\. e4 \S+/);
+
     // Test takeback
     const takebackBtn = page.locator('button[data-action="takeback"]').first();
     await takebackBtn.click();
 
     // Board returns to White's turn
     await expect(page.locator('[data-square="e2"] img')).toBeVisible();
-
-    // Export PGN button check
-    const exportPgn = page.locator('button[data-action="export-pgn"]').first();
-    if (await exportPgn.isVisible()) {
-      await exportPgn.click();
-    }
   });
 
   test('Scenario 2: Full Game vs Maia 1500 as Black with board flip and move navigation', async ({ page }) => {
-    const playTab = page.locator('button:has-text("Play vs Maia"), [data-tab="play"]').first();
-    if (await playTab.isVisible()) await playTab.click();
+    await page.locator('[data-tab="play"]').click();
 
     // Flip board to Black perspective
     await page.locator('button[data-action="flip-board"]').first().click();
@@ -107,8 +129,11 @@ test.describe('09. Tier 4 Real-World User Scenarios (Journeys 1 - 15)', () => {
     const syncBtn = page.locator('button[data-action="sync-chesscom"], button:has-text("Sync")').first();
     await syncBtn.click();
 
-    // Sync notification appears
-    await expect(page.locator('[data-view="database"]').getByText(/sync|games|complete/i).first()).toBeVisible({ timeout: 10000 });
+    // Both mocked months are read and the one new game is added
+    const dialog = page.locator('[data-modal="feedback"]');
+    await expect(dialog).toContainText('Chess.com Sync Complete', { timeout: 10000 });
+    await expect(dialog).toContainText('Successfully synchronized 2 monthly archives');
+    await expect(dialog).toContainText('Added: 1 new games');
   });
 
   test('Scenario 4: Weakness Detection on hoot65 Archives', async ({ page }) => {
@@ -148,18 +173,28 @@ test.describe('09. Tier 4 Real-World User Scenarios (Journeys 1 - 15)', () => {
     const lessonTab = page.locator('button:has-text("Interactive Lessons"), [data-tab="lessons"]').first();
     await lessonTab.click();
 
-    const scandiItem = page.getByText(/Scandinavian|Anti-Scandinavian|Scotch/i).first();
-    if (await scandiItem.isVisible()) {
-      await scandiItem.click();
-    }
+    // The Scandinavian drill opens after 1.e4 d5 with White to move
+    await page.locator('[data-lesson-id="lesson-scandinavian-refutation-drill"]').click();
+    const e4Pawn = page.locator('[data-square="e4"] img[alt="White p"]');
+    await expect(e4Pawn).toBeVisible();
 
-    // Wrong move test
-    const e4Pawn = page.locator('[data-square="e4"]');
-    if (await e4Pawn.locator('img').isVisible()) {
-      await e4Pawn.click();
-      await page.locator('[data-square="e5"]').click();
-      await expect(page.getByText(/equalize|wrong|mistake/i).first()).toBeVisible({ timeout: 5000 });
-    }
+    // Wrong move 2.e5?!: the board shakes, the mistake is explained, 2...d4 is played, then everything rolls back
+    await page.locator('[data-square="e4"]').click();
+    await page.locator('[data-square="e5"]').click();
+    await expect(page.locator('.animate-shake')).toHaveCount(1);
+    await expect(page.locator('[data-feedback="wrong"]').first()).toBeVisible({ timeout: 5000 });
+    await expect(page.locator('[data-square="d4"] img[alt="Black p"]')).toBeVisible({ timeout: 3000 });
+    await expect(page.locator('[data-square="d4"] img')).toHaveCount(0, { timeout: 5000 });
+    await expect(e4Pawn).toBeVisible();
+    await expect(page.locator('[data-run-stats]')).toContainText(/1 slip/);
+
+    // Right move 2.exd5: praised, answered by 2...Qxd5, and the decision is scheduled at once
+    await page.locator('[data-square="e4"]').click();
+    await page.locator('[data-square="d5"]').click();
+    await expect(page.locator('.correct-feedback')).toBeVisible({ timeout: 5000 });
+    await expect(page.locator('[data-square="d5"] img[alt="Black q"]')).toBeVisible({ timeout: 3000 });
+    await expect(page.locator('[data-review-log] [data-rating]')).toHaveCount(1);
+    await expect(page.locator('[data-srs-message]')).toContainText(/next review in/);
   });
 
   test('Scenario 7: Spaced Repetition Lifecycle (SM-2)', async ({ page }) => {
@@ -196,21 +231,27 @@ test.describe('09. Tier 4 Real-World User Scenarios (Journeys 1 - 15)', () => {
     const wsTab = page.locator('button:has-text("Printable Worksheets"), [data-tab="worksheets"]').first();
     await wsTab.click();
 
-    const hootDrill = page.getByText(/hoot65|Scandinavian|185031553576/i).first();
-    if (await hootDrill.isVisible()) {
-      await hootDrill.click();
-      await expect(page.locator('.printable-sheet').first()).toBeVisible();
-    }
+    const hootDrill = page.locator('.worksheet-item', { hasText: 'hoot65 Weakness Drill' }).first();
+    await expect(hootDrill).toBeVisible();
+    const title = (await hootDrill.locator('h4').textContent())!.trim();
+    await hootDrill.click();
+    await expect(page.locator('.printable-sheet h1').first()).toHaveText(title);
   });
 
   test('Scenario 10: Manual PGN Upload with Deduplication', async ({ page }) => {
     const dbTab = page.locator('button:has-text("Game Database"), [data-tab="database"]').first();
     await dbTab.click();
 
-    const uploadBtn = page.locator('button[data-action="upload-pgn"], button:has-text("Upload PGN")').first();
-    if (await uploadBtn.isVisible()) {
-      await uploadBtn.click();
-      await expect(page.locator('textarea, input[type="file"]:not(.hidden)').first()).toBeVisible();
+    const game = '[Event "Casual"]\n[Site "Local"]\n[Date "2026.10.26"]\n[White "hoot65"]\n[Black "Club Friend"]\n[Result "0-1"]\n\n1. e4 c6 2. d4 d5 0-1';
+    const dialog = page.locator('[data-modal="feedback"]');
+    // The first upload adds the game; the same text again is recognised as a duplicate
+    for (const [added, skipped] of [[1, 0], [0, 1]]) {
+      await page.locator('button[data-action="upload-pgn"]').click();
+      await page.locator('textarea[data-input="pgn-upload"]').fill(game);
+      await page.locator('button[data-action="confirm-upload"]').click();
+      await expect(dialog).toContainText(`Games Added: ${added}`, { timeout: 10000 });
+      await expect(dialog).toContainText(`Duplicates Skipped: ${skipped}`);
+      await page.locator('button[data-action="dismiss-feedback"]').click();
     }
   });
 
@@ -223,8 +264,7 @@ test.describe('09. Tier 4 Real-World User Scenarios (Journeys 1 - 15)', () => {
   });
 
   test('Scenario 12: Custom Position Setup & Endgame Practice (Lucena Position)', async ({ page }) => {
-    const playTab = page.locator('button:has-text("Play vs Maia"), [data-tab="play"]').first();
-    if (await playTab.isVisible()) await playTab.click();
+    await page.locator('[data-tab="play"]').click();
 
     const setupBtn = page.locator('button[data-action="setup-position"]').first();
     await setupBtn.click();
@@ -239,8 +279,7 @@ test.describe('09. Tier 4 Real-World User Scenarios (Journeys 1 - 15)', () => {
   });
 
   test('Scenario 13: Offline & Worker Fallback Resilience', async ({ page }) => {
-    const playTab = page.locator('button:has-text("Play vs Maia"), [data-tab="play"]').first();
-    if (await playTab.isVisible()) await playTab.click();
+    await page.locator('[data-tab="play"]').click();
 
     // Make move 1. e4
     await page.locator('[data-square="e2"]').click();
@@ -254,12 +293,10 @@ test.describe('09. Tier 4 Real-World User Scenarios (Journeys 1 - 15)', () => {
   });
 
   test('Scenario 14: Move History Scrubbing during Live Game', async ({ page }) => {
-    const playTab = page.locator('button:has-text("Play vs Maia"), [data-tab="play"]').first();
-    if (await playTab.isVisible()) await playTab.click();
+    await page.locator('[data-tab="play"]').click();
 
     // Turn off engine
-    const offBtn = page.locator('button[data-engine-color="none"]').first();
-    if (await offBtn.isVisible()) await offBtn.click();
+    await page.locator('button[data-engine-color="none"]').click();
 
     // Play 1. e4 e5 2. Nf3 Nc6
     await page.locator('[data-square="e2"]').click();

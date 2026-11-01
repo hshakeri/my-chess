@@ -368,8 +368,10 @@ export const DatabaseView: React.FC = () => {
         <div className="p-3.5 rounded-xl bg-slate-800/60 border border-slate-800">
           <div className="text-xs text-slate-400 uppercase font-medium">Filtered Games</div>
           <div className="text-xl font-bold text-white mt-1">
-            {stats.count}{' '}
-            <span className="text-xs font-normal text-slate-500">/ {totalDbCount} in DB</span>
+            <span data-stat="filtered-games">{stats.count}</span>{' '}
+            <span className="text-xs font-normal text-slate-500">
+              / <span data-stat="db-games">{totalDbCount}</span> in DB
+            </span>
           </div>
         </div>
         <div className="p-3.5 rounded-xl bg-slate-800/60 border border-slate-800">
@@ -412,6 +414,10 @@ export const DatabaseView: React.FC = () => {
           {(['all', 'white', 'black'] as const).map((c) => (
             <button
               key={c}
+              type="button"
+              data-filter="color"
+              data-value={c}
+              aria-pressed={filterColor === c}
               onClick={() => setFilterColor(c)}
               className={`px-2.5 py-1 rounded capitalize transition ${
                 filterColor === c ? 'bg-emerald-600 text-white' : 'text-slate-400 hover:text-white'
@@ -428,6 +434,10 @@ export const DatabaseView: React.FC = () => {
           {(['all', 'win', 'loss', 'draw'] as const).map((r) => (
             <button
               key={r}
+              type="button"
+              data-filter="result"
+              data-value={r}
+              aria-pressed={filterResult === r}
               onClick={() => setFilterResult(r)}
               className={`px-2.5 py-1 rounded capitalize transition ${
                 filterResult === r ? 'bg-emerald-600 text-white' : 'text-slate-400 hover:text-white'
@@ -444,6 +454,10 @@ export const DatabaseView: React.FC = () => {
           {(['all', 'rapid', 'blitz', 'bullet'] as const).map((t) => (
             <button
               key={t}
+              type="button"
+              data-filter="speed"
+              data-value={t}
+              aria-pressed={filterTimeClass === t}
               onClick={() => setFilterTimeClass(t)}
               className={`px-2.5 py-1 rounded capitalize transition ${
                 filterTimeClass === t ? 'bg-emerald-600 text-white' : 'text-slate-400 hover:text-white'
@@ -513,6 +527,7 @@ export const DatabaseView: React.FC = () => {
                     <tr
                       key={game.id}
                       data-game-id={game.id}
+                      data-user-color={game.userColor}
                       onClick={() => setSelectedGame(game)}
                       className="game-row hover:bg-slate-800/60 cursor-pointer transition group"
                     >
@@ -701,7 +716,14 @@ export const DatabaseView: React.FC = () => {
       {/* Feedback Alert Modal */}
       {feedbackModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md p-6 shadow-2xl">
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label={feedbackModal.title}
+            data-modal="feedback"
+            data-feedback-type={feedbackModal.type}
+            className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md p-6 shadow-2xl"
+          >
             <div className="flex items-start gap-3">
               {feedbackModal.type === 'success' ? (
                 <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
@@ -725,6 +747,7 @@ export const DatabaseView: React.FC = () => {
             <div className="flex justify-end mt-5">
               <button
                 onClick={() => setFeedbackModal(null)}
+                data-action="dismiss-feedback"
                 className="px-4 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-white text-sm font-medium transition"
               >
                 Close

@@ -3,10 +3,7 @@ import { test, expect } from '@playwright/test';
 test.describe('08. Tier 3 Cross-Feature Integration Combinations', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
-    const playTab = page.locator('button:has-text("Play vs Maia"), [data-tab="play"]').first();
-    if (await playTab.isVisible()) {
-      await playTab.click();
-    }
+    await page.locator('[data-tab="play"]').click();
     await expect(page.locator('[data-square="e4"]').first()).toBeVisible({ timeout: 10000 });
   });
 
@@ -77,8 +74,7 @@ test.describe('08. Tier 3 Cross-Feature Integration Combinations', () => {
 
   test('Combination 4: Orientation Flip -> Coordinate Inversion & Legal Move Interaction', async ({ page }) => {
     // Turn off engine
-    const offBtn = page.locator('button[data-engine-color="none"]').first();
-    if (await offBtn.isVisible()) await offBtn.click();
+    await page.locator('button[data-engine-color="none"]').click();
 
     // Flip board
     const flipBtn = page.locator('button[data-action="flip-board"]').first();
@@ -110,8 +106,7 @@ test.describe('08. Tier 3 Cross-Feature Integration Combinations', () => {
 
   test('Combination 6: Pawn Promotion to Knight -> live SAN records exd8=N', async ({ page }) => {
     // Turn off engine
-    const offBtn = page.locator('button[data-engine-color="none"]').first();
-    if (await offBtn.isVisible()) await offBtn.click();
+    await page.locator('button[data-engine-color="none"]').click();
 
     // Setup position: White pawn on e7, black rook on d8
     const setupBtn = page.locator('button[data-action="setup-position"]').first();

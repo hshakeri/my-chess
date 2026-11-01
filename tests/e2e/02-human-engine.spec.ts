@@ -3,10 +3,7 @@ import { test, expect } from '@playwright/test';
 test.describe('02. Human-Like Maia Engine Opponent (F05 - F06)', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/');
-    const playTab = page.locator('button:has-text("Play vs Maia"), [data-tab="play"]').first();
-    if (await playTab.isVisible()) {
-      await playTab.click();
-    }
+    await page.locator('[data-tab="play"]').click();
     await expect(page.locator('[data-square="e4"]').first()).toBeVisible();
   });
 
@@ -50,10 +47,7 @@ test.describe('02. Human-Like Maia Engine Opponent (F05 - F06)', () => {
 
   test('Engine plays first move when configured to play as White', async ({ page }) => {
     // Reset/start fresh game
-    const newGameBtn = page.locator('button[data-action="new-game"]').first();
-    if (await newGameBtn.isVisible()) {
-      await newGameBtn.click();
-    }
+    await page.locator('button[data-action="new-game"]').click();
 
     // Set engine to White
     const whiteBtn = page.locator('button[data-engine-color="w"]').first();
@@ -77,22 +71,19 @@ test.describe('02. Human-Like Maia Engine Opponent (F05 - F06)', () => {
 
   test('Supports manual "Move Now" engine trigger', async ({ page }) => {
     // Turn off auto engine
-    const offBtn = page.locator('button[data-engine-color="none"]').first();
-    if (await offBtn.isVisible()) await offBtn.click();
+    await page.locator('button[data-engine-color="none"]').click();
 
     // Make move 1. d4
     await page.locator('[data-square="d2"]').click();
     await page.locator('[data-square="d4"]').click();
 
     // Click "Move Now"
-    const moveNowBtn = page.locator('button[data-action="engine-move-now"]').first();
-    if (await moveNowBtn.isVisible()) {
-      await expect(moveNowBtn).toBeEnabled();
-      await moveNowBtn.click();
+    const moveNowBtn = page.locator('button[data-action="engine-move-now"]');
+    await expect(moveNowBtn).toBeEnabled();
+    await moveNowBtn.click();
 
-      // Wait for reply (ply 2)
-      await expect(page.locator('button[data-ply="2"]').first()).toBeVisible({ timeout: 15000 });
-    }
+    // Wait for reply (ply 2)
+    await expect(page.locator('button[data-ply="2"]').first()).toBeVisible({ timeout: 15000 });
   });
 
   test('Operates 100% client-side without any backend server API calls', async ({ page }) => {

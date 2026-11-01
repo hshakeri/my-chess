@@ -15,12 +15,9 @@ test.describe('07. Git Configuration, .gitignore & GitHub Pages Static Deploymen
   });
 
   test('git ls-files "*.pdf" confirms zero PDF files are tracked in git', () => {
-    try {
-      const output = execSync('git ls-files "*.pdf"', { cwd: rootDir, encoding: 'utf8' });
-      expect(output.trim()).toBe('');
-    } catch {
-      // If git is not yet initialized or command exits, ensure no tracked PDFs
-    }
+    // No try/catch: a failed git command or a tracked PDF must fail the test
+    const output = execSync('git ls-files "*.pdf"', { cwd: rootDir, encoding: 'utf8' });
+    expect(output.trim()).toBe('');
   });
 
   test('GitHub Actions deployment workflow (.github/workflows/deploy.yml) exists', () => {
@@ -29,6 +26,17 @@ test.describe('07. Git Configuration, .gitignore & GitHub Pages Static Deploymen
 
     const content = fs.readFileSync(deployWorkflowPath, 'utf8');
     expect(content).toMatch(/github-pages|actions\/deploy-pages/i);
+  });
+
+  test('CI runs both test suites, and the deploy waits for them', () => {
+    const deploy = fs.readFileSync(path.join(rootDir, '.github/workflows/deploy.yml'), 'utf8');
+    expect(deploy).toMatch(/^  test:\n    uses: \.\/\.github\/workflows\/test\.yml$/m);
+    expect(deploy).toMatch(/^    needs: \[test, build\]$/m);
+
+    const tests = fs.readFileSync(path.join(rootDir, '.github/workflows/test.yml'), 'utf8');
+    expect(tests).toMatch(/^  workflow_call:$/m);
+    expect(tests).toMatch(/run: npx vitest run$/m);
+    expect(tests).toMatch(/run: npx playwright test$/m);
   });
 
   test('vite.config.ts is configured with base path "/my-chess/"', () => {

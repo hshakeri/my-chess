@@ -16,6 +16,10 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # Vitest and Playwright (.github/workflows/test.yml); deploy waits for them
+  test:
+    uses: ./.github/workflows/test.yml
+
   build:
     runs-on: ubuntu-latest
     steps:
@@ -52,7 +56,7 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
-    needs: build
+    needs: [test, build]
     steps:
       - name: Deploy to GitHub Pages
         id: deployment

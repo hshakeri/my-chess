@@ -211,15 +211,24 @@ Tier 4 tests complete real-world user workflows from start to finish:
 ## 7. Test Execution Commands & Environment
 
 ### 7.1 Environment Prerequisites
-All test scripts require Node.js v24:
+The suites run on Node.js 22, the version CI uses; later versions work too. Playwright needs its own
+Chromium, installed into its cache (`~/.cache/ms-playwright` on Linux, as in CI;
+`~/Library/Caches/ms-playwright` on macOS):
 ```bash
-export PATH="$HOME/.nvm/versions/node/v24.17.0/bin:$PATH"
-export PLAYWRIGHT_BROWSERS_PATH="$HOME/Library/Caches/ms-playwright"
+npm ci
+npx playwright install --with-deps chromium
+```
+To use a Chromium installed somewhere else (a sandbox image, a distro package), point Playwright at it;
+`playwright.config.ts` passes the path to the browser launch:
+```bash
+export PLAYWRIGHT_EXECUTABLE_PATH=/path/to/chromium
 ```
 
 ### 7.2 Running Unit Tests (Vitest)
 ```bash
 # Run all unit and contract tests once
+npm test
+# or only tests/unit:
 npm run test:unit
 # or direct:
 npx vitest run tests/unit
@@ -242,10 +251,19 @@ npx playwright test tests/e2e/01-board-and-rules.spec.ts
 ### 7.4 Running the Complete Test Suite
 ```bash
 # Run both unit and E2E suites
-npm test
+npm run test:all
 ```
 
-### 7.5 Pass / Fail Semantics
+### 7.5 Continuous Integration
+`.github/workflows/test.yml` runs `npx vitest run`, then installs Chromium and runs `npx playwright test`,
+on every push to a branch other than `main`. On a push to `main`, `.github/workflows/deploy.yml` calls
+the same workflow, and its `deploy` job needs both `test` and `build`: a failing test stops the publish.
+A failed run keeps the Playwright HTML report as a workflow artifact for 14 days. With `CI` set,
+Playwright refuses `test.only`, starts its own dev server, annotates failures on the run, and keeps the
+trace of every failed test.
+
+### 7.6 Pass / Fail Semantics
 - **Zero Tolerance for Failures**: A single test failure exits with code `1` and fails the test runner.
-- **Zero Console Errors**: E2E browser runs listen to `page.on('console', msg => ...)` and fail if any uncaught error or 404 asset request occurs.
-- **Strict Timeouts**: Unit tests timeout at 5,000ms; E2E steps timeout at 15,000ms. Hanging workers or unhandled promises fail automatically.
+- **No Vacuous Checks**: specs do not wrap interactions in `if (await ...isVisible())`; a missing control fails the test. Specs 03 and 09 mock every Chess.com URL the app requests and answer any other Chess.com request with a 404 that fails the test, so no run reaches the live API.
+- **Zero Console Errors**: spec 07 loads the app and fails on any console error or failed request.
+- **Timeouts**: 30 s per E2E test and 5 s per assertion (`playwright.config.ts`); Vitest's default of 5 s per unit test.

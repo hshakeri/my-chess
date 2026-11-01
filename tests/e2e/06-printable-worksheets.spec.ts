@@ -21,10 +21,7 @@ test.describe('06. Printable Physical-Board Worksheets & @media print (F19 - F20
 
   test('Renders high-contrast 2D diagram with rank (1-8) and file (a-h) coordinates', async ({ page }) => {
     // Select a worksheet
-    const worksheetItem = page.locator('.worksheet-item, button:has-text("Scandinavian"), button:has-text("Scotch")').first();
-    if (await worksheetItem.isVisible()) {
-      await worksheetItem.click();
-    }
+    await page.locator('.worksheet-item').first().click();
 
     // Verify 2D diagram exists on the sheet
     const diagram = page.locator('.print-diagram, .worksheet-board, [data-printable="board"]').first();

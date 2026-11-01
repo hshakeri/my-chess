@@ -9,7 +9,8 @@ You are continuing work on **my-chess**, a 100% client-side chess coach for the 
 **hoot65** (about 1150 rapid). Read `docs/pedagogy-audit.md` first (Sections 1, 7, 8 and the two
 status notes near the top), then `docs/handoff-prompt.md` (this file). The app is deployed by the
 GitHub Actions workflow in `.github/workflows/deploy.yml` to https://hshakeri.github.io/my-chess/
-on every push to `main`.
+on every push to `main`, once the unit and browser suites pass (`.github/workflows/test.yml`, which
+also runs on every push to another branch).
 
 ## Stack and hard constraints
 
@@ -17,8 +18,9 @@ on every push to `main`.
   for scheduling; maia3-js + onnxruntime-web in a Web Worker for the human-like engine.
 - Tests: Vitest (`npm test`, 342 tests: SSR `renderToString` specs, jsdom interaction specs under
   `tests/unit/curriculum/lessons-view-interactions.spec.tsx`, fake-indexeddb for the database) and
-  Playwright (`npm run test:e2e`, 79 tests incl. iPhone-viewport tests). Keep both green or update
-  tests deliberately and say why.
+  Playwright (`npm run test:e2e`, 80 tests incl. iPhone-viewport tests). Keep both green or update
+  tests deliberately and say why. No `if (await ...isVisible())` guards in specs: a missing control
+  must fail, and every Chess.com request in a spec must be mocked.
 - `npm run build` must pass (`tsc && vite build`). Base path is `/my-chess/`.
 - Never commit a PDF: `.gitignore` excludes `*.pdf` and `book/`; run `git ls-files "*.pdf"` before
   every commit and expect no output. The printable lesson book is generated at deploy time
@@ -132,7 +134,10 @@ Next: the roadmap below.
 
 ## Roadmap items not yet built (see `docs/pedagogy-audit.md` Section 7)
 
-- QW-7 and QW-8 (CI, chess-accuracy strings). QW-6 is done (2026-11-01): the tactical search
+- QW-8 (chess-accuracy strings). QW-7 is done (2026-11-01): CI runs Vitest and Playwright on every
+  branch push and before every deploy, `playwright.config.ts` reads `PLAYWRIGHT_EXECUTABLE_PATH`, the
+  33 `isVisible` guards left in the specs are gone, and specs 03 and 09 mock every Chess.com request.
+  QW-6 is done (2026-11-01): the tactical search
   generates each node's moves once as SAN and returns the same scores 2.5-4x faster (a fixture of 30
   game positions and 8 rule cases recorded before the change guards this), every Elo band of the
   heuristic opponent answers in about a second (1700 took 14 s and 1900 took 70 s), evaluations skip
@@ -156,3 +161,6 @@ npx playwright install --with-deps chromium && npm run test:e2e
 npm run build
 git ls-files "*.pdf"   # must print nothing
 ```
+
+Pushing the branch runs the same unit and browser suites in CI (`.github/workflows/test.yml`);
+fast-forward `main` only once that run is green. The push to `main` runs them again before the deploy.
