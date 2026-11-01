@@ -107,6 +107,8 @@ Status (2026-11-01): White 1-5 and Black 1-4 and 6 are done (Black 5 needs no ne
   `black-wall-vs-reti`, so Diagnostics flags the 1.c4/1.Nf3 games that leave the wall.
 - `tests/unit/curriculum/study-order.spec.ts` replays every archive count used as a branch weight
   and every fact the new exercises state.
+- The lesson book's over-the-board practice now has blanks for every branch reply as well as the
+  main line ("The other replies", answers in the key), and Black chapters say White moves first.
 Next: the roadmap below.
 
 ## Roadmap items not yet built (see `docs/pedagogy-audit.md` Section 7)

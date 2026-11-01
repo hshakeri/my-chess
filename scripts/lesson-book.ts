@@ -50,9 +50,9 @@ function diagram(fen: string, orientation: 'w' | 'b' = 'w'): string {
   return html;
 }
 
-/** "1.e4 e5 2.Nf3" style move text for a sequence starting from `fen`. */
+/** "1.e4 e5 2.Nf3" style move text for a sequence starting from `fen` (a leading Black move keeps "1..."). */
 function moveText(fen: string, moves: string[]): string {
-  return moves.map((san, i) => plyLabel(fen, i, san)).join(' ').replace(/(\d+\.\.\.)/g, '$1');
+  return moves.map((san, i) => (i === 0 ? plyLabel(fen, i, san) : plyLabel(fen, i, san).replace(/^\d+\.\.\./, ''))).join(' ');
 }
 
 function fenAfter(fen: string, moves: string[]): string {
@@ -100,12 +100,57 @@ function renderLine(lesson: CurriculumLesson, moves: CurriculumMove[], startFen:
   return html;
 }
 
+/** A, B, ..., Z, AA, AB, ... */
+function branchTag(k: number): string {
+  return k < 26 ? String.fromCharCode(65 + k) : `${branchTag(Math.floor(k / 26) - 1)}${String.fromCharCode(65 + (k % 26))}`;
+}
+
+interface BranchDrill {
+  /** Moves from the lesson's initial position up to and including the opponent's other reply. */
+  path: string[];
+  continuation: CurriculumMove[];
+}
+
+/** Every opponent reply other than the scripted one, at or after `activeFrom`, including replies inside branches. */
+function collectBranches(moves: CurriculumMove[], pathPrefix: string[], activeFrom: number): BranchDrill[] {
+  const out: BranchDrill[] = [];
+  moves.forEach((move, i) => {
+    if (i < activeFrom || move.isUserMove || !move.alternatives) return;
+    for (const opt of replyOptions(move).slice(1)) {
+      if (!opt.continuation) continue;
+      const path = [...pathPrefix, ...moves.slice(0, i).map((m) => m.san), opt.san];
+      out.push({ path, continuation: opt.continuation });
+      out.push(...collectBranches(opt.continuation, path, 0));
+    }
+  });
+  return out;
+}
+
+/** Practice list for a sequence: the student's moves as blanks (answers to the key), the replies given. */
+function practiceList(lesson: CurriculumLesson, moves: CurriculumMove[], plyOffset: number, chapter: string, keyPrefix: string): string {
+  let html = `<ol class="practice">`;
+  moves.forEach((move, i) => {
+    const label = plyLabel(lesson.initialFen, plyOffset + i, move.san);
+    const no = `${label.split(/\.+/)[0]}${label.includes('...') ? '...' : '.'}`;
+    if (move.isUserMove) {
+      html += `<li class="blank"><b>${esc(no)}</b> ________ <span class="hint">(${esc(move.hintTheme || move.hintPiece || 'find the move')})</span></li>`;
+      answerKey.push({ chapter, label: `${keyPrefix}${no}`, answer: `${move.san}${move.accept?.san?.length ? ` (also ${move.accept.san.join(', ')})` : ''}` });
+    } else {
+      html += `<li class="given"><b>${esc(label)}</b> (given)</li>`;
+    }
+  });
+  return `${html}</ol>`;
+}
+
 function renderLesson(lesson: CurriculumLesson, n: number): string {
   const startPly = lesson.startPly ?? 0;
   const prefix = lesson.moves.slice(0, startPly).map((m) => m.san);
   const drillFen = fenAfter(lesson.initialFen, prefix);
   const side: 'w' | 'b' = lesson.targetColor === 'black' ? 'b' : 'w';
+  const sideName = side === 'w' ? 'White' : 'Black';
+  const toMove = new Chess(drillFen).turn();
   const userMoves = lesson.moves.filter((m, i) => i >= startPly && m.isUserMove);
+  const branches = collectBranches(lesson.moves, [], startPly);
   const chapter = `${n}. ${lesson.title}`;
 
   let html = `<section class="chapter"><h2>${esc(chapter)}</h2>`;
@@ -119,7 +164,11 @@ function renderLesson(lesson: CurriculumLesson, n: number): string {
 
   html += `<h3>The line, explained</h3>`;
   if (prefix.length > 0) html += `<p>The drill starts after <b>${esc(moveText(lesson.initialFen, prefix))}</b>; those moves are given.</p>`;
-  html += `<div class="explain"><div class="diagram">${diagram(drillFen, side)}<div class="caption">Start of the drill. ${side === 'w' ? 'White' : 'Black'} to move.</div></div>`;
+  const startCaption =
+    toMove === side
+      ? `Start of the drill. ${sideName} to move.`
+      : `Start of the drill. You play ${sideName}; ${toMove === 'w' ? 'White' : 'Black'}'s move comes first and is given.`;
+  html += `<div class="explain"><div class="diagram">${diagram(drillFen, side)}<div class="caption">${startCaption}</div></div>`;
   html += renderLine(lesson, lesson.moves.slice(startPly), drillFen, prefix, 0);
   html += `</div>`;
 
@@ -134,21 +183,19 @@ function renderLesson(lesson: CurriculumLesson, n: number): string {
 
   // Practice section: cover the answers, set up the start, play your moves
   html += `<h3 class="practice-title">Practice over the board</h3>`;
-  html += `<p>Set up the start position of the drill (FEN <code>${esc(drillFen)}</code>) with ${side === 'w' ? 'White' : 'Black'} nearest you, cover the explanation above, and play your ${userMoves.length} move${userMoves.length === 1 ? '' : 's'} of the line while a partner (or you, with the key) plays the replies. Each move you have to find is listed as a blank below; the opponent's replies are given so you can continue.</p>`;
-  html += `<ol class="practice">`;
-  const c = new Chess(drillFen);
-  lesson.moves.slice(startPly).forEach((move, i) => {
-    const label = plyLabel(lesson.initialFen, startPly + i, move.san);
-    if (move.isUserMove) {
-      const no = label.split(/\.+/)[0];
-      html += `<li class="blank"><b>${esc(no)}${label.includes('...') ? '...' : '.'}</b> ________ <span class="hint">(${esc(move.hintTheme || move.hintPiece || 'find the move')})</span></li>`;
-      answerKey.push({ chapter, label: `${label.split(/\.+/)[0]}${label.includes('...') ? '...' : '.'} (line)`, answer: `${move.san}${move.accept?.san?.length ? ` (also ${move.accept.san.join(', ')})` : ''}` });
-    } else {
-      html += `<li class="given"><b>${esc(label)}</b> (given)</li>`;
-    }
-    c.move(move.san);
-  });
-  html += `</ol>`;
+  html += `<p>Set up the start position of the drill (FEN <code>${esc(drillFen)}</code>) with ${sideName} nearest you, cover the explanation above, and play your ${userMoves.length} move${userMoves.length === 1 ? '' : 's'} of the line while a partner (or you, with the key) plays the replies. Each move you have to find is listed as a blank below; the opponent's replies are given so you can continue.${
+    branches.length ? ` Then do the same for the ${branches.length} other repl${branches.length === 1 ? 'y' : 'ies'} after it: play the given moves to reach the position and find yours.` : ''
+  }</p>`;
+  html += practiceList(lesson, lesson.moves.slice(startPly), startPly, chapter, 'Line · ');
+  if (branches.length) {
+    html += `<h4>The other replies</h4>`;
+    branches.forEach((b, k) => {
+      const tag = branchTag(k);
+      html += `<div class="branch-practice"><p><b>Reply ${tag}</b> · reach it with <b>${esc(moveText(lesson.initialFen, b.path))}</b></p>`;
+      html += practiceList(lesson, b.continuation, b.path.length, chapter, `Reply ${tag} · `);
+      html += `</div>`;
+    });
+  }
 
   if (lesson.exercises.length > 0) {
     html += `<h4>Exercises</h4>`;
@@ -191,9 +238,9 @@ const library = allCurriculumLessons.filter((l) => l.relevance === 'outside-repe
 
 let n = 0;
 const chapters: string[] = [];
-chapters.push(`<section class="part"><h1>Part I · Your drills and repertoire lessons</h1><p>These chapters come from your own Chess.com games (hoot65) and the openings you actually play. Each one explains the position first; the practice section that follows is meant to be done on a real board with the explanation covered. Answers are in the key at the end.</p></section>`);
+chapters.push(`<section class="part"><h1>Part I · Your drills and repertoire lessons</h1><p>These chapters come from your own Chess.com games (hoot65) and the openings you actually play. Each one explains the position first; the practice section that follows, for the main line and for every other reply your opponents chose, is meant to be done on a real board with the explanation covered. Answers are in the key at the end.</p></section>`);
 for (const lesson of openingLessons) chapters.push(renderLesson(lesson, ++n));
-chapters.push(`<section class="part"><h1>Part II · The repertoire plans</h1><p>The full lines behind the lessons: White's Italian with the Evans Gambit and the Anti-Scandinavian, Black's Caro-Kann and the c6-d5 wall against 1.d4.</p></section>`);
+chapters.push(`<section class="part"><h1>Part II · The repertoire plans</h1><p>The full lines behind the lessons: White's Italian with the Evans Gambit and the Anti-Scandinavian, Black's Caro-Kann and the c6-d5 wall against 1.d4, 1.c4 and 1.Nf3.</p></section>`);
 chapters.push(renderPlan(getRecommendedWhiteRepertoire(), ++n));
 chapters.push(renderPlan(getRecommendedBlackRepertoire(), ++n));
 chapters.push(`<section class="part"><h1>Part III · Pattern library</h1><p>Openings you do not play, kept for the patterns in them.</p></section>`);
@@ -210,7 +257,8 @@ for (const e of answerKey) {
 }
 key += `</section>`;
 
-const toc = `<section class="toc"><h1>Contents</h1><ol>${[...openingLessons.map((l) => l.title), getRecommendedWhiteRepertoire().name, getRecommendedBlackRepertoire().name, ...library.map((l) => l.title)]
+const playing = (l: CurriculumLesson) => `${l.title} (you play ${l.targetColor === 'black' ? 'Black' : 'White'})`;
+const toc = `<section class="toc"><h1>Contents</h1><ol>${[...openingLessons.map(playing), getRecommendedWhiteRepertoire().name, getRecommendedBlackRepertoire().name, ...library.map((l) => l.title)]
   .map((t) => `<li>${esc(t)}</li>`)
   .join('')}<li>Answer key</li></ol></section>`;
 
@@ -255,6 +303,8 @@ table.board th { font: 7pt Helvetica, Arial, sans-serif; color: #555; padding: 0
 ol.practice { columns: 2; padding-left: 14pt; margin: 0 0 6pt; }
 ol.practice li { break-inside: avoid; margin-bottom: 2pt; }
 ol.practice li.given { color: #555; }
+.branch-practice { break-inside: avoid; margin: 0 0 4pt; }
+.branch-practice p { margin: 2pt 0; }
 .hint { font-size: 9pt; color: #555; }
 .exercise { display: flex; gap: 10pt; align-items: flex-start; margin: 4pt 0 8pt; break-inside: avoid; }
 .blankline { color: #555; }
