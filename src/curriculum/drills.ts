@@ -209,6 +209,46 @@ export const scandinavianRefutationDrill: CurriculumLesson = buildVerifiedLesson
         eco: 'B01',
       },
     },
+    {
+      id: 'ex-scandi-qd8-pin-too-early',
+      title: 'A Pin Without a Knight',
+      // 1.e4 d5 2.exd5 Qxd5 3.Nc3 Qd8 4.d4 Bg4
+      fen: 'rn1qkbnr/ppp1pppp/8/8/3P2b1/2N5/PPP2PPP/R1BQKBNR w KQkq - 1 5',
+      turn: 'w',
+      difficultyRating: 1,
+      prompt:
+        'White to play. After 3...Qd8 4.d4 Black played the usual Scandinavian bishop move, 4...Bg4, before White has a knight on f3. What does White play?',
+      solutionSan: ['Qxg4'],
+      explanation:
+        '5.Qxg4 wins a bishop. With no knight on f3 there is nothing to pin, and the d1-g4 diagonal is open because the e-pawn has already left e2. Nothing defends g4.',
+      sourceGame: {
+        white: 'hoot65',
+        black: 'OBITOuchik',
+        event: 'Chess.com Live, game 185398892840 (3...Qd8 was played here)',
+        year: 2026,
+        eco: 'B01',
+      },
+    },
+    {
+      id: 'ex-scandi-qe6-pinned-queen',
+      title: 'The Queen on the King\'s Diagonal',
+      // 1.e4 d5 2.exd5 Qxd5 3.Nc3 Qe6+ 4.Be2 Qc6
+      fen: 'rnb1kbnr/ppp1pppp/2q5/8/8/2N5/PPPPBPPP/R1BQK1NR w KQkq - 4 5',
+      turn: 'w',
+      difficultyRating: 2,
+      prompt:
+        'White to play. After 3...Qe6+ 4.Be2 the queen moved for the third time, 4...Qc6, attacking the undefended g2 pawn. What does White play?',
+      solutionSan: ['Bb5'],
+      explanation:
+        '5.Bb5 pins the queen: c6 lies on the diagonal from b5 to the king on e8, and the d7 pawn is gone. The queen cannot step off the diagonal, and 5...Qxb5 6.Nxb5 gives the queen for a bishop. Every extra queen move in the Scandinavian is a chance for a tempo like this.',
+      sourceGame: {
+        white: 'hoot65',
+        black: 'ThugdizzIe',
+        event: 'Chess.com Live, game 185453315814 (3...Qe6+ was played here)',
+        year: 2026,
+        eco: 'B01',
+      },
+    },
   ],
   mistakesAndTraps: [
     {

@@ -216,6 +216,14 @@ export const evansGambitDestruction: CurriculumLesson = buildVerifiedLesson({
             isUserMove: true,
             annotation: 'The king is safe before the centre opens. From here the plan is Re1, Nbd2, Bb3 and d4 at the right moment.',
           },
+          { san: 'O-O', isUserMove: false },
+          {
+            san: 'Bb3',
+            isUserMove: true,
+            annotation:
+              'Step the bishop back before it is hit by ...d5 or ...Na5. On b3 the a2 pawn guards it and it still aims at f7 through c4, d5 and e6.',
+            hintTheme: 'Keep the bishop safe on the same diagonal',
+          },
         ],
         Nd4: [
           {
@@ -235,6 +243,9 @@ export const evansGambitDestruction: CurriculumLesson = buildVerifiedLesson({
             san: 'c3',
             isUserMove: true,
             annotation: 'Attacks the d4 pawn, which nothing defends yet. Whether Black takes on c3 or defends, White gets open lines and the better development.',
+            wrongMoveFeedback: {
+              Qf3: '5.Qf3 was your move in all three games that reached this position, and all three were lost. It threatens Qxf7#, but a single defensive move stops that (...Qe7 and ...f6 were the replies in your games), and then the queen is out early with no target left. 5.c3 attacks the d4 pawn, which nothing defends, so Black has to spend time on it.',
+            },
           },
           {
             san: 'dxc3',
@@ -286,6 +297,14 @@ export const evansGambitDestruction: CurriculumLesson = buildVerifiedLesson({
             annotation:
               'The queen takes the centre, and Black has no knight left to chase it with ...Nc6. After five moves Black has no piece developed; White has a bishop and the queen out and can castle next move.',
           },
+          { san: 'd6', isUserMove: false, annotation: 'Black opens the c8 bishop\'s diagonal. Still no black piece is developed.' },
+          {
+            san: 'O-O',
+            isUserMove: true,
+            annotation:
+              'Castle now. The queen on d4 guards e4, so nothing is loose, and Nc3 and Re1 come next. Black has spent moves on ...h6 and ...d6 and traded the only developed piece.',
+            hintTheme: 'King safety first',
+          },
         ],
       },
     },
@@ -334,8 +353,50 @@ export const evansGambitDestruction: CurriculumLesson = buildVerifiedLesson({
       hintPiece: 'c-Pawn',
       hintSquare: 'c3',
     },
-    // After 5.c3: ...Bc5 in all 7 games.
-    { san: 'Bc5', isUserMove: false, frequency: 7 },
+    {
+      san: 'Bc5',
+      isUserMove: false,
+      // After 5.c3: ...Bc5 in all 7 games. The book retreat 5...Ba5 has not been seen yet (weight 1).
+      frequency: 7,
+      alternatives: {
+        Ba5: [
+          {
+            san: 'd4',
+            isUserMove: true,
+            annotation:
+              'The bishop went to a5, out of reach of d4 and still eyeing c3. The plan does not change: strike in the centre.',
+            hintTheme: 'Same plan against every retreat',
+          },
+          { san: 'exd4', isUserMove: false },
+          {
+            san: 'O-O',
+            isUserMove: true,
+            annotation: 'As in the main line: castle first and recapture on d4 afterwards.',
+          },
+          { san: 'Nge7', isUserMove: false, annotation: 'Black develops the knight and prepares ...d5 to free the c8 bishop.' },
+          {
+            san: 'cxd4',
+            isUserMove: true,
+            annotation: 'Take back with the c-pawn: White has pawns on d4 and e4, and with b2 empty the c1 bishop can reach a3 in one move.',
+          },
+          { san: 'd5', isUserMove: false },
+          {
+            san: 'exd5',
+            isUserMove: true,
+            annotation: 'Take the pawn. After ...Nxd5 the e-file and the a3-f8 diagonal are both open next to Black\'s king.',
+          },
+          { san: 'Nxd5', isUserMove: false },
+          {
+            san: 'Ba3',
+            isUserMove: true,
+            annotation:
+              'Black is a pawn up, but the bishop now covers f8, the square the king crosses to castle short, so Black can no longer castle kingside and the king stays in the centre.',
+            hintTheme: 'Keep the king in the centre',
+            arrows: [{ from: 'a3', to: 'f8', color: 'red' }],
+          },
+        ],
+      },
+    },
     {
       san: 'd4',
       isUserMove: true,
@@ -406,6 +467,31 @@ export const evansGambitDestruction: CurriculumLesson = buildVerifiedLesson({
       prompt: 'White to play. Black just played 6...exd4. How does White prioritize rapid development and king safety over hasty pawn grabbing?',
       solutionSan: ['O-O', 'd6', 'cxd4'],
       explanation: '7.O-O! leaves Black’s king stranded in the center and activates the f1 rook for central operations before recapturing on d4.',
+    },
+    {
+      id: 'ex-italian-h6-bishop',
+      title: 'A Familiar Developing Move on the Wrong Square',
+      // 1.e4 e5 2.Nf3 Nc6 3.Bc4 h6 4.d4 Bc5
+      fen: 'r1bqk1nr/pppp1pp1/2n4p/2b1p3/2BPP3/5N2/PPP2PPP/RNBQK2R w KQkq - 1 5',
+      turn: 'w',
+      difficultyRating: 1,
+      prompt:
+        'White to play. After 3...h6 you met 4.d4 with the bishop developing to its usual Italian square, 4...Bc5. What does White play?',
+      solutionSan: ['dxc5'],
+      explanation:
+        '5.dxc5 wins a whole bishop: the d4 pawn attacks c5 and no black piece can take back on c5. Against 3...h6 the d4 pawn arrives before Black\'s bishop does, so the usual ...Bc5 is no longer available.',
+    },
+    {
+      id: 'ex-two-knights-e4-guard',
+      title: 'Why the d3 Pawn Matters',
+      // 1.e4 e5 2.Nf3 Nc6 3.Bc4 Nf6 4.d3 Nxe4
+      fen: 'r1bqkb1r/pppp1ppp/2n5/4p3/2B1n3/3P1N2/PPP2PPP/RNBQK2R w KQkq - 0 5',
+      turn: 'w',
+      difficultyRating: 1,
+      prompt: 'White to play. After 3...Nf6 4.d3 Black grabbed the e4 pawn with the knight. What does White play?',
+      solutionSan: ['dxe4'],
+      explanation:
+        '5.dxe4 wins a knight for a pawn. This is the point of 4.d3: the pawn on d3 defends e4. After 4.d4 exd4 nothing defends e4, so there ...Nxe4 wins a pawn instead of losing a piece.',
     },
   ],
   mistakesAndTraps: [

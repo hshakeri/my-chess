@@ -69,7 +69,9 @@ describe('enumerateDecisions', () => {
     const main = decisions.filter((d) => d.reachProb === 1);
     const branch = decisions.filter((d) => d.reachProb !== 1);
     expect(main.length).toBe(9);
-    expect(branch.length).toBe(17);
+    // 17 branch decisions before the opening study order pass; it added 6.Bb3 (vs 3...Nf6), 7.O-O (vs 3...h6)
+    // and the five decisions of the 5...Ba5 branch
+    expect(branch.length).toBe(24);
     expect(decisions.every((d) => d.tags.includes('opening:evans-gambit-destruction'))).toBe(true);
     expect(decisions.every((d) => d.tags.includes('family:opening'))).toBe(true);
     expect(decisions.every((d) => d.color === 'w')).toBe(true);
@@ -103,6 +105,9 @@ describe('enumerateDecisions', () => {
 
     // 4...Bxb4 was played 7 of 7 times; the declined ...Bb6 is unobserved (weight 1)
     expect(after(`${italian} Bc5 b4 Bb6`).reachProb).toBeCloseTo(1 / 8, 6);
+    // 5...Bc5 was played 7 of 7 times; the book retreat 5...Ba5 is unobserved (weight 1)
+    expect(after(`${italian} Bc5 b4 Bxb4 c3 Ba5`).reachProb).toBeCloseTo(1 / 8, 6);
+    expect(after(`${italian} Bc5 b4 Bxb4 c3 Ba5 d4 exd4 O-O Nge7 cxd4 d5 exd5 Nxd5`).acceptedSan).toEqual(['Ba3']);
     // 7...dxc3 happened in 4 of 4 games; the book 7...d6 is unobserved (weight 1)
     expect(after(`${italian} Bc5 b4 Bxb4 c3 Bc5 d4 exd4 O-O dxc3`).reachProb).toBeCloseTo(4 / 5, 6);
   });
@@ -110,12 +115,13 @@ describe('enumerateDecisions', () => {
   it('indexes branch decisions by their position in the branch sequence and main-line ones by their line index', () => {
     const decisions = enumerateDecisions(evansGambitDestruction);
     const nf6Branch = decisions.filter((d) => d.path.slice(0, 6).join(' ') === 'e4 e5 Nf3 Nc6 Bc4 Nf6');
-    expect(nf6Branch.map((d) => d.ply)).toEqual([0, 2, 4]);
-    expect(nf6Branch.map((d) => d.acceptedSan[0])).toEqual(['d3', 'c3', 'O-O']);
+    expect(nf6Branch.map((d) => d.ply)).toEqual([0, 2, 4, 6]);
+    expect(nf6Branch.map((d) => d.acceptedSan[0])).toEqual(['d3', 'c3', 'O-O', 'Bb3']);
     expect(nf6Branch.map((d) => d.title)).toEqual([
       'White to move after 3...Nf6',
       'White to move after 4...Bc5',
       'White to move after 5...d6',
+      'White to move after 6...O-O',
     ]);
     const mainAfterBc5 = decisions.find((d) => d.path.join(' ') === 'e4 e5 Nf3 Nc6 Bc4 Bc5')!;
     expect(mainAfterBc5.ply).toBe(6);
