@@ -153,7 +153,10 @@ export interface PrintableWorksheetData {
   diagramFen: string;
   coordinates: boolean;
   movesSan: string[];
+  /** Shown on the sheet itself, so it must not name an answer. */
   lessonSummary?: string;
+  /** Shown on the answer page: the explanation that names the moves. */
+  answerSummary?: string;
   physicalBoardSteps?: string[];
   trapWarning?: {
     name: string;

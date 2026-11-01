@@ -8,6 +8,7 @@ import {
 } from '../../../src/curriculum';
 import seedGamesRaw from '../../../src/data/seed_hoot65_games.json';
 import { CurriculumMove } from '../../../src/types/curriculum';
+import { worksheetSan, worksheetLine, worksheetSetupMoves, fenSideToMove } from '../../../src/curriculum/worksheetLines';
 
 describe('Curriculum Move Legality & Verification (chess.js)', () => {
   it('should have at least 10 comprehensive curriculum lessons across 5 categories', () => {
@@ -251,16 +252,43 @@ describe('Curriculum Move Legality & Verification (chess.js)', () => {
       expect(diagramChess.fen()).toBe(ws.diagramFen);
       expect(ws.exercises.length).toBeGreaterThan(0);
       expect(ws.answerKey.length).toBeGreaterThan(0);
+      // The sheet's own line passes through its diagram, so "Moves to reach Diagram 1" is real
+      expect(worksheetSetupMoves(ws), `${ws.id} never reaches its diagram`).not.toBeNull();
 
-      // Verify each answer key item has a valid solution
+      // Every exercise position is a legal FEN, and the side to move it states is the FEN's
+      for (const ex of ws.exercises) {
+        const fen = ex.diagramFen ?? ws.diagramFen;
+        expect(new Chess(fen).fen(), `${ws.id}: ${fen}`).toBe(fen);
+        if (ex.turn) expect(fenSideToMove(fen), `${ws.id}: ${ex.prompt}`).toBe(ex.turn);
+      }
+
+      // Each answer is legal in its exercise's position, and its follow-up replays from there
       for (const ak of ws.answerKey) {
-        expect(ak.solutionSan).toBeTruthy();
         expect(ak.rationale).toBeTruthy();
-
+        const ex = ws.exercises[ak.exerciseIndex - 1];
+        expect(ex, `${ws.id}: answer ${ak.exerciseIndex} has no exercise`).toBeDefined();
+        const fen = ex.diagramFen ?? ws.diagramFen;
+        const solution = worksheetSan(ak.solutionSan);
+        expect(() => new Chess(fen).move(solution), `${ws.id}: ${ak.solutionSan} from ${fen}`).not.toThrow();
         if (ak.fullSequence && ak.fullSequence.length > 0) {
-          // If a sequence of moves is given, verify that clean SANs parse
-          const cleanSans = ak.fullSequence.map((m) => m.replace(/^[0-9]+\.\.\.?/, '').replace(/[!?+#]/g, '').trim());
-          expect(cleanSans.length).toBeGreaterThan(0);
+          expect(worksheetSan(ak.fullSequence[0])).toBe(solution);
+          const replay = new Chess(fen);
+          for (const san of ak.fullSequence) {
+            expect(() => replay.move(worksheetSan(san)), `${ws.id}: ${san} in ${ak.fullSequence.join(' ')}`).not.toThrow();
+          }
+        }
+      }
+
+      // A trap warning's mistake and its punishment replay from the position before the mistake
+      if (ws.trapWarning) {
+        const numbered = ws.trapWarning.blunderSan.match(/^(\d+)\.(\.\.)?/);
+        expect(numbered, ws.trapWarning.blunderSan).not.toBeNull();
+        const ply = (Number(numbered![1]) - 1) * 2 + (numbered![2] ? 1 : 0);
+        const before = new Chess();
+        for (const san of worksheetLine(ws).slice(0, ply)) before.move(san);
+        expect(() => before.move(worksheetSan(ws.trapWarning!.blunderSan))).not.toThrow();
+        for (const san of ws.trapWarning.refutationSan.split(/\s+/)) {
+          expect(() => before.move(worksheetSan(san)), `${ws.id}: ${san}`).not.toThrow();
         }
       }
     }

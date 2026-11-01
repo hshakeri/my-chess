@@ -67,6 +67,23 @@ test.describe('06. Printable Physical-Board Worksheets & @media print (F19 - F20
     expect(hasPageBreak).toBe(true);
   });
 
+  test('Printing keeps the board chequered, and a Black sheet is drawn from Black\'s side', async ({ page }) => {
+    await page.locator('.worksheet-item', { hasText: 'Siberian' }).click();
+    const board = page.locator('[data-printable="board"]');
+    await expect(page.locator('[data-printable="diagram-caption"]')).toContainText('Black to move');
+    // Rank 1 at the top and the h-file on the left, as on a board set up with Black nearest you
+    await expect(board.locator('[data-ws-square]').first()).toHaveAttribute('data-ws-square', 'h1');
+
+    await page.emulateMedia({ media: 'print' });
+    const dark = await board.locator('[data-shade="dark"]').first().evaluate((el) => {
+      const style = window.getComputedStyle(el) as CSSStyleDeclaration & { printColorAdjust?: string; webkitPrintColorAdjust?: string };
+      return { background: style.backgroundColor, adjust: style.printColorAdjust || style.webkitPrintColorAdjust };
+    });
+    expect(dark.background).not.toBe('rgba(0, 0, 0, 0)');
+    expect(dark.adjust).toBe('exact');
+    await page.emulateMedia({ media: null });
+  });
+
   test('@media print CSS hides navigation bars, buttons, and app chrome', async ({ page }) => {
     // Emulate print media type
     await page.emulateMedia({ media: 'print' });

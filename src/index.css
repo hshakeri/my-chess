@@ -101,6 +101,24 @@
     border: 2px solid #000 !important;
     box-shadow: none !important;
   }
+
+  /* Print the chequered squares even when the browser leaves out background graphics */
+  .worksheet-board,
+  .worksheet-board * {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  /* Keep an exercise, its diagram and its answer lines on one page */
+  .worksheet-exercise {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+}
+
+@page {
+  size: auto;
+  margin: 12mm;
 }
 
 /* Shake animation for incorrect moves in interactive drills */

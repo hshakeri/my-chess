@@ -9,17 +9,16 @@ import {
   ChevronRight,
   Target,
 } from 'lucide-react';
-import {
-  allWorksheets,
-  scotchGambitWorksheet,
-  hoot65ScandiWorksheet,
-} from '../curriculum/worksheetsData';
+import { allWorksheets, hoot65ScandiWorksheet } from '../curriculum/worksheetsData';
+import { worksheetSetupMoves, numberedLine, fenSideToMove, samePosition } from '../curriculum/worksheetLines';
 import { PrintableWorksheetData } from '../types/curriculum';
 import { PieceSymbol, PieceColor } from '../types/chess';
 import { ChessPiece } from '../components/ChessPiece';
 
 const FILES = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'] as const;
 const RANKS = ['8', '7', '6', '5', '4', '3', '2', '1'] as const;
+
+const sideName = (side: 'w' | 'b') => (side === 'w' ? 'White' : 'Black');
 
 function parseFenToBoard(fen: string): Array<Array<{ type: PieceSymbol; color: PieceColor } | null>> {
   const [placement] = fen.split(' ');
@@ -44,10 +43,92 @@ function parseFenToBoard(fen: string): Array<Array<{ type: PieceSymbol; color: P
   });
 }
 
-export const WorksheetsView: React.FC = () => {
-  // Default to Scandinavian drill worksheet (or Scotch Gambit)
+/**
+ * A printable diagram drawn from the student's side: on a Black sheet rank 1 is at the top and the
+ * h-file on the left, so the paper matches a wooden board set up with Black nearest the student.
+ */
+const WorksheetBoard: React.FC<{
+  fen: string;
+  flipped: boolean;
+  size: 'lg' | 'sm';
+  printable: 'board' | 'exercise-board';
+  label: string;
+}> = ({ fen, flipped, size, printable, label }) => {
+  const matrix = parseFenToBoard(fen);
+  const ranks = flipped ? [...RANKS].reverse() : [...RANKS];
+  const files = flipped ? [...FILES].reverse() : [...FILES];
+  const square = size === 'lg' ? 'w-8 h-8 sm:w-9 sm:h-9' : 'w-5 h-5 sm:w-6 sm:h-6';
+  const piece = size === 'lg' ? 'w-7 h-7 sm:w-8 sm:h-8' : 'w-4 h-4 sm:w-5 sm:h-5';
+  const coord = size === 'lg' ? 'text-[11px]' : 'text-[9px]';
+  const fileCell = size === 'lg' ? 'w-8 sm:w-9' : 'w-5 sm:w-6';
+  const rankCell = size === 'lg' ? 'h-8 sm:h-9' : 'h-5 sm:h-6';
+
+  const fileRow = (where: string) => (
+    <div className={`flex justify-around font-bold text-slate-800 ${coord} ${size === 'lg' ? 'pl-4 pr-4' : 'pl-3 pr-3'}`}>
+      {files.map((f) => (
+        <span key={`${where}-${f}`} className={`${fileCell} text-center`}>
+          {f}
+        </span>
+      ))}
+    </div>
+  );
+  const rankColumn = (where: string) => (
+    <div className={`flex flex-col justify-around font-bold text-slate-800 ${coord} ${where === 'left' ? 'pr-1' : 'pl-1'}`}>
+      {ranks.map((r) => (
+        <span key={`${where}-${r}`} className={`${rankCell} flex items-center justify-center`}>
+          {r}
+        </span>
+      ))}
+    </div>
+  );
+
+  return (
+    <div
+      className={`${printable === 'board' ? 'print-diagram ' : ''}worksheet-board bg-white p-2 rounded-lg border-2 border-slate-900 shadow-md print:shadow-none`}
+      data-printable={printable}
+      data-orientation={flipped ? 'black' : 'white'}
+      aria-label={label}
+    >
+      {fileRow('top')}
+      <div className="flex">
+        {rankColumn('left')}
+        <div className="grid grid-cols-8 grid-rows-8 border-2 border-slate-900 chess-board-print">
+          {ranks.map((rankStr) =>
+            files.map((fileStr) => {
+              const rankNum = parseInt(rankStr, 10);
+              const colIdx = FILES.indexOf(fileStr);
+              const isLight = (colIdx + 1 + rankNum) % 2 === 1;
+              const squarePiece = matrix[8 - rankNum]?.[colIdx];
+              return (
+                <div
+                  key={`${fileStr}${rankStr}`}
+                  data-ws-square={`${fileStr}${rankStr}`}
+                  data-shade={isLight ? 'light' : 'dark'}
+                  className={`${square} flex items-center justify-center relative select-none ${
+                    isLight ? 'bg-amber-50' : 'bg-amber-200/90'
+                  }`}
+                >
+                  {squarePiece && (
+                    <div className={piece}>
+                      <ChessPiece type={squarePiece.type} color={squarePiece.color} className="w-full h-full" />
+                    </div>
+                  )}
+                </div>
+              );
+            })
+          )}
+        </div>
+        {rankColumn('right')}
+      </div>
+      {fileRow('bottom')}
+    </div>
+  );
+};
+
+export const WorksheetsView: React.FC<{ initialWorksheetId?: string }> = ({ initialWorksheetId }) => {
+  // Default to the Scandinavian drill worksheet
   const [selectedWorksheet, setSelectedWorksheet] = useState<PrintableWorksheetData>(() => {
-    return hoot65ScandiWorksheet || scotchGambitWorksheet || allWorksheets[0];
+    return allWorksheets.find((ws) => ws.id === initialWorksheetId) || hoot65ScandiWorksheet || allWorksheets[0];
   });
 
   const [filterType, setFilterType] = useState<'all' | 'curriculum_lesson' | 'hoot65_drill'>('all');
@@ -57,7 +138,16 @@ export const WorksheetsView: React.FC = () => {
     return ws.type === filterType;
   });
 
-  const boardMatrix = parseFenToBoard(selectedWorksheet.diagramFen);
+  const playsBlack = selectedWorksheet.targetColor === 'black';
+  const diagramSide = fenSideToMove(selectedWorksheet.diagramFen);
+  const setupMoves = worksheetSetupMoves(selectedWorksheet);
+  // Exercises whose position differs from Diagram 1 get their own diagram, numbered from 2
+  let nextDiagram = 2;
+  const exerciseDiagrams = selectedWorksheet.exercises.map((ex) =>
+    ex.diagramFen && !samePosition(ex.diagramFen, selectedWorksheet.diagramFen)
+      ? { fen: ex.diagramFen, number: nextDiagram++ }
+      : null
+  );
 
   const handlePrint = () => {
     window.print();
@@ -242,6 +332,18 @@ export const WorksheetsView: React.FC = () => {
               </div>
             </div>
 
+            {/* Practice log: one sheet can be reused across spaced attempts */}
+            <div
+              className="worksheet-log grid grid-cols-2 sm:grid-cols-4 gap-x-4 gap-y-2 mb-6 text-xs text-slate-800"
+              data-printable="log"
+            >
+              {['Date', 'Attempt', `Score (of ${selectedWorksheet.exercises.length})`, 'Next review'].map((label) => (
+                <div key={label} className="log-line border-b border-dashed border-slate-400 pb-1">
+                  <span className="font-semibold">{label}:</span>
+                </div>
+              ))}
+            </div>
+
             {/* Lesson Summary & Thematic Objective */}
             <div className="mb-6 p-4 rounded-xl bg-slate-50 border border-slate-200">
               <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 mb-1 flex items-center gap-1.5">
@@ -258,86 +360,23 @@ export const WorksheetsView: React.FC = () => {
               {/* High-Contrast 2D Diagram with Ranks 1-8 and Files a-h */}
               <div className="md:col-span-6 flex flex-col items-center">
                 <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800 mb-2">
-                  Key Diagram Position
+                  Diagram 1
                 </h4>
 
-                {/* Diagram Container */}
+                <WorksheetBoard
+                  fen={selectedWorksheet.diagramFen}
+                  flipped={playsBlack}
+                  size="lg"
+                  printable="board"
+                  label="Diagram 1"
+                />
+
                 <div
-                  className="print-diagram worksheet-board bg-white p-2 rounded-lg border-2 border-slate-900 shadow-md print:shadow-none"
-                  data-printable="board"
+                  className="text-[11px] font-semibold text-slate-600 mt-2 text-center"
+                  data-printable="diagram-caption"
                 >
-                  {/* Top file coordinates */}
-                  <div className="flex pl-4 pr-4 justify-around text-[11px] font-bold text-slate-800 mb-0.5">
-                    {FILES.map((f) => (
-                      <span key={`top-${f}`} className="w-8 sm:w-9 text-center">
-                        {f}
-                      </span>
-                    ))}
-                  </div>
-
-                  {/* 8x8 Board with rank coordinates on left and right */}
-                  <div className="flex">
-                    {/* Left rank coordinates */}
-                    <div className="flex flex-col justify-around pr-1 text-[11px] font-bold text-slate-800">
-                      {RANKS.map((r) => (
-                        <span key={`left-${r}`} className="h-8 sm:h-9 flex items-center justify-center">
-                          {r}
-                        </span>
-                      ))}
-                    </div>
-
-                    {/* 8x8 Squares Grid */}
-                    <div className="grid grid-cols-8 grid-rows-8 border-2 border-slate-900 chess-board-print">
-                      {RANKS.map((rankStr, rowIdx) => {
-                        const rankNum = parseInt(rankStr, 10);
-                        return FILES.map((fileStr, colIdx) => {
-                          const fileNum = colIdx + 1;
-                          const isLight = (fileNum + rankNum) % 2 === 1;
-                          const squarePiece = boardMatrix[rowIdx]?.[colIdx];
-                          return (
-                            <div
-                              key={`${fileStr}${rankStr}`}
-                              className={`w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center relative select-none ${
-                                isLight ? 'bg-amber-50' : 'bg-amber-200/90'
-                              }`}
-                            >
-                              {squarePiece && (
-                                <div className="w-7 h-7 sm:w-8 sm:h-8">
-                                  <ChessPiece
-                                    type={squarePiece.type}
-                                    color={squarePiece.color}
-                                    className="w-full h-full"
-                                  />
-                                </div>
-                              )}
-                            </div>
-                          );
-                        });
-                      })}
-                    </div>
-
-                    {/* Right rank coordinates */}
-                    <div className="flex flex-col justify-around pl-1 text-[11px] font-bold text-slate-800">
-                      {RANKS.map((r) => (
-                        <span key={`right-${r}`} className="h-8 sm:h-9 flex items-center justify-center">
-                          {r}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Bottom file coordinates */}
-                  <div className="flex pl-4 pr-4 justify-around text-[11px] font-bold text-slate-800 mt-0.5">
-                    {FILES.map((f) => (
-                      <span key={`bottom-${f}`} className="w-8 sm:w-9 text-center">
-                        {f}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="text-[11px] font-semibold text-slate-600 mt-2 text-center">
-                  White to Move (ranks 1-2) • Black (ranks 7-8)
+                  {sideName(diagramSide)} to move · You play {playsBlack ? 'Black' : 'White'}
+                  {playsBlack ? ' (Black at the bottom)' : ''}
                 </div>
               </div>
 
@@ -361,17 +400,17 @@ export const WorksheetsView: React.FC = () => {
                   </ol>
                 </div>
 
-                {/* Main line SAN notation */}
-                <div className="p-3.5 rounded-xl bg-slate-100 border border-slate-200">
+                {/* Only the moves that reach Diagram 1; the full annotated line is on the answer page */}
+                <div className="p-3.5 rounded-xl bg-slate-100 border border-slate-200" data-printable="setup-moves">
                   <h5 className="text-[11px] font-bold uppercase tracking-wider text-slate-700 mb-1">
-                    Opening Sequence Notation
+                    Moves to Reach Diagram 1
                   </h5>
-                  <div className="font-mono text-xs text-slate-900 flex flex-wrap gap-x-2 gap-y-1">
-                    {selectedWorksheet.movesSan.map((move, i) => (
-                      <span key={i} className="font-semibold">
-                        {move}
-                      </span>
-                    ))}
+                  <div className="font-mono text-xs font-semibold text-slate-900">
+                    {setupMoves === null
+                      ? 'Set up the position from Diagram 1.'
+                      : setupMoves.length === 0
+                        ? 'The starting position.'
+                        : numberedLine(setupMoves)}
                   </div>
                 </div>
 
@@ -406,8 +445,22 @@ export const WorksheetsView: React.FC = () => {
                 {selectedWorksheet.exercises.map((ex, exIdx) => (
                   <div
                     key={exIdx}
-                    className="p-4 rounded-xl bg-slate-50 border border-slate-300"
+                    className="worksheet-exercise p-4 rounded-xl bg-slate-50 border border-slate-300"
                   >
+                    {exerciseDiagrams[exIdx] && (
+                      <div className="float-right ml-4 mb-2 flex flex-col items-center">
+                        <WorksheetBoard
+                          fen={exerciseDiagrams[exIdx]!.fen}
+                          flipped={playsBlack}
+                          size="sm"
+                          printable="exercise-board"
+                          label={`Diagram ${exerciseDiagrams[exIdx]!.number}`}
+                        />
+                        <div className="text-[10px] font-semibold text-slate-600 mt-1 text-center">
+                          Diagram {exerciseDiagrams[exIdx]!.number} · {sideName(fenSideToMove(exerciseDiagrams[exIdx]!.fen))} to move
+                        </div>
+                      </div>
+                    )}
                     <div className="font-bold text-sm text-slate-950 mb-2">
                       {ex.prompt}
                     </div>
@@ -434,6 +487,7 @@ export const WorksheetsView: React.FC = () => {
                         </>
                       )}
                     </div>
+                    <div className="clear-both" />
                   </div>
                 ))}
               </div>
@@ -460,6 +514,15 @@ export const WorksheetsView: React.FC = () => {
               <p className="text-xs text-slate-600 mb-5 leading-relaxed">
                 Compare your physical board moves with the certified solutions below. Review the rationale and execute the full follow-up sequences on your physical board.
               </p>
+
+              {selectedWorksheet.answerSummary && (
+                <p
+                  className="text-xs sm:text-sm text-slate-800 leading-relaxed mb-5 p-3 rounded-lg bg-slate-50 border border-slate-200"
+                  data-printable="answer-summary"
+                >
+                  {selectedWorksheet.answerSummary}
+                </p>
+              )}
 
               <div className="space-y-5">
                 {selectedWorksheet.answerKey.map((ans, aIdx) => (
@@ -491,6 +554,20 @@ export const WorksheetsView: React.FC = () => {
                   </div>
                 ))}
               </div>
+
+              <div className="mt-5 p-3 rounded-lg bg-slate-50 border border-slate-200 text-xs" data-printable="full-line">
+                <span className="font-bold text-slate-700">The full line: </span>
+                <span className="font-mono font-semibold text-slate-900">{selectedWorksheet.movesSan.join(' ')}</span>
+              </div>
+
+              {selectedWorksheet.trapWarning && (
+                <div className="mt-3 p-3 rounded-lg bg-red-50 border border-red-200 text-xs text-red-900">
+                  <span className="font-bold">Mistake to avoid: </span>
+                  <span className="font-mono font-semibold">
+                    {selectedWorksheet.trapWarning.blunderSan} {selectedWorksheet.trapWarning.refutationSan}
+                  </span>
+                </div>
+              )}
 
               {/* Footer certification */}
               <div className="mt-8 pt-4 border-t border-slate-300 text-[11px] text-slate-500 flex items-center justify-between">

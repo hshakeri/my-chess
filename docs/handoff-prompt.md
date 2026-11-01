@@ -15,9 +15,9 @@ on every push to `main`.
 
 - React 18 + Vite 6 + TypeScript (strict) + Tailwind; chess.js 1.4; Dexie 4 (IndexedDB); ts-fsrs 5
   for scheduling; maia3-js + onnxruntime-web in a Web Worker for the human-like engine.
-- Tests: Vitest (`npm test`, 310 tests: SSR `renderToString` specs, jsdom interaction specs under
+- Tests: Vitest (`npm test`, 313 tests: SSR `renderToString` specs, jsdom interaction specs under
   `tests/unit/curriculum/lessons-view-interactions.spec.tsx`, fake-indexeddb for the database) and
-  Playwright (`npm run test:e2e`, 76 tests incl. iPhone-viewport tests). Keep both green or update
+  Playwright (`npm run test:e2e`, 77 tests incl. iPhone-viewport tests). Keep both green or update
   tests deliberately and say why.
 - `npm run build` must pass (`tsc && vite build`). Base path is `/my-chess/`.
 - Never commit a PDF: `.gitignore` excludes `*.pdf` and `book/`; run `git ls-files "*.pdf"` before
@@ -113,7 +113,11 @@ Next: the roadmap below.
 
 ## Roadmap items not yet built (see `docs/pedagogy-audit.md` Section 7)
 
-- QW-5 to QW-8 (worksheet answer separation and orientation, engine speed-up, deploy size, CI).
+- QW-6 to QW-8 (engine speed-up, deploy size, CI, chess-accuracy strings). QW-5 is done (2026-11-01):
+  the worksheet sheet names no answer (the full line, the narrative and the trap refutation are on
+  the answer page), Black sheets are drawn from Black's side, squares print with
+  `print-color-adjust: exact`, every exercise with its own position has a diagram, the Scotch
+  exercise-2 FEN is fixed, and each sheet has a Date / Attempt / Score / Next review row.
 - CL-3 post-game review with Maia (blunder-to-drill), CL-5 plan-first gates, CL-6 sparring from a
   tabiya, CL-7 visual coaching grammar.
 - DC-1 re-scoped curriculum content for the lines above (this is where the opening order applies).
