@@ -3,6 +3,7 @@ import { renderToString } from 'react-dom/server';
 import { Chess, Square } from 'chess.js';
 import { allCurriculumLessons } from '../../../src/curriculum';
 import { patternPath, patternGroupOf, inPatternOrder } from '../../../src/curriculum/patternPath';
+import { missedThreatLessons, freePieceLessons } from '../../../src/curriculum/gameDrills';
 import { LessonsView } from '../../../src/views/LessonsView';
 import { CurriculumLesson } from '../../../src/types/curriculum';
 
@@ -40,10 +41,13 @@ describe('Study path: every core lesson once, grouped by a pattern its lessons r
     expect(patternGroupOf('lesson-siberian-trap')).toBeUndefined();
   });
 
-  it('orders the default list by the path and opens with the Scandinavian drill', () => {
+  it('orders the default list by the path: the drill sets from the games, then the Scandinavian drill', () => {
     const ordered = inPatternOrder(core).map((l) => l.id);
     expect(ordered).toEqual(patternPath.flatMap((g) => g.lessonIds));
-    expect(ordered[0]).toBe('lesson-scandinavian-refutation-drill');
+    // The path opens with the positions from hoot65's own games (the costliest checks), then the lessons
+    const drills = missedThreatLessons.length + freePieceLessons.length;
+    expect(ordered.slice(0, drills)).toEqual([...missedThreatLessons, ...freePieceLessons].map((l) => l.id));
+    expect(ordered[drills]).toBe('lesson-scandinavian-refutation-drill');
   });
 
   it('group 1: each lesson has an exercise where the queen takes an undefended piece on g4', () => {
@@ -139,5 +143,13 @@ describe('Study path: every core lesson once, grouped by a pattern its lessons r
       for (const id of g.lessonIds) expect(html.indexOf(`data-lesson-id="${id}"`), id).toBeGreaterThan(head);
     }
     expect(html).toContain('Check:');
+    // Each drill set is one row of numbered tiles, not a card per position
+    for (const set of [missedThreatLessons, freePieceLessons]) {
+      const row = html.slice(html.indexOf(`data-drill-set="${set[0].id}"`));
+      expect(row.length).toBeLessThan(html.length);
+      expect((row.slice(0, row.indexOf('</div>')).match(/data-lesson-id=/g) || []).length).toBe(set.length);
+    }
+    expect(html).toContain(`<button type="button" data-lesson-id="${missedThreatLessons[0].id}"`);
+    expect(html).not.toContain(`<div data-lesson-id="${missedThreatLessons[0].id}"`);
   });
 });

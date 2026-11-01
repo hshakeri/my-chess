@@ -5,6 +5,7 @@ import {
   curriculumCourses,
   allWorksheets,
   getCurriculumLessonById,
+  isGameDrill,
 } from '../../../src/curriculum';
 import seedGamesRaw from '../../../src/data/seed_hoot65_games.json';
 import { CurriculumMove } from '../../../src/types/curriculum';
@@ -153,7 +154,8 @@ describe('Curriculum Move Legality & Verification (chess.js)', () => {
     let totalExerciseMovesVerified = 0;
 
     for (const lesson of allCurriculumLessons) {
-      expect(lesson.exercises.length).toBeGreaterThan(0);
+      // A drill position from hoot65's games is itself the exercise: one decision, nothing after it
+      if (!isGameDrill(lesson.id)) expect(lesson.exercises.length).toBeGreaterThan(0);
 
       for (const ex of lesson.exercises) {
         const chess = new Chess(ex.fen);

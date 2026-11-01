@@ -30,7 +30,7 @@ export interface RepertoireLineLessonOptions {
 }
 
 /** A SAN token appears in `text` as a whole word (so a title cannot leak the answer). */
-function mentionsMove(text: string, san: string): boolean {
+export function mentionsMove(text: string, san: string): boolean {
   const escaped = san.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   return new RegExp(`(^|[^A-Za-z0-9])${escaped}(?![A-Za-z0-9])`).test(text);
 }

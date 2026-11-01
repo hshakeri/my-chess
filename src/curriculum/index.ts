@@ -6,6 +6,7 @@ import { fundamentalsLessons } from './fundamentals';
 import { weaknessDrillLessons } from './drills';
 import { antiSicilianLessons } from './antiSicilian';
 import { blackRepertoireLessons } from './blackRepertoire';
+import { gameDrillLessons, gameDrillData } from './gameDrills';
 
 export * from './builder';
 export * from './openings';
@@ -15,6 +16,7 @@ export * from './fundamentals';
 export * from './drills';
 export * from './antiSicilian';
 export * from './blackRepertoire';
+export * from './gameDrills';
 export * from './worksheetsData';
 
 /**
@@ -28,6 +30,7 @@ export const allCurriculumLessons: CurriculumLesson[] = [
   ...trapLessons,
   ...fundamentalsLessons,
   ...weaknessDrillLessons,
+  ...gameDrillLessons,
 ];
 
 /**
@@ -135,6 +138,22 @@ export const curriculumCourses: ChessCurriculumCourse[] = [
       pagesRef: 'Chess.com games 185031553576 (vs meny_26), 185135704918 (vs Brandon0015) and 169351731946 (vs Itilogic)',
     },
     lessons: weaknessDrillLessons,
+  },
+  {
+    id: 'course-game-drills',
+    title: 'From Your Games: Threats and Free Pieces',
+    subtitle: 'Positions from your recent games where an attacked piece was left or a free piece was not taken',
+    category: 'tactical_patterns',
+    targetColor: 'both',
+    targetRatingBand: 'beginner',
+    description: `The two board checks that cost you the most points in recent games, drilled on your own positions from ${gameDrillData.from} to ${gameDrillData.to}: answer the threat of the opponent's last move, and take a piece that can be won.`,
+    sourceAttribution: {
+      bookTitle: 'Chess.com Live Archive',
+      author: 'hoot65 game analysis',
+      publicationYear: 2026,
+      pagesRef: 'Archive analysis: the board checks',
+    },
+    lessons: gameDrillLessons,
   },
 ];
 

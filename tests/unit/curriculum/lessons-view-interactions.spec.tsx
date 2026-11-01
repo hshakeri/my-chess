@@ -6,6 +6,7 @@ import { LessonsView } from '../../../src/views/LessonsView';
 import { CardService } from '../../../src/services/cards';
 import { canonicalFenKey } from '../../../src/services/fenKey';
 import { db } from '../../../src/db/database';
+import { missedThreatLessons } from '../../../src/curriculum/gameDrills';
 
 /**
  * Interaction tests for the lesson player, driven through the real DOM (jsdom) with real timers
@@ -216,5 +217,28 @@ describe('LessonsView interactions (jsdom)', () => {
     expect(document.querySelector('[data-lesson-id="lesson-siberian-trap"]')).toBeTruthy();
     expect(document.querySelector('[data-lesson-id="lesson-evans-gambit-destruction"]')).toBeNull();
     await waitFor(() => expect(document.querySelector('h3')?.textContent).toMatch(/Scotch Gambit/));
+  });
+  it('a drill position from the games: the game move replays its capture, a right move offers the next position', async () => {
+    // The newest threat drill: after 6...Ne5 the queen on f3 is attacked; the game went 7.Bxf7+ Nxf7
+    const [first, second] = missedThreatLessons;
+    render(<LessonsView initialLessonId={first.id} />);
+    // The opponent's move is replayed first, and the lesson tree (which would print the answer) is hidden
+    await waitFor(() => expect(sq('e5').querySelector('img[alt="Black n"]')).toBeTruthy());
+    expect(document.querySelector('[data-tree-root="lesson"]')).toBeNull();
+    expect(screen.getByText(/What does it attack\?/)).toBeTruthy();
+
+    // The move from the game is answered with what it cost, and the capture is played out
+    clickMove('c4', 'f7');
+    await waitFor(() => expect(screen.getByText(/This is what you played vs robertduta/)).toBeTruthy());
+    await waitFor(() => expect(sq('f7').querySelector('img[alt="Black n"]')).toBeTruthy(), { timeout: 3000 });
+    await waitFor(() => expect(sq('c4').querySelector('img[alt="White b"]')).toBeTruthy(), { timeout: 4000 });
+
+    // Any move that saves the queen is right; the position is done and the next one is offered
+    clickMove('f3', 'g3');
+    await waitFor(() => expect(screen.getByText(/Lesson Completed!/)).toBeTruthy());
+    expect(screen.getByText(/took the bishop on f7/)).toBeTruthy();
+    expect(document.querySelector('[data-section="drill-next"]')?.textContent).toMatch(/Position 1 of 12/);
+    fireEvent.click(document.querySelector('button[data-action="next-drill"]') as HTMLButtonElement);
+    await waitFor(() => expect(document.querySelector(`[data-lesson-id="${second.id}"]`)?.className).toMatch(/border-emerald-500/));
   });
 });

@@ -1,4 +1,10 @@
 import { test, expect } from '@playwright/test';
+import { readFileSync } from 'node:fs';
+import { Chess } from 'chess.js';
+import type { GameDrill } from '../../src/curriculum/gameDrills';
+
+// Read as a file: the test runner loads specs as ES modules, where a JSON import needs an attribute
+const gameDrills: { threat: GameDrill[]; free: GameDrill[] } = JSON.parse(readFileSync('src/data/game_drills.json', 'utf8'));
 
 test.describe('05. Interactive Lessons, Feedback Loops & Spaced Repetition (F16 - F18)', () => {
   test.beforeEach(async ({ page }) => {
@@ -41,6 +47,39 @@ test.describe('05. Interactive Lessons, Feedback Loops & Spaced Repetition (F16 
     await expect(page.locator('[data-square="e4"] img')).toBeVisible({ timeout: 5000 });
     await expect(page.locator('[data-square="d5"] img')).toBeVisible();
     await expect(page.locator('[data-run-stats]')).toContainText(/1 slip/);
+  });
+
+  test('Drill positions from your games: a tile opens one, the game move shows its capture, a right move leads on', async ({ page }) => {
+    // The newest threat drill, worked out from the data so a refreshed drill set keeps this test valid
+    const d = gameDrills.threat[0];
+    const board = new Chess(d.fenBefore);
+    const last = board.move(d.lastSan);
+    const played = new Chess(board.fen()).move(d.played);
+    const right = new Chess(board.fen()).move(d.accepted[0]);
+    const alt = (m: { color: string; piece: string }) => `${m.color === 'w' ? 'White' : 'Black'} ${m.piece}`;
+
+    // The study path opens with both sets as rows of numbered tiles
+    const tiles = page.locator('[data-drill-set] [data-lesson-id]');
+    await expect(tiles).toHaveCount(gameDrills.threat.length + gameDrills.free.length);
+    await tiles.first().click();
+
+    // The opponent's move is replayed; there is no lesson tree, which would print the answer
+    await expect(page.locator(`[data-square="${last.to}"] img[alt="${alt(last)}"]`)).toBeVisible({ timeout: 3000 });
+    await expect(page.locator('[data-tree-root="lesson"]')).toHaveCount(0);
+    await expect(page.locator('[data-feedback="opponent-idea"]')).toContainText('What does it attack?');
+
+    // The move from the game is answered with what it cost, then rolled back
+    await page.locator(`[data-square="${played.from}"]`).click();
+    await page.locator(`[data-square="${played.to}"]`).click();
+    await expect(page.locator('.wrong-move-feedback, [data-feedback="wrong"]').first()).toContainText(d.opponent, { timeout: 5000 });
+    await expect(page.locator(`[data-square="${played.from}"] img[alt="${alt(played)}"]`)).toBeVisible({ timeout: 5000 });
+
+    // A right answer finishes the position and offers the next one
+    await page.locator(`[data-square="${right.from}"]`).click();
+    await page.locator(`[data-square="${right.to}"]`).click();
+    await expect(page.locator('[data-section="drill-next"]')).toContainText(`Position 1 of ${gameDrills.threat.length}`, { timeout: 5000 });
+    await page.locator('button[data-action="next-drill"]').click();
+    await expect(tiles.nth(1)).toHaveClass(/border-emerald-500/);
   });
 
   test('Playing correct move triggers positive feedback, auto-plays the opponent reply and shows its idea', async ({ page }) => {

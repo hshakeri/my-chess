@@ -1,4 +1,5 @@
 import { CurriculumLesson } from '../types/curriculum';
+import { missedThreatLessons, freePieceLessons } from './gameDrills';
 
 /**
  * The study path: the core lessons grouped by the pattern they repeat, in the order to learn them.
@@ -9,9 +10,10 @@ import { CurriculumLesson } from '../types/curriculum';
  *
  * Group order follows docs/game-analysis.md, which measured hoot65's archive with the Maia model:
  * the costliest board checks in recent games are a piece left where it can be taken, a threat not
- * answered and a free piece not taken, so the two loose-piece groups come first; allowing mate in
- * one is rarer but costs the most each time, so the king in the centre comes next; the structure
- * group and finishing technique follow.
+ * answered and a free piece not taken. The path opens with those two checks drilled on positions
+ * from hoot65's own games (src/curriculum/gameDrills.ts), then the two loose-piece groups of the
+ * opening lessons; allowing mate in one is rarer but costs the most each time, so the king in the
+ * centre comes next; the structure group and finishing technique follow.
  */
 export interface PatternGroup {
   id: string;
@@ -25,6 +27,22 @@ export interface PatternGroup {
 }
 
 export const patternPath: PatternGroup[] = [
+  {
+    id: 'pattern-what-does-it-attack',
+    title: 'What does the last move attack?',
+    idea:
+      'Positions from your own recent games: the opponent\'s move attacked one of your pieces, and it stayed where it was. Move it, guard it, or take the attacker.',
+    check: 'After every opponent move: what does it attack, and is that piece defended?',
+    lessonIds: missedThreatLessons.map((l) => l.id),
+  },
+  {
+    id: 'pattern-take-what-is-free',
+    title: 'Take what is free',
+    idea:
+      'Positions from your own recent games: a piece of the opponent\'s could be won, because nothing defended it or something cheaper of yours attacked it, and it was not taken.',
+    check: 'Before every move: is a piece of theirs undefended, or attacked by something cheaper?',
+    lessonIds: freePieceLessons.map((l) => l.id),
+  },
   {
     id: 'pattern-queen-takes-on-g4',
     title: 'The undefended piece on g4',

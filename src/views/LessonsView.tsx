@@ -23,6 +23,7 @@ import {
 import { positionKey, enumerateDecisions, chooseOpponentReply, DecisionSpec } from '../curriculum/builder';
 import { lessonFromDecision } from '../curriculum/factories';
 import { patternPath, patternGroupOf, inPatternOrder } from '../curriculum/patternPath';
+import { isGameDrill, drillSetOf } from '../curriculum/gameDrills';
 import { CurriculumLesson, CurriculumMove, CurriculumExercise } from '../types/curriculum';
 import { Chessboard, BoardArrow, BoardHighlight } from '../components/Chessboard';
 import { MoveTree } from '../components/MoveTree';
@@ -939,6 +940,25 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
     return course ? course.lessons : [];
   }, [selectedFilter, patternLibrary]);
 
+  // The list as blocks: each run of positions from one drill set becomes a row of numbered tiles,
+  // every other lesson keeps its card
+  const listBlocks = useMemo(() => {
+    const blocks: Array<{ kind: 'card'; lesson: CurriculumLesson } | { kind: 'tiles'; lessons: CurriculumLesson[] }> = [];
+    for (const lesson of filteredLessons) {
+      const last = blocks[blocks.length - 1];
+      const set = drillSetOf(lesson.id);
+      if (set && last?.kind === 'tiles' && drillSetOf(last.lessons[0].id) === set) last.lessons.push(lesson);
+      else if (set) blocks.push({ kind: 'tiles', lessons: [lesson] });
+      else blocks.push({ kind: 'card', lesson });
+    }
+    return blocks;
+  }, [filteredLessons]);
+
+  // A drill position knows its set, so a finished position can offer the next one
+  const currentDrillSet = drillSetOf(currentLesson.id);
+  const drillIndex = currentDrillSet ? currentDrillSet.findIndex((l) => l.id === currentLesson.id) : -1;
+  const nextDrill = currentDrillSet ? currentDrillSet[drillIndex + 1] : undefined;
+
   // Keep the active lesson visible: a review-queue or hand-off lesson that lives outside the
   // current list switches the filter to where it is listed.
   useEffect(() => {
@@ -964,6 +984,8 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
         return 'Fundamentals';
       case 'hoot65_drills':
         return 'Weakness Drills';
+      case 'tactical_patterns':
+        return 'From Your Games';
       default:
         return category.replace(/_/g, ' ');
     }
@@ -1090,26 +1112,64 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
           </div>
 
           <div className="flex flex-col gap-2.5 max-h-[720px] overflow-y-auto custom-scrollbar pr-1">
-            {filteredLessons.map((lesson, index) => {
-              const isSelected = lesson.id === currentLesson.id;
-              const isDue = dueLessonIds.has(lesson.id);
+            {listBlocks.map((block, index) => {
+              const lesson = block.kind === 'card' ? block.lesson : block.lessons[0];
               // In the study path, each pattern group opens with its idea and the check to make
               const group = selectedFilter === 'all' ? patternGroupOf(lesson.id) : undefined;
-              const opensGroup = group !== undefined && (index === 0 || patternGroupOf(filteredLessons[index - 1].id) !== group);
+              const previous = listBlocks[index - 1];
+              const previousLesson = previous ? (previous.kind === 'card' ? previous.lesson : previous.lessons[previous.lessons.length - 1]) : undefined;
+              const opensGroup = group !== undefined && (!previousLesson || patternGroupOf(previousLesson.id) !== group);
               const groupNumber = group ? patternPath.indexOf(group) + 1 : 0;
+              const heading = opensGroup && group && (
+                <div data-pattern-group={group.id} className={`${index === 0 ? '' : 'mt-2 '}px-1`}>
+                  <div className="text-[11px] font-semibold uppercase tracking-wider text-emerald-400">
+                    {groupNumber}. {group.title}
+                  </div>
+                  <p className="text-[11px] text-slate-400 mt-0.5">{group.idea}</p>
+                  <p className="text-[11px] text-slate-300 mt-0.5">
+                    <span className="font-semibold text-slate-200">Check:</span> {group.check}
+                  </p>
+                </div>
+              );
+              if (block.kind === 'tiles') {
+                return (
+                  <React.Fragment key={`tiles-${lesson.id}`}>
+                    {heading}
+                    <div data-drill-set={lesson.id} className="flex flex-wrap gap-1.5 px-1">
+                      {block.lessons.map((drill, k) => {
+                        const isSelected = drill.id === currentLesson.id;
+                        return (
+                          <button
+                            key={drill.id}
+                            type="button"
+                            data-lesson-id={drill.id}
+                            title={`${drill.title} (${drill.subtitle})`}
+                            onClick={() => handleSelectLesson(drill)}
+                            className={`relative w-9 h-9 rounded-lg border text-xs font-semibold transition-colors ${
+                              isSelected
+                                ? 'bg-slate-900 border-emerald-500 ring-1 ring-emerald-500/50 text-emerald-300'
+                                : 'bg-slate-900/60 border-slate-800 text-slate-300 hover:bg-slate-900 hover:border-slate-700'
+                            }`}
+                          >
+                            {k + 1}
+                            {dueLessonIds.has(drill.id) && (
+                              <span data-due="true" className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-amber-400" />
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                    <p className="text-[10px] text-slate-500 px-1">
+                      {block.lessons.length} positions from your games, newest first. A dot marks a position due for review.
+                    </p>
+                  </React.Fragment>
+                );
+              }
+              const isSelected = lesson.id === currentLesson.id;
+              const isDue = dueLessonIds.has(lesson.id);
               return (
                 <React.Fragment key={lesson.id}>
-                  {opensGroup && group && (
-                    <div data-pattern-group={group.id} className={`${index === 0 ? '' : 'mt-2 '}px-1`}>
-                      <div className="text-[11px] font-semibold uppercase tracking-wider text-emerald-400">
-                        {groupNumber}. {group.title}
-                      </div>
-                      <p className="text-[11px] text-slate-400 mt-0.5">{group.idea}</p>
-                      <p className="text-[11px] text-slate-300 mt-0.5">
-                        <span className="font-semibold text-slate-200">Check:</span> {group.check}
-                      </p>
-                    </div>
-                  )}
+                  {heading}
                   <div
                     data-lesson-id={lesson.id}
                     className={`lesson-card rounded-xl border p-3.5 transition-all cursor-pointer ${
@@ -1327,8 +1387,9 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
             </div>
 
             <div className="xl:col-span-5 flex flex-col gap-3" data-section="side-panel">
-          {/* The lesson tree: main line and the opponent's alternatives, with the current path marked */}
-          {!isSessionLesson && (
+          {/* The lesson tree: main line and the opponent's alternatives, with the current path marked.
+              A drill position from the games has no line to study, and its tree would print the answer. */}
+          {!isSessionLesson && !isGameDrill(currentLesson.id) && (
             <MoveTree
               lesson={currentLesson}
               currentPath={treePath}
@@ -1439,6 +1500,30 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
                 <p>{currentLesson.thematicObjective}</p>
                 {currentLesson.keyTacticalMotif && (
                   <p className="text-xs text-slate-400 mt-1">Motifs: {currentLesson.keyTacticalMotif}</p>
+                )}
+              </div>
+            )}
+
+            {/* A finished drill position leads to the next one of its set */}
+            {isLessonComplete && !session?.current && currentDrillSet && (
+              <div
+                className="p-3.5 rounded-xl bg-slate-900 border border-slate-700 text-sm text-slate-200 flex items-center justify-between gap-3"
+                data-section="drill-next"
+              >
+                <span>
+                  Position {drillIndex + 1} of {currentDrillSet.length}
+                </span>
+                {nextDrill ? (
+                  <button
+                    type="button"
+                    data-action="next-drill"
+                    onClick={() => handleSelectLesson(nextDrill)}
+                    className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold"
+                  >
+                    Next position
+                  </button>
+                ) : (
+                  <span className="text-xs text-slate-400">That was the last position of this set.</span>
                 )}
               </div>
             )}

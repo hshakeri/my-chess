@@ -2,7 +2,8 @@
  * Builds "The hoot65 Opening Book": every core opening lesson, weakness drill and trap lesson of the
  * curriculum, plus the tailored repertoire lines, as one dense printable document. Each chapter first
  * explains the position (the annotated line, the opponent's known replies, the mistakes to avoid),
- * then gives an over-the-board practice section whose answers sit in a key at the very end.
+ * then gives an over-the-board practice section whose answers sit in a key at the very end. The two
+ * drill sets from hoot65's games are one chapter each: a page of positions to solve.
  *
  *   npx tsx scripts/lesson-book.ts            -> book/lesson-book.html and book/lesson-book.pdf
  *
@@ -14,6 +15,7 @@ import { Chess } from 'chess.js';
 import { allCurriculumLessons, curriculumCourses } from '../src/curriculum';
 import { PatternGroup, patternGroupOf, patternPath, inPatternOrder } from '../src/curriculum/patternPath';
 import { plyLabel, replyOptions } from '../src/curriculum/builder';
+import { drillSetOf, gameDrillData } from '../src/curriculum/gameDrills';
 import { getRecommendedWhiteRepertoire, getRecommendedBlackRepertoire } from '../src/analytics/repertoire';
 import { CurriculumLesson, CurriculumMove } from '../src/types/curriculum';
 import { RepertoirePlan } from '../src/types/diagnostics';
@@ -211,6 +213,30 @@ function renderLesson(lesson: CurriculumLesson, n: number, group?: PatternGroup)
   return html;
 }
 
+const drillById = new Map([...gameDrillData.threat, ...gameDrillData.free].map((d) => [`lesson-game-${d.id}`, d] as const));
+
+/**
+ * A drill set from hoot65's games as one chapter: each position as a diagram from the student's side,
+ * just after the opponent's move, with the right moves and the game's story in the key.
+ */
+function renderDrillSet(lessons: CurriculumLesson[], n: number, group?: PatternGroup): string {
+  const chapter = `${n}. ${group ? group.title : 'Positions from your games'}`;
+  let html = `<section class="chapter">${group ? groupIntro(group) : ''}<h2>${esc(chapter)}</h2>`;
+  html += `<p>${lessons.length} positions from your recent games, newest first. Each diagram is drawn from your side just after your opponent's move, which is named under it. Find your move and write it down, then check the key: it lists every move that is right and what happened in the game.</p><div class="drills">`;
+  lessons.forEach((lesson, k) => {
+    const [opp, mine] = lesson.moves;
+    const drill = drillById.get(lesson.id);
+    const side: 'w' | 'b' = lesson.targetColor === 'black' ? 'b' : 'w';
+    const label = `${n}.${k + 1}`;
+    const caption = `vs ${drill?.opponent ?? ''}, ${drill?.date ?? ''}. After ${plyLabel(lesson.initialFen, 0, opp.san)}, ${side === 'w' ? 'White' : 'Black'} to move.`;
+    html += `<div class="drill"><div class="diagram small">${diagram(opp.fenAfter || lesson.initialFen, side)}<div class="caption"><b>${esc(label)}</b> ${esc(caption)}</div></div><p class="blankline">Your move: __________</p></div>`;
+    const also = mine.accept?.san?.length ? ` (also ${mine.accept.san.join(', ')})` : '';
+    answerKey.push({ chapter, label, answer: `${mine.san}${also}. ${mine.annotation ?? ''} ${lesson.thematicObjective ?? ''}`.trim() });
+  });
+  html += `</div></section>`;
+  return html;
+}
+
 function renderPlan(plan: RepertoirePlan, n: number): string {
   let html = `<section class="chapter"><h2>${n}. Repertoire plan: ${esc(plan.name)}</h2><p>${esc(plan.description)}</p>`;
   if (plan.keyThemes.length) html += `<p><b>Themes.</b> ${plan.keyThemes.map(esc).join('; ')}.</p>`;
@@ -244,11 +270,19 @@ const library = allCurriculumLessons.filter((l) => l.relevance === 'outside-repe
 
 let n = 0;
 const chapters: string[] = [];
-chapters.push(`<section class="part"><h1>Part I · Your drills and repertoire lessons</h1><p>These chapters come from your own Chess.com games (hoot65) and the openings you actually play, in the order of the app's study path: lessons that repeat the same pattern follow one another, and each group opens with the check that catches it. Each one explains the position first; the practice section that follows, for the main line and for every other reply your opponents chose, is meant to be done on a real board with the explanation covered. Answers are in the key at the end.</p></section>`);
+chapters.push(`<section class="part"><h1>Part I · Your drills and repertoire lessons</h1><p>These chapters come from your own Chess.com games (hoot65) and the openings you actually play, in the order of the app's study path: lessons that repeat the same pattern follow one another, and each group opens with the check that catches it. The first two chapters are positions from your recent games: a piece your opponent's move attacked that stayed where it was, and a piece of theirs that could have been won. Each lesson chapter after them explains the position first; the practice section that follows, for the main line and for every other reply your opponents chose, is meant to be done on a real board with the explanation covered. Answers are in the key at the end.</p></section>`);
 let previousGroup: PatternGroup | undefined;
+const renderedSets = new Set<CurriculumLesson[]>();
 for (const lesson of openingLessons) {
   const group = patternGroupOf(lesson.id);
-  chapters.push(renderLesson(lesson, ++n, group !== previousGroup ? group : undefined));
+  const set = drillSetOf(lesson.id);
+  if (set) {
+    // A drill set is one chapter of positions, printed where its first position falls
+    if (!renderedSets.has(set)) chapters.push(renderDrillSet(set, ++n, group !== previousGroup ? group : undefined));
+    renderedSets.add(set);
+  } else {
+    chapters.push(renderLesson(lesson, ++n, group !== previousGroup ? group : undefined));
+  }
   previousGroup = group;
 }
 chapters.push(`<section class="part"><h1>Part II · The repertoire plans</h1><p>The full lines behind the lessons: White's Italian with the Evans Gambit and the Anti-Scandinavian, Black's Caro-Kann and the c6-d5 wall against 1.d4, 1.c4 and 1.Nf3.</p></section>`);
@@ -269,7 +303,14 @@ for (const e of answerKey) {
 key += `</section>`;
 
 const playing = (l: CurriculumLesson) => `${l.title} (you play ${l.targetColor === 'black' ? 'Black' : 'White'})`;
-const toc = `<section class="toc"><h1>Contents</h1><ol>${[...openingLessons.map(playing), getRecommendedWhiteRepertoire().name, getRecommendedBlackRepertoire().name, ...library.map((l) => l.title)]
+// A drill set takes one line of the contents, like its one chapter
+const partOne = openingLessons.flatMap((l) => {
+  const set = drillSetOf(l.id);
+  if (!set) return [playing(l)];
+  return set[0] === l ? [`${patternGroupOf(l.id)?.title ?? 'Positions from your games'} (${set.length} positions from your games)`] : [];
+});
+const drillCount = openingLessons.filter((l) => drillSetOf(l.id)).length;
+const toc = `<section class="toc"><h1>Contents</h1><ol>${[...partOne, getRecommendedWhiteRepertoire().name, getRecommendedBlackRepertoire().name, ...library.map((l) => l.title)]
   .map((t) => `<li>${esc(t)}</li>`)
   .join('')}<li>Answer key</li></ol></section>`;
 
@@ -322,6 +363,9 @@ ol.practice li.given { color: #555; }
 .moves { font-size: 10.5pt; }
 ul.notes { padding-left: 14pt; font-size: 9.5pt; }
 .key p { margin-bottom: 3pt; }
+.drills { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6pt 8pt; }
+.drill { break-inside: avoid; }
+.drill .caption { max-width: none; }
 .group { border: 1px solid #0a5c36; padding: 4pt 7pt; margin: 0 0 8pt; }
 .group-title { font: bold 9.5pt Helvetica, Arial, sans-serif; text-transform: uppercase; letter-spacing: .04em; color: #0a5c36; margin-bottom: 2pt; }
 .group p { margin: 0 0 2pt; font-size: 9.5pt; }
@@ -329,7 +373,7 @@ code { font-size: 8.5pt; }
 `;
 
 const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>The hoot65 Opening Book</title><style>${css}</style></head><body>
-<section class="cover"><h1>The hoot65 Opening Book</h1><p>Personalized opening lessons, weakness drills and repertoire lines,<br>generated from the my-chess curriculum on ${new Date().toISOString().slice(0, 10)}.</p><p>${openingLessons.length} lessons · ${answerKey.length} practice answers · ${library.length} pattern-library chapters</p></section>
+<section class="cover"><h1>The hoot65 Opening Book</h1><p>Personalized opening lessons, weakness drills and repertoire lines,<br>generated from the my-chess curriculum on ${new Date().toISOString().slice(0, 10)}.</p><p>${openingLessons.length - drillCount} lessons · ${drillCount} positions from your games · ${answerKey.length} practice answers · ${library.length} pattern-library chapters</p></section>
 ${toc}
 ${chapters.join('\n')}
 ${key}
@@ -338,4 +382,4 @@ ${key}
 mkdirSync(OUT_DIR, { recursive: true });
 const htmlPath = resolve(OUT_DIR, 'lesson-book.html');
 writeFileSync(htmlPath, html);
-console.log(`wrote ${htmlPath} (${openingLessons.length} lessons, ${library.length} library chapters, ${answerKey.length} answers)`);
+console.log(`wrote ${htmlPath} (${openingLessons.length - drillCount} lessons, ${drillCount} positions from your games, ${library.length} library chapters, ${answerKey.length} answers)`);

@@ -121,3 +121,23 @@ heading shows the check that catches the pattern at the board.
 The first two groups train the most expensive checks in the games: a piece left where it can be
 taken, a threat not answered, a free piece not taken. The third trains the costliest single error,
 allowing mate in one.
+
+## Drills from the games
+
+The study path now opens with two drill sets made from hoot65's own positions of the last 120 days
+(`src/data/game_drills.json`, picked by `scripts/game-analysis/drills.mjs`):
+
+1. **What does the last move attack?** Twelve positions where the opponent's move put a piece in
+   danger (a minor piece or more, undefended or attacked by something cheaper) and hoot65 left it
+   there. In six of them the piece was the queen. In every one the opponent's next move was a
+   capture, and three times it took the queen.
+2. **Take what is free.** Twelve positions where an enemy piece could be won and hoot65 did not take
+   it: five knights, four bishops, two rooks and a queen (on d1, attacked by a bishop on g4). Two
+   of them were recaptures right after the opponent had taken a piece.
+
+Each position is a one-decision lesson with its own review card. The opponent's last move is
+replayed first, then every move that keeps the material (threats) or wins it (free pieces) is
+accepted, measured by a material search over every legal move and checked again one ply deeper.
+Playing the move from the game shows what it cost: the capture that followed is played out on the
+board. 27 recent positions passed every test, and the twelve newest of each kind were kept, one per
+game. Re-run the scan as more games are played.

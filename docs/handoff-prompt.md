@@ -15,9 +15,9 @@ on every push to `main`.
 
 - React 18 + Vite 6 + TypeScript (strict) + Tailwind; chess.js 1.4; Dexie 4 (IndexedDB); ts-fsrs 5
   for scheduling; maia3-js + onnxruntime-web in a Web Worker for the human-like engine.
-- Tests: Vitest (`npm test`, 332 tests: SSR `renderToString` specs, jsdom interaction specs under
+- Tests: Vitest (`npm test`, 340 tests: SSR `renderToString` specs, jsdom interaction specs under
   `tests/unit/curriculum/lessons-view-interactions.spec.tsx`, fake-indexeddb for the database) and
-  Playwright (`npm run test:e2e`, 78 tests incl. iPhone-viewport tests). Keep both green or update
+  Playwright (`npm run test:e2e`, 79 tests incl. iPhone-viewport tests). Keep both green or update
   tests deliberately and say why.
 - `npm run build` must pass (`tsc && vite build`). Base path is `/my-chess/`.
 - Never commit a PDF: `.gitignore` excludes `*.pdf` and `book/`; run `git ls-files "*.pdf"` before
@@ -47,8 +47,9 @@ on every push to `main`.
   mistakes, exercises, per-decision FSRS cards (`src/services/cards.ts`, `sessionQueue.ts`,
   `fenKey.ts`) with inferred ratings, "Due today" review sessions. Phone: lesson picker above the
   board. The default list ("My Lessons") is the study path in `src/curriculum/patternPath.ts`:
-  the 15 core lessons in five groups, each group repeating one pattern and headed by the check that
-  catches it; the phone picker and Part I of the lesson book use the same order.
+  two drill sets from hoot65's own games, then the 15 core lessons in five groups, each group
+  repeating one pattern and headed by the check that catches it; the phone picker and Part I of the
+  lesson book use the same order.
 - **Printable Worksheets** and the generated **lesson book** (`scripts/lesson-book.ts`).
 
 ## Maintainer decisions already taken (do not reopen)
@@ -118,6 +119,14 @@ Status (2026-11-01): White 1-5 and Black 1-4 and 6 are done (Black 5 needs no ne
   (toolkit in `scripts/game-analysis/`, its own `package.json`, not part of the build). It found no
   measurable cost in opening choices; the points go to loose pieces, unanswered threats, missed free
   pieces and the clock. Re-run it as more games are played.
+- Game drills (2026-11-01): `src/curriculum/gameDrills.ts` turns `src/data/game_drills.json` (picked
+  by `scripts/game-analysis/drills.mjs`) into 24 one-decision lessons: 12 positions where the
+  opponent's last move attacked a piece that hoot65 left, and 12 where an enemy piece could be won
+  and was not. Each accepts every move that keeps (or wins) the material, plays out the capture after
+  the game move, and has its own review card. They open the study path as two rows of numbered tiles
+  ("From Your Games" course), print as two chapters of diagrams in the book, and
+  `tests/unit/curriculum/game-drills.spec.ts` works out every fact their text states. Re-run the scan
+  and `pick` as new games come in.
 Next: the roadmap below.
 
 ## Roadmap items not yet built (see `docs/pedagogy-audit.md` Section 7)
