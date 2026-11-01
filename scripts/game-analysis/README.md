@@ -1,0 +1,56 @@
+# Game analysis with the Maia simulator
+
+Finds the simplest changes to hoot65's play that would gain the most points, from the whole
+Chess.com archive, weighted toward recent games. It runs offline on a laptop and is not part of the
+app build. The results and what they mean are in `docs/game-analysis.md`.
+
+## Method
+
+1. **Download** every monthly archive from the Chess.com public API (`download.mjs`).
+2. **Parse** each game into positions, moves and clock times (`parse.mjs`).
+3. **Score every position with Maia** (`maia-pass.mjs`), the human-move model the app already uses
+   for play. Maia is conditioned on both players' ratings, so its value head gives the expected score
+   for players of those ratings. The change in hoot65's expected score across a move is what the move
+   cost or gained.
+4. **Describe every move** with checks a player can make at the board (`features.mjs`): is a piece
+   left where it can be taken, was a threat ignored, was a free piece or a mate in one missed, how
+   much time was left and how much was spent.
+5. **Learn which situations cost points.** `describe.py` and `endings.py` compare hoot65 with the
+   opponents (players of the same rating in the same games) and look at clocks, time losses and
+   resignations. `habits.py` fits a context model (game stage, evaluation, material) on both players'
+   moves, then a shallow regression tree on what the context cannot explain: its splits are the rules.
+6. **Find the better move** (`cands.mjs`, `gains.py`): for every decision of the last year, Maia's six
+   likeliest human moves and the expected score after each. A rule's gain is the best of those minus
+   the move played, summed where the rule applies, minus the same quantity on quiet moves (taking
+   the best of six noisy estimates looks better than the move played even when nothing was wrong).
+   `openings.py` does the same for recurring opening positions.
+7. **Simulate** (`simlist.py`, `simulate.mjs`, `simsum.py`): from recent positions where a rule
+   applied, Maia plays both sides forward at their ratings, once after the move played and once after
+   the better move, and the outcomes are compared. The simulated games are independent of the
+   estimates that picked the better move, so they also measure the selection bias directly.
+
+Weights: a game's weight halves every 180 days (`HALF_LIFE` environment variable).
+Ratings: Maia is trained on Lichess games, so Chess.com ratings get +400 before they reach Maia
+(`maia-pass.mjs`, `cands.mjs`, `simlist.py`). That is an assumption; it moves the absolute expected
+scores more than the comparisons between moves.
+
+## Running
+
+From this folder:
+
+```bash
+npm install
+uv venv .venv && uv pip install -r requirements.txt
+node download.mjs hoot65 data/raw
+node parse.mjs data/raw games.jsonl
+node maia-pass.mjs games.jsonl 0 2 pass1-0.jsonl 400 & node maia-pass.mjs games.jsonl 1 2 pass1-1.jsonl 400 & wait
+./run-features.sh
+.venv/bin/python describe.py && .venv/bin/python endings.py && .venv/bin/python habits.py
+.venv/bin/python pass2list.py && node cands.mjs games.jsonl pass2-list.json pass2.json 6 400
+.venv/bin/python gains.py && .venv/bin/python openings.py
+.venv/bin/python simlist.py 'hang3,ignoredThreat,missedFree,allowMate1,!quiet' 80
+node simulate.mjs sim-starts.json sim-out.json 12 14 1 && .venv/bin/python simsum.py && .venv/bin/python table.py
+```
+
+On an 8-core laptop the Maia pass over 230,000 positions takes about 20 minutes, and the candidate
+pass and the simulation about 15 minutes each.

@@ -15,7 +15,7 @@ on every push to `main`.
 
 - React 18 + Vite 6 + TypeScript (strict) + Tailwind; chess.js 1.4; Dexie 4 (IndexedDB); ts-fsrs 5
   for scheduling; maia3-js + onnxruntime-web in a Web Worker for the human-like engine.
-- Tests: Vitest (`npm test`, 325 tests: SSR `renderToString` specs, jsdom interaction specs under
+- Tests: Vitest (`npm test`, 332 tests: SSR `renderToString` specs, jsdom interaction specs under
   `tests/unit/curriculum/lessons-view-interactions.spec.tsx`, fake-indexeddb for the database) and
   Playwright (`npm run test:e2e`, 78 tests incl. iPhone-viewport tests). Keep both green or update
   tests deliberately and say why.
@@ -111,6 +111,13 @@ Status (2026-11-01): White 1-5 and Black 1-4 and 6 are done (Black 5 needs no ne
   and every fact the new exercises state.
 - The lesson book's over-the-board practice now has blanks for every branch reply as well as the
   main line ("The other replies", answers in the key), and Black chapters say White moves first.
+- Study path (2026-11-01): `src/curriculum/patternPath.ts` orders the core lessons in five groups
+  that each repeat one pattern; `tests/unit/curriculum/pattern-path.spec.tsx` replays every fact a
+  group states. Keep every core lesson in exactly one group when adding lessons.
+- Archive analysis (2026-11-01): `docs/game-analysis.md` scores all 4,101 Chess.com games with Maia
+  (toolkit in `scripts/game-analysis/`, its own `package.json`, not part of the build). It found no
+  measurable cost in opening choices; the points go to loose pieces, unanswered threats, missed free
+  pieces and the clock. Re-run it as more games are played.
 Next: the roadmap below.
 
 ## Roadmap items not yet built (see `docs/pedagogy-audit.md` Section 7)

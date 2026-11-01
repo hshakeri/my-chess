@@ -7,9 +7,11 @@ import { CurriculumLesson } from '../types/curriculum';
  * lessons of a group practise what the first one introduced, from the other colour or in another
  * opening. A group names the one question that catches the pattern at the board.
  *
- * Group order: the first groups train the checks that cost hoot65 the most in recent games
- * (pieces left where they can be taken, threats not answered), measured with the Maia model over
- * the whole archive; the structure groups follow, and finishing technique comes last.
+ * Group order follows docs/game-analysis.md, which measured hoot65's archive with the Maia model:
+ * the costliest board checks in recent games are a piece left where it can be taken, a threat not
+ * answered and a free piece not taken, so the two loose-piece groups come first; allowing mate in
+ * one is rarer but costs the most each time, so the king in the centre comes next; the structure
+ * group and finishing technique follow.
  */
 export interface PatternGroup {
   id: string;
@@ -69,7 +71,7 @@ export const patternPath: PatternGroup[] = [
   },
 ];
 
-/** Lesson id to the id of its group in the study path. */
+/** The study-path group a lesson belongs to, if any. */
 export function patternGroupOf(lessonId: string): PatternGroup | undefined {
   return patternPath.find((g) => g.lessonIds.includes(lessonId));
 }

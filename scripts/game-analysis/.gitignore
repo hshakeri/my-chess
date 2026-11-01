@@ -1,0 +1,11 @@
+# Downloaded games and every intermediate output stay local
+data/
+.venv/
+*.jsonl
+*.csv
+*.pkl
+*.log
+pass2-list.json
+pass2.json
+gains-summary.json
+sim-*.json
