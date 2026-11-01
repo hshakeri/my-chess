@@ -1,4 +1,4 @@
-import { Chess } from 'chess.js';
+import { Chess, Square } from 'chess.js';
 
 // Standard piece values in centipawns
 export const PIECE_VALUES: Record<string, number> = {
@@ -77,14 +77,62 @@ const KING_MG_PST = [
   20, 30, 10,  0,  0, 10, 30, 20
 ];
 
+/** Score of a checkmate in centipawns; the search adds the remaining depth so faster mates score higher. */
+export const MATE_SCORE = 20000;
+/** Any evaluation this large is a forced mate: material and square tables never reach it. */
+const MATE_THRESHOLD = 19000;
+/** Evaluations are clamped to this many centipawns before a delta is taken, so a mate is not "Blunder (20285cp)". */
+export const EVAL_CLAMP = 1000;
+
+export type MoveClassification =
+  | 'fine'
+  | 'good'
+  | 'inaccuracy'
+  | 'mistake'
+  | 'blunder'
+  | 'missed_mate'
+  | 'allowed_mate';
+
 export interface TacticalEvaluation {
   centipawns: number; // Positive = White advantage, negative = Black advantage
   isCheckmate: boolean;
   mateIn?: number;
   blunderDelta?: number;
-  classification?: 'best' | 'good' | 'inaccuracy' | 'mistake' | 'blunder';
+  classification?: MoveClassification;
   annotation?: string;
 }
+
+/** Thrown by `search` when its deadline passes; the Chess object is left as it was before the call. */
+export class SearchTimeout extends Error {
+  constructor() {
+    super('Search time budget exhausted');
+    this.name = 'SearchTimeout';
+  }
+}
+
+/** Draws by rule that need no move generation: fifty moves, insufficient material, threefold repetition. */
+function isRuleDraw(chess: Chess): boolean {
+  return chess.isDrawByFiftyMoves() || chess.isInsufficientMaterial() || chess.isThreefoldRepetition();
+}
+
+/** Value of the piece a SAN move captures (en passant takes a pawn); 0 for a move that captures nothing. */
+function victimValue(chess: Chess, san: string): number {
+  if (!san.includes('x')) return 0;
+  const squares = san.match(/[a-h][1-8]/g);
+  const target = squares ? squares[squares.length - 1] : null;
+  const victim = target ? chess.get(target as Square) : undefined;
+  return victim ? PIECE_VALUES[victim.type] : PIECE_VALUES.p;
+}
+
+/** Most valuable victim first; moves that capture nothing keep their generation order at the end. */
+function orderByVictim(chess: Chess, sans: string[]): string[] {
+  return sans
+    .map((san) => ({ san, value: victimValue(chess, san) }))
+    .sort((a, b) => b.value - a.value)
+    .map((m) => m.san);
+}
+
+const now = (): number => (typeof performance !== 'undefined' ? performance.now() : Date.now());
 
 export class TacticalEvaluator {
   /**
@@ -92,12 +140,29 @@ export class TacticalEvaluator {
    */
   public static evaluateStatic(chess: Chess): number {
     if (chess.isCheckmate()) {
-      return chess.turn() === 'w' ? -20000 : 20000;
+      return chess.turn() === 'w' ? -MATE_SCORE : MATE_SCORE;
     }
     if (chess.isDraw()) {
       return 0;
     }
+    return this.material(chess);
+  }
 
+  /**
+   * The same value as `evaluateStatic`, for a node whose legal moves are already generated:
+   * no legal move is mate or stalemate, so the checks need no second move generation.
+   */
+  private static staticScore(chess: Chess, legalMoveCount: number): number {
+    if (legalMoveCount === 0) {
+      if (!chess.inCheck()) return 0;
+      return chess.turn() === 'w' ? -MATE_SCORE : MATE_SCORE;
+    }
+    if (isRuleDraw(chess)) return 0;
+    return this.material(chess);
+  }
+
+  /** Material plus piece-square tables plus a tempo bonus, from White's perspective. */
+  private static material(chess: Chess): number {
     let score = 0;
     const board = chess.board();
 
@@ -148,40 +213,45 @@ export class TacticalEvaluator {
 
   /**
    * Minimax search with alpha-beta pruning and quiescence search.
+   *
+   * Legal moves are generated once per node as SAN (chess.js builds a full Move object, with two FEN
+   * strings, for every verbose move, which cost over 90% of the old search's time). Mate and stalemate
+   * follow from an empty move list. A finite `deadline` (performance.now() milliseconds) makes the
+   * search throw SearchTimeout once it passes; every move made is undone first.
    */
   public static search(
     chess: Chess,
     depth: number,
     alpha: number = -Infinity,
-    beta: number = Infinity
+    beta: number = Infinity,
+    deadline: number = Infinity
   ): number {
-    if (chess.isGameOver()) {
-      if (chess.isCheckmate()) {
-        return chess.turn() === 'w' ? -20000 - depth : 20000 + depth;
-      }
-      return 0;
+    const moves = chess.moves();
+    if (moves.length === 0) {
+      if (!chess.inCheck()) return 0;
+      return chess.turn() === 'w' ? -MATE_SCORE - depth : MATE_SCORE + depth;
     }
+    if (isRuleDraw(chess)) return 0;
 
     if (depth <= 0) {
-      return this.quiescence(chess, alpha, beta, 2);
+      return this.quiescence(chess, alpha, beta, 2, moves);
     }
+    if (deadline !== Infinity && now() > deadline) throw new SearchTimeout();
 
     const isWhite = chess.turn() === 'w';
-    const moves = chess.moves({ verbose: true });
-
-    // Move ordering: captures first
-    moves.sort((a, b) => {
-      const aVal = a.captured ? PIECE_VALUES[a.captured] : 0;
-      const bVal = b.captured ? PIECE_VALUES[b.captured] : 0;
-      return bVal - aVal;
-    });
+    // Move ordering: captures first, most valuable victim first
+    const ordered = orderByVictim(chess, moves);
 
     if (isWhite) {
       let maxEval = -Infinity;
-      for (const m of moves) {
-        chess.move(m);
-        const ev = this.search(chess, depth - 1, alpha, beta);
-        chess.undo();
+      for (const san of ordered) {
+        chess.move(san);
+        let ev: number;
+        try {
+          ev = this.search(chess, depth - 1, alpha, beta, deadline);
+        } finally {
+          chess.undo();
+        }
         maxEval = Math.max(maxEval, ev);
         alpha = Math.max(alpha, ev);
         if (beta <= alpha) break;
@@ -189,10 +259,14 @@ export class TacticalEvaluator {
       return maxEval;
     } else {
       let minEval = Infinity;
-      for (const m of moves) {
-        chess.move(m);
-        const ev = this.search(chess, depth - 1, alpha, beta);
-        chess.undo();
+      for (const san of ordered) {
+        chess.move(san);
+        let ev: number;
+        try {
+          ev = this.search(chess, depth - 1, alpha, beta, deadline);
+        } finally {
+          chess.undo();
+        }
         minEval = Math.min(minEval, ev);
         beta = Math.min(beta, ev);
         if (beta <= alpha) break;
@@ -203,17 +277,21 @@ export class TacticalEvaluator {
 
   /**
    * Quiescence search to avoid the horizon effect on tactical captures.
+   * `legalMoves` is the node's SAN move list when the caller already generated it.
    */
   private static quiescence(
     chess: Chess,
     alpha: number,
     beta: number,
-    maxQDepth: number
+    maxQDepth: number,
+    legalMoves?: string[]
   ): number {
-    const standPat = this.evaluateStatic(chess);
-    const isWhite = chess.turn() === 'w';
+    // A leaf needs only the static value, which costs one internal move generation
+    if (maxQDepth <= 0) return legalMoves ? this.staticScore(chess, legalMoves.length) : this.evaluateStatic(chess);
 
-    if (maxQDepth <= 0) return standPat;
+    const moves = legalMoves ?? chess.moves();
+    const standPat = this.staticScore(chess, moves.length);
+    const isWhite = chess.turn() === 'w';
 
     if (isWhite) {
       if (standPat >= beta) return beta;
@@ -223,11 +301,10 @@ export class TacticalEvaluator {
       if (standPat < beta) beta = standPat;
     }
 
-    const captures = chess.moves({ verbose: true }).filter((m) => m.captured);
-    captures.sort((a, b) => (PIECE_VALUES[b.captured!] || 0) - (PIECE_VALUES[a.captured!] || 0));
+    const captures = orderByVictim(chess, moves.filter((san) => san.includes('x')));
 
-    for (const cap of captures) {
-      chess.move(cap);
+    for (const san of captures) {
+      chess.move(san);
       const score = this.quiescence(chess, alpha, beta, maxQDepth - 1);
       chess.undo();
 
@@ -243,8 +320,18 @@ export class TacticalEvaluator {
     return isWhite ? alpha : beta;
   }
 
+  /** True for an evaluation that is a forced mate (for either side). */
+  public static isMateScore(cp: number): boolean {
+    return Math.abs(cp) >= MATE_THRESHOLD;
+  }
+
   /**
-   * Classify move quality based on evaluation delta.
+   * Classify move quality from the evaluations before and after it (both from White's perspective).
+   *
+   * A move that turns a position the opponent could not mate into one they can is 'allowed_mate';
+   * a move that lets a forced mate for the mover slip away is 'missed_mate'. Otherwise both
+   * evaluations are clamped to +/-EVAL_CLAMP and the drop is graded. 'fine' means the move lost
+   * at most 10 centipawns; no best move is computed, so it is never called "best".
    */
   public static classifyMoveDelta(
     turn: 'w' | 'b',
@@ -252,14 +339,23 @@ export class TacticalEvaluator {
     evalAfter: number
   ): {
     delta: number;
-    classification: 'best' | 'good' | 'inaccuracy' | 'mistake' | 'blunder';
+    classification: MoveClassification;
     description: string;
   } {
-    // Delta from moving player's perspective
-    const delta = turn === 'w' ? evalBefore - evalAfter : evalAfter - evalBefore;
+    const sign = turn === 'w' ? 1 : -1;
+    const before = sign * evalBefore; // from the mover's perspective
+    const after = sign * evalAfter;
+    const clamp = (cp: number) => Math.max(-EVAL_CLAMP, Math.min(EVAL_CLAMP, cp));
+    const delta = clamp(before) - clamp(after);
 
+    if (after <= -MATE_THRESHOLD && before > -MATE_THRESHOLD) {
+      return { delta, classification: 'allowed_mate', description: 'Allowed a forced mate' };
+    }
+    if (before >= MATE_THRESHOLD && after < MATE_THRESHOLD) {
+      return { delta, classification: 'missed_mate', description: 'Missed a forced mate' };
+    }
     if (delta <= 10) {
-      return { delta, classification: 'best', description: 'Best move' };
+      return { delta, classification: 'fine', description: 'Fine move' };
     }
     if (delta <= 50) {
       return { delta, classification: 'good', description: 'Good move' };

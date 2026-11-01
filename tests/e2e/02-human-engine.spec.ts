@@ -117,3 +117,23 @@ test.describe('02. Human-Like Maia Engine Opponent (F05 - F06)', () => {
     expect(externalRequests).toHaveLength(0);
   });
 });
+
+// QW-6: the deploy no longer carries public/wasm (26 runtime files, 99 MB). The runtime must still find
+// the one wasm file it needs, beside its own bundle, and the model must load from the site's base path.
+test('02. The Maia model loads with one ONNX runtime wasm file, served by the site itself', async ({ page }) => {
+  test.setTimeout(90000);
+  const requests: string[] = [];
+  // The context sees the engine worker's requests too, not only the page's
+  page.context().on('request', (req) => requests.push(req.url()));
+
+  await page.goto('/');
+  await expect(page.getByText('Maia Neural ONNX')).toBeVisible({ timeout: 60000 });
+
+  const paths = requests.filter((u) => u.startsWith('http')).map((u) => new URL(u).pathname);
+  const wasm = paths.filter((p) => p.endsWith('.wasm'));
+  expect(wasm).toHaveLength(1);
+  expect(wasm[0]).toMatch(/ort-wasm-simd-threaded\.jsep[^/]*\.wasm$/);
+  expect(paths.filter((p) => p.startsWith('/my-chess/wasm/'))).toEqual([]);
+  expect(paths).toContain('/my-chess/models/maia3_5m.onnx');
+  expect(requests.filter((u) => u.startsWith('http') && !u.startsWith('http://localhost'))).toEqual([]);
+});

@@ -7,7 +7,7 @@ function baseAssetRewritePlugin(): Plugin {
     name: 'rewrite-base-assets',
     configureServer(server) {
       server.middlewares.use((req, _res, next) => {
-        if (req.url && (req.url.startsWith('/wasm/') || req.url.startsWith('/models/') || req.url.startsWith('/pieces/'))) {
+        if (req.url && (req.url.startsWith('/models/') || req.url.startsWith('/pieces/'))) {
           req.url = '/my-chess' + req.url;
         }
         next();

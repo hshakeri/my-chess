@@ -1,0 +1,273 @@
+{
+  "note": "TacticalEvaluator.search scores recorded with the pre-QW-6 move generation (verbose moves, isGameOver per node). The faster search must reproduce every value exactly.",
+  "positions": [
+    {
+      "gameId": "chesscom:23e807b0-45fc-11f1-80e2-8556be01000f",
+      "ply": 20,
+      "fen": "rn2k1nr/pp3ppp/3qp3/3p4/3P4/2P2Q1P/PP3PP1/RN2KB1R w KQkq - 0 11",
+      "depth1": 65,
+      "depth2": 35
+    },
+    {
+      "gameId": "chesscom:d3aa241b-4e57-11f1-9167-58efd501000f",
+      "ply": 22,
+      "fen": "r1bqk2r/ppp1b1p1/3p1p2/6R1/2BP4/5Q2/PPP2PPP/RN4K1 w kq - 0 12",
+      "depth1": 265,
+      "depth2": 265
+    },
+    {
+      "gameId": "chesscom:94e004c5-5187-11f1-91f6-03617901000f",
+      "ply": 23,
+      "fen": "rn2k2r/pq3ppp/2pNp3/5bn1/8/3P1Q2/PPP2PPP/R1B1KB1R b KQkq - 0 12",
+      "depth1": 200,
+      "depth2": 485
+    },
+    {
+      "gameId": "chesscom:963d9bee-5368-11f1-ad8d-65f76101000f",
+      "ply": 24,
+      "fen": "r3k1nr/2q2ppp/p1p1p3/2bp3b/3P4/5N1P/PPPB1PP1/R2QK2R w KQkq - 0 13",
+      "depth1": 60,
+      "depth2": 30
+    },
+    {
+      "gameId": "chesscom:4c143670-5f63-11f1-89ea-13638e01000f",
+      "ply": 28,
+      "fen": "2kr3r/ppqnpp1p/3p2p1/3P4/4N3/1P6/Pb2NPPP/2RQR1K1 w - - 0 15",
+      "depth1": 465,
+      "depth2": 390
+    },
+    {
+      "gameId": "chesscom:161bc31f-6206-11f1-b3d9-feb9bf01000f",
+      "ply": 29,
+      "fen": "r2qk2r/pp3pp1/2n1p3/1N1p2N1/3Pn1p1/4Q2P/PPP2PP1/R4RK1 b kq - 1 15",
+      "depth1": -275,
+      "depth2": -195
+    },
+    {
+      "gameId": "chesscom:2556b38c-6913-11f1-9d7a-8a740101000f",
+      "ply": 20,
+      "fen": "r3kb1r/ppqnp1pp/2p1pn2/4p3/3P4/2N5/PPPBBPPP/R2Q1RK1 w kq - 0 11",
+      "depth1": -15,
+      "depth2": -20
+    },
+    {
+      "gameId": "chesscom:9f6b9a77-6cdc-11f1-b361-283de901000f",
+      "ply": 21,
+      "fen": "rn3rk1/p2pbppp/bqp2p2/1p6/1P1P2PP/2PBP3/P2N1P2/RN1QK2R b KQ - 2 11",
+      "depth1": -20,
+      "depth2": -10
+    },
+    {
+      "gameId": "chesscom:18a6a5b9-6f4f-11f1-9775-01783e01000f",
+      "ply": 22,
+      "fen": "r1bq1rk1/p1p2ppn/1pnp3p/4P3/2B5/Q1p2N2/PP3PPP/RNB1R1K1 w - - 0 12",
+      "depth1": 310,
+      "depth2": 185
+    },
+    {
+      "gameId": "chesscom:6ed46eb5-7a94-11f1-b4e3-23a23201000f",
+      "ply": 23,
+      "fen": "rn1qkb1r/pp2pp2/2pp1pb1/8/3PP1P1/3B4/PPPBN2P/R2QK2R b KQkq - 0 12",
+      "depth1": 105,
+      "depth2": 115
+    },
+    {
+      "gameId": "chesscom:a07e5c74-87d7-11f1-ba91-2fad6a01000f",
+      "ply": 24,
+      "fen": "r1bq4/ppp2kp1/2np3p/4p3/1P2P1n1/3P4/P1P3PP/RNBQK3 w - - 0 13",
+      "depth1": -345,
+      "depth2": -380
+    },
+    {
+      "gameId": "chesscom:e6b81e86-95d3-11f1-b2f3-fbc79f01000f",
+      "ply": 25,
+      "fen": "2rq1bnr/4kppp/4p3/p2p1b2/Np1P4/1B3N2/PPP1QPPP/R4RK1 b - - 3 13",
+      "depth1": -15,
+      "depth2": 60
+    },
+    {
+      "gameId": "chesscom:1230384a-a576-11f1-baf2-8a56cc01000f",
+      "ply": 27,
+      "fen": "r2qkbnr/p1pn4/3p4/3Q3p/4P1p1/8/PPP2PPP/RNB1R1K1 b - - 2 14",
+      "depth1": -70,
+      "depth2": -90
+    },
+    {
+      "gameId": "chesscom:df43f819-a999-11f1-baf2-8a56cc01000f",
+      "ply": 28,
+      "fen": "r3kb1r/p2n1ppp/1np1p3/q7/NpBPP3/1Pp3BP/P4PP1/R2QK2R w KQkq - 1 15",
+      "depth1": 35,
+      "depth2": -45
+    },
+    {
+      "gameId": "chesscom:459804c0-ad52-11f1-856c-7c639201000f",
+      "ply": 29,
+      "fen": "2kr1b1r/ppq2ppb/1n1p1n1p/4p2P/4P1P1/1BN2P1R/PPPBQ3/2KR2N1 b - - 2 15",
+      "depth1": -135,
+      "depth2": -55
+    },
+    {
+      "gameId": "chesscom:bac91105-b099-11f1-93e5-8500da01000f",
+      "ply": 30,
+      "fen": "2kr3r/pp2bppp/3p1n2/2q5/2B5/7P/PPP1QPP1/R1B1R1K1 w - - 6 16",
+      "depth1": 345,
+      "depth2": 115
+    },
+    {
+      "gameId": "chesscom:2fb970cd-b4f7-11f1-b4a6-d9079701000f",
+      "ply": 20,
+      "fen": "r2q1b1r/ppp2kp1/2nPR2p/8/3p2n1/5N2/PPP2PPP/RNBQ2K1 w - - 1 11",
+      "depth1": 225,
+      "depth2": 95
+    },
+    {
+      "gameId": "chesscom:68bcb6d4-b8e7-11f1-9c4d-f45fe701000f",
+      "ply": 21,
+      "fen": "r2qr1k1/pppbbp1p/2np1n1B/8/2B1P3/2N5/PPP2PPP/R2QR1K1 b - - 2 11",
+      "depth1": -210,
+      "depth2": -210
+    },
+    {
+      "gameId": "chesscom:457d5ae3-bb35-11f1-8ba1-8500da01000f",
+      "ply": 22,
+      "fen": "2kr3r/ppqnppbp/2pp1np1/6B1/P2PP3/2N2B1P/1PP2PP1/R2Q1RK1 w - - 2 12",
+      "depth1": 110,
+      "depth2": 105
+    },
+    {
+      "gameId": "chesscom:b5a4cc55-bd22-11f1-8c7a-e0caaf01000f",
+      "ply": 23,
+      "fen": "r3kbnr/pp3Npp/2n1p3/2p1Pb2/8/3P4/PpPQ1PPP/R3KB1R b KQkq - 0 12",
+      "depth1": -965,
+      "depth2": -1005
+    },
+    {
+      "gameId": "chesscom:f025e37d-c290-11f1-b809-a9c32901000f",
+      "ply": 24,
+      "fen": "r3k2r/p3nppp/1qn1p3/1pbp4/6b1/P1NP1N2/1PPBBPPP/1R1Q1RK1 w kq - 2 13",
+      "depth1": 20,
+      "depth2": -70
+    },
+    {
+      "gameId": "chesscom:b1025cef-c530-11f1-a987-563c1101000f",
+      "ply": 25,
+      "fen": "2kr1bnr/1pp1qpp1/p2pb2p/8/P1BpP3/NQ1P3P/1PP2PP1/R1B2RK1 b - - 0 13",
+      "depth1": -50,
+      "depth2": 55
+    },
+    {
+      "gameId": "chesscom:013f18c7-c8c9-11f1-b539-bdbd6e01000f",
+      "ply": 26,
+      "fen": "r1b1kb1r/2B2ppp/1p1p1n2/1PpPp3/n3P3/3B1P2/P5PP/RN2K1NR w KQkq - 0 14",
+      "depth1": 25,
+      "depth2": 30
+    },
+    {
+      "gameId": "chesscom:ad6073ca-cb44-11f1-a1b0-cf070e01000f",
+      "ply": 27,
+      "fen": "r2q2kr/p1p3pp/1bp5/5bN1/1P1p1B2/7P/P1P2PP1/RN2R1K1 b - - 2 14",
+      "depth1": -720,
+      "depth2": -695
+    },
+    {
+      "gameId": "chesscom:e17861a6-d006-11f1-b280-1bd5c501000f",
+      "ply": 28,
+      "fen": "r1bq1rk1/ppp2ppp/1b1p4/8/2B1n3/B1P2Q2/P5PP/RN3RK1 w - - 0 15",
+      "depth1": -410,
+      "depth2": -400
+    },
+    {
+      "gameId": "chesscom:be693b3a-4b20-11f1-aa58-a277c101000f",
+      "ply": 20,
+      "fen": "r2qk1nr/5ppp/p1p1p3/5b2/1b1p4/2NP1P2/PPPBN1PP/R2QK2R w KQkq - 0 11",
+      "depth1": 15,
+      "depth2": -75
+    },
+    {
+      "gameId": "chesscom:00c8f58b-4d6d-11f1-8da4-0c2c5401000f",
+      "ply": 21,
+      "fen": "r1bqkb2/ppp5/2n2nQ1/8/2p1p3/8/PPPP1PPP/RNB1K1NR b KQq - 2 11",
+      "depth1": 265,
+      "depth2": 295
+    },
+    {
+      "gameId": "chesscom:5c267453-5091-11f1-92d2-ca68c301000f",
+      "ply": 22,
+      "fen": "r1bq1rk1/3nppbp/p1pp1np1/1p6/3PPBP1/1BN4P/PPPQ1P2/2KR2NR w - - 2 12",
+      "depth1": 105,
+      "depth2": 85
+    },
+    {
+      "gameId": "chesscom:f5e9523e-51e7-11f1-94da-11d9b101000f",
+      "ply": 23,
+      "fen": "2rqk2r/pppbbpp1/5n1p/4Q3/2B2B2/2N5/PPP2PPP/R3R1K1 b k - 4 12",
+      "depth1": 45,
+      "depth2": 210
+    },
+    {
+      "gameId": "chesscom:3a10da4a-55cf-11f1-ae89-2b507e01000f",
+      "ply": 24,
+      "fen": "r1bq2kr/ppppn1p1/8/2b1P1Bp/4R1nN/3p1Q2/PPP2PPP/RN4K1 w - - 2 13",
+      "depth1": -65,
+      "depth2": -330
+    }
+  ],
+  "edgeCases": [
+    {
+      "name": "en passant available",
+      "fen": "rnbqkbnr/ppp1p1pp/8/3pPp2/8/8/PPPP1PPP/RNBQKBNR w KQkq f6 0 3",
+      "depth1": 55,
+      "depth2": 40,
+      "static": 25
+    },
+    {
+      "name": "promotion with and without capture",
+      "fen": "r1b1k3/1P4pp/8/8/8/8/6PP/4K3 w - - 0 1",
+      "depth1": 550,
+      "depth2": 570,
+      "static": -660
+    },
+    {
+      "name": "mate in one (back rank)",
+      "fen": "6k1/5ppp/8/8/8/8/5PPP/R5K1 w - - 0 1",
+      "depth1": 20000,
+      "depth2": 20001,
+      "static": 510
+    },
+    {
+      "name": "stalemate on the board",
+      "fen": "7k/5K2/6Q1/8/8/8/8/8 b - - 0 1",
+      "depth1": 0,
+      "depth2": 0,
+      "static": 0
+    },
+    {
+      "name": "one queen move stalemates, others mate",
+      "fen": "7k/5K2/8/8/8/8/8/6Q1 w - - 0 1",
+      "depth1": 20000,
+      "depth2": 20001,
+      "static": 840
+    },
+    {
+      "name": "side to move in check",
+      "fen": "rnbqkbnr/ppp2ppp/8/1B1pp3/4P3/8/PPPP1PPP/RNBQK1NR b KQkq - 1 3",
+      "depth1": -50,
+      "depth2": -10,
+      "static": -35
+    },
+    {
+      "name": "insufficient material",
+      "fen": "8/8/4k3/8/8/3NK3/8/8 w - - 0 1",
+      "depth1": 0,
+      "depth2": 0,
+      "static": 0
+    },
+    {
+      "name": "mate in one along the b-file",
+      "fen": "6k1/5ppp/8/8/8/8/1Q3PPP/1R4K1 w - - 0 1",
+      "depth1": 20000,
+      "depth2": 20001,
+      "static": 1410
+    }
+  ]
+}

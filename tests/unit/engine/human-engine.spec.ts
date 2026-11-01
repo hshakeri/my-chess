@@ -62,6 +62,29 @@ describe('F05 & F06 Human-Like Engine & Heuristic Fallback', () => {
     expect(good.classification).toBe('good');
   });
 
+  // QW-6: no best move is computed, so a small drop is "fine", not "best"; mates get their own classes
+  it('calls a drop of 10 cp or less "Fine move", clamps evaluations to 1000 cp, and names missed and allowed mates', () => {
+    const fine = TacticalEvaluator.classifyMoveDelta('w', 0, -5);
+    expect(fine).toMatchObject({ classification: 'fine', description: 'Fine move' });
+
+    // A winning position that stays winning is not a "Mistake (600cp)"
+    expect(TacticalEvaluator.classifyMoveDelta('w', 1800, 1200).classification).toBe('fine');
+
+    // Allowing mate is graded as such, with the delta clamped (was "Blunder (20303cp)")
+    const allowed = TacticalEvaluator.classifyMoveDelta('w', 300, -20003);
+    expect(allowed).toMatchObject({ classification: 'allowed_mate', description: 'Allowed a forced mate', delta: 1300 });
+
+    // Black had a forced mate (White-perspective -20002) and let it go
+    const missed = TacticalEvaluator.classifyMoveDelta('b', -20002, 150);
+    expect(missed).toMatchObject({ classification: 'missed_mate', description: 'Missed a forced mate', delta: 1150 });
+
+    // Still mating after the move: fine
+    expect(TacticalEvaluator.classifyMoveDelta('w', 20003, 20001).classification).toBe('fine');
+
+    // An ordinary large drop is still a blunder, with the clamped delta in its description
+    expect(TacticalEvaluator.classifyMoveDelta('w', 900, -400)).toMatchObject({ classification: 'blunder', description: 'Blunder (1300cp)' });
+  });
+
   // 5. Hybrid Engine Tier Progression
   it('uses Tier 1 (Human Opening Book) on initial plies', async () => {
     const hybrid = new HybridEngine();

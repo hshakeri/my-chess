@@ -1,6 +1,16 @@
 import { Chess } from 'chess.js';
 import { HumanElo, MoveCandidate } from '../../types/engine';
 
+/**
+ * The model's URL: the site's base path (Vite's BASE_URL, '/my-chess/' on GitHub Pages) resolved
+ * against the page's or the worker's origin.
+ */
+export function defaultModelUrl(): string {
+  const base = import.meta.env?.BASE_URL ?? '/';
+  const origin = typeof self !== 'undefined' && self.location ? self.location.origin : '';
+  return `${origin}${base}models/maia3_5m.onnx`;
+}
+
 export class MaiaEngine {
   private maiaInstance: any = null;
   private isModelLoading = false;
@@ -27,23 +37,13 @@ export class MaiaEngine {
 
     try {
       const { Maia3 } = await import('maia3-js/web');
-      
-      const origin = typeof window !== 'undefined'
-        ? window.location.origin
-        : (typeof self !== 'undefined' && (self as any).location ? (self as any).location.origin : '');
-
-      const defaultUrl = origin
-        ? `${origin}/my-chess/models/maia3_5m.onnx`
-        : '/my-chess/models/maia3_5m.onnx';
-
-      const defaultWasm = origin
-        ? `${origin}/my-chess/wasm/`
-        : '/my-chess/wasm/';
 
       this.maiaInstance = new Maia3({
         variant: '5m',
-        url: modelUrl || defaultUrl,
-        wasmPaths: wasmPath || defaultWasm,
+        url: modelUrl || defaultModelUrl(),
+        // No wasm path by default: onnxruntime-web then runs the loader bundled into its own module and
+        // fetches the one .wasm file Vite emits beside it in assets/, so the site ships a single copy.
+        wasmPaths: wasmPath,
         numThreads: 1,
       });
 

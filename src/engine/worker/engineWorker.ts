@@ -1,5 +1,6 @@
 import { EngineRequest, EngineResponse } from '../../types/engine';
 import { HybridEngine } from '../human/hybridEngine';
+import { thinkingDelayMs } from './thinkingDelay';
 
 const engine = new HybridEngine();
 
@@ -32,10 +33,10 @@ self.onmessage = async (event: MessageEvent<EngineRequest>) => {
     return;
   }
 
-  // Optional realistic thinking delay (e.g. 150-400ms for natural play if requested)
-  const thinkingTime = req.options?.thinkingTimeMs ?? 250;
+  // A short pause before a played move feels natural; an evaluation is wanted at once
+  const thinkingTime = thinkingDelayMs(req);
   if (thinkingTime > 0) {
-    await new Promise((resolve) => setTimeout(resolve, Math.min(thinkingTime, 3000)));
+    await new Promise((resolve) => setTimeout(resolve, thinkingTime));
   }
 
   try {
