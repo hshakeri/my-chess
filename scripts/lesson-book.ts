@@ -12,6 +12,7 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { Chess } from 'chess.js';
 import { allCurriculumLessons, curriculumCourses } from '../src/curriculum';
+import { PatternGroup, patternGroupOf, patternPath, inPatternOrder } from '../src/curriculum/patternPath';
 import { plyLabel, replyOptions } from '../src/curriculum/builder';
 import { getRecommendedWhiteRepertoire, getRecommendedBlackRepertoire } from '../src/analytics/repertoire';
 import { CurriculumLesson, CurriculumMove } from '../src/types/curriculum';
@@ -142,7 +143,7 @@ function practiceList(lesson: CurriculumLesson, moves: CurriculumMove[], plyOffs
   return `${html}</ol>`;
 }
 
-function renderLesson(lesson: CurriculumLesson, n: number): string {
+function renderLesson(lesson: CurriculumLesson, n: number, group?: PatternGroup): string {
   const startPly = lesson.startPly ?? 0;
   const prefix = lesson.moves.slice(0, startPly).map((m) => m.san);
   const drillFen = fenAfter(lesson.initialFen, prefix);
@@ -153,7 +154,7 @@ function renderLesson(lesson: CurriculumLesson, n: number): string {
   const branches = collectBranches(lesson.moves, [], startPly);
   const chapter = `${n}. ${lesson.title}`;
 
-  let html = `<section class="chapter"><h2>${esc(chapter)}</h2>`;
+  let html = `<section class="chapter">${group ? groupIntro(group) : ''}<h2>${esc(chapter)}</h2>`;
   html += `<p class="meta">${lesson.eco ? `ECO ${esc(lesson.eco)} · ` : ''}You play ${side === 'w' ? 'White' : 'Black'} · ${esc(lesson.sourceBook)}, ${esc(lesson.author)}${lesson.pagesRef ? ` (${esc(lesson.pagesRef)})` : ''}</p>`;
   if (lesson.subtitle) html += `<p class="lead">${esc(lesson.subtitle)}</p>`;
 
@@ -232,14 +233,24 @@ function renderPlan(plan: RepertoirePlan, n: number): string {
 }
 
 const core = allCurriculumLessons.filter((l) => l.relevance !== 'outside-repertoire');
-const order = (cat: string) => ({ weakness_drill: 0, opening: 1, trap: 2, fundamentals: 3 } as Record<string, number>)[cat] ?? 9;
-const openingLessons = core.filter((l) => l.category !== 'fundamentals').sort((a, b) => order(a.category) - order(b.category));
+// Part I follows the app's study path: lessons grouped by the pattern they repeat
+const openingLessons = inPatternOrder(core.filter((l) => l.category !== 'fundamentals'));
+
+/** The heading that opens a study-path group, printed above the group's first chapter. */
+function groupIntro(group: PatternGroup): string {
+  return `<div class="group"><div class="group-title">Pattern ${patternPath.indexOf(group) + 1} · ${esc(group.title)}</div><p>${esc(group.idea)}</p><p><b>Check before you move:</b> ${esc(group.check)}</p></div>`;
+}
 const library = allCurriculumLessons.filter((l) => l.relevance === 'outside-repertoire');
 
 let n = 0;
 const chapters: string[] = [];
-chapters.push(`<section class="part"><h1>Part I · Your drills and repertoire lessons</h1><p>These chapters come from your own Chess.com games (hoot65) and the openings you actually play. Each one explains the position first; the practice section that follows, for the main line and for every other reply your opponents chose, is meant to be done on a real board with the explanation covered. Answers are in the key at the end.</p></section>`);
-for (const lesson of openingLessons) chapters.push(renderLesson(lesson, ++n));
+chapters.push(`<section class="part"><h1>Part I · Your drills and repertoire lessons</h1><p>These chapters come from your own Chess.com games (hoot65) and the openings you actually play, in the order of the app's study path: lessons that repeat the same pattern follow one another, and each group opens with the check that catches it. Each one explains the position first; the practice section that follows, for the main line and for every other reply your opponents chose, is meant to be done on a real board with the explanation covered. Answers are in the key at the end.</p></section>`);
+let previousGroup: PatternGroup | undefined;
+for (const lesson of openingLessons) {
+  const group = patternGroupOf(lesson.id);
+  chapters.push(renderLesson(lesson, ++n, group !== previousGroup ? group : undefined));
+  previousGroup = group;
+}
 chapters.push(`<section class="part"><h1>Part II · The repertoire plans</h1><p>The full lines behind the lessons: White's Italian with the Evans Gambit and the Anti-Scandinavian, Black's Caro-Kann and the c6-d5 wall against 1.d4, 1.c4 and 1.Nf3.</p></section>`);
 chapters.push(renderPlan(getRecommendedWhiteRepertoire(), ++n));
 chapters.push(renderPlan(getRecommendedBlackRepertoire(), ++n));
@@ -311,6 +322,9 @@ ol.practice li.given { color: #555; }
 .moves { font-size: 10.5pt; }
 ul.notes { padding-left: 14pt; font-size: 9.5pt; }
 .key p { margin-bottom: 3pt; }
+.group { border: 1px solid #0a5c36; padding: 4pt 7pt; margin: 0 0 8pt; }
+.group-title { font: bold 9.5pt Helvetica, Arial, sans-serif; text-transform: uppercase; letter-spacing: .04em; color: #0a5c36; margin-bottom: 2pt; }
+.group p { margin: 0 0 2pt; font-size: 9.5pt; }
 code { font-size: 8.5pt; }
 `;
 

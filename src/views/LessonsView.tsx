@@ -19,10 +19,10 @@ import {
   allCurriculumLessons,
   curriculumCourses,
   scandinavianRefutationDrill,
-  weaknessDrillLessons,
 } from '../curriculum';
 import { positionKey, enumerateDecisions, chooseOpponentReply, DecisionSpec } from '../curriculum/builder';
 import { lessonFromDecision } from '../curriculum/factories';
+import { patternPath, patternGroupOf, inPatternOrder } from '../curriculum/patternPath';
 import { CurriculumLesson, CurriculumMove, CurriculumExercise } from '../types/curriculum';
 import { Chessboard, BoardArrow, BoardHighlight } from '../components/Chessboard';
 import { MoveTree } from '../components/MoveTree';
@@ -915,12 +915,24 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
     []
   );
 
+  // The phone picker lists the core lessons by study-path group, then any core lesson not on the path
+  const pathSections = useMemo(() => {
+    const byId = new Map(allCurriculumLessons.map((l) => [l.id, l] as const));
+    const sections = patternPath.map((g, i) => ({
+      id: g.id,
+      label: `${i + 1}. ${g.title}`,
+      lessons: g.lessonIds.map((id) => byId.get(id)).filter((l): l is CurriculumLesson => l !== undefined),
+    }));
+    const onPath = new Set(patternPath.flatMap((g) => g.lessonIds));
+    const rest = allCurriculumLessons.filter((l) => l.relevance !== 'outside-repertoire' && !onPath.has(l.id));
+    if (rest.length) sections.push({ id: 'other-lessons', label: 'Other lessons', lessons: rest });
+    return sections;
+  }, []);
+
   const filteredLessons = useMemo(() => {
     if (selectedFilter === 'all') {
-      const core = allCurriculumLessons.filter((l) => l.relevance !== 'outside-repertoire');
-      const drills = core.filter((l) => l.category === 'weakness_drill');
-      const rest = core.filter((l) => l.category !== 'weakness_drill');
-      return [...weaknessDrillLessons.filter((d) => drills.includes(d)), ...rest];
+      // The study path: lessons grouped by the pattern they repeat (src/curriculum/patternPath.ts)
+      return inPatternOrder(allCurriculumLessons.filter((l) => l.relevance !== 'outside-repertoire'));
     }
     if (selectedFilter === PATTERN_LIBRARY_ID) return patternLibrary;
     const course = curriculumCourses.find((c) => c.id === selectedFilter);
@@ -1078,68 +1090,84 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
           </div>
 
           <div className="flex flex-col gap-2.5 max-h-[720px] overflow-y-auto custom-scrollbar pr-1">
-            {filteredLessons.map((lesson) => {
+            {filteredLessons.map((lesson, index) => {
               const isSelected = lesson.id === currentLesson.id;
               const isDue = dueLessonIds.has(lesson.id);
+              // In the study path, each pattern group opens with its idea and the check to make
+              const group = selectedFilter === 'all' ? patternGroupOf(lesson.id) : undefined;
+              const opensGroup = group !== undefined && (index === 0 || patternGroupOf(filteredLessons[index - 1].id) !== group);
+              const groupNumber = group ? patternPath.indexOf(group) + 1 : 0;
               return (
-                <div
-                  key={lesson.id}
-                  data-lesson-id={lesson.id}
-                  className={`lesson-card rounded-xl border p-3.5 transition-all cursor-pointer ${
-                    isSelected
-                      ? 'bg-slate-900 border-emerald-500 shadow-md shadow-emerald-950/40 ring-1 ring-emerald-500/50'
-                      : 'bg-slate-900/60 border-slate-800 hover:bg-slate-900 hover:border-slate-700'
-                  }`}
-                  onClick={() => handleSelectLesson(lesson)}
-                >
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-1.5 flex-wrap mb-1">
-                        {lesson.eco && (
-                          <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-semibold bg-slate-800 text-slate-300 border border-slate-700">
-                            {lesson.eco}
-                          </span>
-                        )}
-                        <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 capitalize">
-                          {lesson.category.replace('_', ' ')}
-                        </span>
-                        <span className="text-[10px] text-slate-400 capitalize">{lesson.targetRatingBand}</span>
-                        <span className="text-[10px] text-slate-500">
-                          plays {lesson.targetColor === 'black' ? 'Black' : lesson.targetColor === 'both' ? 'both sides' : 'White'}
-                        </span>
-                        {lesson.relevance === 'outside-repertoire' && (
-                          <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-slate-800 text-slate-400 border border-slate-700">
-                            pattern library
-                          </span>
-                        )}
-                        {isDue && (
-                          <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/30">
-                            due
-                          </span>
-                        )}
+                <React.Fragment key={lesson.id}>
+                  {opensGroup && group && (
+                    <div data-pattern-group={group.id} className={`${index === 0 ? '' : 'mt-2 '}px-1`}>
+                      <div className="text-[11px] font-semibold uppercase tracking-wider text-emerald-400">
+                        {groupNumber}. {group.title}
                       </div>
-                      <button
-                        type="button"
-                        className="lesson-item text-left font-bold text-sm text-white hover:text-emerald-300 line-clamp-1"
-                      >
-                        {lesson.title}
-                      </button>
-                      <p className="text-xs text-slate-400 line-clamp-1 mt-0.5">{lesson.subtitle || lesson.description}</p>
+                      <p className="text-[11px] text-slate-400 mt-0.5">{group.idea}</p>
+                      <p className="text-[11px] text-slate-300 mt-0.5">
+                        <span className="font-semibold text-slate-200">Check:</span> {group.check}
+                      </p>
                     </div>
-                    <ChevronRight
-                      className={`w-4 h-4 mt-1 flex-shrink-0 transition-transform ${
-                        isSelected ? 'text-emerald-400 translate-x-0.5' : 'text-slate-600'
-                      }`}
-                    />
-                  </div>
+                  )}
+                  <div
+                    data-lesson-id={lesson.id}
+                    className={`lesson-card rounded-xl border p-3.5 transition-all cursor-pointer ${
+                      isSelected
+                        ? 'bg-slate-900 border-emerald-500 shadow-md shadow-emerald-950/40 ring-1 ring-emerald-500/50'
+                        : 'bg-slate-900/60 border-slate-800 hover:bg-slate-900 hover:border-slate-700'
+                    }`}
+                    onClick={() => handleSelectLesson(lesson)}
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-1.5 flex-wrap mb-1">
+                          {lesson.eco && (
+                            <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-semibold bg-slate-800 text-slate-300 border border-slate-700">
+                              {lesson.eco}
+                            </span>
+                          )}
+                          <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 capitalize">
+                            {lesson.category.replace('_', ' ')}
+                          </span>
+                          <span className="text-[10px] text-slate-400 capitalize">{lesson.targetRatingBand}</span>
+                          <span className="text-[10px] text-slate-500">
+                            plays {lesson.targetColor === 'black' ? 'Black' : lesson.targetColor === 'both' ? 'both sides' : 'White'}
+                          </span>
+                          {lesson.relevance === 'outside-repertoire' && (
+                            <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-slate-800 text-slate-400 border border-slate-700">
+                              pattern library
+                            </span>
+                          )}
+                          {isDue && (
+                            <span className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                              due
+                            </span>
+                          )}
+                        </div>
+                        <button
+                          type="button"
+                          className="lesson-item text-left font-bold text-sm text-white hover:text-emerald-300 line-clamp-1"
+                        >
+                          {lesson.title}
+                        </button>
+                        <p className="text-xs text-slate-400 line-clamp-1 mt-0.5">{lesson.subtitle || lesson.description}</p>
+                      </div>
+                      <ChevronRight
+                        className={`w-4 h-4 mt-1 flex-shrink-0 transition-transform ${
+                          isSelected ? 'text-emerald-400 translate-x-0.5' : 'text-slate-600'
+                        }`}
+                      />
+                    </div>
 
-                  <div className="mt-2.5 pt-2 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400">
-                    <span className="truncate">
-                      <strong className="text-slate-300">Source:</strong> {lesson.sourceBook}
-                    </span>
-                    <span className="text-slate-500 whitespace-nowrap ml-2">{lesson.author}</span>
+                    <div className="mt-2.5 pt-2 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400">
+                      <span className="truncate">
+                        <strong className="text-slate-300">Source:</strong> {lesson.sourceBook}
+                      </span>
+                      <span className="text-slate-500 whitespace-nowrap ml-2">{lesson.author}</span>
+                    </div>
                   </div>
-                </div>
+                </React.Fragment>
               );
             })}
           </div>
@@ -1162,16 +1190,14 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
                   className="flex-1 min-w-0 bg-slate-900 border border-slate-700 rounded-lg px-2 py-2 text-sm text-white"
                 >
                   {isAdHocLesson && <option value={currentLesson.id}>{currentLesson.title}</option>}
-                  {curriculumCourses.map((c) => (
-                    <optgroup key={c.id} label={courseLabel(c.category)}>
-                      {c.lessons
-                        .filter((l) => l.relevance !== 'outside-repertoire')
-                        .map((l) => (
-                          <option key={l.id} value={l.id}>
-                            {l.title}
-                            {dueLessonIds.has(l.id) ? ' (due)' : ''}
-                          </option>
-                        ))}
+                  {pathSections.map((s) => (
+                    <optgroup key={s.id} label={s.label}>
+                      {s.lessons.map((l) => (
+                        <option key={l.id} value={l.id}>
+                          {l.title}
+                          {dueLessonIds.has(l.id) ? ' (due)' : ''}
+                        </option>
+                      ))}
                     </optgroup>
                   ))}
                   <optgroup label="Pattern Library">

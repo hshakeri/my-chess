@@ -46,7 +46,9 @@ on every push to `main`.
   board (click a node to jump there), hint ladder theme/piece/square, refutation playback on
   mistakes, exercises, per-decision FSRS cards (`src/services/cards.ts`, `sessionQueue.ts`,
   `fenKey.ts`) with inferred ratings, "Due today" review sessions. Phone: lesson picker above the
-  board.
+  board. The default list ("My Lessons") is the study path in `src/curriculum/patternPath.ts`:
+  the 15 core lessons in five groups, each group repeating one pattern and headed by the check that
+  catches it; the phone picker and Part I of the lesson book use the same order.
 - **Printable Worksheets** and the generated **lesson book** (`scripts/lesson-book.ts`).
 
 ## Maintainer decisions already taken (do not reopen)
