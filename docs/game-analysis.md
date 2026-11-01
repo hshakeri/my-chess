@@ -124,8 +124,9 @@ allowing mate in one.
 
 ## Drills from the games
 
-The study path now opens with two drill sets made from hoot65's own positions of the last 120 days
-(`src/data/game_drills.json`, picked by `scripts/game-analysis/drills.mjs`):
+The study path now opens with three drill sets made from hoot65's own positions of the last 120 days
+(`src/data/game_drills.json`, picked by `scripts/game-analysis/drills.mjs`), in the order the checks
+are made at the board:
 
 1. **What does the last move attack?** Twelve positions where the opponent's move put a piece in
    danger (a minor piece or more, undefended or attacked by something cheaper) and hoot65 left it
@@ -134,10 +135,16 @@ The study path now opens with two drill sets made from hoot65's own positions of
 2. **Take what is free.** Twelve positions where an enemy piece could be won and hoot65 did not take
    it: five knights, four bishops, two rooks and a queen (on d1, attacked by a bishop on g4). Two
    of them were recaptures right after the opponent had taken a piece.
+3. **Is your move safe?** Twelve positions where nothing of either side was in danger until hoot65's
+   own move left a piece where it could be taken: six bishops, three knights, two rooks and a queen.
+   Half of those moves took a pawn and gave up the piece for it: three bishop captures on f7, a
+   knight on a6, a rook on g3 and the queen on b5. In nine of the games the opponent took the piece
+   on the next move.
 
 Each position is a one-decision lesson with its own review card. The opponent's last move is
-replayed first, then every move that keeps the material (threats) or wins it (free pieces) is
-accepted, measured by a material search over every legal move and checked again one ply deeper.
+replayed first, then every move that keeps the material (threats, safe moves) or wins it (free
+pieces) is accepted, measured by a material search over every legal move and checked again one ply
+deeper.
 Playing the move from the game shows what it cost: the capture that followed is played out on the
-board. 27 recent positions passed every test, and the twelve newest of each kind were kept, one per
+board. 50 recent positions passed every test, and the twelve newest of each kind were kept, one per
 game. Re-run the scan as more games are played.

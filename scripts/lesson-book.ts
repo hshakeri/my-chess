@@ -2,7 +2,7 @@
  * Builds "The hoot65 Opening Book": every core opening lesson, weakness drill and trap lesson of the
  * curriculum, plus the tailored repertoire lines, as one dense printable document. Each chapter first
  * explains the position (the annotated line, the opponent's known replies, the mistakes to avoid),
- * then gives an over-the-board practice section whose answers sit in a key at the very end. The two
+ * then gives an over-the-board practice section whose answers sit in a key at the very end. The three
  * drill sets from hoot65's games are one chapter each: a page of positions to solve.
  *
  *   npx tsx scripts/lesson-book.ts            -> book/lesson-book.html and book/lesson-book.pdf
@@ -213,7 +213,7 @@ function renderLesson(lesson: CurriculumLesson, n: number, group?: PatternGroup)
   return html;
 }
 
-const drillById = new Map([...gameDrillData.threat, ...gameDrillData.free].map((d) => [`lesson-game-${d.id}`, d] as const));
+const drillById = new Map([...gameDrillData.threat, ...gameDrillData.free, ...gameDrillData.hang].map((d) => [`lesson-game-${d.id}`, d] as const));
 
 /**
  * A drill set from hoot65's games as one chapter: each position as a diagram from the student's side,
@@ -270,7 +270,7 @@ const library = allCurriculumLessons.filter((l) => l.relevance === 'outside-repe
 
 let n = 0;
 const chapters: string[] = [];
-chapters.push(`<section class="part"><h1>Part I · Your drills and repertoire lessons</h1><p>These chapters come from your own Chess.com games (hoot65) and the openings you actually play, in the order of the app's study path: lessons that repeat the same pattern follow one another, and each group opens with the check that catches it. The first two chapters are positions from your recent games: a piece your opponent's move attacked that stayed where it was, and a piece of theirs that could have been won. Each lesson chapter after them explains the position first; the practice section that follows, for the main line and for every other reply your opponents chose, is meant to be done on a real board with the explanation covered. Answers are in the key at the end.</p></section>`);
+chapters.push(`<section class="part"><h1>Part I · Your drills and repertoire lessons</h1><p>These chapters come from your own Chess.com games (hoot65) and the openings you actually play, in the order of the app's study path: lessons that repeat the same pattern follow one another, and each group opens with the check that catches it. The first three chapters are positions from your recent games: a piece your opponent's move attacked that stayed where it was, a piece of theirs that could have been won, and a move of yours that left a piece where it could be taken. Each lesson chapter after them explains the position first; the practice section that follows, for the main line and for every other reply your opponents chose, is meant to be done on a real board with the explanation covered. Answers are in the key at the end.</p></section>`);
 let previousGroup: PatternGroup | undefined;
 const renderedSets = new Set<CurriculumLesson[]>();
 for (const lesson of openingLessons) {

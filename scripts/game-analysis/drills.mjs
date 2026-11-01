@@ -1,12 +1,15 @@
-// Drill positions from hoot65's recent games, for the app's two drill sets:
+// Drill positions from hoot65's recent games, for the app's three drill sets:
 //   threat: the opponent's last move attacked a piece (a minor piece or more) and hoot65 left it there;
-//   free:   an enemy piece could be won and hoot65 did not take it.
+//   free:   an enemy piece could be won and hoot65 did not take it;
+//   hang:   nothing of either side was in danger, and hoot65's move put a piece where it can be taken.
 // Every legal move of a candidate is scored with a material search (captures are followed until the
 // position is quiet). A threat drill accepts the moves that keep the material balance and answer the
 // threat: the piece is safe afterwards, or the move captures or gives check (a quiet move that leaves
 // the piece hanging is not accepted even when a deeper trick saves it). A free drill accepts the moves
 // that win as much as the best one; all of them must be captures and one must take the free piece,
-// otherwise the position is not used. The move played must come out at least two pawns worse.
+// otherwise the position is not used. A hang drill accepts the moves that keep the material balance
+// and leave nothing of hoot65's where it can be taken (or capture, or give check). The move played
+// must come out at least two pawns worse.
 // Accepted moves and the move played are checked again one ply deeper, and the drill keeps only the
 // moves that pass.
 //
@@ -109,6 +112,25 @@ function reaches(fen, san, threshold, depth = DEPTH) {
   return -search(chess, depth, -threshold, -threshold + 1) >= threshold;
 }
 
+/**
+ * The capture that punishes `played` and the square of the piece it takes, in order: the game's reply
+ * when it took one of the pieces on `squares` (earlier squares first), the best reply that takes one,
+ * the game's reply when it captured something else, the best capture.
+ */
+function punishment(fen, played, squares, reply) {
+  const after = new Chess(fen);
+  after.move(played);
+  const takes = (m, sq) => !!m && m.includes('x') && dest(m) === sq;
+  for (const sq of squares) if (takes(reply, sq)) return { refutation: reply, refutationPlayed: true, square: sq };
+  const bestReplies = bestMoves(after.fen()).moves;
+  for (const sq of squares) {
+    const best = bestReplies.find((m) => takes(m, sq));
+    if (best) return { refutation: best, refutationPlayed: false, square: sq };
+  }
+  if (reply && reply.includes('x')) return { refutation: reply, refutationPlayed: true, square: squares[0] };
+  return { refutation: bestReplies.find((m) => m.includes('x')) ?? null, refutationPlayed: false, square: squares[0] };
+}
+
 /** The best score in `fen` and the moves that reach it (null-window tests against the best so far). */
 function bestMoves(fen) {
   const chess = new Chess(fen);
@@ -154,19 +176,23 @@ function scan([gamesFile, featuresFile, outFile, daysArg = '120', shardArg = '0'
       if (wp === undefined || wp < 0.15 || wp > 0.85) continue;
       const last = new Chess(g.fens[p - 1]).move(g.san[p - 1]);
       const wasAttacked = enPrise(new Chess(g.fens[p - 1]), g.me).map((t) => t.square);
-      const threats = last.captured ? [] : enPrise(chess, g.me).filter((t) => !wasAttacked.includes(t.square));
+      const inDanger = enPrise(chess, g.me);
+      const threats = last.captured ? [] : inDanger.filter((t) => !wasAttacked.includes(t.square));
       const frees = enPrise(chess, other(g.me));
-      if (!threats.length && !frees.length) continue;
+      const quiet = inDanger.length === 0 && frees.length === 0;
+      if (!threats.length && !frees.length && !quiet) continue;
       const played = g.san[p];
       // Cheap test first (the rules of features.mjs): the move played left the attacked piece where
-      // it can be taken, or did not take the free piece
+      // it can be taken, did not take the free piece, or (in a quiet position) put a piece in danger
       const after = new Chess(fen);
       const mv = after.move(played);
       const capVal = mv.captured ? V[mv.captured] : 0;
-      const hangAfter = enPrise(after, g.me).map((h) => h.square);
+      const dangerAfter = enPrise(after, g.me);
+      const hangAfter = dangerAfter.map((h) => h.square);
       const leftThreat = threats.filter((t) => hangAfter.includes(t.square) && capVal < t.gain);
       const skippedFree = frees.filter((f) => capVal < f.gain && mv.to !== f.square);
-      if (!leftThreat.length && !skippedFree.length) continue;
+      const leftHanging = quiet ? dangerAfter.filter((h) => capVal < h.gain) : [];
+      if (!leftThreat.length && !skippedFree.length && !leftHanging.length) continue;
 
       const base = material(chess);
       const { best, moves: bestSet } = bestMoves(fen);
@@ -196,21 +222,7 @@ function scan([gamesFile, featuresFile, outFile, daysArg = '120', shardArg = '0'
         const confirmedLoss = !reaches(fen, played, base - MIN_LOSS + 1, CONFIRM_DEPTH);
         const safe = accepted.filter(safeAfter);
         if (safe.length && confirmedLoss) {
-          // The punishment, in order: the game's reply when it took the piece, the best reply that
-          // takes it, the game's reply when it captured something else, the best capture
-          const afterPlayed = new Chess(fen);
-          const playedMove = afterPlayed.move(played);
-          const fenAfter = afterPlayed.fen();
-          const pieceSquare = playedMove.from === t.square ? playedMove.to : t.square;
-          const takesPiece = (m) => m && m.includes('x') && dest(m) === pieceSquare;
-          const bestReplies = bestMoves(fenAfter).moves;
-          const reply = common.reply;
-          let refutation = null;
-          let refutationPlayed = false;
-          if (takesPiece(reply)) [refutation, refutationPlayed] = [reply, true];
-          else if (bestReplies.some(takesPiece)) refutation = bestReplies.find(takesPiece);
-          else if (reply && reply.includes('x')) [refutation, refutationPlayed] = [reply, true];
-          else refutation = bestReplies.find((m) => m.includes('x')) ?? null;
+          const { refutation, refutationPlayed } = punishment(fen, played, [mv.from === t.square ? mv.to : t.square], common.reply);
           // Main answer: a move that leaves the piece safe, preferring a move of the piece itself
           const main = safe.find((m) => new Chess(fen).move(m).from === t.square) ?? safe[0];
           found.push({
@@ -231,37 +243,69 @@ function scan([gamesFile, featuresFile, outFile, daysArg = '120', shardArg = '0'
           found.push({ ...common, kind: 'free', target: f.square, accepted: [takes[0], ...accepted.filter((m) => m !== takes[0])] });
         }
       }
+
+      // Hang: nothing was in danger, and the move played put a piece where it can be taken. Every
+      // move that keeps the balance and leaves nothing in danger (or captures, or checks) is right
+      if (leftHanging.length && best >= base - 50 && playedScore <= base - MIN_LOSS) {
+        const answers = (m) => {
+          const c = new Chess(fen);
+          c.move(m);
+          return enPrise(c, g.me).length === 0 || m.includes('x') || m.includes('+');
+        };
+        const accepted = new Chess(fen)
+          .moves()
+          .filter(answers)
+          .filter((m) => reaches(fen, m, base - 50))
+          .filter((m) => reaches(fen, m, base - 50, CONFIRM_DEPTH));
+        const confirmedLoss = !reaches(fen, played, base - MIN_LOSS + 1, CONFIRM_DEPTH);
+        // The drill names the piece the punishing capture takes, so that capture must take one of them
+        const { refutation, refutationPlayed, square } = punishment(fen, played, leftHanging.map((x) => x.square), common.reply);
+        const caught = !!refutation && refutation.includes('x') && dest(refutation) === square;
+        if (accepted.length && confirmedLoss && caught) {
+          // Main answer: the piece moved in the game, to a square where it is safe, when it can
+          const main = accepted.find((m) => new Chess(fen).move(m).from === mv.from) ?? accepted[0];
+          found.push({
+            ...common, kind: 'hang', target: square,
+            accepted: [main, ...accepted.filter((m) => m !== main)],
+            refutation, refutationPlayed,
+          });
+        }
+      }
     }
   }
   console.error(`shard ${SHARD}: ${recent.length} games in ${((Date.now() - t0) / 1000).toFixed(0)} s, ${found.length} drills`);
   fs.writeFileSync(outFile, JSON.stringify(found, null, 1));
 }
 
-/** Newest first, one drill per game and set, and no position in both sets (the free drill wins). */
+/** Newest first, one drill per game and set, and each position in one set (free, then threat, then hang). */
 function pick([outFile, perSetArg = '12', ...inFiles]) {
   const perSet = Number(perSetArg);
   const all = inFiles.flatMap((f) => JSON.parse(fs.readFileSync(f, 'utf8'))).sort((a, b) => b.end - a.end || b.ply - a.ply);
-  const freeKeys = new Set(all.filter((d) => d.kind === 'free').map((d) => `${d.url}#${d.ply}`));
-  const out = { threat: [], free: [] };
+  const keysOf = (kind) => new Set(all.filter((d) => d.kind === kind).map((d) => `${d.url}#${d.ply}`));
+  const freeKeys = keysOf('free');
+  const threatKeys = keysOf('threat');
+  const out = { threat: [], free: [], hang: [] };
   for (const d of all) {
     const set = out[d.kind];
+    const key = `${d.url}#${d.ply}`;
     if (set.length >= perSet || set.some((x) => x.url === d.url)) continue;
-    if (d.kind === 'threat' && freeKeys.has(`${d.url}#${d.ply}`)) continue;
+    if (d.kind !== 'free' && freeKeys.has(key)) continue;
+    if (d.kind === 'hang' && threatKeys.has(key)) continue;
     const drill = {
       id: `${d.kind}-${d.url.split('/').pop()}-${d.ply}`,
       url: d.url, date: d.date, opponent: d.opponent, color: d.color,
       fenBefore: d.fenBefore, lastSan: d.lastSan, played: d.played, accepted: d.accepted, target: d.target,
     };
-    if (d.kind === 'threat') Object.assign(drill, { refutation: d.refutation, refutationPlayed: d.refutationPlayed });
-    else drill.reply = d.reply;
+    if (d.kind === 'free') drill.reply = d.reply;
+    else Object.assign(drill, { refutation: d.refutation, refutationPlayed: d.refutationPlayed });
     set.push(drill);
   }
-  const dates = [...out.threat, ...out.free].map((d) => d.date).sort();
+  const dates = [...out.threat, ...out.free, ...out.hang].map((d) => d.date).sort();
   fs.writeFileSync(
     outFile,
     JSON.stringify({ source: 'hoot65 Chess.com archive', from: dates[0], to: dates[dates.length - 1], ...out }, null, 2) + '\n'
   );
-  console.error(`threat ${out.threat.length}, free ${out.free.length} (of ${all.length})`);
+  console.error(`threat ${out.threat.length}, free ${out.free.length}, hang ${out.hang.length} (of ${all.length})`);
 }
 
 const [mode, ...args] = process.argv.slice(2);

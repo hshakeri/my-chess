@@ -5,9 +5,10 @@ import { mentionsMove } from './factories';
 import drillFile from '../data/game_drills.json';
 
 /**
- * Two drill sets from hoot65's own recent games, picked by `scripts/game-analysis/drills.mjs` (see
+ * Three drill sets from hoot65's own recent games, picked by `scripts/game-analysis/drills.mjs` (see
  * docs/game-analysis.md): positions where the opponent's last move attacked a piece and hoot65 left
- * it there, and positions where an enemy piece could be won and hoot65 did not take it.
+ * it there, positions where an enemy piece could be won and hoot65 did not take it, and positions
+ * where nothing was in danger until hoot65's own move left a piece where it could be taken.
  *
  * Each position is a one-decision lesson. The opponent's last move is replayed, then every move the
  * script's material search accepted is right, and the move played in the game is answered with what
@@ -29,11 +30,11 @@ export interface GameDrill {
   played: string;
   /** Every right answer, the main one first. */
   accepted: string[];
-  /** Threat: the attacked piece of hoot65's; free: the enemy piece that could be won. */
+  /** Threat: the attacked piece of hoot65's; free: the enemy piece that could be won; hang: the piece the move played left in danger. */
   target: string;
-  /** Threat only: the capture that punishes the move played. */
+  /** Threat and hang: the capture that punishes the move played. */
   refutation?: string | null;
-  /** Threat only: whether the opponent played that capture in the game. */
+  /** Threat and hang: whether the opponent played that capture in the game. */
   refutationPlayed?: boolean;
   /** Free only: the opponent's reply in the game. */
   reply?: string | null;
@@ -45,6 +46,7 @@ interface GameDrillFile {
   to: string;
   threat: GameDrill[];
   free: GameDrill[];
+  hang: GameDrill[];
 }
 
 export const gameDrillData = drillFile as GameDrillFile;
@@ -108,17 +110,21 @@ function isLoose(chess: Chess, square: Square): boolean {
   return chess.attackers(square, piece.color).length === 0 || VALUE[attacker.type] < VALUE[piece.type];
 }
 
-/** `color`'s pieces (a minor piece or more) that can be won in `now` and could not be in `before`, most valuable first. */
-function newlyLoose(now: Chess, before: Chess, color: 'w' | 'b') {
+/** `color`'s pieces (a minor piece or more) that can be won in `chess`, most valuable first. */
+function looseOf(chess: Chess, color: 'w' | 'b') {
   const out: Array<{ square: Square; piece: string; value: number; attacker: { square: Square; type: string } }> = [];
-  for (const row of now.board()) {
+  for (const row of chess.board()) {
     for (const pc of row) {
-      if (!pc || pc.color !== color || pc.type === 'p' || pc.type === 'k') continue;
-      if (!isLoose(now, pc.square) || isLoose(before, pc.square)) continue;
-      out.push({ square: pc.square, piece: NAME[pc.type], value: VALUE[pc.type], attacker: cheapestAttacker(now, pc.square, color === 'w' ? 'b' : 'w')! });
+      if (!pc || pc.color !== color || pc.type === 'p' || pc.type === 'k' || !isLoose(chess, pc.square)) continue;
+      out.push({ square: pc.square, piece: NAME[pc.type], value: VALUE[pc.type], attacker: cheapestAttacker(chess, pc.square, color === 'w' ? 'b' : 'w')! });
     }
   }
   return out.sort((a, b) => b.value - a.value);
+}
+
+/** `color`'s pieces that can be won in `now` and could not be from the same square in `before`, most valuable first. */
+function newlyLoose(now: Chess, before: Chess, color: 'w' | 'b') {
+  return looseOf(now, color).filter((x) => !isLoose(before, x.square));
 }
 
 const PREFIX = 'lesson-game-';
@@ -127,7 +133,7 @@ const PREFIX = 'lesson-game-';
 export const isGameDrill = (lessonId: string): boolean => lessonId.startsWith(PREFIX);
 
 /** A drill position as a one-decision lesson. */
-export function lessonFromGameDrill(d: GameDrill, kind: 'threat' | 'free'): CurriculumLesson {
+export function lessonFromGameDrill(d: GameDrill, kind: 'threat' | 'free' | 'hang'): CurriculumLesson {
   const me: 'w' | 'b' = d.color === 'white' ? 'w' : 'b';
   const them: 'w' | 'b' = me === 'w' ? 'b' : 'w';
   const { chess: board, move: last } = play(d, d.fenBefore, d.lastSan);
@@ -152,44 +158,7 @@ export function lessonFromGameDrill(d: GameDrill, kind: 'threat' | 'free'): Curr
   let otherWrong: string;
   const mistakes: MistakeTrapInput[] = [];
 
-  if (kind === 'threat') {
-    const loose = whyLoose(d, board, target, them);
-    if (board.get(target)?.color !== me) fail(d, `the piece on ${target} is not ${d.color}'s`);
-    // Everything the last move put in danger: the moved piece's own attacks, then lines it opened
-    const endangered = newlyLoose(board, new Chess(d.fenBefore), me);
-    if (!endangered.some((x) => x.square === target)) fail(d, `the piece on ${target} was not put in danger by ${d.lastSan}`);
-    const hit = endangered.filter((x) => board.attackers(x.square, them).includes(last.to as Square));
-    const opened = endangered.filter((x) => !hit.includes(x));
-    const parts: string[] = [];
-    if (hit.length) parts.push(`attacked ${listOf(hit.map((x) => `the ${x.piece} on ${x.square}`))}`);
-    for (const x of opened) parts.push(`opened the line of the ${NAME[x.attacker.type]} on ${x.attacker.square} to the ${x.piece} on ${x.square}`);
-    const opener = `${lastLabel} ${parts.join(', and ')}`;
-    const reason = loose.defended
-      ? `. A ${NAME[loose.attacker.type]} is worth less than a ${loose.piece}, so the ${loose.piece} on ${target} could be won.`
-      : `. Nothing defended the ${loose.piece} on ${target}.`;
-    if (!d.refutation) fail(d, 'no refutation');
-    const punish = play(d, playedMove.chess.fen(), d.refutation!);
-    if (!punish.move.captured) fail(d, `the refutation ${d.refutation} captures nothing`);
-    const punishLabel = plyLabel(playedMove.chess.fen(), 0, punish.move.san);
-    const took = captureText(punish.move);
-    opponentNote = `${lastLabel} in your game vs ${d.opponent}. What does it attack?`;
-    rightNote = d.refutationPlayed
-      ? `In the game you played ${playedLabel}, and ${punishLabel} took ${took}.`
-      : `In the game you played ${playedLabel}; ${punishLabel} would have taken ${took}.`;
-    playedNote = `This is what you played vs ${d.opponent} on ${d.date}: ${punishLabel} takes ${took}.`;
-    takeaway = `After every opponent move, ask what it attacks. ${opener}${reason}`;
-    hintTheme = `${lastLabel} attacks one of your pieces.`;
-    otherWrong = `Not this one. What does ${lastLabel} attack, and is it defended?`;
-    mistakes.push({
-      triggerFen: fen,
-      attemptedSan: playedMove.move.san,
-      isTrap: false,
-      severity: 'blunder',
-      explanatoryFeedback: playedNote,
-      refutationSanList: [punish.move.san],
-      punishmentSummary: '',
-    });
-  } else {
+  if (kind === 'free') {
     const loose = whyLoose(d, board, target, me);
     if (board.get(target)?.color !== them) fail(d, `the piece on ${target} is not the opponent's`);
     const takes = accepted.filter((san) => {
@@ -214,6 +183,60 @@ export function lessonFromGameDrill(d: GameDrill, kind: 'threat' | 'free'): Curr
     takeaway = `Before every move, look for a piece of theirs that can be won. Here the ${loose.piece} on ${target} could be taken: ${reason}.`;
     hintTheme = 'One of the opponent’s pieces can be won.';
     otherWrong = 'Not this one. Look at each of the opponent’s pieces: what attacks it, and what defends it?';
+  } else {
+    // A threat or a hang drill: the move played let the opponent capture, and that capture is replayed
+    if (!d.refutation) fail(d, 'no refutation');
+    const punish = play(d, playedMove.chess.fen(), d.refutation!);
+    if (!punish.move.captured) fail(d, `the refutation ${d.refutation} captures nothing`);
+    const punishLabel = plyLabel(playedMove.chess.fen(), 0, punish.move.san);
+    const took = captureText(punish.move);
+    rightNote = d.refutationPlayed
+      ? `In the game you played ${playedLabel}, and ${punishLabel} took ${took}.`
+      : `In the game you played ${playedLabel}; ${punishLabel} would have taken ${took}.`;
+    playedNote = `This is what you played vs ${d.opponent} on ${d.date}: ${punishLabel} takes ${took}.`;
+    mistakes.push({
+      triggerFen: fen,
+      attemptedSan: playedMove.move.san,
+      isTrap: false,
+      severity: 'blunder',
+      explanatoryFeedback: playedNote,
+      refutationSanList: [punish.move.san],
+      punishmentSummary: '',
+    });
+
+    if (kind === 'threat') {
+      const loose = whyLoose(d, board, target, them);
+      if (board.get(target)?.color !== me) fail(d, `the piece on ${target} is not ${d.color}'s`);
+      // Everything the last move put in danger: the moved piece's own attacks, then lines it opened
+      const endangered = newlyLoose(board, new Chess(d.fenBefore), me);
+      if (!endangered.some((x) => x.square === target)) fail(d, `the piece on ${target} was not put in danger by ${d.lastSan}`);
+      const hit = endangered.filter((x) => board.attackers(x.square, them).includes(last.to as Square));
+      const opened = endangered.filter((x) => !hit.includes(x));
+      const parts: string[] = [];
+      if (hit.length) parts.push(`attacked ${listOf(hit.map((x) => `the ${x.piece} on ${x.square}`))}`);
+      for (const x of opened) parts.push(`opened the line of the ${NAME[x.attacker.type]} on ${x.attacker.square} to the ${x.piece} on ${x.square}`);
+      const opener = `${lastLabel} ${parts.join(', and ')}`;
+      const reason = loose.defended
+        ? `. A ${NAME[loose.attacker.type]} is worth less than a ${loose.piece}, so the ${loose.piece} on ${target} could be won.`
+        : `. Nothing defended the ${loose.piece} on ${target}.`;
+      opponentNote = `${lastLabel} in your game vs ${d.opponent}. What does it attack?`;
+      takeaway = `After every opponent move, ask what it attacks. ${opener}${reason}`;
+      hintTheme = `${lastLabel} attacks one of your pieces.`;
+      otherWrong = `Not this one. What does ${lastLabel} attack, and is it defended?`;
+    } else {
+      // Nothing of either side was in danger; the move played put the piece on the target square in danger
+      if (looseOf(board, me).length || looseOf(board, them).length) fail(d, 'something was already in danger before the move');
+      if (playedMove.chess.get(target)?.color !== me) fail(d, `the piece on ${target} is not ${d.color}'s after ${d.played}`);
+      if (!newlyLoose(playedMove.chess, board, me).some((x) => x.square === target)) fail(d, `${d.played} did not put the piece on ${target} in danger`);
+      const loose = whyLoose(d, playedMove.chess, target, them);
+      const reason = loose.defended
+        ? `the ${NAME[loose.attacker.type]} on ${loose.attacker.square} attacked it, and a ${NAME[loose.attacker.type]} is worth less than a ${loose.piece}`
+        : 'nothing defended it';
+      opponentNote = `${lastLabel} in your game vs ${d.opponent}. Before you move: what could they take after your move?`;
+      takeaway = `Before every move, ask what your opponent could take after it. After ${playedLabel}, the ${loose.piece} on ${target} could be taken: ${reason}.`;
+      hintTheme = 'Before you play a move, check what your opponent could take after it.';
+      otherWrong = 'Not this one. After it, what could your opponent take?';
+    }
   }
 
   // Every legal move that is not an answer gets the drill's own question; the game move gets its story
@@ -240,7 +263,12 @@ export function lessonFromGameDrill(d: GameDrill, kind: 'threat' | 'free'): Curr
   return buildVerifiedLesson({
     id: `${PREFIX}${d.id}`,
     title,
-    subtitle: kind === 'threat' ? `${d.date} · What does ${lastLabel} attack?` : `${d.date} · Can you win something?`,
+    subtitle:
+      kind === 'threat'
+        ? `${d.date} · What does ${lastLabel} attack?`
+        : kind === 'free'
+          ? `${d.date} · Can you win something?`
+          : `${d.date} · Is your move safe?`,
     category: 'weakness_drill',
     sourceBook: 'hoot65 Chess.com archive',
     author: 'hoot65 game analysis',
@@ -248,7 +276,12 @@ export function lessonFromGameDrill(d: GameDrill, kind: 'threat' | 'free'): Curr
     initialFen: d.fenBefore,
     description: `${sideName} in your game vs ${d.opponent} on ${d.date} (${d.url}).`,
     thematicObjective: takeaway,
-    keyTacticalMotif: kind === 'threat' ? 'Answer the threat: move or guard the attacked piece' : 'Win the loose piece',
+    keyTacticalMotif:
+      kind === 'threat'
+        ? 'Answer the threat: move or guard the attacked piece'
+        : kind === 'free'
+          ? 'Win the loose piece'
+          : 'Blunder check: leave nothing where it can be taken',
     targetColor: d.color,
     targetRatingBand: 'beginner',
     startPly: 0,
@@ -265,11 +298,12 @@ export const missedThreatLessons: CurriculumLesson[] = gameDrillData.threat.map(
 /** Free-piece drills: an enemy piece could be won and was not taken. */
 export const freePieceLessons: CurriculumLesson[] = gameDrillData.free.map((d) => lessonFromGameDrill(d, 'free'));
 
-export const gameDrillLessons: CurriculumLesson[] = [...missedThreatLessons, ...freePieceLessons];
+/** Hanging-move drills: nothing was in danger, and the move played left a piece where it could be taken. */
+export const hangingMoveLessons: CurriculumLesson[] = gameDrillData.hang.map((d) => lessonFromGameDrill(d, 'hang'));
 
-/** The drill set a lesson belongs to (the threat or the free-piece set), if it is a game drill. */
+export const gameDrillLessons: CurriculumLesson[] = [...missedThreatLessons, ...freePieceLessons, ...hangingMoveLessons];
+
+/** The drill set a lesson belongs to (threats, free pieces or hanging moves), if it is a game drill. */
 export function drillSetOf(lessonId: string): CurriculumLesson[] | undefined {
-  if (missedThreatLessons.some((l) => l.id === lessonId)) return missedThreatLessons;
-  if (freePieceLessons.some((l) => l.id === lessonId)) return freePieceLessons;
-  return undefined;
+  return [missedThreatLessons, freePieceLessons, hangingMoveLessons].find((set) => set.some((l) => l.id === lessonId));
 }

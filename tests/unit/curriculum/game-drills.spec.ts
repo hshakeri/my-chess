@@ -4,6 +4,7 @@ import {
   gameDrillData,
   missedThreatLessons,
   freePieceLessons,
+  hangingMoveLessons,
   gameDrillLessons,
   drillSetOf,
   isGameDrill,
@@ -73,6 +74,7 @@ describe('Drill positions from hoot65 games: the data', () => {
     for (const [kind, set] of [
       ['threat', gameDrillData.threat],
       ['free', gameDrillData.free],
+      ['hang', gameDrillData.hang],
     ] as const) {
       expect(set).toHaveLength(12);
       const dates = set.map((d) => d.date);
@@ -88,8 +90,9 @@ describe('Drill positions from hoot65 games: the data', () => {
       }
       expect(new Set(set.map((d) => d.url)).size, `${kind}: one position per game`).toBe(set.length);
     }
-    const keys = (set: GameDrill[]) => set.map((d) => d.id.slice(d.id.indexOf('-') + 1));
-    expect(keys(gameDrillData.threat).filter((k) => keys(gameDrillData.free).includes(k))).toEqual([]);
+    // A position belongs to one set only
+    const keys = [gameDrillData.threat, gameDrillData.free, gameDrillData.hang].flatMap((set) => set.map((d) => d.id.slice(d.id.indexOf('-') + 1)));
+    expect(new Set(keys).size).toBe(keys.length);
   });
 
   it('threat: the last move put a piece in danger, the move played left it there, every answer meets the threat', () => {
@@ -134,11 +137,38 @@ describe('Drill positions from hoot65 games: the data', () => {
       expect(after(fen, d.played).move.to).not.toBe(target);
     }
   });
+
+  it('hang: nothing was in danger, the move played left a piece to take, every answer leaves nothing to take', () => {
+    const looseOf = (chess: Chess, color: 'w' | 'b') =>
+      chess.board().flat().filter((pc) => pc && pc.color === color && 'nbrq'.includes(pc.type) && loose(chess, pc.square));
+    for (const d of gameDrillData.hang) {
+      const { chess, fen, me } = decision(d);
+      expect(looseOf(chess, me), `${d.id}: nothing of yours in danger`).toEqual([]);
+      expect(looseOf(chess, other(me)), `${d.id}: nothing of theirs to take`).toEqual([]);
+
+      const played = after(fen, d.played);
+      const target = d.target as Square;
+      const piece = played.chess.get(target);
+      expect(piece?.color, d.id).toBe(me);
+      expect(['n', 'b', 'r', 'q']).toContain(piece!.type);
+      expect(loose(played.chess, target), `${d.id}: ${d.played} left the piece on ${target} to take`).toBe(true);
+      // Not a fair trade: whatever the move captured is worth less than the piece it left
+      expect(played.move.captured ? VALUE[played.move.captured] : 0).toBeLessThan(VALUE[piece!.type]);
+      expect(d.accepted.map((s) => after(fen, s).move.san)).not.toContain(played.move.san);
+      const punish = after(played.fen, d.refutation!);
+      expect(punish.move.captured, `${d.id}: ${d.refutation} captures`).toBeTruthy();
+
+      for (const san of d.accepted) {
+        const { chess: c, move } = after(fen, san);
+        expect(looseOf(c, me).length === 0 || !!move.captured || c.inCheck(), `${d.id}: ${san} leaves nothing to take`).toBe(true);
+      }
+    }
+  });
 });
 
 describe('Drill positions from hoot65 games: the lessons', () => {
   it('each position is a one-decision lesson: the opponent move is replayed, then every answer is accepted', () => {
-    for (const d of [...gameDrillData.threat, ...gameDrillData.free]) {
+    for (const d of [...gameDrillData.threat, ...gameDrillData.free, ...gameDrillData.hang]) {
       const l = lessonOf(d);
       const { fen, last } = decision(d);
       expect(l.initialFen).toBe(d.fenBefore);
@@ -249,20 +279,63 @@ describe('Drill positions from hoot65 games: the lessons', () => {
       expect(l.moves[1].annotation).toBe(`${story}.`);
     }
   });
+
+  it('hang text: what the move played left to take and why, and the capture that followed', () => {
+    for (const d of gameDrillData.hang) {
+      const l = lessonOf(d);
+      const { fen, last, me } = decision(d);
+      const played = after(fen, d.played);
+      const target = d.target as Square;
+      const name = NAME[played.chess.get(target)!.type];
+      const playedLabel = plyLabel(fen, 0, played.move.san);
+      expect(l.moves[0].annotation).toBe(
+        `${plyLabel(d.fenBefore, 0, last.san)} in your game vs ${d.opponent}. Before you move: what could they take after your move?`
+      );
+      const lead = `Before every move, ask what your opponent could take after it. After ${playedLabel}, the ${name} on ${target} could be taken: `;
+      const takeaway = l.thematicObjective ?? '';
+      expect(takeaway.startsWith(lead), l.id).toBe(true);
+      const why = takeaway.slice(lead.length);
+      if (why === 'nothing defended it.') {
+        expect(played.chess.attackers(target, me)).toEqual([]);
+      } else {
+        const m = why.match(/^the (\w+) on ([a-h][1-8]) attacked it, and a (\w+) is worth less than a (\w+)\.$/);
+        expect(m, l.id).not.toBeNull();
+        const att = cheapest(played.chess, target, other(me))!;
+        expect([m![1], m![2], m![3], m![4]]).toEqual([NAME[att.type], att.square, NAME[att.type], name]);
+        expect(VALUE[att.type]).toBeLessThan(VALUE[played.chess.get(target)!.type]);
+      }
+
+      const punish = after(played.fen, d.refutation!);
+      const took = `the ${NAME[punish.move.captured!]} on ${punish.move.to}`;
+      const punishLabel = plyLabel(played.fen, 0, punish.move.san);
+      expect(l.moves[1].annotation).toBe(
+        d.refutationPlayed
+          ? `In the game you played ${playedLabel}, and ${punishLabel} took ${took}.`
+          : `In the game you played ${playedLabel}; ${punishLabel} would have taken ${took}.`
+      );
+      expect(playedNote(l, d)).toBe(`This is what you played vs ${d.opponent} on ${d.date}: ${punishLabel} takes ${took}.`);
+      expect(l.commonMistakesAndTraps).toEqual([
+        expect.objectContaining({ triggerFen: fen, attemptedSan: played.move.san, refutationSanList: [punish.move.san] }),
+      ]);
+    }
+  });
 });
 
 describe('Drill positions from hoot65 games: where they appear', () => {
-  it('opens the study path with the two sets, newest first, and lists them as a course', () => {
+  it('opens the study path with the three sets, newest first, and lists them as a course', () => {
     expect(patternPath[0].lessonIds).toEqual(gameDrillData.threat.map((d) => `lesson-game-${d.id}`));
     expect(patternPath[1].lessonIds).toEqual(gameDrillData.free.map((d) => `lesson-game-${d.id}`));
+    expect(patternPath[2].lessonIds).toEqual(gameDrillData.hang.map((d) => `lesson-game-${d.id}`));
     expect(missedThreatLessons.map((l) => l.id)).toEqual(patternPath[0].lessonIds);
     expect(freePieceLessons.map((l) => l.id)).toEqual(patternPath[1].lessonIds);
+    expect(hangingMoveLessons.map((l) => l.id)).toEqual(patternPath[2].lessonIds);
     for (const l of gameDrillLessons) {
       expect(isGameDrill(l.id)).toBe(true);
       expect(allCurriculumLessons).toContain(l);
     }
     expect(drillSetOf(missedThreatLessons[3].id)).toBe(missedThreatLessons);
     expect(drillSetOf(freePieceLessons[0].id)).toBe(freePieceLessons);
+    expect(drillSetOf(hangingMoveLessons[5].id)).toBe(hangingMoveLessons);
     expect(drillSetOf('lesson-legals-mate')).toBeUndefined();
     expect(allCurriculumLessons.filter((l) => !isGameDrill(l.id)).every((l) => drillSetOf(l.id) === undefined)).toBe(true);
     expect(curriculumCourses.find((c) => c.id === 'course-game-drills')?.lessons).toEqual(gameDrillLessons);

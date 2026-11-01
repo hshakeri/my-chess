@@ -29,18 +29,21 @@ app build. The results and what they mean are in `docs/game-analysis.md`.
    the better move, and the outcomes are compared. The simulated games are independent of the
    estimates that picked the better move, so they also measure the selection bias directly.
 
-8. **Drills** (`drills.mjs`): positions for the app's two drill sets, from the last 120 days. A
+8. **Drills** (`drills.mjs`): positions for the app's three drill sets, from the last 120 days. A
    threat drill is a position where the opponent's last move put a piece (a minor piece or more) in
    danger and hoot65 left it there; a free drill is a position where an enemy piece could be won and
-   was not taken. Only positions where the game was still open count (Maia between 15% and 85%).
-   Every legal move is scored with a material search (two plies, then captures until quiet), and
-   the accepted moves and the move played are checked again one ply deeper. A threat drill accepts
-   the moves that keep the material balance and answer the threat (the piece is safe afterwards, or
-   the move captures or checks); a free drill accepts the moves that win as much as the best one,
-   which must all be captures, one of them of the free piece. The move played must come out at
-   least two pawns worse. `pick` keeps the twelve newest per set, one per game, and writes
-   `src/data/game_drills.json`; `src/curriculum/gameDrills.ts` turns each into a lesson and states
-   only facts it works out from the position with chess.js.
+   was not taken; a hang drill is a position where nothing of either side was in danger until
+   hoot65's own move left a piece where it could be taken. Only positions where the game was still
+   open count (Maia between 15% and 85%). Every legal move is scored with a material search (two
+   plies, then captures until quiet), and the accepted moves and the move played are checked again
+   one ply deeper. A threat drill accepts the moves that keep the material balance and answer the
+   threat (the piece is safe afterwards, or the move captures or checks); a free drill accepts the
+   moves that win as much as the best one, which must all be captures, one of them of the free
+   piece; a hang drill accepts the moves that keep the balance and leave nothing in danger (or
+   capture, or check), and the capture that punishes the move played must take the piece it left.
+   The move played must come out at least two pawns worse. `pick` keeps the twelve newest per set,
+   one per game, and writes `src/data/game_drills.json`; `src/curriculum/gameDrills.ts` turns each
+   into a lesson and states only facts it works out from the position with chess.js.
 
 Weights: a game's weight halves every 180 days (`HALF_LIFE` environment variable).
 Ratings: Maia is trained on Lichess games, so Chess.com ratings get +400 before they reach Maia
@@ -68,4 +71,4 @@ node drills.mjs pick ../../src/data/game_drills.json 12 drills-*.json
 ```
 
 On an 8-core laptop the Maia pass over 230,000 positions takes about 20 minutes, the candidate
-pass and the simulation about 15 minutes each, and the drill scan about 3 minutes.
+pass and the simulation about 15 minutes each, and the drill scan about 8 minutes.

@@ -1,5 +1,5 @@
 import { CurriculumLesson } from '../types/curriculum';
-import { missedThreatLessons, freePieceLessons } from './gameDrills';
+import { missedThreatLessons, freePieceLessons, hangingMoveLessons } from './gameDrills';
 
 /**
  * The study path: the core lessons grouped by the pattern they repeat, in the order to learn them.
@@ -10,9 +10,10 @@ import { missedThreatLessons, freePieceLessons } from './gameDrills';
  *
  * Group order follows docs/game-analysis.md, which measured hoot65's archive with the Maia model:
  * the costliest board checks in recent games are a piece left where it can be taken, a threat not
- * answered and a free piece not taken. The path opens with those two checks drilled on positions
- * from hoot65's own games (src/curriculum/gameDrills.ts), then the two loose-piece groups of the
- * opening lessons; allowing mate in one is rarer but costs the most each time, so the king in the
+ * answered and a free piece not taken. The path opens with those checks drilled on positions from
+ * hoot65's own games (src/curriculum/gameDrills.ts), in the order they are made at the board: what
+ * the opponent's move attacks, what can be taken, and whether the move about to be played leaves
+ * anything to take. The two loose-piece groups of the opening lessons follow; allowing mate in one is rarer but costs the most each time, so the king in the
  * centre comes next; the structure group and finishing technique follow.
  */
 export interface PatternGroup {
@@ -42,6 +43,14 @@ export const patternPath: PatternGroup[] = [
       'Positions from your own recent games: a piece of the opponent\'s could be won, because nothing defended it or something cheaper of yours attacked it, and it was not taken.',
     check: 'Before every move: is a piece of theirs undefended, or attacked by something cheaper?',
     lessonIds: freePieceLessons.map((l) => l.id),
+  },
+  {
+    id: 'pattern-is-your-move-safe',
+    title: 'Is your move safe?',
+    idea:
+      'Positions from your own recent games: nothing was in danger, and your move left a piece where it could be taken, because nothing defended it or something cheaper attacked it.',
+    check: 'Before every move: after it, what could your opponent take?',
+    lessonIds: hangingMoveLessons.map((l) => l.id),
   },
   {
     id: 'pattern-queen-takes-on-g4',
