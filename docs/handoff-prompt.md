@@ -15,7 +15,7 @@ on every push to `main`.
 
 - React 18 + Vite 6 + TypeScript (strict) + Tailwind; chess.js 1.4; Dexie 4 (IndexedDB); ts-fsrs 5
   for scheduling; maia3-js + onnxruntime-web in a Web Worker for the human-like engine.
-- Tests: Vitest (`npm test`, 293 tests: SSR `renderToString` specs, jsdom interaction specs under
+- Tests: Vitest (`npm test`, 307 tests: SSR `renderToString` specs, jsdom interaction specs under
   `tests/unit/curriculum/lessons-view-interactions.spec.tsx`, fake-indexeddb for the database) and
   Playwright (`npm run test:e2e`, 76 tests incl. iPhone-viewport tests). Keep both green or update
   tests deliberately and say why.
@@ -88,6 +88,22 @@ As Black:
 4. Caro-Kann Classical 3.Nc3 dxe4 4.Nxe4 Bf5 (4 games, 25%): short line, drill until automatic.
 5. Pirc/Philidor 1...d6 (41 games, 49%): no new content; fold into 1...c6 over time.
 6. 1.c4 / 1.Nf3 (13 games, 46%): answer ...c6 and ...d5, same wall; a short lesson later.
+
+Status (2026-11-01): White 1-5 and Black 1-4 are done.
+- White 1-3: the Evans lesson has a 5...Ba5 branch (6.d4 exd4 7.O-O Nge7 8.cxd4 d5 9.exd5 Nxd5
+  10.Ba3), four decisions each against 3...h6 and 3...Nf6 with an exercise each, and the
+  Scandinavian drill has exercises for 3...Qd8 and 3...Qe6+.
+- White 4: `lesson-blackburne-shilling-drill` (weakness drill) has 4.Nxd4 exd4 5.c3 as its main
+  line, with feedback for the 5.Qf3 played in all three archived games.
+- White 5: `lesson-alapin-sicilian-centre` (`src/curriculum/antiSicilian.ts`), 2.c3 and 3.d4,
+  branches weighted by Black's second move in the archived Sicilians.
+- Black 1-4: six lessons in `src/curriculum/blackRepertoire.ts` (course `course-black-repertoire`):
+  the wall vs the London, 2.c4 (Slav) and 2.Nc3/2.Bg5, and the Caro-Kann Advance, ...Bg4 timing vs
+  2.Nf3/2.Nc3, and Classical. The repertoire lines open these lessons through
+  `src/curriculum/repertoireLessons.ts`; the Advance plan line now mirrors the lesson.
+- `tests/unit/curriculum/study-order.spec.ts` replays every archive count used as a branch weight
+  and every fact the new exercises state.
+Next: Black 6 (a short 1.c4/1.Nf3 wall lesson), then the roadmap below.
 
 ## Roadmap items not yet built (see `docs/pedagogy-audit.md` Section 7)
 
