@@ -5,6 +5,7 @@ import { trapLessons } from './traps';
 import { fundamentalsLessons } from './fundamentals';
 import { weaknessDrillLessons } from './drills';
 import { antiSicilianLessons } from './antiSicilian';
+import { blackRepertoireLessons } from './blackRepertoire';
 
 export * from './builder';
 export * from './openings';
@@ -13,6 +14,7 @@ export * from './traps';
 export * from './fundamentals';
 export * from './drills';
 export * from './antiSicilian';
+export * from './blackRepertoire';
 export * from './worksheetsData';
 
 /**
@@ -21,6 +23,7 @@ export * from './worksheetsData';
 export const allCurriculumLessons: CurriculumLesson[] = [
   ...openingLessons,
   ...antiSicilianLessons,
+  ...blackRepertoireLessons,
   ...antiGambitLessons,
   ...trapLessons,
   ...fundamentalsLessons,
@@ -47,6 +50,23 @@ export const curriculumCourses: ChessCurriculumCourse[] = [
       pagesRef: 'Scotch Gambit, Evans Gambit and Najdorf 6.h3 chapters',
     },
     lessons: [...openingLessons, ...antiSicilianLessons],
+  },
+  {
+    id: 'course-black-repertoire',
+    title: 'Black Repertoire: Caro-Kann & the c6-d5 Wall',
+    subtitle: 'One structure against 1.e4 and 1.d4: pawns on c6 and d5, the bishop out before ...e6',
+    category: 'black_repertoire',
+    targetColor: 'black',
+    targetRatingBand: 'intermediate',
+    description:
+      'The lines hoot65 reaches as Black, weighted by his own games: the wall against the London, 2.c4, 2.Nc3 and 2.Bg5, and the Caro-Kann against the Advance, the Classical, and 2.Nf3 or 2.Nc3 with the question of when ...Bg4 is safe.',
+    sourceAttribution: {
+      bookTitle: 'Chess.com Live Archive',
+      author: 'hoot65 Diagnostic Analysis',
+      publicationYear: 2026,
+      pagesRef: 'Repertoire plan: Caro-Kann & the c6-d5 Wall',
+    },
+    lessons: blackRepertoireLessons,
   },
   {
     id: 'course-anti-gambit',

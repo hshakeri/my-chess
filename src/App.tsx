@@ -26,22 +26,12 @@ import { CurriculumLesson } from './types/curriculum';
 import { OpeningDeviation, RepertoirePlan } from './types/diagnostics';
 import { getRepertoireById } from './analytics/repertoire';
 import { lessonFromDeviation, lessonFromRepertoireLine } from './curriculum/factories';
+import { REPERTOIRE_LINE_TO_LESSON } from './curriculum/repertoireLessons';
 import seedGamesRaw from './data/seed_hoot65_games.json';
 
 const seedGames = seedGamesRaw as unknown as StoredGame[];
 
 type ActiveTab = 'play' | 'database' | 'diagnostics' | 'lessons' | 'worksheets';
-
-/**
- * Repertoire lines that have an interactive lesson today. Lines without an entry
- * open the Lessons tab at its default lesson (the closed loop is completed in the
- * repertoire-divergence work, roadmap CL-4).
- */
-const REPERTOIRE_LINE_TO_LESSON: Record<string, string> = {
-  'white-scandi-refutation': 'lesson-scandinavian-refutation-drill',
-  'white-italian-evans-gambit': 'lesson-evans-gambit-destruction',
-  // The Scotch line has no authored lesson on the plan's own move order: it is built from the line
-};
 
 const ADOPTED_REPERTOIRES_KEY = 'my_chess_adopted_repertoires_v1';
 

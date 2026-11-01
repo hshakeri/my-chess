@@ -25,7 +25,7 @@ export const alapinSicilianCentre: CurriculumLesson = buildVerifiedLesson({
   thematicObjective:
     'Play c3 and then d4. Recapture on d4 with the c-pawn. Develop the knights so they guard e4 and d4, and check what the d4 pawn needs before you move a knight.',
   keyTacticalMotif: 'Pawn centre on d4 and e4; counting attackers and defenders of d4',
-  // Branch weights are Black's second move in hoot65's 15 archived Sicilians (after 2.Nf3 or 2.Bc4):
+  // Branch weights are Black's second move in the 14 archived Sicilians that reached it (after 2.Nf3 or 2.Bc4):
   // ...d6 5, ...Nc6 5, ...e6 2, ...a6 2 (not drilled; it is met with the same 3.d4). hoot65 has never
   // played 2.c3, so the Alapin main lines 2...d5 and 2...Nf6 have no count and weigh 1.
   moves: [

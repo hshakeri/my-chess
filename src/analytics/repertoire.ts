@@ -202,9 +202,11 @@ export function getRecommendedBlackRepertoire(): RepertoirePlan {
   const initialFen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
 
   // Line 1: Caro-Kann Advance Variation (Disciplined 3...Bf5!)
+  // Mirrors the main line of lesson-black-caro-kann-advance so the plan and the lesson agree
+  // (5.c3 is the archive's most common fifth move, with 5.Bd3).
   const advanceMoves = [
-    'e4', 'c6', 'd4', 'd5', 'e5', 'Bf5', 'Nf3', 'e6', 'Be2', 'c5',
-    'c3', 'Nc6', 'O-O', 'cxd4', 'cxd4', 'Nge7', 'Nc3', 'Nc8', 'Bg5', 'Be7'
+    'e4', 'c6', 'd4', 'd5', 'e5', 'Bf5', 'Nf3', 'e6', 'c3', 'c5',
+    'Be2', 'Nc6', 'O-O', 'Qb6'
   ];
   const advanceAnnotations: Record<number, { commentary?: string; annotation?: string; tacticalMotif?: string; isKeyMove?: boolean }> = {
     2: { commentary: 'Caro-Kann Defense! A rock-solid defense preparing d5 with a protected pawn structure.', isKeyMove: true },
@@ -212,7 +214,8 @@ export function getRecommendedBlackRepertoire(): RepertoirePlan {
     6: { commentary: 'DISCIPLINED BISHOP PLACEMENT: Play 3...Bf5! outside the pawn chain BEFORE playing ...e6. Crucially avoid premature ...Bg4?! which allows White to trap the bishop with f3 and g4.', annotation: '!', tacticalMotif: 'Prophylaxis & Piece Placement', isKeyMove: true },
     8: { commentary: 'Now Black securely locks the center with ...e6, with the light-squared bishop safely active outside the pawn chain.', isKeyMove: true },
     10: { commentary: 'The thematic Caro-Kann counter-strike against White\'s pawn base at d4!', annotation: '!', tacticalMotif: 'Pawn Chain Undermining', isKeyMove: true },
-    12: { commentary: 'Piling up heavy pressure on the d4 pawn.', isKeyMove: true }
+    12: { commentary: 'Piling up heavy pressure on the d4 pawn.', isKeyMove: true },
+    14: { commentary: 'The queen hits b2 and lines up behind the c5 pawn against d4; ...Nge7-f5 can follow.', isKeyMove: true }
   };
 
   const advanceLine: RepertoireLine = {
@@ -228,7 +231,7 @@ export function getRecommendedBlackRepertoire(): RepertoirePlan {
       'Put relentless pressure on the d4 pawn base'
     ],
     moves: buildMoveChain(advanceMoves, initialFen, advanceAnnotations),
-    pgn: '1. e4 c6 2. d4 d5 3. e5 Bf5! 4. Nf3 e6 5. Be2 c5 6. c3 Nc6 7. O-O cxd4 8. cxd4 Nge7 9. Nc3 Nc8 10. Bg5 Be7'
+    pgn: '1. e4 c6 2. d4 d5 3. e5 Bf5! 4. Nf3 e6 5. c3 c5 6. Be2 Nc6 7. O-O Qb6'
   };
 
   // Line 2: Caro-Kann Classical Variation (Capablanca 4...Bf5!)

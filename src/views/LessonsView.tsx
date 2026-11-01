@@ -941,7 +941,9 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
   const courseLabel = (category: string): string => {
     switch (category) {
       case 'white_repertoire':
-        return 'White Weapons';
+        return 'White Repertoire';
+      case 'black_repertoire':
+        return 'Black Repertoire';
       case 'anti_gambit':
         return 'Anti-Gambit Clinic';
       case 'opening_traps':
