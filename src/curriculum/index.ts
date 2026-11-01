@@ -79,10 +79,10 @@ export const curriculumCourses: ChessCurriculumCourse[] = [
     targetColor: 'white',
     targetRatingBand: 'intermediate',
     description:
-      'Eric Schiller’s refutations of Black’s rarer gambits. hoot65 has faced these lines at most once in 150 White games, so they live in the pattern library: maintain composure, secure king safety, and counter-strike in the center.',
+      'Eric Schiller and John Watson’s refutations of Black’s rarer gambits. hoot65 has faced these lines at most once in 150 White games, so they live in the pattern library: maintain composure, secure king safety, and counter-strike in the center.',
     sourceAttribution: {
       bookTitle: 'Survive and Beat Annoying Chess Openings',
-      author: 'Eric Schiller',
+      author: 'Eric Schiller & John Watson',
       publicationYear: 2003,
       pagesRef: 'Konikowski, Elephant and Latvian Gambit chapters',
     },
@@ -91,7 +91,7 @@ export const curriculumCourses: ChessCurriculumCourse[] = [
   {
     id: 'course-opening-traps',
     title: 'Opening Traps Hall of Fame',
-    subtitle: 'Lethal traps to spring as Black and avoid as White',
+    subtitle: 'Opening traps to spring as Black and avoid as White',
     category: 'opening_traps',
     targetColor: 'both',
     targetRatingBand: 'intermediate',
@@ -100,7 +100,7 @@ export const curriculumCourses: ChessCurriculumCourse[] = [
     sourceAttribution: {
       bookTitle: '101 Chess Opening Traps',
       author: 'Steve Giddins',
-      publicationYear: 2001,
+      publicationYear: 1998,
       pagesRef: 'Siberian Trap, Legal\'s Mate, Noah\'s Ark Trap, Elephant Trap',
     },
     lessons: trapLessons,
@@ -113,7 +113,7 @@ export const curriculumCourses: ChessCurriculumCourse[] = [
     targetColor: 'white',
     targetRatingBand: 'beginner',
     description:
-      'Core principles of checkmate delivery: confinement boxing with the queen and avoiding accidental stalemate catastrophes.',
+      'Core principles of checkmate delivery: confinement boxing with the queen and avoiding accidental stalemate.',
     sourceAttribution: {
       bookTitle: 'LearningChess - Lessons for Beginners - Workbook for Students Vol 1',
       author: 'GM Jozsef Pinter & Shamin de Moraes',

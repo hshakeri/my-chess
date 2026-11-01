@@ -3,16 +3,16 @@ import { buildVerifiedLesson } from './builder';
 
 /**
  * Anti-Gambit Lessons: Refuting tricky and annoying sidelines
- * Source: Survive and Beat Annoying Chess Openings by Eric Schiller (Chess-Openings.pdf)
+ * Source: Survive and Beat Annoying Chess Openings: The Open Games by Eric Schiller and John Watson (Cardoza, 2003; Chess-Openings.pdf)
  */
 
 export const refutingKonikowskiGambit: CurriculumLesson = buildVerifiedLesson({
   id: 'lesson-refuting-konikowski-gambit',
   title: 'Refuting the Konikowski Gambit',
-  subtitle: 'Calm castling and the d4 central fork punish Black\'s unsound queen sortie',
+  subtitle: 'Black\'s queen attacks the e5 knight and the g2 pawn at once',
   category: 'opening',
   sourceBook: 'Survive and Beat Annoying Chess Openings',
-  author: 'Eric Schiller',
+  author: 'Eric Schiller & John Watson',
   publicationYear: 2003,
   pagesRef: 'Konikowski Gambit chapter',
   eco: 'C64',
@@ -21,7 +21,7 @@ export const refutingKonikowskiGambit: CurriculumLesson = buildVerifiedLesson({
   // Starts with 3.Bb5, a move hoot65 has never played; kept as a pattern.
   relevance: 'outside-repertoire',
   description:
-    'In the Ruy Lopez / Italian structure, Black sometimes tries the tricky Konikowski Gambit with 3.Bb5 Bc5 4.c3 d5!? aiming for sudden tactical chaos with ...Qg5. Eric Schiller demonstrates how White refutes this with calm castling and a devastating central fork.',
+    'In the Ruy Lopez, Black sometimes answers 3.Bb5 Bc5 4.c3 with the Konikowski Gambit, 4...d5!?, and after 5.Nxe5 the queen comes to g5, attacking the knight and the g2 pawn at once. The book\'s answer puts White\'s king in safety first and then strikes in the centre with d4.',
   thematicObjective: 'Maintain composure against early queen attacks, castle to safety, and counter-strike in the center with d4.',
   keyTacticalMotif: 'King safety via castling, central counter-fork with d4',
   moves: [
@@ -45,12 +45,12 @@ export const refutingKonikowskiGambit: CurriculumLesson = buildVerifiedLesson({
     {
       san: 'd5',
       isUserMove: false,
-      annotation: 'The Konikowski counter-strike! Black lashes out in the center before completing kingside development.',
+      annotation: 'The Konikowski Gambit: Black strikes in the centre before finishing kingside development.',
     },
     {
       san: 'Nxe5',
       isUserMove: true,
-      annotation: 'Accept the challenge. White captures the unprotected e5 pawn and piles pressure onto c6.',
+      annotation: 'Take the e5 pawn: the c6 knight that guards it is pinned to Black\'s king, since d7 is empty. The e5 knight also attacks c6.',
       hintPiece: 'Knight on f3',
       hintSquare: 'e5',
       hintTheme: 'Take the free central pawn',
@@ -58,25 +58,25 @@ export const refutingKonikowskiGambit: CurriculumLesson = buildVerifiedLesson({
     {
       san: 'Qg5',
       isUserMove: false,
-      annotation: 'Black\'s tactical trick, hitting both the e5 knight and the undefended g2 pawn.',
+      annotation: 'The queen attacks the e5 knight and the g2 pawn, which nothing defends.',
     },
     {
       san: 'O-O',
       isUserMove: true,
-      annotation: 'The key refutation! White calmly castles, shielding g2 with the king and activating the rook.',
+      annotation: 'Castle: the king now guards g2, and the rook comes to f1.',
       hintPiece: 'King',
       hintSquare: 'g1',
-      hintTheme: 'Calm castling neutralizes threats',
+      hintTheme: 'Guard g2 and get the king safe in one move',
     },
     {
       san: 'Qxe5',
       isUserMove: false,
-      annotation: 'Black captures the knight, believing material is restored.',
+      annotation: 'Black takes the knight and is a piece for a pawn up, for one move.',
     },
     {
       san: 'd4',
       isUserMove: true,
-      annotation: 'The knockout punch! 7.d4 forks Black\'s queen on e5 and bishop on c5, recovering the piece with complete central control.',
+      annotation: '7.d4 forks the queen on e5 and the bishop on c5, and wins the piece back.',
       hintPiece: 'Queen Pawn',
       hintSquare: 'd4',
       hintTheme: 'Central fork',
@@ -86,7 +86,7 @@ export const refutingKonikowskiGambit: CurriculumLesson = buildVerifiedLesson({
     {
       san: 'dxc5',
       isUserMove: true,
-      annotation: 'Chop off the bishop. White has an extra pawn, bishop pair, and safe king.',
+      annotation: 'Take the bishop. White is a pawn up and has both bishops.',
       hintPiece: 'd-Pawn',
       hintSquare: 'c5',
     },
@@ -106,9 +106,9 @@ export const refutingKonikowskiGambit: CurriculumLesson = buildVerifiedLesson({
       fen: 'r1b1k1nr/ppp2ppp/2n5/1BbpN1q1/4P3/2P5/PP1P1PPP/RNBQK2R w KQkq - 1 6',
       turn: 'w',
       difficultyRating: 3,
-      prompt: 'White to play. Black just played 5...Qg5 attacking the knight on e5 and pawn on g2. Find White\'s precise refutation sequence.',
+      prompt: 'White to play. Black just played 5...Qg5, attacking the knight on e5 and the pawn on g2. Find White\'s answer.',
       solutionSan: ['O-O', 'Qxe5', 'd4'],
-      explanation: '6.O-O! defends g2 by bringing the king to safety. When Black takes the knight with 6...Qxe5, 7.d4! creates a devastating pawn fork against Queen and Bishop.',
+      explanation: '6.O-O! guards g2 with the king. When Black takes the knight with 6...Qxe5, 7.d4! forks the queen and the bishop.',
     },
   ],
   mistakesAndTraps: [
@@ -117,9 +117,9 @@ export const refutingKonikowskiGambit: CurriculumLesson = buildVerifiedLesson({
       attemptedSan: 'Nxc6',
       isTrap: false,
       severity: 'inaccuracy',
-      explanatoryFeedback: 'Greedily taking on c6 with 6.Nxc6 allows Black to play 6...Qxg2! hitting the rook, and after 7.Rf1 the queen takes on e4 with check.',
-      refutationSanList: ['Qxg2', 'Rf1', 'Qxe4+'],
-      punishmentSummary: 'Black regains the pawn with check and White\'s king is stuck in the center.',
+      explanatoryFeedback: 'Taking on c6 with 6.Nxc6 lets Black play 6...Qxg2!, hitting the rook on h1. After 7.Rf1 the queen takes on e4 with check, and once White has blocked it, ...bxc6 takes the knight back.',
+      refutationSanList: ['Qxg2', 'Rf1', 'Qxe4+', 'Be2', 'bxc6'],
+      punishmentSummary: 'Black has the knight back and is a pawn up, and White can no longer castle kingside.',
     },
   ],
 });
@@ -130,7 +130,7 @@ export const refutingElephantGambit: CurriculumLesson = buildVerifiedLesson({
   subtitle: 'Exploit the open e-file with 4.Qe2 pinning Black\'s advanced pawn',
   category: 'opening',
   sourceBook: 'Survive and Beat Annoying Chess Openings',
-  author: 'Eric Schiller',
+  author: 'Eric Schiller & John Watson',
   publicationYear: 2003,
   pagesRef: 'Elephant Gambit chapter',
   eco: 'C40',
@@ -139,7 +139,7 @@ export const refutingElephantGambit: CurriculumLesson = buildVerifiedLesson({
   // Faced once in 71 games starting 1.e4 e5 2.Nf3; kept as a pattern.
   relevance: 'outside-repertoire',
   description:
-    'The Elephant Gambit (1.e4 e5 2.Nf3 d5?!) is an aggressive but fundamentally unsound attempt by Black to seize the initiative. White easily refutes it by pinning the e-pawn with 4.Qe2 and developing rapidly.',
+    'The Elephant Gambit (1.e4 e5 2.Nf3 d5?!) is a risky attempt by Black to take the initiative. After 3.exd5 e4, White pins the e-pawn with 4.Qe2 and wins it.',
   thematicObjective: 'Pin Black’s overextended e4 pawn, develop the queen knight to c3, and emerge a solid pawn ahead.',
   keyTacticalMotif: 'Pinning on the e-file with Qe2, centralized knight',
   moves: [
@@ -158,7 +158,7 @@ export const refutingElephantGambit: CurriculumLesson = buildVerifiedLesson({
     {
       san: 'Qe2',
       isUserMove: true,
-      annotation: 'The refutation! The queen pins the e4 pawn to Black’s king. The pawn cannot take the f3 knight.',
+      annotation: 'The queen pins the e4 pawn to Black’s king, so the pawn cannot take the f3 knight.',
       hintPiece: 'Queen',
       hintSquare: 'e2',
       hintTheme: 'Pin along the e-file',
@@ -176,7 +176,7 @@ export const refutingElephantGambit: CurriculumLesson = buildVerifiedLesson({
     {
       san: 'Nxe4',
       isUserMove: true,
-      annotation: 'Cash in! White wins the e4 pawn, standing two pawns ahead with a dominating position.',
+      annotation: 'White wins the e4 pawn and is two pawns up.',
       hintPiece: 'Knight on c3',
       hintSquare: 'e4',
     },
@@ -192,7 +192,7 @@ export const refutingElephantGambit: CurriculumLesson = buildVerifiedLesson({
     {
       san: 'Bd2',
       isUserMove: true,
-      annotation: 'Complete development smoothly. White is a clean pawn up with superior king safety.',
+      annotation: 'Develop the bishop. White is a pawn up.',
       hintPiece: 'Dark-squared Bishop',
       hintSquare: 'd2',
     },
@@ -206,7 +206,7 @@ export const refutingElephantGambit: CurriculumLesson = buildVerifiedLesson({
       difficultyRating: 2,
       prompt: 'White to play. Black pushed 3...e4 attacking your knight. Find the queen move that immobilizes the pawn and prepares to win it.',
       solutionSan: ['Qe2', 'Nf6', 'Nc3'],
-      explanation: '4.Qe2! pins the e4 pawn directly against Black\'s king. Black cannot capture on f3, and 5.Nc3 adds an unstoppable second attacker.',
+      explanation: '4.Qe2! pins the e4 pawn to Black\'s king, so ...exf3 is illegal, and 5.Nc3 adds a second attacker.',
     },
   ],
 });
@@ -214,10 +214,10 @@ export const refutingElephantGambit: CurriculumLesson = buildVerifiedLesson({
 export const refutingLatvianGambit: CurriculumLesson = buildVerifiedLesson({
   id: 'lesson-refuting-latvian-gambit',
   title: 'Refuting the Latvian Gambit (2...f5)',
-  subtitle: 'Crush Black\'s premature kingside aggression with 3.Nxe5 and central dominance',
+  subtitle: 'After 2...f5 the e5 pawn has no defender and the e8-h5 diagonal is open',
   category: 'opening',
   sourceBook: 'Survive and Beat Annoying Chess Openings',
-  author: 'Eric Schiller',
+  author: 'Eric Schiller & John Watson',
   publicationYear: 2003,
   pagesRef: 'Latvian Gambit chapter',
   eco: 'C40',
@@ -226,7 +226,7 @@ export const refutingLatvianGambit: CurriculumLesson = buildVerifiedLesson({
   // Never faced in 71 games starting 1.e4 e5 2.Nf3; kept as a pattern.
   relevance: 'outside-repertoire',
   description:
-    'The Latvian Gambit (1.e4 e5 2.Nf3 f5?!) attempts a reverse King’s Gambit. However, Black’s king becomes dangerously exposed along the e8-h5 diagonal. White exploits this decisively with 3.Nxe5! followed by 4.d4! and Nc4.',
+    'The Latvian Gambit (1.e4 e5 2.Nf3 f5?!) is a reversed King’s Gambit. After 2...f5 nothing defends the e5 pawn, and f7 and g6 are empty, so the e8-h5 diagonal leads straight to Black’s king. White takes with 3.Nxe5, then plays 4.d4 and Nc4.',
   thematicObjective: 'Exploit the weakened e8-h5 diagonal, establish central pawns, and leave Black’s queen overextended.',
   keyTacticalMotif: 'Weak e8-h5 diagonal, queen harassment',
   moves: [
@@ -237,7 +237,7 @@ export const refutingLatvianGambit: CurriculumLesson = buildVerifiedLesson({
     {
       san: 'Nxe5',
       isUserMove: true,
-      annotation: 'Accept the challenge! 3.Nxe5 puts immediate pressure on the vulnerable f7 and d7 squares.',
+      annotation: '3.Nxe5 takes the undefended pawn; the knight now hits f7 and d7.',
       hintPiece: 'King Knight',
       hintSquare: 'e5',
     },
@@ -245,7 +245,7 @@ export const refutingLatvianGambit: CurriculumLesson = buildVerifiedLesson({
     {
       san: 'd4',
       isUserMove: true,
-      annotation: 'Anchor the knight in the center while opening the diagonal for the dark-squared bishop.',
+      annotation: 'The d4 pawn defends the knight, which the queen on f6 attacks, and opens the diagonal for the dark-squared bishop.',
       hintPiece: 'Queen Pawn',
       hintSquare: 'd4',
     },
@@ -253,7 +253,7 @@ export const refutingLatvianGambit: CurriculumLesson = buildVerifiedLesson({
     {
       san: 'Nc4',
       isUserMove: true,
-      annotation: 'Retreat the knight safely to c4 where it targets the e5/e4 square and Black\'s queenside.',
+      annotation: 'The d6 pawn attacked the knight; from c4 it hits d6 and e5.',
       hintPiece: 'Knight on e5',
       hintSquare: 'c4',
     },
@@ -261,7 +261,7 @@ export const refutingLatvianGambit: CurriculumLesson = buildVerifiedLesson({
     {
       san: 'Nc3',
       isUserMove: true,
-      annotation: 'Develop the queen knight, immediately pressuring Black\'s isolated e4 pawn.',
+      annotation: 'Develop the queen knight; it attacks the e4 pawn.',
       hintPiece: 'Queen Knight',
       hintSquare: 'c3',
     },
@@ -269,7 +269,7 @@ export const refutingLatvianGambit: CurriculumLesson = buildVerifiedLesson({
     {
       san: 'f3',
       isUserMove: true,
-      annotation: 'Challenge Black’s remaining central pawn with f3, opening lines for the White heavy pieces.',
+      annotation: 'The f-pawn attacks e4 as well, so the pawn is attacked twice.',
       hintPiece: 'f-Pawn',
       hintSquare: 'f3',
     },
@@ -277,7 +277,7 @@ export const refutingLatvianGambit: CurriculumLesson = buildVerifiedLesson({
     {
       san: 'Qxf3',
       isUserMove: true,
-      annotation: 'Recapture with the queen. White enjoys tremendous development and Black\'s king is hopelessly exposed.',
+      annotation: 'Recapture with the queen. Material is level, and there is no pawn left on the f-file.',
       hintPiece: 'Queen',
       hintSquare: 'f3',
     },
@@ -291,7 +291,7 @@ export const refutingLatvianGambit: CurriculumLesson = buildVerifiedLesson({
       difficultyRating: 2,
       prompt: 'White to play. Black lashed out with 2...f5?!. How does White immediately punish this weakening move?',
       solutionSan: ['Nxe5', 'Qf6', 'd4'],
-      explanation: '3.Nxe5! snatches the pawn and targets f7. After 3...Qf6, 4.d4! cements White\'s central dominance.',
+      explanation: '3.Nxe5! takes the undefended pawn and hits f7. After 3...Qf6, which attacks the knight, 4.d4! defends it.',
     },
   ],
 });

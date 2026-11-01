@@ -136,7 +136,7 @@ export const queenCageBoxMate: CurriculumLesson = buildVerifiedLesson({
       fen: 'k7/8/2K5/8/8/8/8/1Q6 w - - 0 1',
       turn: 'w',
       difficultyRating: 1,
-      prompt: 'White to play. White king has opposition on c6. Deliver the decisive checkmate.',
+      prompt: 'White to play, with the king on c6. Deliver checkmate.',
       solutionSan: ['Qb7#'],
       explanation: '1.Qb7# delivers checkmate directly adjacent to Black\'s king, fully supported by the king on c6.',
     },
@@ -150,14 +150,14 @@ export const queenCageBoxMate: CurriculumLesson = buildVerifiedLesson({
       severity: 'blunder',
       explanatoryFeedback: '1.Qf5+?? puts the queen next to the enemy king with nothing defending it: Black simply takes it. A check is only useful when the queen is safe and the king loses squares; here it loses the game-winning piece.',
       refutationSanList: ['Kxf5'],
-      punishmentSummary: 'The queen is lost for nothing and the game is a dead draw.',
+      punishmentSummary: 'The queen is lost for nothing, and with only the two kings left the game is drawn.',
     },
   ],
 });
 
 export const stalemateCatastrophes: CurriculumLesson = buildVerifiedLesson({
   id: 'lesson-stalemate-catastrophes',
-  title: 'Avoiding Stalemate Catastrophes',
+  title: 'Avoiding Stalemate',
   subtitle: 'Learn to recognize when the defending king is trapped without legal moves',
   category: 'fundamentals',
   sourceBook: 'LearningChess - Lessons for Beginners Vol 1',
@@ -170,7 +170,7 @@ export const stalemateCatastrophes: CurriculumLesson = buildVerifiedLesson({
   targetRatingBand: 'beginner',
   relevance: 'core',
   description:
-    'Stalemate occurs when the player whose turn it is to move has no legal moves and is NOT in check. In this tragic situation, a completely winning game ends in an immediate draw! GM Pinter emphasizes always asking: "Does my opponent have a legal move after I play this?"',
+    'Stalemate occurs when the player to move has no legal move and is not in check. The game is then drawn, however much material the other side has. Before a quiet queen move near the enemy king, ask: does my opponent still have a legal move after it?',
   thematicObjective: 'Never smother the opponent\'s king without delivering check. Always calculate checks first.',
   keyTacticalMotif: 'Stalemate prevention, back-rank checkmate',
   moves: [
@@ -190,9 +190,9 @@ export const stalemateCatastrophes: CurriculumLesson = buildVerifiedLesson({
       attemptedSan: 'Qc7',
       isTrap: true,
       severity: 'blunder',
-      explanatoryFeedback: 'Playing 1.Qc7?? causes an immediate STALEMATE catastrophe! The Black king has no legal moves and is not in check. Instead, 1.Qd8# wins immediately!',
+      explanatoryFeedback: '1.Qc7?? is stalemate: the black king is not in check and has no legal move, so the game is drawn. 1.Qd8# mates instead.',
       refutationSanList: [],
-      punishmentSummary: 'Draw by stalemate in a 100% winning position.',
+      punishmentSummary: 'A draw by stalemate in a position where White has mate in one.',
     },
   ],
   exercises: [
@@ -202,9 +202,9 @@ export const stalemateCatastrophes: CurriculumLesson = buildVerifiedLesson({
       fen: 'k7/8/1K1Q4/8/8/8/8/8 w - - 0 1',
       turn: 'w',
       difficultyRating: 1,
-      prompt: 'White to play. Moving the queen to c7 would leave Black no legal move without giving check: stalemate, a draw. Find the move that delivers instant checkmate.',
+      prompt: 'White to play. Moving the queen to c7 would leave Black no legal move without giving check: stalemate, a draw. Find the move that gives checkmate.',
       solutionSan: ['Qd8#'],
-      explanation: '1.Qd8# (1.Qf8# also works) delivers checkmate along the back rank. Playing 1.Qc7?? is a horrific blunder resulting in an instant draw by stalemate.',
+      explanation: '1.Qd8# (1.Qf8# also works) delivers checkmate along the back rank. 1.Qc7?? would be stalemate, a draw.',
     },
   ],
 });

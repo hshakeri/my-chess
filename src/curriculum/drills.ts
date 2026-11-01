@@ -45,9 +45,9 @@ export const scandinavianRefutationDrill: CurriculumLesson = buildVerifiedLesson
       hintSquare: 'd5',
       hintTheme: 'Take the pawn!',
       wrongMoveFeedback: {
-        e5: 'Blunder from your game vs meny_26! 2.e5?! surrenders central tension and allows Black easy development with 2...d4.',
+        e5: '2.e5?! is the move from your game vs meny_26: it gives up the tension in the centre, and Black answered 2...d4.',
         d3: 'Too passive! Give yourself active open lines.',
-        Nc3: 'Playable, but 2.exd5! is the definitive refutation.',
+        Nc3: 'Playable, but 2.exd5! takes the pawn at once.',
       },
     },
     {
@@ -186,7 +186,7 @@ export const scandinavianRefutationDrill: CurriculumLesson = buildVerifiedLesson
     {
       san: 'Qe2',
       isUserMove: true,
-      annotation: 'Centralize the queen, preparing O-O-O with overwhelming piece activity.',
+      annotation: 'Centralize the queen; with d1 empty, nothing stands between the king and the a1 rook.',
       hintPiece: 'Queen',
       hintSquare: 'e2',
     },
@@ -200,7 +200,7 @@ export const scandinavianRefutationDrill: CurriculumLesson = buildVerifiedLesson
       difficultyRating: 1,
       prompt: 'White to play. Black just played 2...Qxd5. How does White gain an immediate development tempo and seize the center?',
       solutionSan: ['Nc3', 'Qa5', 'd4'],
-      explanation: '3.Nc3! attacks Black’s queen on d5. After 3...Qa5, 4.d4! secures complete central domination for White.',
+      explanation: '3.Nc3! attacks Black’s queen on d5. After 3...Qa5, 4.d4! takes the centre: the pawn covers c5 and e5.',
       sourceGame: {
         white: 'hoot65',
         black: 'meny_26',
@@ -255,10 +255,10 @@ export const scandinavianRefutationDrill: CurriculumLesson = buildVerifiedLesson
       triggerFen: 'rnbqkbnr/ppp1pppp/8/3p4/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2',
       attemptedSan: 'e5',
       isTrap: false,
-      severity: 'blunder',
+      severity: 'inaccuracy',
       explanatoryFeedback: '2.e5?! was the exact mistake you made in your game vs meny_26! It releases central pressure and allows Black to take over the center with 2...d4. Play 2.exd5! instead.',
       refutationSanList: ['d4', 'c4', 'Bf5'],
-      punishmentSummary: 'Black equalizes immediately and dominates the d-file.',
+      punishmentSummary: 'The pawn on d4 takes c3 and e3 away from White\'s knight and bishop, and Black\'s light-squared bishop gets out to f5 before ...e6.',
     },
   ],
 });
@@ -383,7 +383,7 @@ export const caroKannDisciplineDrill: CurriculumLesson = buildVerifiedLesson({
     {
       san: 'Nf3',
       isUserMove: true,
-      annotation: 'Develop the king knight toward e5, securing supreme piece harmony.',
+      annotation: 'Develop the king knight; from f3 it eyes e5.',
       hintPiece: 'King Knight',
       hintSquare: 'f3',
     },

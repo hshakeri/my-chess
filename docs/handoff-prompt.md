@@ -16,7 +16,7 @@ also runs on every push to another branch).
 
 - React 18 + Vite 6 + TypeScript (strict) + Tailwind; chess.js 1.4; Dexie 4 (IndexedDB); ts-fsrs 5
   for scheduling; maia3-js + onnxruntime-web in a Web Worker for the human-like engine.
-- Tests: Vitest (`npm test`, 342 tests: SSR `renderToString` specs, jsdom interaction specs under
+- Tests: Vitest (`npm test`, 343 tests: SSR `renderToString` specs, jsdom interaction specs under
   `tests/unit/curriculum/lessons-view-interactions.spec.tsx`, fake-indexeddb for the database) and
   Playwright (`npm run test:e2e`, 80 tests incl. iPhone-viewport tests). Keep both green or update
   tests deliberately and say why. No `if (await ...isVisible())` guards in specs: a missing control
@@ -148,7 +148,9 @@ Next: the roadmap below.
 
 ## Roadmap items not yet built (see `docs/pedagogy-audit.md` Section 7)
 
-- QW-8 (chess-accuracy strings). QW-7 is done (2026-11-01): CI runs Vitest and Playwright on every
+- QW-8 is done (2026-11-01): every refutation line must show what the mistake costs (a legality test
+  checks mate, a lasting material gain or stalemate), superlatives are gone with every fact replayed,
+  and the Schiller/Watson and Giddins attributions are corrected. QW-7 is done (2026-11-01): CI runs Vitest and Playwright on every
   branch push and before every deploy, `playwright.config.ts` reads `PLAYWRIGHT_EXECUTABLE_PATH`, the
   33 `isVisible` guards left in the specs are gone, and specs 03 and 09 mock every Chess.com request.
   QW-6 is done (2026-11-01): the tactical search

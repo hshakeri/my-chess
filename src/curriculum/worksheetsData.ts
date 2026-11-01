@@ -35,7 +35,7 @@ export const scotchGambitWorksheet: PrintableWorksheetData = {
     'Cover the answer page, then write your answers below.',
   ],
   trapWarning: {
-    name: 'Greedy Pawn Snatching (5...dxc3?)',
+    name: 'Taking a Second Pawn (5...dxc3?)',
     blunderSan: '5...dxc3?',
     refutationSan: '6.Qd5! Nh6 7.Bxh6',
     explanation: 'Black has taken two pawns with only two pieces developed, and f7 has a single defender.',
@@ -85,8 +85,8 @@ export const konikowskiWorksheet: PrintableWorksheetData = {
   subtitle: 'Meeting an early queen attack on e5 and g2',
   type: 'curriculum_lesson',
   sourceBook: 'Survive and Beat Annoying Chess Openings',
-  author: 'Eric Schiller',
-  eco: 'C65',
+  author: 'Eric Schiller & John Watson',
+  eco: 'C64',
   targetColor: 'white',
   diagramFen: 'r1b1k1nr/ppp2ppp/2n5/1BbpN1q1/4P3/2P5/PP1P1PPP/RNBQK2R w KQkq - 1 6',
   coordinates: true,
@@ -117,7 +117,7 @@ export const konikowskiWorksheet: PrintableWorksheetData = {
       turn: 'w',
       diagramFen: 'r1b1k1nr/ppp2ppp/2n5/1Bbpq3/4P3/2P5/PP1P1PPP/RNBQ1RK1 w kq - 0 7',
       fillInBlankLines: [
-        'Decisive move: _______________________',
+        'Move: _______________________',
         'Tactical motif: _______________________',
         'Pieces attacked: _______________________',
       ],

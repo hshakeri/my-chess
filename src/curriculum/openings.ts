@@ -3,12 +3,12 @@ import { buildVerifiedLesson } from './builder';
 
 /**
  * Opening Lessons: Scotch Gambit & Italian Attack, Evans Gambit, and Adams Attack
- * Sources: TacticsInJuniorOpenings.pdf (Dave), Chess-Openings.pdf (Schiller), 7500.pdf (Amanov & Kavutskiy)
+ * Sources: TacticsInJuniorOpenings.pdf (Dave), Chess-Openings.pdf (Schiller & Watson), 7500.pdf (Amanov & Kavutskiy)
  */
 
 export const scotchGambitBreakthrough: CurriculumLesson = buildVerifiedLesson({
   id: 'lesson-scotch-gambit-breakthrough',
-  title: 'The Scotch Gambit: Crushing Early Passivity',
+  title: 'The Scotch Gambit: Punishing Early Passivity',
   subtitle: 'Punish Black\'s slow play with a rapid central sacrifice and double attack on f7',
   category: 'opening',
   sourceBook: 'Tactics in Junior Openings',
@@ -21,7 +21,7 @@ export const scotchGambitBreakthrough: CurriculumLesson = buildVerifiedLesson({
   // hoot65 plays 3.Bc4 in every Italian game; the 3.d4 move order has never occurred.
   relevance: 'outside-repertoire',
   description:
-    'The Scotch Gambit (1.e4 e5 2.Nf3 Nc6 3.d4 exd4 4.Bc4) is one of the most lethal weapons against 1...e5. White sacrifices a pawn to seize the center, open diagonal lines toward Black’s vulnerable f7 square, and punish greedy pawn snatching.',
+    'The Scotch Gambit (1.e4 e5 2.Nf3 Nc6 3.d4 exd4 4.Bc4) is a sharp answer to 1...e5. White sacrifices a pawn to seize the center, open diagonal lines toward Black’s vulnerable f7 square, and punish pawn grabbing.',
   thematicObjective: 'Rip open the center, exploit the weak f7 square, and coordinate Queen and Bishop before Black can castle.',
   keyTacticalMotif: 'f7 weakness, rapid development, double attack with Qd5',
   moves: [
@@ -67,7 +67,7 @@ export const scotchGambitBreakthrough: CurriculumLesson = buildVerifiedLesson({
     },
     {
       san: 'Be7',
-      annotation: 'Black plays a passive retreat. Club players more often answer 4...Nf6 or 4...Bc5; this line shows what happens when Black neglects the center.',
+      annotation: 'A passive developing move. Club players more often answer 4...Nf6 or 4...Bc5; this line shows what happens when Black neglects the center.',
     },
     {
       san: 'c3',
@@ -78,14 +78,14 @@ export const scotchGambitBreakthrough: CurriculumLesson = buildVerifiedLesson({
     },
     {
       san: 'dxc3',
-      annotation: 'Black greedily consumes the c3 pawn, falling right into White’s tactical trap.',
+      annotation: 'Black takes a second pawn.',
     },
     {
       san: 'Qd5',
-      annotation: 'The lethal strike! 6.Qd5 creates an irresistible threat against f7 with mate in one looming.',
+      annotation: '6.Qd5, backed by the c4 bishop, threatens Qxf7#.',
       hintPiece: 'White Queen',
       hintSquare: 'd5',
-      hintTheme: 'Irresistible mate threat on f7',
+      hintTheme: 'Mate threat on f7',
       arrows: [{ from: 'd5', to: 'f7', color: 'red' }, { from: 'c4', to: 'f7', color: 'red' }],
     },
     {
@@ -102,35 +102,35 @@ export const scotchGambitBreakthrough: CurriculumLesson = buildVerifiedLesson({
     },
     {
       san: 'O-O',
-      annotation: 'Black scrambles into castling to evade immediate checkmate.',
+      annotation: 'Black castles; now the f8 rook defends f7 as well.',
     },
     {
       san: 'Bxg7',
-      annotation: 'Demolish Black’s kingside pawn shield.',
+      annotation: 'Take the g7 pawn in front of Black’s king.',
       hintPiece: 'Dark-squared Bishop',
       hintSquare: 'g7',
-      hintTheme: 'Destroy king shelter',
+      hintTheme: 'Take a pawn from the king’s cover',
     },
     {
       san: 'Kxg7',
-      annotation: 'Black is forced to recapture.',
+      annotation: 'Black recaptures.',
     },
     {
       san: 'Nxc3',
-      annotation: 'White restores material balance with a completely shattered Black king and dominating minor pieces.',
+      annotation: '9.Nxc3 restores material balance, and Black’s king has lost the g7 pawn that sheltered it.',
       hintPiece: 'Queen Knight',
       hintSquare: 'c3',
-      hintTheme: 'Regain material and dominate',
+      hintTheme: 'Win back the second pawn',
     },
   ],
   exercises: [
     {
       id: 'ex-scotch-1',
-      title: 'Find White\'s Knockout Punch on f7',
+      title: 'Find White\'s Threat Against f7',
       fen: 'r1bqk1nr/ppppbppp/2n5/8/2B1P3/2p2N2/PP3PPP/RNBQK2R w KQkq - 0 6',
       turn: 'w',
       difficultyRating: 2,
-      prompt: 'White to play. Black just played 5...dxc3, grabbing a second pawn. Find White\'s devastating move threatening immediate checkmate.',
+      prompt: 'White to play. Black just played 5...dxc3, taking a second pawn. Find White\'s move that threatens mate in one.',
       solutionSan: ['Qd5', 'Nh6', 'Bxh6'],
       explanation: '6.Qd5! immediately threatens Qxf7# with battery coordination from the c4-bishop. After 6...Nh6, White removes the defender with 7.Bxh6!',
       sourceGame: {
@@ -148,8 +148,8 @@ export const scotchGambitBreakthrough: CurriculumLesson = buildVerifiedLesson({
       isTrap: false,
       severity: 'inaccuracy',
       explanatoryFeedback: 'Recapturing quietly with 6.bxc3 is playable, but it misses 6.Qd5!, which threatens Qxf7# and forces Black into an awkward defence.',
-      refutationSanList: ['Nf6', 'e5', 'd5'],
-      punishmentSummary: 'Allows Black to coordinate defense with ...Nf6.',
+      refutationSanList: [],
+      punishmentSummary: 'After 6.bxc3 White is still a pawn down, while 6.Qd5 Nh6 7.Bxh6 O-O 8.Bxg7 Kxg7 9.Nxc3 wins both pawns back.',
     },
   ],
 });
@@ -157,7 +157,7 @@ export const scotchGambitBreakthrough: CurriculumLesson = buildVerifiedLesson({
 export const evansGambitDestruction: CurriculumLesson = buildVerifiedLesson({
   id: 'lesson-evans-gambit-destruction',
   title: 'The Evans Gambit: Rapid Wing Sacrifice',
-  subtitle: 'Sacrifice the b4 pawn to build an unstoppable classical pawn center and quick castle',
+  subtitle: 'A pawn sacrifice for a quick pawn centre and early castling',
   category: 'opening',
   sourceBook: 'Tactics in Junior Openings',
   author: 'Dave',

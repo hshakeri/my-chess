@@ -23,7 +23,7 @@ describe('Review cards built from decisions', () => {
     expect(lesson.moves[0].accept?.san).toEqual(['Qf8#']);
     // The lesson's own stalemate trap travels with the card
     expect(lesson.commonMistakesAndTraps?.map((t) => t.attemptedSan)).toEqual(['Qc7']);
-    expect(lesson.commonMistakesAndTraps?.[0].explanatoryFeedback).toMatch(/STALEMATE/);
+    expect(lesson.commonMistakesAndTraps?.[0].explanatoryFeedback).toMatch(/1\.Qc7\?\? is stalemate/);
   });
 
   it('keeps every accepted answer of a position shared by several lessons', () => {

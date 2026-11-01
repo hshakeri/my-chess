@@ -196,6 +196,70 @@ describe('Curriculum Move Legality & Verification (chess.js)', () => {
     }
   });
 
+  it('every refutation line shows what the mistake costs', () => {
+    // Material in centipawns from `color`'s side; kings count nothing
+    const VALUE: Record<string, number> = { p: 100, n: 300, b: 300, r: 500, q: 900, k: 0 };
+    const MATE = 100000;
+    const balance = (chess: Chess, color: 'w' | 'b') =>
+      chess
+        .board()
+        .flat()
+        .reduce((s, sq) => s + (sq ? (sq.color === color ? 1 : -1) * VALUE[sq.type] : 0), 0);
+    // Material from the side to move once the captures still on the board are played out (checks answered)
+    const settled = (chess: Chess, alpha: number, beta: number, depth: number): number => {
+      const inCheck = chess.inCheck();
+      const moves = chess.moves({ verbose: true });
+      if (moves.length === 0) return inCheck ? -MATE : 0;
+      if (depth === 0) return balance(chess, chess.turn());
+      if (!inCheck) {
+        const standPat = balance(chess, chess.turn());
+        if (standPat >= beta) return standPat;
+        alpha = Math.max(alpha, standPat);
+      }
+      for (const m of moves) {
+        if (!inCheck && !m.captured && !m.promotion) continue;
+        chess.move(m);
+        const score = -settled(chess, -beta, -alpha, depth - 1);
+        chess.undo();
+        if (score >= beta) return score;
+        alpha = Math.max(alpha, score);
+      }
+      return alpha;
+    };
+
+    // After a blunder or a trap the line ends in mate, in a material gain of at least a pawn over the position
+    // before the mistake that survives the captures still available, or in stalemate when the side that erred was
+    // a piece or more up. An inaccuracy's line may be a quiet continuation (2.e5 d4 in the Scandinavian), but it
+    // may not hand material back: it ends at least as well for the refuting side as the position after the mistake.
+    let checked = 0;
+    for (const lesson of allCurriculumLessons) {
+      for (const mt of lesson.commonMistakesAndTraps ?? []) {
+        const chess = new Chess(mt.triggerFen);
+        const erring = chess.turn();
+        const refuting = erring === 'w' ? 'b' : 'w';
+        const outcome = () =>
+          chess.isGameOver() ? balance(chess, refuting) : (chess.turn() === refuting ? 1 : -1) * settled(chess, -Infinity, Infinity, 8);
+        const before = balance(chess, refuting);
+        chess.move(mt.attemptedSan);
+        const afterMistake = outcome();
+        for (const san of mt.refutationSanList) chess.move(san);
+        const label = `${lesson.id}: ${mt.attemptedSan} ${mt.refutationSanList.join(' ')}`;
+        const mated = chess.isCheckmate() && chess.turn() === erring;
+        const after = outcome();
+        if (mt.severity === 'inaccuracy') {
+          expect(after - afterMistake, label).toBeGreaterThanOrEqual(0);
+        } else {
+          // The gain shows on the board where the line stops, and the captures left do not take it back
+          const stalemateFromAhead = chess.isStalemate() && before <= -300;
+          const shown = balance(chess, refuting) - before;
+          expect(mated || stalemateFromAhead || (shown >= 100 && after - before >= 100), `${label} (gain ${shown}, settled ${after - before})`).toBe(true);
+        }
+        checked++;
+      }
+    }
+    expect(checked).toBeGreaterThanOrEqual(30);
+  });
+
   it('cites personal drill games with the dates recorded in the archive', () => {
     const drills = allCurriculumLessons.filter((l) => l.category === 'weakness_drill');
     const archive = (seedGamesRaw as unknown as Array<{ url?: string; pgn: string }>);

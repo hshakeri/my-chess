@@ -3,17 +3,17 @@ import { buildVerifiedLesson } from './builder';
 
 /**
  * Opening Traps Hall of Fame: Spring Them & Dodge Them
- * Source: 101 Chess Opening Traps by Steve Giddins (Gambit Publications, 2001)
+ * Source: 101 Chess Opening Traps by Steve Giddins (Gambit Publications, 1998)
  */
 
 export const siberianTrap: CurriculumLesson = buildVerifiedLesson({
   id: 'lesson-siberian-trap',
   title: 'The Siberian Trap (Smith-Morra / Sicilian)',
-  subtitle: 'A devastating queen & knight ambush punishing White\'s careless 9.h3',
+  subtitle: 'A queen and knight trap after White\'s 9.h3',
   category: 'trap',
   sourceBook: '101 Chess Opening Traps',
   author: 'Steve Giddins',
-  publicationYear: 2001,
+  publicationYear: 1998,
   pagesRef: 'Siberian Trap',
   eco: 'B21',
   targetColor: 'black',
@@ -21,8 +21,8 @@ export const siberianTrap: CurriculumLesson = buildVerifiedLesson({
   // hoot65 never plays 1...c5; kept as a deflection and Qh2# pattern.
   relevance: 'outside-repertoire',
   description:
-    'In the Smith-Morra Gambit against the Sicilian, White often plays the automatic move 9.h3? to kick Black\'s g4 knight. Black springs the shocking trap with 9...Nd4!!, attacking White\'s queen while simultaneously unleashing a checkmate threat on h2.',
-  thematicObjective: 'Lure White into 9.h3?, then unleash 9...Nd4!! with dual mate threats on h2 and f3.',
+    'In the Smith-Morra Gambit against the Sicilian, if White kicks Black\'s g4 knight with 9.h3?, Black has 9...Nd4!!: it attacks White\'s queen, and taking the knight with 10.Nxd4 allows 10...Qh2#, because the f3 knight no longer guards h2.',
+  thematicObjective: 'Lure White into 9.h3?, then play 9...Nd4!!: it attacks the queen, and 10.Nxd4 allows 10...Qh2#.',
   keyTacticalMotif: 'Deflection, queen double-threat, mate on h2',
   moves: [
     { san: 'e4', isUserMove: false },
@@ -39,7 +39,7 @@ export const siberianTrap: CurriculumLesson = buildVerifiedLesson({
     {
       san: 'Qc7',
       isUserMove: true,
-      annotation: 'Develop the queen to control the c-file and target the c4 bishop.',
+      annotation: 'Develop the queen onto the c7-h2 diagonal, which leads to White\'s castled king.',
       hintPiece: 'Queen',
       hintSquare: 'c7',
     },
@@ -55,7 +55,7 @@ export const siberianTrap: CurriculumLesson = buildVerifiedLesson({
     {
       san: 'Ng4',
       isUserMove: true,
-      annotation: 'The bait! Threatening ...Nd4, White feels compelled to push the knight away.',
+      annotation: 'The bait. From g4 the knight hits h2 together with the queen, and White wants to push it away.',
       hintPiece: 'Knight on f6',
       hintSquare: 'g4',
       hintTheme: 'Set up the ambush',
@@ -63,12 +63,12 @@ export const siberianTrap: CurriculumLesson = buildVerifiedLesson({
     {
       san: 'h3',
       isUserMove: false,
-      annotation: 'White walks right into the Siberian Trap! The pawn push weakens the kingside critically.',
+      annotation: 'White walks into the Siberian Trap: 9.h3 attacks the knight but allows the next move.',
     },
     {
       san: 'Nd4',
       isUserMove: true,
-      annotation: 'The thunderbolt! 9...Nd4!! attacks the White queen. If White plays 10.Nxd4, Black plays 10...Qh2# checkmate!',
+      annotation: '9...Nd4!! attacks the queen. If 10.Nxd4, the f3 knight no longer guards h2, and 10...Qh2# is mate.',
       hintPiece: 'Knight on c6',
       hintSquare: 'd4',
       hintTheme: 'Double mate threat',
@@ -82,21 +82,21 @@ export const siberianTrap: CurriculumLesson = buildVerifiedLesson({
       fen: 'r1b1kb1r/ppqp1ppp/2n1p3/8/2B1P1n1/2N2N1P/PP2QPP1/R1B2RK1 b kq - 0 9',
       turn: 'b',
       difficultyRating: 2,
-      prompt: 'Black to play. White just played 9.h3 to kick your knight. Find the shocking knight move that wins on the spot.',
+      prompt: 'Black to play. White just played 9.h3 to kick your knight. Find the knight move that attacks the queen and sets up mate on h2.',
       solutionSan: ['Nd4'],
-      explanation: '9...Nd4!! attacks White’s queen on e2. If 10.Nxd4, White is mated instantly with 10...Qh2#! If 10.Qd1, 10...Nxf3+ 11.Qxf3 Qh2# is also mate.',
+      explanation: '9...Nd4!! attacks White’s queen on e2. If 10.Nxd4, 10...Qh2# is mate. If 10.Qd1, 10...Nxf3+ 11.Qxf3 Qh2# is also mate.',
     },
   ],
 });
 
 export const legalsMate: CurriculumLesson = buildVerifiedLesson({
   id: 'lesson-legals-mate',
-  title: 'Legal\'s Mate: The Immortal Queen Sacrifice',
-  subtitle: 'Sacrifice the queen on d1 to deliver a breathtaking minor-piece checkmate on e7',
+  title: 'Legal\'s Mate: The Queen Sacrifice',
+  subtitle: 'Black\'s bishop pins the f3 knight to the queen: is the pin real?',
   category: 'trap',
   sourceBook: '101 Chess Opening Traps',
   author: 'Steve Giddins',
-  publicationYear: 2001,
+  publicationYear: 1998,
   pagesRef: 'Legal\'s Mate',
   eco: 'C41',
   targetColor: 'white',
@@ -104,7 +104,7 @@ export const legalsMate: CurriculumLesson = buildVerifiedLesson({
   // 1.e4 e5 2.Nf3 d6 3.Bc4 Bg4 has occurred in hoot65's own games.
   relevance: 'core',
   description:
-    'Named after Sire de Légal in the 18th century, this timeless trap demonstrates the supreme value of piece coordination over material. White pretends to be pinned on the d1-h5 diagonal, then sacrifices the queen to deliver checkmate with two knights and a bishop.',
+    'Named after Sire de Légal, an 18th-century French player. The f3 knight looks pinned to the queen along the d1-h5 diagonal, but White moves it anyway and gives up the queen: two knights and a bishop then mate the black king.',
   thematicObjective: 'Ignore the pseudo-pin on f3, sacrifice the queen on d1, and deliver checkmate on d5/e7.',
   keyTacticalMotif: 'Queen sacrifice, minor piece coordination, checkmate on e7',
   moves: [
@@ -131,7 +131,7 @@ export const legalsMate: CurriculumLesson = buildVerifiedLesson({
     {
       san: 'Nxe5',
       isUserMove: true,
-      annotation: 'The legendary queen sacrifice! White captures on e5, daring Black to take the queen.',
+      annotation: 'The queen sacrifice: White takes on e5 and leaves the queen to Black\'s bishop.',
       hintPiece: 'Knight on f3',
       hintSquare: 'e5',
       hintTheme: 'Queen sacrifice',
@@ -150,7 +150,7 @@ export const legalsMate: CurriculumLesson = buildVerifiedLesson({
     {
       san: 'Nd5#',
       isUserMove: true,
-      annotation: 'Checkmate! The two knights and bishop create a perfect mating cage. The black king is trapped.',
+      annotation: 'Checkmate by two knights and a bishop.',
       hintPiece: 'Knight on c3',
       hintSquare: 'd5',
       hintTheme: 'Deliver checkmate',
@@ -164,9 +164,9 @@ export const legalsMate: CurriculumLesson = buildVerifiedLesson({
       fen: 'rn1qkbnr/ppp2p1p/3p2p1/4p3/2B1P1b1/2N2N2/PPPP1PPP/R1BQK2R w KQkq - 0 5',
       turn: 'w',
       difficultyRating: 1,
-      prompt: 'White to play. Black pinned your knight with ...Bg4 and played 4...g6. Unleash the legendary mating combination.',
+      prompt: 'White to play. Black pinned your knight with ...Bg4 and played 4...g6. Find the mating combination.',
       solutionSan: ['Nxe5', 'Bxd1', 'Bxf7+', 'Ke7', 'Nd5#'],
-      explanation: '5.Nxe5!! sacrifices the queen. When Black captures 5...Bxd1, 6.Bxf7+ Ke7 7.Nd5# is pure checkmate!',
+      explanation: '5.Nxe5!! sacrifices the queen. When Black captures 5...Bxd1, 6.Bxf7+ Ke7 7.Nd5# is mate.',
     },
   ],
 });
@@ -174,11 +174,11 @@ export const legalsMate: CurriculumLesson = buildVerifiedLesson({
 export const noahsArkTrap: CurriculumLesson = buildVerifiedLesson({
   id: 'lesson-noahs-ark-trap',
   title: 'The Noah\'s Ark Trap (Ruy Lopez)',
-  subtitle: 'Entrap White\'s prized Spanish bishop behind an advancing wall of queenside pawns',
+  subtitle: 'White takes the d4 pawn with the queen, and the bishop on b3 is left behind',
   category: 'trap',
   sourceBook: '101 Chess Opening Traps',
   author: 'Steve Giddins',
-  publicationYear: 2001,
+  publicationYear: 1998,
   pagesRef: 'Noah\'s Ark Trap',
   eco: 'C71',
   targetColor: 'black',
@@ -186,7 +186,7 @@ export const noahsArkTrap: CurriculumLesson = buildVerifiedLesson({
   // hoot65 never plays 1...e5 as Black; kept as a bishop-trapping pattern.
   relevance: 'outside-repertoire',
   description:
-    'One of the oldest and most famous traps in chess history. White gets seduced into grabbing the central d4 pawn with the queen, allowing Black to roll the queenside pawns forward with ...b5, ...c5, and ...c4, completely boxing in White’s b3 light-squared bishop like animals on Noah\'s Ark.',
+    'An old trap in the Ruy Lopez. When White takes the d4 pawn with the queen, Black\'s queenside pawns, already on a6 and b5, advance with ...c5 and ...c4 and shut in White’s light-squared bishop on b3, as the animals were shut in on Noah\'s Ark.',
   thematicObjective: 'Chase White\'s bishop to b3, push ...c5 and ...c4, and capture the trapped piece.',
   keyTacticalMotif: 'Trapping a bishop with pawns, queen harassment',
   moves: [
@@ -247,7 +247,7 @@ export const noahsArkTrap: CurriculumLesson = buildVerifiedLesson({
     {
       san: 'Be6',
       isUserMove: true,
-      annotation: 'Develop the bishop and block the threat on the a8 rook.',
+      annotation: 'Develop the bishop with an attack on the queen, which was threatening the a8 rook.',
       hintPiece: 'Light-squared Bishop',
       hintSquare: 'e6',
     },
@@ -263,7 +263,7 @@ export const noahsArkTrap: CurriculumLesson = buildVerifiedLesson({
     {
       san: 'c4',
       isUserMove: true,
-      annotation: 'The cage snaps shut! The b3 bishop is trapped with nowhere to go. Black wins a full minor piece.',
+      annotation: 'The bishop on b3 has no safe square: a4 and c4 are covered by the b5 pawn, and a2 and c2 hold White\'s own pawns. After 12.Bxc4 bxc4 13.Qxc4 White has two pawns for the bishop.',
       hintPiece: 'c-Pawn',
       hintSquare: 'c4',
       hintTheme: 'Trap the bishop',
@@ -277,9 +277,9 @@ export const noahsArkTrap: CurriculumLesson = buildVerifiedLesson({
       fen: 'r1bqkbnr/2p2ppp/p2p4/1p6/3QP3/1B6/PPP2PPP/RNB1K2R b KQkq - 0 8',
       turn: 'b',
       difficultyRating: 2,
-      prompt: 'Black to play. White just played 8.Qxd4. Find the pawn avalanche sequence that traps White\'s light-squared bishop.',
+      prompt: 'Black to play. White just played 8.Qxd4. Find the sequence that traps White\'s light-squared bishop.',
       solutionSan: ['c5', 'Qd5', 'Be6', 'Qc6+', 'Bd7', 'Qd5', 'c4'],
-      explanation: '8...c5! gains tempo on the queen. After the tactical checks, 11...c4! completely traps White\'s bishop on b3, winning a full piece.',
+      explanation: '8...c5! attacks the queen. After 9.Qd5 Be6 10.Qc6+ Bd7 11.Qd5, 11...c4! traps the bishop on b3, and 12.Bxc4 bxc4 13.Qxc4 gives White only two pawns for it.',
     },
   ],
 });
@@ -287,11 +287,11 @@ export const noahsArkTrap: CurriculumLesson = buildVerifiedLesson({
 export const elephantTrapQGD: CurriculumLesson = buildVerifiedLesson({
   id: 'lesson-elephant-trap-qgd',
   title: 'The Elephant Trap (Queen\'s Gambit Declined)',
-  subtitle: 'A pseudo-pin on the queen catches White in a deadly counter-pin and King hunt',
+  subtitle: 'The f6 knight only looks pinned to the queen',
   category: 'trap',
   sourceBook: '101 Chess Opening Traps',
   author: 'Steve Giddins',
-  publicationYear: 2001,
+  publicationYear: 1998,
   pagesRef: 'Elephant Trap',
   eco: 'D51',
   targetColor: 'black',
@@ -299,8 +299,8 @@ export const elephantTrapQGD: CurriculumLesson = buildVerifiedLesson({
   // hoot65 never plays the Queen's Gambit Declined; kept as a counter-pin pattern.
   relevance: 'outside-repertoire',
   description:
-    'In the Queen’s Gambit Declined, White often believes that Black\'s f6 knight is hopelessly pinned to the queen. When White greedily plays 6.Nxd5?, Black shocks them with 6...Nxd5! 7.Bxd8 Bb4+!, winning a piece after the dust clears.',
-  thematicObjective: 'Use the ...Nbd7 setup to spring the ...Nxd5! counter-attack and ...Bb4+ skewer.',
+    'In the Queen’s Gambit Declined the g5 bishop seems to pin Black\'s f6 knight to the queen. If White takes the d5 pawn with 6.Nxd5?, Black answers 6...Nxd5! 7.Bxd8 Bb4+, and after 8.Qd2 Bxd2+ 9.Kxd2 Kxd8 Black is a knight for a pawn up.',
+  thematicObjective: 'Use the ...Nbd7 setup to spring the ...Nxd5! counter-attack and the ...Bb4+ check.',
   keyTacticalMotif: 'Discovered attack, intermediate check with Bb4+, winning a piece',
   moves: [
     { san: 'd4', isUserMove: false },
@@ -313,7 +313,7 @@ export const elephantTrapQGD: CurriculumLesson = buildVerifiedLesson({
     {
       san: 'Nbd7',
       isUserMove: true,
-      annotation: 'The bait! Black develops the knight, appearing to leave the d5 pawn undefended.',
+      annotation: 'The bait. Black develops the knight; after the exchange on d5, the d5 pawn will seem to rely on a pinned knight.',
       hintPiece: 'Knight on b8',
       hintSquare: 'd7',
     },
@@ -327,7 +327,7 @@ export const elephantTrapQGD: CurriculumLesson = buildVerifiedLesson({
     {
       san: 'Nxd5',
       isUserMove: true,
-      annotation: 'The shocker! Black takes the knight, giving up the queen!',
+      annotation: 'Black takes the knight and gives up the queen.',
       hintPiece: 'Knight on f6',
       hintSquare: 'd5',
       hintTheme: 'Queen sacrifice',
@@ -346,7 +346,7 @@ export const elephantTrapQGD: CurriculumLesson = buildVerifiedLesson({
     {
       san: 'Bxd2+',
       isUserMove: true,
-      annotation: 'Chop the queen with check.',
+      annotation: 'Take the queen with check.',
       hintPiece: 'Bishop on b4',
       hintSquare: 'd2',
     },

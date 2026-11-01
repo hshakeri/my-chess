@@ -170,7 +170,7 @@ describe('LessonsView interactions (jsdom)', () => {
     await waitFor(() => expect(screen.getByText(/Lesson Completed!/)).toBeTruthy());
     await waitFor(() => expect(reviewLog()).toEqual(['good']));
     // Only after the answer is the source lesson named
-    expect(document.querySelector('[data-section="session-card"]')?.textContent).toMatch(/Avoiding Stalemate Catastrophes/);
+    expect(document.querySelector('[data-section="session-card"]')?.textContent).toMatch(/Avoiding Stalemate/);
 
     fireEvent.click(document.querySelector('button[data-action="next-card"]')!);
     await waitFor(() => expect(document.querySelector('[data-section="session-summary"]')).toBeTruthy());
