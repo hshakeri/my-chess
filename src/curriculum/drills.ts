@@ -445,7 +445,144 @@ export const caroKannDisciplineDrill: CurriculumLesson = buildVerifiedLesson({
   ],
 });
 
+export const blackburneShillingDrill: CurriculumLesson = buildVerifiedLesson({
+  id: 'lesson-blackburne-shilling-drill',
+  title: 'Weakness Drill: The Knight on d4',
+  subtitle: 'Five games reached 3...Nd4 and all five were lost; take the knight and go after the pawn that recaptures',
+  category: 'weakness_drill',
+  sourceBook: 'Chess.com Live Archive',
+  author: 'hoot65 Diagnostic Analysis',
+  publicationYear: 2026,
+  eco: 'C50',
+  targetColor: 'white',
+  targetRatingBand: 'beginner',
+  startPly: 6,
+  relevance: 'core',
+  description:
+    'The Blackburne-Shilling Gambit, 1.e4 e5 2.Nf3 Nc6 3.Bc4 Nd4, reached the board in five of your games and you lost all five. Twice you took the e5 pawn, 4.Nxe5?, and met 4...Qg5 (2026-05-28 vs Itilogic, game 169351731946, mated on move 7; 2026-09-18 vs Fantomboss, game 184018513142). Three times you played 4.Nxd4 exd4 and then 5.Qf3 (2026-05-30 vs Sarvin-2025, game 169462171410; 2026-08-26 vs Boburshox_Sharifzoda, game 173560422718; 2026-10-11 vs erenyeager01o, game 185142463810). The capture 4.Nxd4 was right; the drill is about the move after it.',
+  thematicObjective:
+    'Take the knight with 4.Nxd4, never the pawn with 4.Nxe5?. After 4...exd4 play 5.c3: it attacks the pawn that nothing defends, and after ...dxc3 Nxc3 White has a knight and a bishop out against nothing.',
+  keyTacticalMotif: 'Remove the attacker; attack the undefended pawn; queen and knight mate on f3 after Nxe5?',
+  moves: [
+    { san: 'e4', isUserMove: true },
+    { san: 'e5', isUserMove: false },
+    { san: 'Nf3', isUserMove: true },
+    { san: 'Nc6', isUserMove: false },
+    { san: 'Bc4', isUserMove: true },
+    {
+      san: 'Nd4',
+      isUserMove: false,
+      annotation: 'The knight jumps to d4, attacking the f3 knight and leaving the e5 pawn unguarded. The pawn is the bait.',
+    },
+    {
+      san: 'Nxd4',
+      isUserMove: true,
+      annotation: 'Take the knight. After 4...exd4 Black has no piece developed and a lone pawn on d4.',
+      hintTheme: 'Remove the piece, not the pawn',
+      wrongMoveFeedback: {
+        Nxe5:
+          'This is the move the knight on d4 is fishing for, and you played it twice. 4...Qg5 attacks the knight on e5 and the g2 pawn at once, and nothing defends either of them.',
+        'O-O': 'Castling is playable, but it leaves Black the choice of when to trade on f3. Take the knight now.',
+      },
+    },
+    { san: 'exd4', isUserMove: false },
+    {
+      san: 'c3',
+      isUserMove: true,
+      annotation: 'Hit the d4 pawn. Nothing defends it, so Black has to spend a move on it while White develops.',
+      hintTheme: 'Attack the undefended pawn',
+      arrows: [{ from: 'c3', to: 'd4', color: 'red' }],
+      wrongMoveFeedback: {
+        Qf3: '5.Qf3 was your move in all three games that reached this position, and all three were lost. It threatens Qxf7#, but a single defensive move stops that (...Qe7 and ...f6 were the replies in your games), and then the queen is out early with no target left. 5.c3 attacks the d4 pawn, which nothing defends, so Black has to spend time on it.',
+      },
+    },
+    {
+      san: 'dxc3',
+      isUserMove: false,
+      annotation: 'Black takes on c3, and White recaptures with a developing move.',
+      alternatives: {
+        Bc5: [
+          {
+            san: 'cxd4',
+            isUserMove: true,
+            annotation: 'Take the pawn and attack the bishop. If the bishop takes back on d4, material is level and White castles next.',
+            hintTheme: 'Take the pawn with tempo',
+          },
+          { san: 'Bxd4', isUserMove: false, annotation: 'The bishop takes the pawn back. Material is level.' },
+          {
+            san: 'O-O',
+            isUserMove: true,
+            annotation: 'Castle. White has a safe king and a bishop out; Black has only the d4 bishop and the king still on e8.',
+          },
+        ],
+        Nf6: [
+          {
+            san: 'd3',
+            isUserMove: true,
+            annotation: 'The knight hits e4, so guard it with the d-pawn, as in the Italian with 4.d3. The d4 pawn can wait.',
+            hintTheme: 'Guard e4 first',
+          },
+          { san: 'dxc3', isUserMove: false },
+          {
+            san: 'Nxc3',
+            isUserMove: true,
+            annotation: 'Material is level, e4 is guarded twice (by the c3 knight and the d3 pawn) and White has two pieces out.',
+          },
+        ],
+      },
+    },
+    {
+      san: 'Nxc3',
+      isUserMove: true,
+      annotation: 'Material is level again, and White has a knight and a bishop out while Black has nothing developed.',
+    },
+    { san: 'Nf6', isUserMove: false, annotation: 'The knight attacks e4, which the c3 knight defends.' },
+    {
+      san: 'd4',
+      isUserMove: true,
+      annotation: 'Two pawns in the centre, e4 still guarded by the knight, and the c1 bishop\'s diagonal is open. Castling comes next.',
+      hintTheme: 'Take the centre',
+    },
+  ],
+  exercises: [
+    {
+      id: 'ex-blackburne-mate-pattern',
+      title: 'How the Lure Ends',
+      // 1.e4 e5 2.Nf3 Nc6 3.Bc4 Nd4 4.Nxe5 Qg5 5.Nxf7 Qxg2 6.Rf1 Qxe4+ 7.Be2: your game vs Itilogic
+      fen: 'r1b1kbnr/pppp1Npp/8/8/3nq3/8/PPPPBP1P/RNBQKR2 b Qkq - 1 7',
+      turn: 'b',
+      difficultyRating: 2,
+      prompt:
+        'Black to play. This is your game vs Itilogic after 4.Nxe5? Qg5 5.Nxf7 Qxg2 6.Rf1 Qxe4+ 7.Be2. Find the move Black played.',
+      solutionSan: ['Nf3#'],
+      explanation:
+        '7...Nf3# is checkmate: the knight checks from f3, the e2 bishop is pinned to the king by the queen on e4, and the king has no square because d1 holds the queen, f1 the rook and d2, f2 its own pawns. Remember this picture when the knight lands on d4: take it with 4.Nxd4.',
+      sourceGame: {
+        white: 'hoot65',
+        black: 'Itilogic',
+        event: 'Chess.com Live, game 169351731946',
+        year: 2026,
+        eco: 'C50',
+      },
+    },
+  ],
+  mistakesAndTraps: [
+    {
+      // The position after 1.e4 e5 2.Nf3 Nc6 3.Bc4 Nd4
+      plyIndex: 6,
+      attemptedSan: 'Nxe5',
+      isTrap: true,
+      severity: 'trap_victim',
+      explanatoryFeedback:
+        '4.Nxe5? is the move the knight on d4 is fishing for. 4...Qg5 attacks the knight on e5 and the pawn on g2 at the same time: 5.Nxf7 Qxg2 6.Rf1 Qxe4+ 7.Be2 Nf3# is checkmate (your game vs Itilogic), and 5.Bxf7+ Ke7 6.O-O Qxe5 7.Bxg8 Rxg8 leaves Black a piece for two pawns.',
+      refutationSanList: ['Qg5', 'Nxf7', 'Qxg2', 'Rf1', 'Qxe4+', 'Be2', 'Nf3#'],
+      punishmentSummary: 'Checkmate by queen and knight on f3.',
+    },
+  ],
+});
+
 export const weaknessDrillLessons: CurriculumLesson[] = [
   scandinavianRefutationDrill,
   caroKannDisciplineDrill,
+  blackburneShillingDrill,
 ];

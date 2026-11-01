@@ -90,6 +90,8 @@ describe('Curriculum Move Legality & Verification (chess.js)', () => {
     expect(alternativesVerified).toBeGreaterThanOrEqual(11);
     expect(branchMovesVerified).toBeGreaterThanOrEqual(50);
     expect([...lessonsWithBranches].sort()).toEqual([
+      'lesson-alapin-sicilian-centre',
+      'lesson-blackburne-shilling-drill',
       'lesson-caro-kann-discipline-drill',
       'lesson-evans-gambit-destruction',
       'lesson-scandinavian-refutation-drill',

@@ -4,6 +4,7 @@ import { antiGambitLessons } from './antiGambits';
 import { trapLessons } from './traps';
 import { fundamentalsLessons } from './fundamentals';
 import { weaknessDrillLessons } from './drills';
+import { antiSicilianLessons } from './antiSicilian';
 
 export * from './builder';
 export * from './openings';
@@ -11,6 +12,7 @@ export * from './antiGambits';
 export * from './traps';
 export * from './fundamentals';
 export * from './drills';
+export * from './antiSicilian';
 export * from './worksheetsData';
 
 /**
@@ -18,6 +20,7 @@ export * from './worksheetsData';
  */
 export const allCurriculumLessons: CurriculumLesson[] = [
   ...openingLessons,
+  ...antiSicilianLessons,
   ...antiGambitLessons,
   ...trapLessons,
   ...fundamentalsLessons,
@@ -30,20 +33,20 @@ export const allCurriculumLessons: CurriculumLesson[] = [
 export const curriculumCourses: ChessCurriculumCourse[] = [
   {
     id: 'course-white-repertoire',
-    title: 'White Repertoire: Scotch Gambit & Aggressive Classical Weapons',
-    subtitle: 'Lethal weapons against 1...e5 and the Open Sicilian',
+    title: 'White Repertoire: Italian, Evans Gambit & the Alapin',
+    subtitle: 'The 3.Bc4 Italian with 4.b4 against 3...Bc5, and one c3-d4 plan against the Sicilian',
     category: 'white_repertoire',
     targetColor: 'white',
     targetRatingBand: 'beginner',
     description:
-      'Master an aggressive, tactical 1.e4 opening repertoire that punishes passivity, seizes the center, and attacks the f7 square with the Scotch and Evans Gambits, plus the modern Adams Attack vs the Sicilian.',
+      'hoot65\'s 1.e4 repertoire: the Italian with the Evans Gambit after 3...Bc5 and branches for 3...h6, 3...Nf6 and 3...Nd4 weighted by his own games, and the c3-d4 centre against the Sicilian. The Scotch Gambit and the Adams Attack stay in the pattern library.',
     sourceAttribution: {
       bookTitle: 'Tactics in Junior Openings & Modernized: The Open Sicilian',
       author: 'Dave / IM Zhanibek Amanov & FM Kostya Kavutskiy',
       publicationYear: 2015,
       pagesRef: 'Scotch Gambit, Evans Gambit and Najdorf 6.h3 chapters',
     },
-    lessons: openingLessons,
+    lessons: [...openingLessons, ...antiSicilianLessons],
   },
   {
     id: 'course-anti-gambit',
@@ -104,12 +107,12 @@ export const curriculumCourses: ChessCurriculumCourse[] = [
     targetColor: 'white',
     targetRatingBand: 'beginner',
     description:
-      'Targeted drills designed specifically for hoot65’s rating band (~1150 Rapid), fixing the Scandinavian 2.e5?! error from game vs meny_26 and the Caro-Kann 3.h3?! passivity from game vs Brandon0015.',
+      'Targeted drills designed specifically for hoot65’s rating band (~1150 Rapid), fixing the Scandinavian 2.e5?! error from game vs meny_26, the Caro-Kann 3.h3?! passivity from game vs Brandon0015, and the 0-5 record against the Blackburne-Shilling knight on d4.',
     sourceAttribution: {
       bookTitle: 'Chess.com Live Archives & Tactics in Junior Openings',
       author: 'hoot65 Game Diagnostics & Dave',
       publicationYear: 2026,
-      pagesRef: 'Chess.com games 185031553576 (vs meny_26) and 185135704918 (vs Brandon0015)',
+      pagesRef: 'Chess.com games 185031553576 (vs meny_26), 185135704918 (vs Brandon0015) and 169351731946 (vs Itilogic)',
     },
     lessons: weaknessDrillLessons,
   },
