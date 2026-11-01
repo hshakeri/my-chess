@@ -1,14 +1,17 @@
 /**
  * Builds "The hoot65 Opening Book": every core opening lesson, weakness drill and trap lesson of the
- * curriculum, plus the tailored repertoire lines, as one dense printable document. Each chapter first
- * explains the position (the annotated line, the opponent's known replies, the mistakes to avoid),
- * then gives an over-the-board practice section whose answers sit in a key at the very end. The three
- * drill sets from hoot65's games are one page each: twelve positions to solve.
+ * curriculum, plus the tailored repertoire lines, as one dense printable document.
  *
- * Laid out for paper: the title and contents share the first page, chapters run on instead of each
- * opening a new page, diagrams are vector drawings in the app's own piece set (no font decides how a
- * piece looks), dark squares are a light grey, all text is black, and the key is two columns of run-in
- * answers. The page fits both US Letter and A4; `npm run book:pdf` renders Letter unless BOOK_PAPER=a4.
+ * Printed double-sided, every page with questions is the front of a sheet whose back holds its answers,
+ * so each sheet can be used on its own. The three drill pages from hoot65's games come first, each
+ * with its answers on the back. The lesson chapters that follow are study pages: the annotated line,
+ * the opponent's known replies and the mistakes to avoid. The practice for every lesson (the line and
+ * each reply as blanks, and the exercises) is gathered at the end as practice items, which
+ * `npm run book:pdf` packs onto practice sheets, moving each sheet's answers to its back.
+ *
+ * Laid out for paper: diagrams are vector drawings in the app's own piece set (no font decides how a
+ * piece looks), dark squares are a light grey and all text is black. The page fits both US Letter and
+ * A4; `npm run book:pdf` renders Letter unless BOOK_PAPER=a4.
  *
  *   npx tsx scripts/lesson-book.ts            -> book/lesson-book.html (`npm run book:pdf` renders the PDF)
  *
@@ -87,23 +90,25 @@ function fenAfter(fen: string, moves: string[]): string {
   return c.fen();
 }
 
-interface KeyEntry {
-  chapter: string;
-  label: string;
-  answer: string;
-}
-const answerKey: KeyEntry[] = [];
-/** Every blank, exercise and drill position the reader answers (a key entry can hold several). */
+/** Every blank, exercise and drill position the reader answers. */
 let answerCount = 0;
 
+/**
+ * A page number the PDF step fills in from the bookmark of the heading `heading` (empty in the HTML).
+ * In print it keeps the width of a three-digit number, so filling it in cannot move a line or a page.
+ */
+function pageOf(heading: string): string {
+  return `<span class="pg" data-page-of="${attr(heading)}"></span>`;
+}
+
 interface TocEntry {
-  /** The chapter heading as printed, which is also the title of its PDF bookmark. */
+  /** The heading the entry points to, as printed, which is also the title of its PDF bookmark. */
   heading: string;
   id: string;
   no: string;
   title: string;
 }
-/** The contents in print order; `npm run book:pdf` fills in each page number from the PDF's bookmarks. */
+/** The contents in print order. */
 const toc: TocEntry[] = [];
 
 function renderLine(lesson: CurriculumLesson, moves: CurriculumMove[], startFen: string, pathPrefix: string[], depth: number): string {
@@ -165,30 +170,96 @@ function collectBranches(moves: CurriculumMove[], pathPrefix: string[], activeFr
 }
 
 /**
- * Practice list for a sequence: the student's moves as blanks, the replies given. The sequence's answers
- * go to the key as one run-in entry ("Line: 2.exd5 3.Nc3 4.d4").
+ * Practice list for a sequence, one row per move number as on a scoresheet: the student's moves are
+ * blanks with a hint, the replies are given. `answer` is "2.exd5 3.Nc3 4.d4" for the back of the sheet.
  */
-function practiceList(lesson: CurriculumLesson, moves: CurriculumMove[], plyOffset: number, chapter: string, keyLabel: string): string {
-  let html = `<ol class="practice">`;
+function practiceList(lesson: CurriculumLesson, moves: CurriculumMove[], plyOffset: number): { html: string; answer: string } {
+  const rows: { no: string; white: string; black: string }[] = [];
   const answers: string[] = [];
   moves.forEach((move, i) => {
     const label = plyLabel(lesson.initialFen, plyOffset + i, move.san);
-    const no = `${label.split(/\.+/)[0]}${label.includes('...') ? '...' : '.'}`;
+    const no = label.split(/\.+/)[0];
+    const isBlack = label.includes('...');
+    let cell = `<span class="given">${esc(move.san)}</span>`;
     if (move.isUserMove) {
-      html += `<li class="blank"><b>${esc(no)}</b> ________ <span class="hint">(${esc(move.hintTheme || move.hintPiece || 'find the move')})</span></li>`;
-      answers.push(`${no}${move.san}${move.accept?.san?.length ? ` (also ${move.accept.san.join(', ')})` : ''}`);
+      cell = `<span class="blank">________</span> <span class="hint">(${esc(move.hintTheme || move.hintPiece || 'find the move')})</span>`;
+      answers.push(`${no}${isBlack ? '...' : '.'}${move.san}${move.accept?.san?.length ? ` (also ${move.accept.san.join(', ')})` : ''}`);
       answerCount++;
-    } else {
-      html += `<li class="given"><b>${esc(label)}</b> (given)</li>`;
     }
+    const last = rows[rows.length - 1];
+    if (isBlack && last && last.no === no && !last.black) last.black = cell;
+    else rows.push({ no, white: isBlack ? '…' : cell, black: isBlack ? cell : '' });
   });
-  if (answers.length) answerKey.push({ chapter, label: keyLabel, answer: answers.join(' ') });
-  return `${html}</ol>`;
+  const html = `<ol class="practice">${rows.map((r) => `<li><b>${r.no}.</b> ${r.white}${r.black ? ` ${r.black}` : ''}</li>`).join('')}</ol>`;
+  return { html, answer: answers.join(' ') };
 }
+
+/**
+ * One block of the practice sheets. In the HTML its answers fold out under it; `npm run book:pdf`
+ * packs the blocks onto sheets and moves the answers of each sheet to the back of that sheet.
+ */
+function practiceItem(chapter: string, body: string, answers: string, kind = ''): string {
+  return `<div class="pitem${kind}" data-chapter="${attr(chapter)}">${body}<details class="answers"><summary>Answers</summary><div class="answer-body">${answers}</div></details></div>`;
+}
+
+/** The heading of a lesson's practice, which the study chapter points to. */
+const practiceHeading = (chapter: string) => `Practice · ${chapter}`;
 
 /** The heading block of a chapter, kept together and with what follows it. */
 function chapterHead(title: string, group: PatternGroup | undefined, extra = ''): string {
   return `<header class="chapter-head">${group ? groupIntro(group) : ''}<h2>${esc(title)}</h2>${extra}</header>`;
+}
+
+/** Practice items for a lesson, gathered at the end of the book: the line and each reply as blanks, then the exercises. */
+const practiceItems: string[] = [];
+
+function renderPractice(lesson: CurriculumLesson, n: number, chapter: string): string {
+  const startPly = lesson.startPly ?? 0;
+  const prefix = lesson.moves.slice(0, startPly).map((m) => m.san);
+  const drillFen = fenAfter(lesson.initialFen, prefix);
+  const side: 'w' | 'b' = lesson.targetColor === 'black' ? 'b' : 'w';
+  const sideName = side === 'w' ? 'White' : 'Black';
+  const toMove = new Chess(drillFen).turn();
+  const userMoves = lesson.moves.filter((m, i) => i >= startPly && m.isUserMove);
+  const branches = collectBranches(lesson.moves, [], startPly);
+
+  const caption = toMove === side ? `${sideName} to move.` : `You play ${sideName}; ${toMove === 'w' ? 'White' : 'Black'} moves first (given).`;
+  const intro = `<p>Set up this position${prefix.length ? ` (after ${esc(moveText(lesson.initialFen, prefix))})` : ''} with ${sideName} nearest you and find your ${userMoves.length} move${userMoves.length === 1 ? '' : 's'}: each blank is one, and the replies are given. FEN <code>${esc(drillFen)}</code>.${
+    branches.length ? ` Then the same for the ${branches.length} other repl${branches.length === 1 ? 'y' : 'ies'} below, reached by the given moves.` : ''
+  }</p>`;
+  const line = practiceList(lesson, lesson.moves.slice(startPly), startPly);
+  let html = practiceItem(
+    chapter,
+    `<h3 id="practice-${n}">${esc(practiceHeading(chapter))}</h3><figure class="diagram">${diagram(drillFen, side)}<figcaption>${caption}</figcaption></figure>${intro}${line.html}`,
+    line.answer ? `<p><b>Line</b> ${esc(line.answer)}</p>` : '',
+    ' pstart'
+  );
+  // The other replies two to a row, each row one block
+  for (let k = 0; k < branches.length; k += 2) {
+    let body = '';
+    let answers = '';
+    branches.slice(k, k + 2).forEach((b, j) => {
+      const tag = branchTag(k + j);
+      const list = practiceList(lesson, b.continuation, b.path.length);
+      body += `<div class="reply"><p class="reply-head"><b>Reply ${tag}</b> · after <b>${esc(moveText(lesson.initialFen, b.path))}</b></p>${list.html}</div>`;
+      if (list.answer) answers += `<p><b>Reply ${tag}</b> ${esc(list.answer)}</p>`;
+    });
+    html += practiceItem(chapter, body, answers, ' replies');
+  }
+  // Exercises two to a row, each row one block
+  for (let k = 0; k < lesson.exercises.length; k += 2) {
+    let body = k === 0 ? '<h4>Exercises</h4>' : '';
+    let answers = '';
+    lesson.exercises.slice(k, k + 2).forEach((ex, j) => {
+      const turn = ex.turn ?? (new Chess(ex.fen).turn() as 'w' | 'b');
+      const label = `Exercise ${n}.${k + j + 1}`;
+      body += `<div class="exercise"><figure class="diagram">${diagram(ex.fen, turn)}<figcaption><b>${esc(label)}</b>${ex.title ? `: ${esc(ex.title)}` : ''} · ${turn === 'w' ? 'White' : 'Black'} to move</figcaption></figure><div><p>${esc(ex.prompt)}</p><p class="blankline">Your answer: ______________</p></div></div>`;
+      answers += `<p><b>${esc(label)}</b> ${esc(`${moveText(ex.fen, ex.solutionSan)}. ${ex.explanation}`)}</p>`;
+      answerCount++;
+    });
+    html += practiceItem(chapter, body, answers, ' exercises');
+  }
+  return html;
 }
 
 function renderLesson(lesson: CurriculumLesson, n: number, group?: PatternGroup, newPage = false, tocTitle = lesson.title): string {
@@ -198,8 +269,6 @@ function renderLesson(lesson: CurriculumLesson, n: number, group?: PatternGroup,
   const side: 'w' | 'b' = lesson.targetColor === 'black' ? 'b' : 'w';
   const sideName = side === 'w' ? 'White' : 'Black';
   const toMove = new Chess(drillFen).turn();
-  const userMoves = lesson.moves.filter((m, i) => i >= startPly && m.isUserMove);
-  const branches = collectBranches(lesson.moves, [], startPly);
   const chapter = `${n}. ${lesson.title}`;
   toc.push({ heading: chapter, id: `ch-${n}`, no: `${n}.`, title: tocTitle });
 
@@ -231,33 +300,9 @@ function renderLesson(lesson: CurriculumLesson, n: number, group?: PatternGroup,
     html += `</ul>`;
   }
 
-  // Practice section: cover the answers, set up the start, play your moves
-  html += `<h3 class="practice-title">Practice over the board</h3>`;
-  html += `<p>Set up the start position of the drill (FEN <code>${esc(drillFen)}</code>) with ${sideName} nearest you, cover the explanation above, and play your ${userMoves.length} move${userMoves.length === 1 ? '' : 's'} of the line while a partner (or you, with the key) plays the replies. Each move you have to find is listed as a blank below; the opponent's replies are given so you can continue.${
-    branches.length ? ` Then do the same for the ${branches.length} other repl${branches.length === 1 ? 'y' : 'ies'} after it: play the given moves to reach the position and find yours.` : ''
-  }</p>`;
-  html += practiceList(lesson, lesson.moves.slice(startPly), startPly, chapter, 'Line');
-  if (branches.length) {
-    html += `<h4>The other replies</h4>`;
-    branches.forEach((b, k) => {
-      const tag = branchTag(k);
-      html += `<div class="branch-practice"><p><b>Reply ${tag}</b> · reach it with <b>${esc(moveText(lesson.initialFen, b.path))}</b></p>`;
-      html += practiceList(lesson, b.continuation, b.path.length, chapter, `Reply ${tag}`);
-      html += `</div>`;
-    });
-  }
-
-  if (lesson.exercises.length > 0) {
-    html += `<h4>Exercises</h4><div class="exercises">`;
-    lesson.exercises.forEach((ex, k) => {
-      const turn = ex.turn ?? (new Chess(ex.fen).turn() as 'w' | 'b');
-      const label = `Exercise ${n}.${k + 1}`;
-      html += `<div class="exercise"><figure class="diagram">${diagram(ex.fen, turn)}<figcaption><b>${esc(label)}</b>${ex.title ? `: ${esc(ex.title)}` : ''} · ${turn === 'w' ? 'White' : 'Black'} to move</figcaption></figure><div><p>${esc(ex.prompt)}</p><p class="blankline">Your answer: ______________</p></div></div>`;
-      answerKey.push({ chapter, label, answer: `${moveText(ex.fen, ex.solutionSan)}. ${ex.explanation}` });
-      answerCount++;
-    });
-    html += `</div>`;
-  }
+  // The practice is on the practice sheets at the end, with its answers on the backs
+  html += `<p class="see-practice"><a href="#practice-${n}">Practice for this chapter</a> is on the practice sheets at the end of the book<span class="pg-ref">, page ${pageOf(practiceHeading(chapter))}</span>.</p>`;
+  practiceItems.push(renderPractice(lesson, n, chapter));
   html += `</section>`;
   return html;
 }
@@ -265,28 +310,30 @@ function renderLesson(lesson: CurriculumLesson, n: number, group?: PatternGroup,
 const drillById = new Map([...gameDrillData.threat, ...gameDrillData.free, ...gameDrillData.hang].map((d) => [`lesson-game-${d.id}`, d] as const));
 
 /**
- * A drill set from hoot65's games as one chapter on one page: each position as a diagram from the
- * student's side, just after the opponent's move, with the right moves and the game's story in the key.
+ * A drill set from hoot65's games as one sheet: the front holds each position as a diagram from the
+ * student's side, just after the opponent's move; the back holds the right moves and the game's story.
  */
-function renderDrillSet(lessons: CurriculumLesson[], n: number, group: PatternGroup | undefined, newPage: boolean): string {
+function renderDrillSet(lessons: CurriculumLesson[], n: number, group: PatternGroup | undefined, before = ''): string {
   const name = group ? group.title : 'Positions from your games';
   const chapter = `${n}. ${name}`;
   toc.push({ heading: chapter, id: `ch-${n}`, no: `${n}.`, title: `${name} (${lessons.length} positions from your games)` });
-  const intro = `<p>${lessons.length} positions from your recent games, newest first. Each diagram is drawn from your side just after your opponent's move, which is named under it. Find your move and write it down, then check the key: it lists every move that is right and what happened in the game.</p>`;
-  let html = `<section class="chapter drill-set${newPage ? ' new-page' : ''}" id="ch-${n}">${chapterHead(chapter, group, intro)}<div class="drills">`;
+  const intro = `<p>${lessons.length} positions from your recent games, newest first. Each diagram is drawn from your side just after your opponent's move, which is named under it. Find your move and write it down. The answers are on the back of this page: every move that is right, and what happened in the game.</p>`;
+  let front = `<section class="sheet sheet-front drill-set" id="ch-${n}">${before}${chapterHead(chapter, group, intro)}<div class="drills">`;
+  let answers = '';
   lessons.forEach((lesson, k) => {
     const [opp, mine] = lesson.moves;
     const drill = drillById.get(lesson.id);
     const side: 'w' | 'b' = lesson.targetColor === 'black' ? 'b' : 'w';
     const label = `${n}.${k + 1}`;
     const caption = `vs ${drill?.opponent ?? ''}, ${drill?.date ?? ''}. After ${plyLabel(lesson.initialFen, 0, opp.san)}, ${side === 'w' ? 'White' : 'Black'} to move.`;
-    html += `<div class="drill"><figure class="diagram">${diagram(opp.fenAfter || lesson.initialFen, side)}<figcaption><b>${esc(label)}</b> ${esc(caption)}</figcaption></figure><p class="blankline">Your move: __________</p></div>`;
+    front += `<div class="drill"><figure class="diagram">${diagram(opp.fenAfter || lesson.initialFen, side)}<figcaption><b>${esc(label)}</b> ${esc(caption)}</figcaption></figure><p class="blankline">Your move: __________</p></div>`;
     const also = mine.accept?.san?.length ? ` (also ${mine.accept.san.join(', ')})` : '';
-    answerKey.push({ chapter, label, answer: `${mine.san}${also}. ${mine.annotation ?? ''} ${lesson.thematicObjective ?? ''}`.trim() });
+    answers += `<p><b>${esc(label)}</b> ${esc(`${mine.san}${also}. ${mine.annotation ?? ''} ${lesson.thematicObjective ?? ''}`.trim())}</p>`;
     answerCount++;
   });
-  html += `</div></section>`;
-  return html;
+  front += `</div></section>`;
+  const back = `<section class="sheet sheet-back"><details class="answers"><summary>Answers to ${esc(chapter)}</summary><h2 class="sheet-title">Answers · ${esc(chapter)}</h2><div class="answer-body">${answers}</div></details></section>`;
+  return front + back;
 }
 
 function renderPlan(plan: RepertoirePlan, n: number): string {
@@ -321,20 +368,20 @@ function groupIntro(group: PatternGroup): string {
 }
 const library = allCurriculumLessons.filter((l) => l.relevance === 'outside-repertoire');
 
-/** A part heading; it runs on with the chapter after it unless `newPage`. */
-function partHead(title: string, text: string, newPage = false): string {
-  return `<section class="part${newPage ? ' new-page' : ''}"><h1>${esc(title)}</h1>${text ? `<p>${esc(text)}</p>` : ''}</section>`;
+/** A part heading; it runs on with the chapter after it. */
+function partHead(title: string, text: string, extraClass = '', id = ''): string {
+  return `<section class="part${extraClass}"${id ? ` id="${id}"` : ''}><h1>${esc(title)}</h1>${text ? `<p>${esc(text)}</p>` : ''}</section>`;
 }
 
 const howToUse =
-  "These chapters come from your own Chess.com games (hoot65) and the openings you actually play, in the order of the app's study path: lessons that repeat the same pattern follow one another, and each group opens with the check that catches it. The first three chapters are positions from your recent games: a piece your opponent's move attacked that stayed where it was, a piece of theirs that could have been won, and a move of yours that left a piece where it could be taken. Each lesson chapter after them explains the position first; the practice section that follows, for the main line and for every other reply your opponents chose, is meant to be done on a real board with the explanation covered. Answers are in the key at the end.";
+  "These chapters come from your own Chess.com games (hoot65) and the openings you actually play, in the order of the app's study path: lessons that repeat the same pattern follow one another, and each group opens with the check that catches it. The first three chapters are positions from your recent games: a piece your opponent's move attacked that stayed where it was, a piece of theirs that could have been won, and a move of yours that left a piece where it could be taken. Each lesson chapter after them explains the position: the line with its notes, the other replies your opponents chose, and the mistakes to avoid. The practice for every lesson, the main line and each of those replies as moves to find plus the exercises, is on the practice sheets at the end of the book, to be played out on a real board.";
+const printing =
+  'Print the book double-sided, flipping on the long edge. Every page with questions, the three pages of positions from your games and each practice sheet, is the front of a sheet with its answers on the back, so each sheet can be taken to the board on its own. Where a practice sheet would otherwise start on the back of a page, a page for notes comes first.';
 
 const playing = (l: CurriculumLesson) => `${l.title} (you play ${l.targetColor === 'black' ? 'Black' : 'White'})`;
 
 let n = 0;
 const chapters: string[] = [];
-// Part I opens the second page: the first drill set fills it, and each set after it gets a page of its own
-chapters.push(partHead('Part I · Your drills and repertoire lessons', '', true));
 let previousGroup: PatternGroup | undefined;
 let previousLessonId = '';
 const renderedSets = new Set<CurriculumLesson[]>();
@@ -342,11 +389,14 @@ for (const lesson of openingLessons) {
   const group = patternGroupOf(lesson.id);
   const set = drillSetOf(lesson.id);
   if (set) {
-    // A drill set is one chapter of positions, printed where its first position falls
-    if (!renderedSets.has(set)) chapters.push(renderDrillSet(set, ++n, group !== previousGroup ? group : undefined, renderedSets.size > 0));
+    // A drill set is one sheet of positions, printed where its first position falls; the first one carries the part heading
+    if (!renderedSets.has(set)) {
+      const before = renderedSets.size === 0 ? partHead('Part I · Your drills and repertoire lessons', '') : '';
+      chapters.push(renderDrillSet(set, ++n, group !== previousGroup ? group : undefined, before));
+    }
     renderedSets.add(set);
   } else {
-    // The drill pages hold nothing else, so the first lesson after them opens a page; later lessons run on
+    // The lesson after the drill sheets opens a page; later lessons run on
     chapters.push(
       renderLesson(lesson, ++n, group !== previousGroup ? group : undefined, previousGroup !== undefined && renderedSets.size > 0 && !!drillSetOf(previousLessonId), playing(lesson))
     );
@@ -365,23 +415,20 @@ chapters.push(renderPlan(getRecommendedBlackRepertoire(), ++n));
 chapters.push(partHead('Part III · Pattern library', 'Openings you do not play, kept for the patterns in them.'));
 for (const lesson of library) chapters.push(renderLesson(lesson, ++n));
 
-// The key starts a new page (printed double-sided, that can be the back of the last practice page); two columns of run-in entries
-toc.push({ heading: 'Answer key', id: 'key', no: '', title: 'Answer key' });
-let key = `<section class="key new-page" id="key"><h1>Answer key</h1><div class="key-body">`;
-let currentChapter = '';
-for (const e of answerKey) {
-  if (e.chapter !== currentChapter) {
-    currentChapter = e.chapter;
-    key += `<h3>${esc(currentChapter)}</h3>`;
-  }
-  key += `<p><b>${esc(e.label)}</b> ${esc(e.answer)}</p>`;
-}
-key += `</div></section>`;
+// Part IV: the practice of every lesson, as blocks the PDF step packs onto sheets with their answers on the backs
+const practiceTitle = 'Part IV · Practice sheets';
+toc.push({ heading: practiceTitle, id: 'practice', no: '', title: 'Practice sheets, with the answers on the back of each sheet' });
+const practicePart = `${partHead(
+  practiceTitle,
+  'The practice for each lesson chapter, in chapter order: set up the position, play your moves of the line and of each reply, and solve the exercises. The answers to each sheet are on its back.',
+  ' practice-part',
+  'practice'
+)}<div id="practice-items">${practiceItems.join('')}</div>`;
 
 const drillCount = openingLessons.filter((l) => drillSetOf(l.id)).length;
-// One line per chapter (a drill set is one chapter); the page column stays empty in the HTML
+// One line per chapter (a drill set is one chapter)
 const contents = `<h2>Contents</h2><ol class="toc">${toc
-  .map((e) => `<li data-heading="${attr(e.heading)}"><a href="#${e.id}"><span class="no">${esc(e.no)}</span><span class="t">${esc(e.title)}</span><span class="pg"></span></a></li>`)
+  .map((e) => `<li><a href="#${e.id}"><span class="no">${esc(e.no)}</span><span class="t">${esc(e.title)}</span>${pageOf(e.heading)}</a></li>`)
   .join('')}</ol>`;
 
 const SERIF = `'Times New Roman', 'Liberation Serif', Times, serif`;
@@ -399,24 +446,32 @@ h3 { font: bold 9pt/1.3 ${SANS}; margin: 8pt 0 2pt; }
 h4 { font-size: 10.5pt; margin: 6pt 0 2pt; }
 p { margin: 0 0 4pt; text-align: justify; }
 ul, ol { margin: 0 0 4pt; }
-.new-page { break-before: page; page-break-before: always; }
+a { color: inherit; }
+.new-page, .howto, .sheet-front, .sheet-back, .notes-page { break-before: page; page-break-before: always; }
 .front .title { font-size: 24pt; margin: 0 0 4pt; }
 .front .subtitle { font-style: italic; margin-bottom: 2pt; }
 .front .counts { font: 9pt ${SANS}; }
-.front h2 { margin-top: 12pt; border-bottom: .75pt solid #000; padding-bottom: 1pt; }
+.front h2, .howto h2 { margin-top: 12pt; border-bottom: .75pt solid #000; padding-bottom: 1pt; }
+.howto h2 { margin-top: 0; }
 ol.toc { list-style: none; columns: 2; column-gap: 8mm; padding: 0; margin-top: 4pt; }
 ol.toc li { break-inside: avoid; margin-bottom: 1.5pt; }
-ol.toc a { display: flex; align-items: baseline; gap: 4pt; color: inherit; text-decoration: none; }
+ol.toc a { display: flex; align-items: baseline; gap: 4pt; text-decoration: none; }
 ol.toc .no { flex: 0 0 1.4em; text-align: right; }
 ol.toc .t { flex: 1 1 auto; }
-ol.toc .pg { flex: 0 0 auto; padding-left: 4pt; }
-ol.toc .pg:empty { display: none; }
+ol.toc .pg { flex: 0 0 auto; }
+.pg:empty { display: none; }
+.pg-ref:has(.pg:empty) { display: none; }
+@media print {
+  .pg, .pg:empty { display: inline-block; min-width: 1.6em; text-align: right; }
+  .pg-ref, .pg-ref:has(.pg:empty) { display: inline; }
+  details.answers > summary { display: none; }
+}
 .part { margin: 14pt 0 0; }
 .part h1 { border-bottom: 2pt solid #000; padding-bottom: 2pt; }
 .part + .chapter { margin-top: 6pt; }
 .chapter { margin-top: 16pt; }
 .chapter-head { border-top: 1.5pt solid #000; padding-top: 4pt; break-inside: avoid; break-after: avoid; page-break-after: avoid; }
-.part + .chapter .chapter-head { border-top: none; padding-top: 0; }
+.part + .chapter .chapter-head, .part + .chapter-head { border-top: none; padding-top: 0; }
 .meta { font: 8.5pt/1.3 ${SANS}; margin-bottom: 2pt; }
 .lead { font-style: italic; }
 .group { border-bottom: .5pt solid #000; padding: 0 0 3pt; margin: 0 0 5pt; }
@@ -439,36 +494,49 @@ ol.line li { margin: 0 0 2.5pt; }
 .warn { font-weight: bold; font-style: italic; }
 ul.traps { padding-left: 13pt; }
 ul.traps li { margin-bottom: 2pt; }
-.practice-title { margin-top: 10pt; border-top: .75pt dashed #000; padding-top: 5pt; }
-ol.practice { list-style: none; columns: 2; column-gap: 8mm; padding: 0; margin: 0 0 5pt; }
-ol.practice li { break-inside: avoid; margin-bottom: 1.5pt; }
-.hint { font-size: 8.5pt; }
-.branch-practice { break-inside: avoid; margin: 0 0 3pt; }
-.branch-practice p { margin: 2pt 0; }
-.exercises { display: grid; grid-template-columns: 1fr 1fr; gap: 8pt 8mm; }
-.exercise { display: flex; gap: 6pt; align-items: flex-start; break-inside: avoid; }
+.see-practice { margin-top: 6pt; font-style: italic; }
+.sheet { display: flow-root; }
+.sheet-title { font: bold 10pt/1.3 ${SANS}; border-bottom: .75pt solid #000; padding-bottom: 1pt; margin: 0 0 6pt; }
+.pitem { display: flow-root; margin: 0 0 7pt; }
+.pitem h3 { margin-top: 0; }
+.pstart { border-top: 1pt solid #000; padding-top: 4pt; }
+.pstart > figure { float: right; width: 38mm; margin: 0 0 4pt 8pt; }
+.cont { font: italic 8.5pt/1.3 ${SANS}; border-top: 1pt solid #000; padding-top: 3pt; margin: 0 0 3pt; }
+.reply-head { margin: 0 0 2pt; }
+ol.practice { list-style: none; columns: 2; column-gap: 8mm; padding: 0; margin: 0 0 3pt; font-size: 9.5pt; }
+ol.practice li { break-inside: avoid; margin-bottom: 1.5pt; text-indent: -1.2em; padding-left: 1.2em; }
+.hint { font-size: 8pt; }
+.pitem.replies { display: grid; grid-template-columns: 1fr 1fr; gap: 0 8mm; }
+.pitem.replies > details { grid-column: 1 / -1; }
+.reply ol.practice { columns: 1; }
+.reply-head { text-align: left; }
+.pitem.exercises { display: grid; grid-template-columns: 1fr 1fr; gap: 8pt 8mm; }
+.pitem.exercises > h4, .pitem.exercises > details { grid-column: 1 / -1; margin: 0; }
+.exercise { display: flex; gap: 6pt; align-items: flex-start; }
 .exercise > figure { flex: 0 0 38mm; }
 .exercise p { text-align: left; font-size: 9.5pt; }
 .blankline { text-align: left; margin: 3pt 0 0; }
 code { font: 8pt 'Courier New', 'Liberation Mono', monospace; }
+details.answers { margin: 2pt 0 0; }
+details.answers > summary { font: 8.5pt ${SANS}; cursor: pointer; }
+.answer-body { columns: 2; column-gap: 8mm; font-size: 9pt; line-height: 1.25; }
+.answer-body p { text-align: left; margin: 0 0 3pt; break-inside: avoid; }
+.answer-body .ach { font: bold 8.5pt/1.3 ${SANS}; margin: 5pt 0 2pt; break-after: avoid; }
+.answer-body .ach:first-child { margin-top: 0; }
 .drills { display: grid; grid-template-columns: repeat(4, 1fr); gap: 7pt 4mm; margin-top: 4pt; }
-.drill { break-inside: avoid; }
 .drill .blankline { font-size: 9pt; }
 .plan-line { display: flow-root; }
 .plan-line > figure { float: right; width: 40mm; margin: 0 0 4pt 10pt; }
 .moves { font-size: 10pt; }
 ul.notes { padding-left: 13pt; font-size: 9.5pt; }
-.key-body { columns: 2; column-gap: 8mm; font-size: 8.5pt; line-height: 1.25; }
-.key-body h3 { font-size: 8pt; margin: 5pt 0 1pt; }
-.key-body h3:first-child { margin-top: 0; }
-.key-body p { text-align: left; margin: 0 0 2pt; }
 `;
 
 const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>The hoot65 Opening Book</title><style>${css}</style></head><body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">${pieceSymbols}</svg>
-<section class="front"><h1 class="title">The hoot65 Opening Book</h1><p class="subtitle">Personalized opening lessons, weakness drills and repertoire lines, generated from the my-chess curriculum on ${new Date().toISOString().slice(0, 10)}.</p><p class="counts">${openingLessons.length - drillCount} lessons · ${drillCount} positions from your games · ${answerCount} practice answers · ${library.length} pattern-library chapters</p><h2>How to use this book</h2><p>${esc(howToUse)}</p>${contents}</section>
+<section class="front"><h1 class="title">The hoot65 Opening Book</h1><p class="subtitle">Personalized opening lessons, weakness drills and repertoire lines, generated from the my-chess curriculum on ${new Date().toISOString().slice(0, 10)}.</p><p class="counts">${openingLessons.length - drillCount} lessons · ${drillCount} positions from your games · ${answerCount} practice answers · ${library.length} pattern-library chapters</p>${contents}</section>
+<section class="howto"><h2>How to use this book</h2><p>${esc(howToUse)}</p><p>${esc(printing)}</p></section>
 ${chapters.join('\n')}
-${key}
+${practicePart}
 </body></html>`;
 
 mkdirSync(OUT_DIR, { recursive: true });

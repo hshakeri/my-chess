@@ -131,15 +131,19 @@ Status (2026-11-01): White 1-5 and Black 1-4 and 6 are done (Black 5 needs no ne
   Games" course), print as three one-page chapters of 12 diagrams in the book, and
   `tests/unit/curriculum/game-drills.spec.ts` works out every fact their text states. Re-run the scan
   and `pick` as new games come in.
-- Lesson book print layout (2026-11-01): 48 US Letter pages (46 on A4) instead of 86 A4 pages, with
-  the same 351 answers. Title and contents share page 1, and the contents carry page numbers:
-  `npm run book:pdf` renders twice and reads where each chapter landed from the first PDF's
-  bookmarks (it fails if a chapter has no bookmark or moves). Chapters run on instead of opening a
-  page; each drill set is one page of 12 diagrams; the key is two columns of run-in answers (3 pages,
-  not 10). Diagrams are SVG drawings with the app's piece set (`public/pieces`), so macOS and the
-  Linux runner print the same pieces; the fonts are Times New Roman and Arial, whose metric twins
-  Liberation Serif and Sans the runner has, so pages break the same way there. All text is black
-  and dark squares are a light grey: by Ghostscript's ink estimate the book takes 26% less ink.
+- Lesson book print layout (2026-11-01): printed double-sided, every page with questions is the
+  front of a sheet whose back holds its answers, so each sheet can be used on its own. The three drill
+  pages come first, each with its answers on the back; the lesson chapters are study pages; the
+  practice for every lesson (the line and each reply as scoresheet rows with blanks, and the exercises)
+  is gathered at the end as blocks that `npm run book:pdf` packs onto practice sheets in the browser,
+  moving each sheet's answers to its back. Chromium cannot force a front page, so the PDF step renders
+  a draft, reads from its bookmarks where each heading landed, puts a notes page where a practice sheet
+  would start on a back, fills in the page numbers (contents and each chapter's pointer to its
+  practice), renders the book, and fails if any sheet is not a front page followed by its answers.
+  62 US Letter pages (62 on A4), 17 sheets, 351 answers. Diagrams are SVG drawings with the app's
+  piece set (`public/pieces`); the fonts are Times New Roman and Arial, whose metric twins Liberation
+  Serif and Sans the Linux runner has, so pages break the same way there. All text is black and dark
+  squares are a light grey.
 Next: the roadmap below.
 
 ## Roadmap items not yet built (see `docs/pedagogy-audit.md` Section 7)
