@@ -75,7 +75,12 @@ describe('HeuristicFallbackEngine: every Elo band answers quickly', () => {
     for (const elo of [1100, 1300, 1500, 1700] as HumanElo[]) expect(ELO_PROFILES[elo].deepen).toBeUndefined();
   });
 
-  it('answers the spec middlegame with a legal move in under 2 s at every Elo', { timeout: 60000 }, () => {
+  // Every band must answer well before the engine worker gives up (4 s); the searches this guards against
+  // took 14 s (1700) and 70 s (1900). On a laptop the slowest band takes about 1 s, so the bound there is
+  // 2 s. A CI runner, with other test files running in parallel, measured 2.0 s for Elo 1500 (0.4 s on a
+  // laptop), so CI checks the worker's 4 s limit itself.
+  const limitMs = process.env.CI ? 4000 : 2000;
+  it(`answers the spec middlegame with a legal move in under ${limitMs / 1000} s at every Elo`, { timeout: 60000 }, () => {
     const legal = new Chess(SPEC_FEN).moves();
     for (const elo of [1100, 1300, 1500, 1700, 1900] as HumanElo[]) {
       const timed = () => {
@@ -85,9 +90,9 @@ describe('HeuristicFallbackEngine: every Elo band answers quickly', () => {
       };
       let run = timed();
       // One retry, so a single garbage-collection pause or a busy machine does not fail the test
-      if (run.ms >= 2000) run = timed();
+      if (run.ms >= limitMs) run = timed();
       expect(legal, `Elo ${elo}`).toContain(run.san);
-      expect(run.ms, `Elo ${elo} took ${Math.round(run.ms)} ms`).toBeLessThan(2000);
+      expect(run.ms, `Elo ${elo} took ${Math.round(run.ms)} ms`).toBeLessThan(limitMs);
     }
   });
 
