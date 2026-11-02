@@ -195,8 +195,13 @@ Next: the roadmap below.
   built: the Maia-in-Vitest spec (DC-7).
 - CL-5 done (2026-11-01): a board question before every lesson and review decision (what the last
   move attacks, what is undefended, how many checks), a wrong answer rates the decision Hard, and a
-  two-minute warm-up on positions from hoot65's games. Not built: the question about the opponent's
-  likeliest reply after the student's move.
+  two-minute warm-up on positions from hoot65's games. The Play tab has the two archive habits as
+  switches (2026-11-02): the board question before each of the student's moves against Maia, and a
+  safety check before each move is played ("is it safe?", judged by the review's material search,
+  `losesMaterial` in `src/analytics/errorTaxonomy.ts`, in the engine worker within 20,000 nodes);
+  both belong to one position of one game. The warm-up's "Was it safe?" uses the same search within
+  2,000 nodes and takes half its questions from 32 unsafe drill moves. Not built: the question about
+  the opponent's likeliest reply after the student's move.
 - CL-6 done (2026-11-01): play a finished lesson line on against Maia 1100/1300 from the Play tab,
   with plan goals (castle, develop, keep material, plus any `planMilestones`) and a review of the
   spar's moves; the engine worker is shared through `src/engine/EngineContext.tsx`. A game review's
@@ -237,7 +242,13 @@ Next: the roadmap below.
   (`src/views/TacticsDeckPanel.tsx`): graded by solve time, Again first, retired after three Good
   solves in a row; a Worksheets sheet (also as "two moves ahead", a visualization format) and three
   lesson-book sheets. The Lessons header shows the
-  day's routine (warm-up, due cards, ten tactics, plans) with each step ticked when done.
+  day's routine (warm-up, due cards, ten tactics, plans, and a game with the Play tab's two checks,
+  ticked after ten answers in games) with each step ticked when done.
+- A full archive stays responsive (2026-11-02, checked on all 4,097 of hoot65's games): Diagnostics
+  reads the openings in 1.6 s instead of 10.7 (each position and move parsed once for the archive),
+  in slices between frames beyond 800 games; the Games tab filters in memory and draws 500 rows at a
+  time. The lesson book's "How to use" page carries a card of the checks in the order they come up
+  at the board, with their points.
 - DC-6 archive half done (2026-11-02): Maia's opening book is the archive opponents' moves
   (`scripts/game-analysis/opening-book.mjs`, 253 positions).
 - DC-8 habit done (2026-11-02): "Kept a lead of 3 points for the next 10 moves" replaces "traded
