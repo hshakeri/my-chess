@@ -51,6 +51,8 @@ export const GameReviewPanel: React.FC<GameReviewPanelProps> = ({ game, currentP
   const [revealWanted, setRevealWanted] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const runRef = useRef<Run | null>(null);
+  // A batch review of this game, kept hidden until the student has made their marks
+  const batchRef = useRef<GameReview | null>(null);
   const marksRef = useRef<StudentMark[]>([]);
   marksRef.current = marks;
 
@@ -61,7 +63,11 @@ export const GameReviewPanel: React.FC<GameReviewPanelProps> = ({ game, currentP
       .get(game.id)
       .then((saved) => {
         if (!alive) return;
-        if (saved) {
+        batchRef.current = null;
+        if (saved?.source === 'batch') {
+          batchRef.current = saved;
+          setPhase('idle');
+        } else if (saved) {
           setReview(saved);
           setMarks(saved.marks);
           setPhase('revealed');
@@ -123,13 +129,22 @@ export const GameReviewPanel: React.FC<GameReviewPanelProps> = ({ game, currentP
   const beginReview = () => {
     setMarks([]);
     setPhase('marking');
-    startEngine();
+    if (batchRef.current) {
+      // The batch review already has the engine's moments
+      setError(null);
+      setEngineResult(batchRef.current);
+    } else {
+      startEngine();
+    }
   };
 
   /** Save the review with the student's marks and turn its mistakes into review cards. */
   const reveal = useCallback(
     async (result: GameReview) => {
-      const withMarks: GameReview = { ...result, marks: marksRef.current.map((m) => ({ ...m, reason: m.reason.trim() })) };
+      const { source: _batch, ...engineReview } = result;
+      void _batch;
+      batchRef.current = null;
+      const withMarks: GameReview = { ...engineReview, marks: marksRef.current.map((m) => ({ ...m, reason: m.reason.trim() })) };
       let cardIds: string[] = [];
       try {
         cardIds = (await CardService.ensureCards(cardSpecsFromReview(withMarks, opponent))).map((c) => c.id);
@@ -265,6 +280,11 @@ export const GameReviewPanel: React.FC<GameReviewPanelProps> = ({ game, currentP
             First mark up to three of your moves you think went wrong, and say why in a line. Then the engine's review is shown beside your marks, and
             each mistake it can check becomes a card in Today's session.
           </p>
+          {batchRef.current && (
+            <p className="text-xs text-slate-400" data-review-batch>
+              The batch review on the Diagnostics tab has already checked this game; what it found stays hidden until you have made your marks.
+            </p>
+          )}
           <button
             type="button"
             data-action="review-start"

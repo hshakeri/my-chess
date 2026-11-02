@@ -64,4 +64,9 @@ export interface GameReview {
   lossCause?: string;
   /** Review cards made from the moments (canonical FEN keys). */
   cardIds: string[];
+  /**
+   * 'batch': made by the batch review on the Diagnostics tab, without the student's marks; opening
+   * the game still asks for the marks first, and then shows this review without running the engine.
+   */
+  source?: 'batch';
 }

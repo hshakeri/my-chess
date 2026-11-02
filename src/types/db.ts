@@ -161,6 +161,8 @@ export interface DatabaseExportData {
   diagnostics?: StoredDiagnostic[];
   cards?: StoredCard[];
   revlog?: StoredRevlog[];
+  /** Game reviews (CL-3), one per game; absent from backups made before reviews were exported. */
+  reviews?: StoredReview[];
 }
 
 export const DATABASE_EXPORT_VERSION = 2;

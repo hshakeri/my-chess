@@ -7,6 +7,7 @@ import {
   type BatchInsertResult,
   type DatabaseExportData,
   type StoredRevlog,
+  type StoredReview,
 } from '../types/db';
 
 /**
@@ -308,6 +309,7 @@ export class GamesRepository {
     const diagnostics = await this.db.diagnostics.toArray();
     const cards = await this.db.cards.toArray();
     const revlog = await this.db.revlog.toArray();
+    const reviews = await this.db.reviews.toArray();
 
     return {
       version: DATABASE_EXPORT_VERSION,
@@ -318,6 +320,7 @@ export class GamesRepository {
       diagnostics,
       cards,
       revlog,
+      reviews,
     };
   }
 
@@ -361,12 +364,26 @@ export class GamesRepository {
     if (Array.isArray(parsed.revlog) && parsed.revlog.length > 0) {
       await this.importRevlog(parsed.revlog);
     }
+    if (Array.isArray(parsed.reviews) && parsed.reviews.length > 0) {
+      await this.importReviews(parsed.reviews);
+    }
 
     return {
       gamesAdded: result.added,
       gamesSkipped: result.duplicatesSkipped,
       version: parsed.version || 1,
     };
+  }
+
+  /**
+   * One review per game: a review from the backup replaces the local one only when it is newer, so
+   * restoring an old backup never undoes a review made since.
+   */
+  private async importReviews(rows: StoredReview[]): Promise<number> {
+    const existing = await this.db.reviews.bulkGet(rows.map((r) => r.gameId));
+    const toPut = rows.filter((r, i) => r && r.gameId && (!existing[i] || existing[i]!.reviewedAt < r.reviewedAt));
+    if (toPut.length > 0) await this.db.reviews.bulkPut(toPut);
+    return toPut.length;
   }
 
   /**

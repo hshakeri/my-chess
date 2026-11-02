@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { test, expect } from '@playwright/test';
 
 test.describe('04. Personalized Diagnostics & Repertoire Recommendation (F13 - F15)', () => {
@@ -123,5 +124,20 @@ test.describe('04. Personalized Diagnostics & Repertoire Recommendation (F13 - F
     await page.locator('[data-square="d5"]').click();
     await expect(page.locator('.correct-feedback')).toBeVisible();
     await expect(page.locator('[data-review-log] [data-rating]')).toHaveCount(1);
+  });
+
+  test('Your mistake patterns: the reviewed games counted, and a batch review of the newest unreviewed games (CL-3)', async ({ page }) => {
+    const view = page.locator('.diagnostics-view, [data-view="diagnostics"]').first();
+    await view.locator('[data-diag-tab="mistakes"]').click();
+    const panel = page.locator('[data-section="mistake-patterns"]');
+    await expect(panel).toBeVisible();
+    // A fresh profile has no review yet
+    await expect(panel.locator('[data-section="mistake-summary"]')).toHaveAttribute('data-games', '0');
+    // Every seed game of hoot65's with ten plies or more is waiting for a review
+    const seed: Array<{ movesSan: string[]; userColor?: string }> = JSON.parse(readFileSync('src/data/seed_hoot65_games.json', 'utf8'));
+    const waiting = seed.filter((g) => g.userColor && g.movesSan.length >= 10).length;
+    await expect(panel.locator('[data-batch-status]')).toHaveText(`${waiting} of your games are not reviewed yet.`, { timeout: 15000 });
+    await expect(panel.locator('[data-action="batch-review"]')).toBeEnabled();
+    await expect(panel.locator('select[data-select="batch-size"]')).toHaveValue('10');
   });
 });

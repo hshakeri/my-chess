@@ -15,6 +15,7 @@ import {
   GraduationCap,
   Play,
   Info,
+  ListChecks,
 } from 'lucide-react';
 import { StoredGame } from '../types/db';
 import {
@@ -32,6 +33,7 @@ import {
 } from '../analytics/repertoire';
 import { Chessboard, BoardArrow } from '../components/Chessboard';
 import { RulesEngine } from '../engine/rules';
+import { MistakePatternsPanel } from './MistakePatternsPanel';
 
 interface DiagnosticsViewProps {
   /** The games to analyze (the live IndexedDB archive in the app). */
@@ -90,7 +92,7 @@ export const DiagnosticsView: React.FC<DiagnosticsViewProps> = ({
   onAdoptRepertoire,
   adoptedRepertoireIds = [],
 }) => {
-  const [activeTab, setActiveTab] = useState<'leaks' | 'repertoires' | 'openings'>('leaks');
+  const [activeTab, setActiveTab] = useState<'leaks' | 'repertoires' | 'openings' | 'mistakes'>('leaks');
   const [leakFilter, setLeakFilter] = useState<'all' | 'white' | 'black' | string>('all');
   const [selectedRepColor, setSelectedRepColor] = useState<'white' | 'black'>('white');
   const [selectedLineId, setSelectedLineId] = useState<string>('white-scandi-refutation');
@@ -302,7 +304,23 @@ export const DiagnosticsView: React.FC<DiagnosticsViewProps> = ({
           <TrendingUp className="w-4 h-4 text-emerald-400" />
           Opening Performance Matrix
         </button>
+
+        <button
+          data-diag-tab="mistakes"
+          onClick={() => setActiveTab('mistakes')}
+          className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${
+            activeTab === 'mistakes'
+              ? 'bg-amber-500/10 text-amber-300 border border-amber-500/30 shadow-sm'
+              : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
+          }`}
+        >
+          <ListChecks className="w-4 h-4 text-amber-400" />
+          Your Mistake Patterns
+        </button>
       </div>
+
+      {/* The game reviews, counted (CL-3) */}
+      {activeTab === 'mistakes' && <MistakePatternsPanel games={games} />}
 
       {/* 3. Leaks Tab */}
       {activeTab === 'leaks' && (

@@ -241,6 +241,34 @@ describe('Export / import version 2', () => {
     expect(await testDb.cards.count()).toBe(2);
   });
 
+  it('exports game reviews and imports them without overwriting a newer local review', async () => {
+    const review = (gameId: string, reviewedAt: number) => ({
+      gameId,
+      reviewedAt,
+      engine: 'maia' as const,
+      userColor: 'white' as const,
+      movesReviewed: 30,
+      criticalMoments: [],
+      marks: [],
+      cardIds: [],
+    });
+    await testDb.reviews.bulkPut([review('g1', NOW), review('g2', NOW)]);
+    const exported = await repo.exportDatabaseJson();
+    expect(exported.reviews!.map((r) => r.gameId).sort()).toEqual(['g1', 'g2']);
+    const json = JSON.stringify(exported);
+
+    // Since the backup: g1 was reviewed again here, g2 was deleted
+    await testDb.reviews.put({ ...review('g1', NOW + 5000), movesReviewed: 31 });
+    await testDb.reviews.delete('g2');
+    await repo.importDatabaseJson(json);
+    expect((await testDb.reviews.get('g1'))!.movesReviewed).toBe(31);
+    expect((await testDb.reviews.get('g2'))!.reviewedAt).toBe(NOW);
+
+    // A newer review in a backup does replace the local one
+    await repo.importDatabaseJson({ ...exported, reviews: [{ ...review('g1', NOW + 9000), movesReviewed: 40 }] });
+    expect((await testDb.reviews.get('g1'))!.movesReviewed).toBe(40);
+  });
+
   it('imports revlog rows from another database without id collisions', async () => {
     await testDb.revlog.add(sampleRevlog('local', NOW)); // takes id 1 locally
     const foreign: DatabaseExportData = {

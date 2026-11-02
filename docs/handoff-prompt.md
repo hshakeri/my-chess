@@ -16,9 +16,9 @@ also runs on every push to another branch).
 
 - React 18 + Vite 6 + TypeScript (strict) + Tailwind; chess.js 1.4; Dexie 4 (IndexedDB); ts-fsrs 5
   for scheduling; maia3-js + onnxruntime-web in a Web Worker for the human-like engine.
-- Tests: Vitest (`npm test`, 373 tests: SSR `renderToString` specs, jsdom interaction specs under
+- Tests: Vitest (`npm test`, 383 tests: SSR `renderToString` specs, jsdom interaction specs under
   `tests/unit/curriculum/lessons-view-interactions.spec.tsx`, fake-indexeddb for the database) and
-  Playwright (`npm run test:e2e`, 84 tests incl. iPhone-viewport tests). Keep both green or update
+  Playwright (`npm run test:e2e`, 85 tests incl. iPhone-viewport tests). Keep both green or update
   tests deliberately and say why. The board question before each lesson move (CL-5) is on by default:
   a test that plays lesson moves either answers it or sets localStorage `my_chess_cct_gate` to `off`
   first (`page.addInitScript` in e2e, the jsdom spec's beforeEach). No `if (await ...isVisible())` guards in specs: a missing control
@@ -173,12 +173,16 @@ Next: the roadmap below.
   the answer page), Black sheets are drawn from Black's side, squares print with
   `print-color-adjust: exact`, every exercise with its own position has a diagram, the Scotch
   exercise-2 FEN is fixed, and each sheet has a Date / Attempt / Score / Next review row.
-- CL-3, first slice done (2026-11-01): a game opened in the database can be reviewed (marks first,
+- CL-3 done (2026-11-01). First slice: a game opened in the database can be reviewed (marks first,
   then Maia's critical moments named by `src/analytics/errorTaxonomy.ts`, in the engine worker), and
   each mistake with a material answer becomes a card that comes first among a session's new cards.
-  Next slice: the "Your patterns" dashboard over many reviewed games (errors per 100 moves by type,
-  phase and clock, rolling trend) with a batch review in the worker, reviews in the JSON backup, and
-  the Maia-in-Vitest spec (DC-7).
+  Second slice: Diagnostics has a "Your Mistake Patterns" tab (`src/views/MistakePatternsPanel.tsx`,
+  `src/analytics/mistakePatterns.ts`): every reviewed game counted per 100 of hoot65's moves by kind
+  (with the check that catches it), by phase, by the time left on the clock and by month, and a batch
+  review of the newest unreviewed games in the worker. Batch reviews are saved with `source: 'batch'`
+  and no marks; opening such a game still asks for the marks first, then shows the batch result
+  without running the engine. Reviews are in the JSON backup (a newer local review is kept). Not
+  built: the Maia-in-Vitest spec (DC-7).
 - CL-5 done (2026-11-01): a board question before every lesson and review decision (what the last
   move attacks, what is undefended, how many checks), a wrong answer rates the decision Hard, and a
   two-minute warm-up on positions from hoot65's games. Not built: the question about the opponent's
