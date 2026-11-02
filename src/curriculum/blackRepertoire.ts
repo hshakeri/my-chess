@@ -918,6 +918,116 @@ export const caroKannBc4Lesson: CurriculumLesson = buildVerifiedLesson({
   ],
 });
 
+export const caroKannExchangeLesson: CurriculumLesson = buildVerifiedLesson({
+  ...SOURCE,
+  id: 'lesson-black-caro-exchange',
+  title: 'Caro-Kann Exchange: The Bishop on f5',
+  subtitle: 'When White\'s bishop comes to d3 or b5',
+  category: 'opening',
+  eco: 'B13',
+  targetColor: 'black',
+  targetRatingBand: 'intermediate',
+  relevance: 'core',
+  description:
+    'After 2.d4 d5, 3.exd5 came up in 4 of your Caro-Kann games (2 points). The position is level, and the c8 bishop comes out to f5 at once. Two moments decide whether it stays comfortable: when a white bishop comes to d3 to meet yours, and when one gives check on b5.',
+  thematicObjective:
+    'Meet Bd3 by trading or by retreating to g6, never by leaving the bishop to be taken. Against Bb5+, block with the c-knight: a knight on d7 is pinned there and Ne5 piles up on it.',
+  keyTacticalMotif: 'A pinned knight on d7 attacked twice, by the b5 bishop and a knight on e5',
+  moves: [
+    { san: 'e4', isUserMove: false },
+    { san: 'c6', isUserMove: true },
+    { san: 'd4', isUserMove: false },
+    { san: 'd5', isUserMove: true },
+    // After 2...d5: 3.e5 14, 3.exd5 4, 3.Nc3 3, 3.f3 2, 3.Nd2 1.
+    { san: 'exd5', isUserMove: false, frequency: 4 },
+    { san: 'cxd5', isUserMove: true, annotation: 'Take back with the pawn: Black keeps a pawn in the centre.' },
+    {
+      san: 'Nc3',
+      isUserMove: false,
+      // After 3...cxd5: 4.Nc3 3, 4.Nf3 1.
+      frequency: 3,
+      alternatives: {
+        Nf3: [
+          {
+            san: 'Bg4',
+            isUserMove: true,
+            frequency: 1,
+            annotation: 'Pin the knight; the d4 pawn closes the fourth rank, so a check on a4 could not reach g4.',
+            hintTheme: 'Pin the knight',
+          },
+          // After 4...Bg4: 5.Be2 1.
+          { san: 'Be2', isUserMove: false, frequency: 1 },
+          { san: 'e6', isUserMove: true, annotation: 'Close the wall behind the bishop.', accept: { san: ['Nc6', 'Nf6'] } },
+        ],
+      },
+    },
+    { san: 'Bf5', isUserMove: true, annotation: 'The bishop comes out before ...e6 shuts it in.', hintTheme: 'Develop the light-squared bishop' },
+    {
+      san: 'Nf3',
+      isUserMove: false,
+      // After 4...Bf5: 5.Nf3 2, 5.Bd3 1.
+      frequency: 2,
+      alternatives: {
+        Bd3: [
+          {
+            san: 'Bxd3',
+            isUserMove: true,
+            frequency: 1,
+            annotation: 'Trade the bishops, or retreat with 5...Bg6 as you did. The bishop may not just stay there.',
+            hintTheme: 'Trade or retreat',
+            accept: { san: ['Bg6'] },
+            wrongMoveFeedback: {
+              e6: '5...e6?? leaves the f5 bishop to be taken: after 6.Bxf5 exf5 7.Qe2+ Be7 8.Qb5+ Nc6 9.Nxd5 White has won the d5 pawn.',
+            },
+          },
+        ],
+      },
+    },
+    {
+      san: 'Nc6',
+      isUserMove: true,
+      annotation: 'Develop the knight first. Then a bishop on b5 only pins it, without check.',
+      hintTheme: 'Knight before pawn',
+      wrongMoveFeedback: {
+        e6: '5...e6 is playable (you chose it in both games), but it lets 6.Bb5+ come with check. Then block with 6...Nc6; after 6...Nd7?? 7.Ne5 the pinned knight is attacked twice.',
+      },
+    },
+    { san: 'Bb5', isUserMove: false, annotation: 'The pin on c6.' },
+    { san: 'a6', isUserMove: true, annotation: 'Ask the bishop at once: take on c6 or go back.' },
+    { san: 'Bxc6+', isUserMove: false },
+    {
+      san: 'bxc6',
+      isUserMove: true,
+      annotation: 'Take toward the centre: the c6 pawn supports d5, and Black keeps the f5 bishop.',
+    },
+  ],
+  exercises: [
+    {
+      id: 'ex-caro-exchange-bb5-check',
+      title: 'The Check on b5',
+      // 1.e4 c6 2.d4 d5 3.exd5 cxd5 4.Nc3 Bf5 5.Nf3 e6 6.Bb5+ (your games of 2026)
+      fen: 'rn1qkbnr/pp3ppp/4p3/1B1p1b2/3P4/2N2N2/PPP2PPP/R1BQK2R b KQkq - 1 6',
+      turn: 'b',
+      difficultyRating: 2,
+      prompt: 'Black to play. White has just given check with 6.Bb5+. How does Black block it?',
+      solutionSan: ['Nc6'],
+      explanation:
+        '6...Nc6 blocks with the knight that belongs on c6. 6...Nd7?? leaves the d7 knight pinned to the king, and 7.Ne5 attacks it a second time; after 7...Nf6 8.Bg5 Be7 9.Bxf6 gxf6 10.Nxd7 White has won it (10...Qxd7 11.Bxd7+).',
+    },
+  ],
+  mistakesAndTraps: [
+    {
+      triggerFen: 'rn1qkbnr/pp2pppp/8/3p1b2/3P4/2NB4/PPP2PPP/R1BQK1NR b KQkq - 3 5',
+      attemptedSan: 'e6',
+      isTrap: false,
+      severity: 'blunder',
+      explanatoryFeedback: '5...e6?? leaves the f5 bishop to be taken: 6.Bxf5 exf5 7.Qe2+ and the d5 pawn falls.',
+      refutationSanList: ['Bxf5', 'exf5', 'Qe2+', 'Be7', 'Qb5+', 'Nc6', 'Nxd5'],
+      punishmentSummary: 'White has won the d5 pawn, and Black\'s f-pawns are doubled.',
+    },
+  ],
+});
+
 export const caroKannClassicalLesson: CurriculumLesson = buildVerifiedLesson({
   ...SOURCE,
   id: 'lesson-black-caro-kann-classical',
@@ -1209,5 +1319,6 @@ export const blackRepertoireLessons: CurriculumLesson[] = [
   caroKannAdvanceLesson,
   caroKannBg4TimingLesson,
   caroKannBc4Lesson,
+  caroKannExchangeLesson,
   caroKannClassicalLesson,
 ];

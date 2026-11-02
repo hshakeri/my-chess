@@ -95,10 +95,12 @@ describe('Curriculum Move Legality & Verification (chess.js)', () => {
     // and the seven Black repertoire lessons, all with archive-weighted branches. The Stockfish pass gave
     // the Konikowski lesson a 9...Bd7 branch (unobserved in the archive, so unweighted). The king and pawn
     // ending has the other way to give way, 1...Kc8 (an ending, so unweighted too). The Caro-Kann
-    // lesson against 2.Bc4 (2026-11-02) branches on White's fourth and fifth moves, weighted from the seed.
+    // lesson against 2.Bc4 (2026-11-02) branches on White's fourth and fifth moves, and the Exchange lesson on
+    // White's fourth and fifth, weighted from the seed.
     expect([...lessonsWithBranches].sort()).toEqual([
       'lesson-alapin-sicilian-centre',
       'lesson-black-caro-bg4-timing',
+      'lesson-black-caro-exchange',
       'lesson-black-caro-kann-advance',
       'lesson-black-caro-kann-classical',
       'lesson-black-caro-vs-bc4',
