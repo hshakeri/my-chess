@@ -40,6 +40,8 @@ export interface TacticPosition {
   /** Whether hoot65 is the side to move (the opponent had blundered), and the move played in the game. */
   ownSide: boolean;
   played: string;
+  /** The position two plies earlier and the two moves that led here, for the "two moves ahead" sheet. */
+  before?: { fen: string; moves: string[] };
   /** How often players of the game's ratings play the winning move, by Maia (null when unknown, and for quiet positions). */
   share?: number | null;
   game?: string;

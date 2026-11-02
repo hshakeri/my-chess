@@ -89,7 +89,8 @@ app build. The results and what they mean are in `docs/game-analysis.md`.
    Stockfish finds the position open (within 2 pawns), no single winning move, at least two moves
    within 0.8 pawns of the best (all accepted), and the game move 1.5 pawns or more worse.
    `node tactics-merge.mjs <deck.json> <quiet.json> <deck.json>` spreads them through the deck's
-   middle tier.
+   middle tier, and `node tactics-before.mjs <deck.json>` adds to each position the one two plies
+   earlier and the two moves played (for the "two moves ahead" sheet; it checks they replay).
 12. **Opening book** (`opening-book.mjs`): `node opening-book.mjs games.jsonl
    ../../src/data/openingBook.json [min] [plies]` rebuilds the book Maia plays from on the Play tab
    out of the archive: every position of the first 16 plies where the opponent was to move and that

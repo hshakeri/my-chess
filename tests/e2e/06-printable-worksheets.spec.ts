@@ -117,5 +117,10 @@ test.describe('06. Printable Physical-Board Worksheets & @media print (F19 - F20
     await expect(sheet.locator('[data-printable="answer-key"]')).toHaveCSS('break-before', 'page');
     await page.locator('button[data-action="tactics-sheet"]').click();
     await expect(sheet).toHaveCount(0);
+    // Two moves ahead: the same sheet, drawn two moves earlier
+    await page.locator('button[data-action="ahead-sheet"]').click();
+    await expect(sheet).toHaveAttribute('data-ahead', 'true');
+    await expect(sheet.locator('[data-tactics-item]')).toHaveCount(12);
+    await expect(sheet.locator('[data-tactics-item="1"]')).toContainText('to play and win');
   });
 });

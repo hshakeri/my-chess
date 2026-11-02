@@ -6,9 +6,10 @@
  * move in question at the same depth (UCI `searchmoves`), and the audit reports what a move gives
  * away against the best one, in centipawns:
  *   - an answer that loses 70 or more while the game is still open (|best| < 600),
- *   - an accepted alternative that loses 150 or more,
+ *   - an accepted alternative that loses 150 or more and does not keep a 6-pawn advantage,
  *   - a warned-against move ("Not X?!") that loses less than 20 (as good as the answer),
  *   - an exercise solution that loses 70 or more,
+ *   - a drill move accepted that loses 200 or more and does not keep a 3-pawn advantage,
  *   - a drill whose move from the game loses less than 100 (the drill's premise is weak),
  *   - a recorded mistake or trap that loses less than its severity says (a blunder or a trap less than
  *     150, an inaccuracy less than 30), or whose refutation starts with a reply 100 or more worse than
@@ -90,7 +91,11 @@ async function main() {
         const r = await lossOf(d.fen, san);
         if (!r) continue;
         const kind = drill ? 'drill_accepted' : k === 0 ? 'answer' : 'alternative';
-        const flagged = drill ? r.loss >= 200 : k === 0 ? r.loss >= 70 && Math.abs(r.score) < 600 : r.loss >= 150;
+        // An accepted move that keeps a decisive advantage is fine whatever the best one gives: a drill
+        // accepts what still wins by 3 pawns (verify-drills.mjs), and a final move what still wins by 6
+        // (a slower mate, or a rook instead of a queen, which a fixed depth may not see to the end)
+        const kept = r.score - r.loss;
+        const flagged = drill ? r.loss >= 200 && kept < 300 : k === 0 ? r.loss >= 70 && Math.abs(r.score) < 600 : r.loss >= 150 && kept < 600;
         record({ kind, lessonId: lesson.id, label, fen: d.fen, move: san, loss: r.loss, best: r.move, bestScore: r.score }, flagged);
       }
       // The moves the lesson warns against by name

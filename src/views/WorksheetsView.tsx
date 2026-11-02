@@ -136,7 +136,7 @@ export const WorksheetsView: React.FC<{ initialWorksheetId?: string }> = ({ init
   const [filterType, setFilterType] = useState<'all' | 'curriculum_lesson' | 'hoot65_drill'>('all');
   // The sheet of the student's own reviewed mistakes (DC-4) instead of a worksheet
   // A sheet built from the student's own games instead of a lesson worksheet
-  const [ownSheet, setOwnSheet] = useState<'none' | 'mistakes' | 'tactics'>('none');
+  const [ownSheet, setOwnSheet] = useState<'none' | 'mistakes' | 'tactics' | 'ahead'>('none');
   const showMistakes = ownSheet === 'mistakes';
 
   const filteredWorksheets = allWorksheets.filter((ws) => {
@@ -223,6 +223,16 @@ export const WorksheetsView: React.FC<{ initialWorksheetId?: string }> = ({ init
             }`}
           >
             {ownSheet === 'tactics' ? 'Back to the worksheets' : 'Tactics from your games'}
+          </button>
+          <button
+            type="button"
+            data-action="ahead-sheet"
+            onClick={() => setOwnSheet((v) => (v === 'ahead' ? 'none' : 'ahead'))}
+            className={`text-left px-3 py-2 rounded-lg border text-sm font-semibold ${
+              ownSheet === 'ahead' ? 'bg-rose-950/40 border-rose-500/50 text-rose-200' : 'bg-slate-900 border-slate-800 text-slate-200 hover:border-slate-600'
+            }`}
+          >
+            {ownSheet === 'ahead' ? 'Back to the worksheets' : 'Two moves ahead (visualization)'}
           </button>
 
           {/* Filter tabs */}
@@ -320,7 +330,7 @@ export const WorksheetsView: React.FC<{ initialWorksheetId?: string }> = ({ init
 
         {/* Right Column: Printable Paper Sheet Container */}
         <div className="lg:col-span-8 flex flex-col gap-4">
-          {ownSheet === 'mistakes' ? <MistakeSheet /> : ownSheet === 'tactics' ? <TacticsSheet /> : (
+          {ownSheet === 'mistakes' ? <MistakeSheet /> : ownSheet === 'tactics' ? <TacticsSheet /> : ownSheet === 'ahead' ? <TacticsSheet ahead /> : (
           <div
             className="printable-sheet bg-white text-slate-900 p-8 sm:p-10 rounded-2xl shadow-xl border border-slate-200 print:shadow-none print:border-none print:p-0 print:max-w-none print:rounded-none w-full"
             data-printable="sheet"

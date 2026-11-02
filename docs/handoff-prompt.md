@@ -157,8 +157,8 @@ Compromised Defence plays 9.Bg5; the Konikowski 9.Bf4 and the Elephant 7.Nxf6+ a
   a draft, reads from its bookmarks where each heading landed, puts a notes page wherever a sheet would
   start on a back (rendering again after each), fills in the page numbers (contents and each chapter's pointer to its
   practice), renders the book, and fails if any sheet is not a front page followed by its answers.
-  70 US Letter pages (70 on A4), 20 sheets (the four drill sheets, two tactics sheets at the end of
-  Part I, fourteen practice sheets), 401 answers. Diagrams are SVG drawings with the app's
+  72 US Letter pages, 21 sheets (the four drill sheets, three tactics sheets at the end of Part I,
+  fourteen practice sheets), 413 answers. Diagrams are SVG drawings with the app's
   piece set (`public/pieces`); the fonts are Times New Roman and Arial, whose metric twins Liberation
   Serif and Sans the Linux runner has, so pages break the same way there. All text is black and dark
   squares are a light grey.
@@ -234,7 +234,8 @@ Next: the roadmap below.
   win, several solid moves) (`scripts/game-analysis/tactics.mjs`,
   `tactics-pick.mjs`, `src/data/tactics_deck.json`), Woodpecker-lite in the Lessons header
   (`src/views/TacticsDeckPanel.tsx`): graded by solve time, Again first, retired after three Good
-  solves in a row; a Worksheets sheet and two lesson-book sheets. The Lessons header shows the
+  solves in a row; a Worksheets sheet (also as "two moves ahead", a visualization format) and three
+  lesson-book sheets. The Lessons header shows the
   day's routine (warm-up, due cards, ten tactics, plans) with each step ticked when done.
 - DC-6 archive half done (2026-11-02): Maia's opening book is the archive opponents' moves
   (`scripts/game-analysis/opening-book.mjs`, 253 positions).

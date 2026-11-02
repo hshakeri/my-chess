@@ -173,6 +173,13 @@ describe('Tactics deck (DC-2)', () => {
     expect(sheet.querySelector('[data-tactics-item="2"]')?.textContent).toContain('Black to play, after Kg1.');
     expect(sheet.querySelector('[data-tactics-answer="1"]')?.textContent).toContain('Rd8#: mate in one. Stockfish\'s line: 30.Rd8#. From your game of 2026-10-01.');
     expect(sheet.querySelector('[data-printable="answer-key"]')).not.toBeNull();
+    cleanup();
+    // Two moves ahead: the earlier position and the two moves; quiet positions are left out
+    const before = { fen: '6k1/5ppp/8/8/8/8/5PPP/3R3K w - - 0 29', moves: ['Kg1', 'Kh8'] };
+    const ahead = render(<TacticsSheet ahead deck={[tactic('q', 'quiet', { before }), tactic('w', 'mate-in-one', { before, lastMove: { from: 'h8', to: 'g8', san: 'Kh8' } })]} />);
+    const aheadSheet = ahead.container.querySelector('[data-section="tactics-sheet"]')!;
+    expect(aheadSheet.getAttribute('data-items')).toBe('1');
+    expect(aheadSheet.querySelector('[data-tactics-item="1"]')?.textContent).toContain('After 29.Kg1 Kh8, White to play and win.');
   });
 
   it('every deck position replays with chess.js: the answer, the line, the last move and the motif', () => {
@@ -187,6 +194,13 @@ describe('Tactics deck (DC-2)', () => {
       // The piece that just moved stands on its square, and it is the other side's
       expect(c.get(t.lastMove.to as never)?.color, t.id).toBe(c.turn() === 'w' ? 'b' : 'w');
       expect(t.accepted, t.id).toContain(t.solution);
+      // Two plies earlier: the two moves played reach this position, the second being the last move
+      if (t.before) {
+        const earlier = new Chess(t.before.fen);
+        for (const san of t.before.moves) earlier.move(san);
+        expect(earlier.fen().split(' ').slice(0, 4), t.id).toEqual(t.fen.split(' ').slice(0, 4));
+        expect(t.before.moves[1], t.id).toBe(t.lastMove.san);
+      }
       expect(t.share === null || t.share === undefined || (t.share > 0 && t.share < 0.9), t.id).toBe(true);
       for (const san of [...t.accepted, t.played]) expect(() => new Chess(t.fen).move(san), `${t.id} ${san}`).not.toThrow();
       const line = new Chess(t.fen);

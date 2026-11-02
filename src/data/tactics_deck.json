@@ -22,6 +22,13 @@
   "ownSide": false,
   "played": "Qxf7#",
   "share": 0.898,
+  "before": {
+   "fen": "r1bqk2r/pppnppbp/6p1/1N1Q4/8/5N2/P1P2PPP/1R2KB1R w Kkq - 2 12",
+   "moves": [
+    "Ng5",
+    "c6"
+   ]
+  },
   "game": "https://www.chess.com/game/live/96625133697"
  },
  {
@@ -49,6 +56,13 @@
   "ownSide": true,
   "played": "Rxd1",
   "share": 0.897,
+  "before": {
+   "fen": "r2r4/p2N1pk1/1p4pp/8/2p2P2/4PPnP/PPP2R1K/3R4 b - - 4 26",
+   "moves": [
+    "Nf5",
+    "Ne5"
+   ]
+  },
   "game": "https://www.chess.com/game/live/106432019659"
  },
  {
@@ -72,6 +86,13 @@
   "ownSide": true,
   "played": "Qxh7#",
   "share": 0.896,
+  "before": {
+   "fen": "r4rk1/3bqppp/4p3/pp1pP3/2p1nNP1/1PP1P3/P1Q2PP1/R3KB1R w KQ - 0 18",
+   "moves": [
+    "f3",
+    "Nc5"
+   ]
+  },
   "game": "https://www.chess.com/game/live/99457304963"
  },
  {
@@ -95,6 +116,13 @@
   "ownSide": true,
   "played": "Qxb2#",
   "share": 0.895,
+  "before": {
+   "fen": "rn2k2r/pp3pbp/2pp1qp1/8/2BPPBb1/6P1/PPPQN2P/2KR3R b kq - 4 14",
+   "moves": [
+    "c5",
+    "dxc5"
+   ]
+  },
   "game": "https://www.chess.com/game/live/115587503569"
  },
  {
@@ -118,6 +146,13 @@
   "ownSide": true,
   "played": "Qe8#",
   "share": 0.892,
+  "before": {
+   "fen": "Q5N1/2pk1r2/1p2p1p1/p2pP3/5P1P/2qPP3/4b1PK/8 w - - 8 34",
+   "moves": [
+    "Nf6+",
+    "Ke7"
+   ]
+  },
   "game": "https://www.chess.com/game/live/73152002615"
  },
  {
@@ -141,6 +176,13 @@
   "ownSide": true,
   "played": "Be5",
   "share": 0.891,
+  "before": {
+   "fen": "2k1Q3/2p2pbp/3p2p1/7q/8/2P5/PP3PPP/3R2K1 b - - 0 25",
+   "moves": [
+    "Kb7",
+    "Qxf7"
+   ]
+  },
   "game": "https://www.chess.com/game/live/103544474943"
  },
  {
@@ -168,6 +210,13 @@
   "ownSide": true,
   "played": "h3",
   "share": 0.89,
+  "before": {
+   "fen": "2r5/4ppkp/5qp1/3rN3/8/1P3P2/P3Q1PP/4R2K w - - 1 37",
+   "moves": [
+    "Ng4",
+    "Rcd8"
+   ]
+  },
   "game": "https://www.chess.com/game/live/169910125784"
  },
  {
@@ -191,6 +240,13 @@
   "ownSide": true,
   "played": "Qxc7#",
   "share": 0.889,
+  "before": {
+   "fen": "r3k2r/pppn2p1/2n1p3/3p1p1q/3P4/2PBPQBP/P1P2P2/R3K2R w KQkq - 3 15",
+   "moves": [
+    "Qf4",
+    "O-O-O"
+   ]
+  },
   "game": "https://www.chess.com/game/live/83260641141"
  },
  {
@@ -214,6 +270,13 @@
   "ownSide": true,
   "played": "Ng5",
   "share": 0.887,
+  "before": {
+   "fen": "r1b2r1k/pp2ppnp/2pq3Q/3p2Pn/3P4/2N2P1N/PPP1P3/2KR1B2 w - - 1 16",
+   "moves": [
+    "g6",
+    "Qg3"
+   ]
+  },
   "game": "https://www.chess.com/game/live/107782975343"
  },
  {
@@ -238,6 +301,13 @@
   "ownSide": false,
   "played": "Qf2#",
   "share": 0.886,
+  "before": {
+   "fen": "r3kb1Q/pp2p3/4b3/6r1/2p1N3/4pP2/PPP1B1q1/R2QK2R b q - 3 23",
+   "moves": [
+    "Bf5",
+    "Nxg5"
+   ]
+  },
   "game": "https://www.chess.com/game/live/102543105305"
  },
  {
@@ -261,6 +331,13 @@
   "ownSide": false,
   "played": "Qc8#",
   "share": 0.885,
+  "before": {
+   "fen": "rn2kb1r/p3pppp/3p4/8/b2B4/3P1N2/P1q2PPP/RQ3RK1 w kq - 0 17",
+   "moves": [
+    "Qb7",
+    "Bc6"
+   ]
+  },
   "game": "https://www.chess.com/game/live/73543786783"
  },
  {
@@ -286,6 +363,13 @@
   "ownSide": true,
   "played": "Qh8#",
   "share": 0.883,
+  "before": {
+   "fen": "6k1/5p2/4r1pR/p2p2Q1/8/3qP3/P2NnPK1/3R4 w - - 10 33",
+   "moves": [
+    "Qd8+",
+    "Kg7"
+   ]
+  },
   "game": "https://www.chess.com/game/live/108745173617"
  },
  {
@@ -313,6 +397,13 @@
   "ownSide": true,
   "played": "Rxf6",
   "share": 0.879,
+  "before": {
+   "fen": "2r1r1k1/5p1p/R5pP/1p6/6Q1/4P3/1q3PP1/3R2K1 w - - 1 32",
+   "moves": [
+    "Rad6",
+    "Qf6"
+   ]
+  },
   "game": "https://www.chess.com/game/live/109822292123"
  },
  {
@@ -340,6 +431,13 @@
   "ownSide": false,
   "played": "Nxe3",
   "share": 0.872,
+  "before": {
+   "fen": "8/5pk1/4p1p1/2K2n2/1PP5/4N3/P2n4/8 w - - 1 45",
+   "moves": [
+    "Nc2",
+    "Ne3"
+   ]
+  },
   "game": "https://www.chess.com/game/live/120267400728"
  },
  {
@@ -367,6 +465,13 @@
   "ownSide": true,
   "played": "Qxf2",
   "share": 0.87,
+  "before": {
+   "fen": "r2q1r1k/6pp/p3Qp2/1p1p4/5BPP/3P4/P1P2P2/7K b - - 0 25",
+   "moves": [
+    "Qb6",
+    "Qxd5"
+   ]
+  },
   "game": "https://www.chess.com/game/live/169996326110"
  },
  {
@@ -390,6 +495,13 @@
   "ownSide": false,
   "played": "Qh2#",
   "share": 0.869,
+  "before": {
+   "fen": "8/6pp/2pqp1k1/8/6nP/8/5P2/1Q3RK1 b - - 3 30",
+   "moves": [
+    "Kf7",
+    "Qe4"
+   ]
+  },
   "game": "https://www.chess.com/game/live/116109062981"
  },
  {
@@ -417,6 +529,13 @@
   "ownSide": true,
   "played": "e4",
   "share": 0.868,
+  "before": {
+   "fen": "r3r1k1/p1R2p1p/3p2p1/4Pb2/1p1Q2q1/1P3N2/P2R1PPP/6K1 b - - 0 30",
+   "moves": [
+    "dxe5",
+    "Qd7"
+   ]
+  },
   "game": "https://www.chess.com/game/live/108954016871"
  },
  {
@@ -444,6 +563,13 @@
   "ownSide": false,
   "played": "Bxg4",
   "share": 0.868,
+  "before": {
+   "fen": "rnb1kbn1/pp1p3r/5pNp/q1p1P3/6Q1/2P1P1B1/PP3PPP/RN2KB1R b KQq - 0 10",
+   "moves": [
+    "d6",
+    "exf6"
+   ]
+  },
   "game": "https://www.chess.com/game/live/103571518265"
  },
  {
@@ -471,6 +597,13 @@
   "ownSide": true,
   "played": "Qxb1+",
   "share": 0.864,
+  "before": {
+   "fen": "1k1r3r/pp3ppp/4p3/8/1b2q3/1B2B1Q1/PP3PPP/1RR3K1 b - - 1 19",
+   "moves": [
+    "Ka8",
+    "Rc4"
+   ]
+  },
   "game": "https://www.chess.com/game/live/119897655986"
  },
  {
@@ -498,6 +631,13 @@
   "ownSide": true,
   "played": "Nxc5",
   "share": 0.863,
+  "before": {
+   "fen": "8/8/5nk1/p1N1r1p1/1p4P1/1P3P2/PKP5/5R2 w - - 2 34",
+   "moves": [
+    "Nd3",
+    "Rc5"
+   ]
+  },
   "game": "https://www.chess.com/game/live/119411978846"
  },
  {
@@ -525,6 +665,13 @@
   "ownSide": false,
   "played": "Bxg5",
   "share": 0.862,
+  "before": {
+   "fen": "6k1/p2r1p1p/1pqp2p1/4r3/2P1p1P1/1P2B3/P2Q1PP1/3R2K1 w - - 1 29",
+   "moves": [
+    "Qd4",
+    "Rg5"
+   ]
+  },
   "game": "https://www.chess.com/game/live/110163621849"
  },
  {
@@ -552,6 +699,13 @@
   "ownSide": false,
   "played": "Bc5",
   "share": 0.857,
+  "before": {
+   "fen": "3qkb1r/1B1b1ppp/p1n1pn2/1p6/8/8/PPPPQPPP/RNB1K1NR b KQk - 2 10",
+   "moves": [
+    "Nd4",
+    "Qe3"
+   ]
+  },
   "game": "https://www.chess.com/game/live/142052793954"
  },
  {
@@ -575,6 +729,13 @@
   "ownSide": false,
   "played": "Qg3#",
   "share": 0.857,
+  "before": {
+   "fen": "r2q1rk1/1pp3p1/p1b1Pp2/2bp4/3N2Pp/2N2P2/PPP3PK/R1BQR3 b - - 0 16",
+   "moves": [
+    "Qd6+",
+    "Kh3"
+   ]
+  },
   "game": "https://www.chess.com/game/live/121877877596"
  },
  {
@@ -598,6 +759,13 @@
   "ownSide": true,
   "played": "Qxh7#",
   "share": 0.856,
+  "before": {
+   "fen": "rn1q1rk1/ppp2ppp/3bb3/3p4/3P4/2N1PNP1/PP3PP1/R2QKB1R w KQ - 2 10",
+   "moves": [
+    "Qc2",
+    "Nc6"
+   ]
+  },
   "game": "https://www.chess.com/game/live/96577191791"
  },
  {
@@ -621,6 +789,13 @@
   "ownSide": false,
   "played": "Qxb2#",
   "share": 0.854,
+  "before": {
+   "fen": "r1b2r2/4pp1R/2p1k1p1/pp2b1N1/3q4/3B2P1/PPPQ1PP1/2K4R b - - 8 20",
+   "moves": [
+    "Kd5",
+    "Rd1"
+   ]
+  },
   "game": "https://www.chess.com/game/live/76247995361"
  },
  {
@@ -648,6 +823,13 @@
   "ownSide": true,
   "played": "Rxd5",
   "share": 0.846,
+  "before": {
+   "fen": "r3k2r/ppp1npp1/1b1q3p/nP2R3/3p2b1/P4N2/2P1BPPP/RNBQ2K1 w kq - 3 13",
+   "moves": [
+    "Bf4",
+    "Qd5"
+   ]
+  },
   "game": "https://www.chess.com/game/live/170252689572"
  },
  {
@@ -675,6 +857,13 @@
   "ownSide": false,
   "played": "Ne5",
   "share": 0.846,
+  "before": {
+   "fen": "r2qk2r/pppb1ppp/2nb1n2/4N3/4p3/2P1P1B1/PP2BPPP/RN1QK2R w KQkq - 2 10",
+   "moves": [
+    "Nxf7",
+    "Kf8"
+   ]
+  },
   "game": "https://www.chess.com/game/live/98851460201"
  },
  {
@@ -698,6 +887,13 @@
   "ownSide": true,
   "played": "Qe1#",
   "share": 0.844,
+  "before": {
+   "fen": "2r3k1/p1P1pp1p/1p1p2p1/6q1/2R5/4PQ2/P4PPP/b5K1 b - - 0 23",
+   "moves": [
+    "Qa5",
+    "Qb7"
+   ]
+  },
   "game": "https://www.chess.com/game/live/102543034535"
  },
  {
@@ -725,6 +921,13 @@
   "ownSide": true,
   "played": "Nxf3+",
   "share": 0.842,
+  "before": {
+   "fen": "4rr1k/pp4pp/2p5/2b1nP2/3p2P1/1B1PBN1P/PP6/R3R1K1 b - - 0 22",
+   "moves": [
+    "dxe3",
+    "Bc4"
+   ]
+  },
   "game": "https://www.chess.com/game/live/120819771626"
  },
  {
@@ -748,6 +951,13 @@
   "ownSide": true,
   "played": "Nxf2",
   "share": 0.842,
+  "before": {
+   "fen": "rn2k2r/p3ppbp/1q4p1/3p4/3Nn1b1/1BP2N2/PP3PPP/R1BQK2R b KQkq - 0 13",
+   "moves": [
+    "Bxf3",
+    "Nxf3"
+   ]
+  },
   "game": "https://www.chess.com/game/live/102738572731"
  },
  {
@@ -771,6 +981,13 @@
   "ownSide": false,
   "played": "Qxc2#",
   "share": 0.84,
+  "before": {
+   "fen": "3r1R1k/p2n3p/3Q2b1/8/2BPq3/4P3/PPP3P1/2KR4 b - - 0 29",
+   "moves": [
+    "Rxf8",
+    "Qxd7"
+   ]
+  },
   "game": "https://www.chess.com/game/live/169898628982"
  },
  {
@@ -798,6 +1015,13 @@
   "ownSide": true,
   "played": "Kxh6",
   "share": 0.838,
+  "before": {
+   "fen": "6r1/pp5k/2p2R1B/P2p3p/1P1Pb3/2P3P1/5K1P/8 b - - 4 35",
+   "moves": [
+    "Bg6",
+    "h4"
+   ]
+  },
   "game": "https://www.chess.com/game/live/184129501002"
  },
  {
@@ -825,6 +1049,13 @@
   "ownSide": false,
   "played": "Qxd4",
   "share": 0.837,
+  "before": {
+   "fen": "r3k2r/3n1ppp/p3p3/5b2/1p1B4/1Bn5/1qPQ1PPP/R4RK1 b kq - 3 21",
+   "moves": [
+    "Ne4",
+    "Qe2"
+   ]
+  },
   "game": "https://www.chess.com/game/live/184582182704"
  },
  {
@@ -848,6 +1079,13 @@
   "ownSide": true,
   "played": "Qxd8#",
   "share": 0.836,
+  "before": {
+   "fen": "rnbqk2r/4ppbp/3p1np1/2p5/Np1PPB2/1B6/PPPQ1PPP/2KR2NR w kq - 0 11",
+   "moves": [
+    "dxc5",
+    "dxc5"
+   ]
+  },
   "game": "https://www.chess.com/game/live/74653371091"
  },
  {
@@ -873,6 +1111,13 @@
   "ownSide": true,
   "played": "Bxh7+",
   "share": 0.829,
+  "before": {
+   "fen": "r4rk1/ppp2ppp/2n2q2/8/2P5/2QB1n2/PP1N1P1P/2B2KR1 w - - 0 20",
+   "moves": [
+    "Nxf3",
+    "Qxf3"
+   ]
+  },
   "game": "https://www.chess.com/game/live/98723645917"
  },
  {
@@ -900,6 +1145,13 @@
   "ownSide": false,
   "played": "Bxh5",
   "share": 0.815,
+  "before": {
+   "fen": "rn3rk1/pp2ppbp/2ppb1p1/7q/2PP1P2/2N1P1P1/PPQ3BP/R4R1K w - - 3 18",
+   "moves": [
+    "Bf3",
+    "Bh3"
+   ]
+  },
   "game": "https://www.chess.com/game/live/115133957831"
  },
  {
@@ -927,6 +1179,13 @@
   "ownSide": false,
   "played": "Bxf8",
   "share": 0.811,
+  "before": {
+   "fen": "3q3k/p5pp/2pBr1b1/6P1/5P1r/P6B/2P4K/4RR2 w - - 0 37",
+   "moves": [
+    "Rxe6",
+    "Qf8"
+   ]
+  },
   "game": "https://www.chess.com/game/live/167692239242"
  },
  {
@@ -954,6 +1213,13 @@
   "ownSide": false,
   "played": "Rf1",
   "share": 0.81,
+  "before": {
+   "fen": "3Q4/r6p/1pp3p1/1k5n/1q6/R7/PPP1r1PP/R6K w - - 6 30",
+   "moves": [
+    "Rb3",
+    "Rxa2"
+   ]
+  },
   "game": "https://www.chess.com/game/live/171894388406"
  },
  {
@@ -977,6 +1243,13 @@
   "ownSide": true,
   "played": "Qxc7",
   "share": 0.809,
+  "before": {
+   "fen": "r3r2k/2p1q1pp/4B3/1p2Q3/2p3P1/4P3/PPP2P1P/3RK2R w K - 3 22",
+   "moves": [
+    "Rd7",
+    "Qxe6"
+   ]
+  },
   "game": "https://www.chess.com/game/live/102825624641"
  },
  {
@@ -1000,6 +1273,13 @@
   "ownSide": false,
   "played": "Qxb2#",
   "share": 0.808,
+  "before": {
+   "fen": "1r1r2k1/p4pqp/6p1/8/Q2Np3/8/PPP2PPP/2KR3R b - - 3 19",
+   "moves": [
+    "Rb6",
+    "Nc6"
+   ]
+  },
   "game": "https://www.chess.com/game/live/108899219792"
  },
  {
@@ -1023,6 +1303,13 @@
   "ownSide": false,
   "played": "Qc7#",
   "share": 0.808,
+  "before": {
+   "fen": "2kr4/1p3p1p/1Pp3p1/8/4BP2/3nP1QP/P5PK/3q4 w - - 2 25",
+   "moves": [
+    "f5",
+    "Qe1"
+   ]
+  },
   "game": "https://www.chess.com/game/live/116606462407"
  },
  {
@@ -1050,6 +1337,13 @@
   "ownSide": false,
   "played": "Bxd5",
   "share": 0.805,
+  "before": {
+   "fen": "6k1/r4ppp/8/4P3/7P/p1n2PK1/B5P1/R7 w - - 4 44",
+   "moves": [
+    "Bb3",
+    "Nd5"
+   ]
+  },
   "game": "https://www.chess.com/game/live/174297609928"
  },
  {
@@ -1073,6 +1367,13 @@
   "ownSide": true,
   "played": "Qxh3#",
   "share": 0.804,
+  "before": {
+   "fen": "r4k1r/1ppq1pQ1/3p4/p2Pp3/8/3P1P1P/PPP2P1K/R5R1 b - - 6 24",
+   "moves": [
+    "Ke7",
+    "Rae1"
+   ]
+  },
   "game": "https://www.chess.com/game/live/108593972149"
  },
  {
@@ -1100,6 +1401,13 @@
   "ownSide": true,
   "played": "Bxd8",
   "share": 0.801,
+  "before": {
+   "fen": "3q1rk1/5ppp/1ppppn2/8/1P1PPn1B/2P2N2/1P1K1PPP/3Q1R2 w - - 1 20",
+   "moves": [
+    "Kc2",
+    "Nxe4"
+   ]
+  },
   "game": "https://www.chess.com/game/live/109179080471"
  },
  {
@@ -1127,6 +1435,13 @@
   "ownSide": true,
   "played": "Rxd3",
   "share": 0.793,
+  "before": {
+   "fen": "6k1/p5pp/P3p3/3q1p2/7P/r2BPQP1/5PK1/8 b - - 2 30",
+   "moves": [
+    "Qxf3+",
+    "Kxf3"
+   ]
+  },
   "game": "https://www.chess.com/game/live/121527587338"
  },
  {
@@ -1154,6 +1469,13 @@
   "ownSide": true,
   "played": "Qxf6",
   "share": 0.792,
+  "before": {
+   "fen": "2r3k1/p4pp1/2q4p/1p3Q1P/4R1P1/8/P4P2/6K1 w - - 0 29",
+   "moves": [
+    "Re7",
+    "Qf6"
+   ]
+  },
   "game": "https://www.chess.com/game/live/116274661967"
  },
  {
@@ -1181,6 +1503,13 @@
   "ownSide": false,
   "played": "Qxb4",
   "share": 0.79,
+  "before": {
+   "fen": "8/pp2p1kp/5pp1/8/nqB1PP2/8/2Qr2PP/B1R4K w - - 6 28",
+   "moves": [
+    "Qb1",
+    "Nc3"
+   ]
+  },
   "game": "https://www.chess.com/game/live/109104448022"
  },
  {
@@ -1208,6 +1537,13 @@
   "ownSide": false,
   "played": "Rxf6",
   "share": 0.784,
+  "before": {
+   "fen": "2r3k1/5p1p/r1p2R1P/p5p1/4P1P1/1P3P2/PP6/1K5R b - - 0 25",
+   "moves": [
+    "c5",
+    "a3"
+   ]
+  },
   "game": "https://www.chess.com/game/live/91934298665"
  },
  {
@@ -1232,6 +1568,13 @@
   "ownSide": true,
   "played": "Qg8#",
   "share": 0.782,
+  "before": {
+   "fen": "4r2k/p5p1/6qp/3Q4/3p4/3P2P1/PPr3PK/R3R3 w - - 0 29",
+   "moves": [
+    "Rxe8+",
+    "Kh7"
+   ]
+  },
   "game": "https://www.chess.com/game/live/109097427088"
  },
  {
@@ -1255,6 +1598,13 @@
   "ownSide": false,
   "played": "Rxf6#",
   "share": 0.781,
+  "before": {
+   "fen": "2n2b2/8/pB1R1pp1/4pkp1/1pr5/5P2/PP4PP/3R2K1 w - - 1 29",
+   "moves": [
+    "g4+",
+    "Kf4"
+   ]
+  },
   "game": "https://www.chess.com/game/live/136722162370"
  },
  {
@@ -1282,6 +1632,13 @@
   "ownSide": true,
   "played": "Bxb2",
   "share": 0.775,
+  "before": {
+   "fen": "r6k/ppq1p1bp/2p2rp1/2P5/1P1P4/P4P1Q/1BB3PP/2R2K2 b - - 2 24",
+   "moves": [
+    "Rf4",
+    "d5"
+   ]
+  },
   "game": "https://www.chess.com/game/live/107143813069"
  },
  {
@@ -1305,6 +1662,13 @@
   "ownSide": false,
   "played": "Qb3",
   "share": 0.774,
+  "before": {
+   "fen": "8/1Q4pp/4rpk1/8/4P1PP/2Pq1PK1/8/8 w - - 9 42",
+   "moves": [
+    "h5+",
+    "Kg5"
+   ]
+  },
   "game": "https://www.chess.com/game/live/138994993012"
  },
  {
@@ -1332,6 +1696,13 @@
   "ownSide": true,
   "played": "g3",
   "share": 0.768,
+  "before": {
+   "fen": "8/R4pk1/4p1p1/4P2p/4NP2/8/2r1K1P1/8 w - - 4 37",
+   "moves": [
+    "Kd3",
+    "Ra2"
+   ]
+  },
   "game": "https://www.chess.com/game/live/95830460221"
  },
  {
@@ -1359,6 +1730,13 @@
   "ownSide": false,
   "played": "Qxa4",
   "share": 0.765,
+  "before": {
+   "fen": "r3k1nr/pp3ppp/2n1p3/q2pP3/3P4/P3KN1P/1P1b1PP1/R2Q1B1R w kq - 0 14",
+   "moves": [
+    "Nxd2",
+    "Qa4"
+   ]
+  },
   "game": "https://www.chess.com/game/live/121830172506"
  },
  {
@@ -1382,6 +1760,13 @@
   "ownSide": true,
   "played": "Qxa3#",
   "share": 0.761,
+  "before": {
+   "fen": "1r3rk1/5pbp/3p2p1/pB2p1P1/q3P2P/B4P2/1Q6/KR5R b - - 0 28",
+   "moves": [
+    "Rxb5",
+    "Qxb5"
+   ]
+  },
   "game": "https://www.chess.com/game/live/98294761659"
  },
  {
@@ -1409,6 +1794,13 @@
   "ownSide": false,
   "played": "Kxh7",
   "share": 0.759,
+  "before": {
+   "fen": "5r1k/p5pB/1p1p3Q/n2Pp3/7b/6N1/PP3PRP/7K b - - 0 27",
+   "moves": [
+    "gxh6",
+    "Nh5"
+   ]
+  },
   "game": "https://www.chess.com/game/live/114898686211"
  },
  {
@@ -1436,6 +1828,13 @@
   "ownSide": false,
   "played": "Qxc2",
   "share": 0.758,
+  "before": {
+   "fen": "rn2r1k1/ppp1p2R/6p1/6N1/3P1q2/2PK4/2Q3P1/3R4 b - - 2 23",
+   "moves": [
+    "Qf5+",
+    "Kc4"
+   ]
+  },
   "game": "https://www.chess.com/game/live/99327890085"
  },
  {
@@ -1459,6 +1858,13 @@
   "ownSide": true,
   "played": "Qxh7#",
   "share": 0.752,
+  "before": {
+   "fen": "r1bq1rk1/ppp4p/4p1pQ/3pb3/7P/3BP3/P1P2PP1/1R1K3R w - - 0 17",
+   "moves": [
+    "h5",
+    "gxh5"
+   ]
+  },
   "game": "https://www.chess.com/game/live/84403125265"
  },
  {
@@ -1483,6 +1889,13 @@
   "ownSide": false,
   "played": "Qxf7#",
   "share": 0.75,
+  "before": {
+   "fen": "r2qk2r/ppp2pbp/2n1p1p1/4P3/2BP4/2P2Q1P/P1P3P1/R1B1K2R w KQkq - 0 12",
+   "moves": [
+    "O-O",
+    "Na5"
+   ]
+  },
   "game": "https://www.chess.com/game/live/75045061905"
  },
  {
@@ -1506,6 +1919,13 @@
   "ownSide": false,
   "played": "Qg7#",
   "share": 0.749,
+  "before": {
+   "fen": "5r1k/p6p/6pP/1p1Qr3/2p5/8/PPP2q2/1K1R4 w - - 0 28",
+   "moves": [
+    "Qxe5+",
+    "Kg8"
+   ]
+  },
   "game": "https://www.chess.com/game/live/98825097971"
  },
  {
@@ -1533,6 +1953,13 @@
   "ownSide": true,
   "played": "Qxa4",
   "share": 0.746,
+  "before": {
+   "fen": "4k2r/q4ppp/4p2n/4Nb2/1Q6/P2r1PN1/1P4PP/R4R1K b k - 4 22",
+   "moves": [
+    "Rd5",
+    "Qa4+"
+   ]
+  },
   "game": "https://www.chess.com/game/live/168429634182"
  },
  {
@@ -1560,6 +1987,13 @@
   "ownSide": true,
   "played": "Rxe8+",
   "share": 0.744,
+  "before": {
+   "fen": "r1bqr1k1/pp3ppp/3b1p2/8/3N4/3Qn3/PPP2PPP/R3R1K1 w - - 0 15",
+   "moves": [
+    "Rxe3",
+    "Qc7"
+   ]
+  },
   "game": "https://www.chess.com/game/live/115699086365"
  },
  {
@@ -1587,6 +2021,13 @@
   "ownSide": true,
   "played": "Qxa5",
   "share": 0.744,
+  "before": {
+   "fen": "6k1/5p2/1qp1pnp1/r2p3p/3P1P2/4P1N1/1PPQ1KPP/5R2 w - - 0 25",
+   "moves": [
+    "Kf3",
+    "Qxb2"
+   ]
+  },
   "game": "https://www.chess.com/game/live/109873327735"
  },
  {
@@ -1614,6 +2055,13 @@
   "ownSide": false,
   "played": "Nxf6",
   "share": 0.742,
+  "before": {
+   "fen": "6k1/pp6/2p4p/1P1p1Rp1/P3n1P1/4PQ1K/3q4/8 b - - 8 40",
+   "moves": [
+    "Qb4",
+    "Rf6"
+   ]
+  },
   "game": "https://www.chess.com/game/live/102447156503"
  },
  {
@@ -1641,6 +2089,13 @@
   "ownSide": false,
   "played": "Qxc7",
   "share": 0.741,
+  "before": {
+   "fen": "3r1rk1/2q1bppp/8/4n3/8/2P1B1Q1/P4PPP/3RR1K1 w - - 16 25",
+   "moves": [
+    "Bh6",
+    "Ng6"
+   ]
+  },
   "game": "https://www.chess.com/game/live/120994743240"
  },
  {
@@ -1668,6 +2123,13 @@
   "ownSide": false,
   "played": "b3",
   "share": 0.726,
+  "before": {
+   "fen": "r4rk1/1p1q1pbp/p2p1np1/3Pp3/4P3/2N1BQ1P/PP3PP1/R2R2K1 w - - 0 17",
+   "moves": [
+    "Bc1",
+    "Qb5"
+   ]
+  },
   "game": "https://www.chess.com/game/live/96916854483"
  },
  {
@@ -1695,6 +2157,13 @@
   "ownSide": false,
   "played": "Nxe5",
   "share": 0.719,
+  "before": {
+   "fen": "rn1qkbnr/3b1ppp/p3p3/1p1pP3/3Q4/1BN5/PPP2PPP/R1B1K1NR b KQkq - 0 8",
+   "moves": [
+    "Nc6",
+    "Qh4"
+   ]
+  },
   "game": "https://www.chess.com/game/live/184528226978"
  },
  {
@@ -1722,6 +2191,13 @@
   "ownSide": false,
   "played": "Bxd6",
   "share": 0.716,
+  "before": {
+   "fen": "5b2/1r6/1p2Rpk1/2p4p/P1P1RP1P/1P3K2/8/8 b - - 2 43",
+   "moves": [
+    "Rb8",
+    "Rd6"
+   ]
+  },
   "game": "https://www.chess.com/game/live/121956124108"
  },
  {
@@ -1745,6 +2221,13 @@
   "ownSide": false,
   "played": "Rxe1#",
   "share": 0.712,
+  "before": {
+   "fen": "1r2r1k1/1b2bppp/1P6/pP2N3/8/8/P1P2PPP/R1B1R1K1 b - - 0 21",
+   "moves": [
+    "Bf6",
+    "Nd7"
+   ]
+  },
   "game": "https://www.chess.com/game/live/116166626453"
  },
  {
@@ -1772,6 +2255,13 @@
   "ownSide": false,
   "played": "Qxe7",
   "share": 0.71,
+  "before": {
+   "fen": "3r2r1/ppknpp1Q/2p3p1/4P3/2q2n2/5PKB/P4P1P/3R3R w - - 3 22",
+   "moves": [
+    "Qxf7",
+    "Rgf8"
+   ]
+  },
   "game": "https://www.chess.com/game/live/115159680693"
  },
  {
@@ -1799,6 +2289,13 @@
   "ownSide": false,
   "played": "Rxc6",
   "share": 0.71,
+  "before": {
+   "fen": "5rk1/6pp/4p3/1Q1p1p2/8/1P3B2/Pqr2PPP/3R1RK1 b - - 1 28",
+   "moves": [
+    "Qxa2",
+    "Qc6"
+   ]
+  },
   "game": "https://www.chess.com/game/live/99374678527"
  },
  {
@@ -1826,6 +2323,13 @@
   "ownSide": true,
   "played": "Qxf4",
   "share": 0.709,
+  "before": {
+   "fen": "r1b1k1nr/pppp1ppp/1b3q2/3P4/Q3P3/5N2/PP1N1PPP/R3K2R w KQkq - 1 11",
+   "moves": [
+    "e5",
+    "Qf4"
+   ]
+  },
   "game": "https://www.chess.com/game/live/122004204186"
  },
  {
@@ -1853,6 +2357,13 @@
   "ownSide": true,
   "played": "Nxd4",
   "share": 0.706,
+  "before": {
+   "fen": "r2q1rk1/pp2n1pp/2n1bp2/3pp3/2P5/PB3N2/2PP1PPP/R1BQR1K1 w - - 1 12",
+   "moves": [
+    "c5",
+    "d4"
+   ]
+  },
   "game": "https://www.chess.com/game/live/120244987896"
  },
  {
@@ -1880,6 +2391,13 @@
   "ownSide": true,
   "played": "Nxg4+",
   "share": 0.702,
+  "before": {
+   "fen": "3r3r/pp2kp1p/2p1bnp1/4R1Q1/1P6/P1q1NN1P/5PPK/3R4 b - - 8 22",
+   "moves": [
+    "h6",
+    "Qg4"
+   ]
+  },
   "game": "https://www.chess.com/game/live/109051752669"
  },
  {
@@ -1907,6 +2425,13 @@
   "ownSide": false,
   "played": "Nxc3",
   "share": 0.702,
+  "before": {
+   "fen": "rnb1kb1r/pp1ppppp/1q6/3n4/3P4/1P4B1/P1P2PPP/RN1QKBNR b KQkq - 0 6",
+   "moves": [
+    "Qb4+",
+    "Nc3"
+   ]
+  },
   "game": "https://www.chess.com/game/live/103893610229"
  },
  {
@@ -1934,6 +2459,13 @@
   "ownSide": true,
   "played": "Nxb3",
   "share": 0.701,
+  "before": {
+   "fen": "r3k2r/pQp1pp1p/6p1/q7/3n4/2N4P/PPP2PP1/R4RK1 b kq - 0 14",
+   "moves": [
+    "O-O",
+    "Qb3"
+   ]
+  },
   "game": "https://www.chess.com/game/live/104723463139"
  },
  {
@@ -1961,6 +2493,13 @@
   "ownSide": true,
   "played": "Nxb3",
   "share": 0.697,
+  "before": {
+   "fen": "r2qk2r/pQp1ppbp/3p1np1/6B1/2B5/2N4P/PPn2PP1/2R2RK1 b kq - 1 12",
+   "moves": [
+    "Nd4",
+    "Qb3"
+   ]
+  },
   "game": "https://www.chess.com/game/live/96580211533"
  },
  {
@@ -1988,6 +2527,13 @@
   "ownSide": false,
   "played": "a5",
   "share": 0.694,
+  "before": {
+   "fen": "8/5pkp/p1Q1p1p1/8/P7/7P/1qr2PP1/5RK1 w - - 0 27",
+   "moves": [
+    "Qxa6",
+    "Rc4"
+   ]
+  },
   "game": "https://www.chess.com/game/live/96262395175"
  },
  {
@@ -2015,6 +2561,13 @@
   "ownSide": true,
   "played": "Nxf6+",
   "share": 0.692,
+  "before": {
+   "fen": "r1b1k1nr/pp3ppp/2p5/2b1p3/4Nq2/1Q6/PPPKP1PP/RNB2B1R w kq - 2 11",
+   "moves": [
+    "Kd3",
+    "Qf6"
+   ]
+  },
   "game": "https://www.chess.com/game/live/104465416561"
  },
  {
@@ -2042,6 +2595,13 @@
   "ownSide": false,
   "played": "Kf8",
   "share": 0.691,
+  "before": {
+   "fen": "2r1r1k1/pp2q1pQ/1n6/3Pp1P1/3P1P2/6P1/P7/R3K2R b KQ - 0 22",
+   "moves": [
+    "Kf7",
+    "Qg6+"
+   ]
+  },
   "game": "https://www.chess.com/game/live/106330149249"
  },
  {
@@ -2069,6 +2629,13 @@
   "ownSide": false,
   "played": "Qxc2",
   "share": 0.689,
+  "before": {
+   "fen": "rnb1k2r/pp1p1ppp/4p3/4N3/3P1n2/2B5/qPQ1PPPP/1R2KB1R b Kkq - 7 11",
+   "moves": [
+    "d6",
+    "b4"
+   ]
+  },
   "game": "https://www.chess.com/game/live/96912624031"
  },
  {
@@ -2096,6 +2663,13 @@
   "ownSide": false,
   "played": "Qg4",
   "share": 0.686,
+  "before": {
+   "fen": "8/p1k2p1p/P1p3p1/2p1p3/PpB1Pb2/5Q1P/2q2PK1/8 w - - 0 37",
+   "moves": [
+    "Bxf7",
+    "Qa2"
+   ]
+  },
   "game": "https://www.chess.com/game/live/143244185260"
  },
  {
@@ -2121,6 +2695,13 @@
   "ownSide": false,
   "played": "Qe6#",
   "share": 0.682,
+  "before": {
+   "fen": "rn3bkr/pp2p1pp/2p5/2qpQRP1/8/3P4/P6P/R5K1 w - - 3 23",
+   "moves": [
+    "d4",
+    "Qc3"
+   ]
+  },
   "game": "https://www.chess.com/game/live/115794024027"
  },
  {
@@ -2144,6 +2725,13 @@
   "ownSide": true,
   "played": "Qg8#",
   "share": 0.674,
+  "before": {
+   "fen": "r1bqkr1b/1pp1p2P/3pQ2B/3Pnp2/4P3/pPN5/P1P2P2/2KR2NR w - - 3 21",
+   "moves": [
+    "Bxf8",
+    "Kxf8"
+   ]
+  },
   "game": "https://www.chess.com/game/live/143435470468"
  },
  {
@@ -2171,6 +2759,13 @@
   "ownSide": false,
   "played": "Nxd5",
   "share": 0.668,
+  "before": {
+   "fen": "6k1/p4pp1/2p2b1p/8/6P1/2N4P/PPPr1P2/R4K2 w - - 2 22",
+   "moves": [
+    "Ke1",
+    "Rd5"
+   ]
+  },
   "game": "https://www.chess.com/game/live/142584267828"
  },
  {
@@ -2198,6 +2793,13 @@
   "ownSide": true,
   "played": "Rxd8+",
   "share": 0.668,
+  "before": {
+   "fen": "1k1r4/1ppBrp1p/p7/6p1/7n/5P2/PPP4P/2KR3R w - - 6 23",
+   "moves": [
+    "Bg4",
+    "f5"
+   ]
+  },
   "game": "https://www.chess.com/game/live/109110102671"
  },
  {
@@ -2225,6 +2827,13 @@
   "ownSide": false,
   "played": "Rxd7",
   "share": 0.668,
+  "before": {
+   "fen": "3r1rk1/p1p2p2/5bpp/1N6/4p3/7P/P1P2PP1/3R1RK1 w - - 0 19",
+   "moves": [
+    "Nxc7",
+    "Rd7"
+   ]
+  },
   "game": "https://www.chess.com/game/live/97302564255"
  },
  {
@@ -2248,6 +2857,13 @@
   "ownSide": true,
   "played": "Qd1#",
   "share": 0.66,
+  "before": {
+   "fen": "rn1qk2r/ppp1pp1p/6p1/3nPb2/2B5/2N2Q2/PPP2PPP/R1B1K2R b KQkq - 0 9",
+   "moves": [
+    "Nxc3",
+    "Qxb7"
+   ]
+  },
   "game": "https://www.chess.com/game/live/116519980617"
  },
  {
@@ -2275,6 +2891,13 @@
   "ownSide": true,
   "played": "Rdf5",
   "share": 0.659,
+  "before": {
+   "fen": "8/6kp/6p1/p2r2r1/5p2/1P1p3P/P2R1BP1/3B2K1 b - - 3 37",
+   "moves": [
+    "f3",
+    "Bg3"
+   ]
+  },
   "game": "https://www.chess.com/game/live/109569652899"
  },
  {
@@ -2302,6 +2925,13 @@
   "ownSide": true,
   "played": "Nxe5",
   "share": 0.657,
+  "before": {
+   "fen": "2k1rb1r/ppqn1pp1/2ppp1p1/8/PP1PQP2/2P2N2/3N1PPP/RR4K1 b - - 1 16",
+   "moves": [
+    "d5",
+    "Qe5"
+   ]
+  },
   "game": "https://www.chess.com/game/live/145089016114"
  },
  {
@@ -2326,6 +2956,13 @@
   "ownSide": true,
   "played": "Rh8+",
   "share": 0.651,
+  "before": {
+   "fen": "2k5/p1p5/1p6/7R/4rr1P/4b1pK/PPPR2P1/5B2 w - - 0 32",
+   "moves": [
+    "Ba6+",
+    "Kb8"
+   ]
+  },
   "game": "https://www.chess.com/game/live/107283595091"
  },
  {
@@ -2349,6 +2986,13 @@
   "ownSide": false,
   "played": "Rxh7#",
   "share": 0.644,
+  "before": {
+   "fen": "8/2R4p/pQ3ppk/5q2/8/5P2/5PKP/r7 w - - 5 32",
+   "moves": [
+    "Qe3+",
+    "Kh5"
+   ]
+  },
   "game": "https://www.chess.com/game/live/102482436929"
  },
  {
@@ -2376,6 +3020,13 @@
   "ownSide": false,
   "played": "Kh2",
   "share": 0.643,
+  "before": {
+   "fen": "5rk1/Q1r2p1p/6p1/5p2/p1q5/P6P/3R1PP1/4R1K1 w - - 2 29",
+   "moves": [
+    "Qa5",
+    "Qb3"
+   ]
+  },
   "game": "https://www.chess.com/game/live/96580628875"
  },
  {
@@ -2403,6 +3054,13 @@
   "ownSide": false,
   "played": "Ne2",
   "share": 0.635,
+  "before": {
+   "fen": "2k4r/ppqrpp2/2pp1bp1/7p/P2PP3/2N4P/1PP2PP1/R2QR1K1 w - - 0 16",
+   "moves": [
+    "Qf3",
+    "e6"
+   ]
+  },
   "game": "https://www.chess.com/game/live/184499231278"
  },
  {
@@ -2426,6 +3084,13 @@
   "ownSide": false,
   "played": "Rxd1#",
   "share": 0.623,
+  "before": {
+   "fen": "8/pp4pr/4p1k1/1N1pP1qp/2p3P1/6Q1/PPPr2P1/1K1R3R b - - 0 22",
+   "moves": [
+    "hxg4",
+    "Rxh7"
+   ]
+  },
   "game": "https://www.chess.com/game/live/170529209638"
  },
  {
@@ -2453,6 +3118,13 @@
   "ownSide": true,
   "played": "Qxd3",
   "share": 0.623,
+  "before": {
+   "fen": "3Rkb1r/p5p1/2R2pp1/1q6/5B2/5QP1/P4P1P/6K1 b - - 0 25",
+   "moves": [
+    "Kxd8",
+    "Qd3+"
+   ]
+  },
   "game": "https://www.chess.com/game/live/169531926766"
  },
  {
@@ -2480,6 +3152,13 @@
   "ownSide": true,
   "played": "Qxb7",
   "share": 0.614,
+  "before": {
+   "fen": "r3k2r/p4p2/2Q1pp1p/2Pp1b2/P7/8/1q3PPP/2R1R1K1 b - - 0 25",
+   "moves": [
+    "Ke7",
+    "Qb7+"
+   ]
+  },
   "game": "https://www.chess.com/game/live/168524470668"
  },
  {
@@ -2507,6 +3186,13 @@
   "ownSide": true,
   "played": "Nxf2",
   "share": 0.595,
+  "before": {
+   "fen": "rnb1kb1r/pp2pppp/2pp4/q7/3PnB2/2NQP3/PPP1NPPP/R3KB1R b KQkq - 1 6",
+   "moves": [
+    "Bf5",
+    "O-O-O"
+   ]
+  },
   "game": "https://www.chess.com/game/live/169386240976"
  },
  {
@@ -2534,6 +3220,13 @@
   "ownSide": false,
   "played": "Bf6",
   "share": 0.592,
+  "before": {
+   "fen": "r6r/pp1nk1b1/2p1R1p1/6pp/2B1P2P/2N2P2/PPP2P2/2K4R b - - 3 18",
+   "moves": [
+    "Kd8",
+    "Re7"
+   ]
+  },
   "game": "https://www.chess.com/game/live/100225339489"
  },
  {
@@ -2561,6 +3254,13 @@
   "ownSide": false,
   "played": "Qg5",
   "share": 0.59,
+  "before": {
+   "fen": "r2q1r2/1R6/6pk/p2N4/2PQ2P1/8/P4P1P/6K1 b - - 0 23",
+   "moves": [
+    "Qh4",
+    "Qf4+"
+   ]
+  },
   "game": "https://www.chess.com/game/live/146382280174"
  },
  {
@@ -2584,6 +3284,13 @@
   "ownSide": true,
   "played": "Qxh7#",
   "share": 0.586,
+  "before": {
+   "fen": "r1bq1rk1/ppp2ppp/2n1p3/8/1bBP4/4PNP1/PPQ2PP1/RN2K2R w KQ - 3 11",
+   "moves": [
+    "Nbd2",
+    "a5"
+   ]
+  },
   "game": "https://www.chess.com/game/live/97108258779"
  },
  {
@@ -2611,6 +3318,13 @@
   "ownSide": false,
   "played": "Bxc2",
   "share": 0.577,
+  "before": {
+   "fen": "q6r/p4ppp/2pkpn2/3P1b2/3P4/4P3/PP3PPP/2RQK1NR b K - 0 13",
+   "moves": [
+    "cxd5",
+    "Qc2"
+   ]
+  },
   "game": "https://www.chess.com/game/live/99252334463"
  },
  {
@@ -2635,6 +3349,13 @@
   "ownSide": true,
   "played": "Nxh3+",
   "share": 0.566,
+  "before": {
+   "fen": "B4rk1/5ppp/4p3/p5qn/Pp1n4/1P5P/3N1PP1/R2QR1K1 b - - 0 22",
+   "moves": [
+    "Nf4",
+    "Ne4"
+   ]
+  },
   "game": "https://www.chess.com/game/live/168120998404"
  },
  {
@@ -2662,6 +3383,13 @@
   "ownSide": false,
   "played": "Bxd6",
   "share": 0.566,
+  "before": {
+   "fen": "1R3b1r/pp3kpp/6n1/3Q4/5Bq1/8/PP3P1P/5R1K b - - 0 22",
+   "moves": [
+    "Kf6",
+    "Qd6+"
+   ]
+  },
   "game": "https://www.chess.com/game/live/139686376102"
  },
  {
@@ -2687,6 +3415,13 @@
   "ownSide": false,
   "played": "Qf6#",
   "share": 0.565,
+  "before": {
+   "fen": "r6r/pp5q/2pRp1k1/2P5/4p3/1P2P3/PQ2BP2/R5K1 w - - 2 24",
+   "moves": [
+    "Rxe6+",
+    "Kf5"
+   ]
+  },
   "game": "https://www.chess.com/game/live/109052994101"
  },
  {
@@ -2710,6 +3445,13 @@
   "ownSide": false,
   "played": "Qg7#",
   "share": 0.545,
+  "before": {
+   "fen": "3r1rk1/pbp1p2p/1p3ppn/2q5/2P1pP2/1PQ1P2P/PB1N2P1/R3R1K1 w - - 1 21",
+   "moves": [
+    "g4",
+    "f5"
+   ]
+  },
   "game": "https://www.chess.com/game/live/121043400472"
  },
  {
@@ -2733,6 +3475,13 @@
   "ownSide": true,
   "played": "Qxe1#",
   "share": 0.541,
+  "before": {
+   "fen": "r7/ppp3B1/2np1kp1/3Q4/7q/2P2P2/PPP3PP/R5K1 b - - 0 18",
+   "moves": [
+    "Kxg7",
+    "Re1"
+   ]
+  },
   "game": "https://www.chess.com/game/live/72673259039"
  },
  {
@@ -2760,6 +3509,13 @@
   "ownSide": false,
   "played": "Nxg4",
   "share": 0.528,
+  "before": {
+   "fen": "rn1qk2r/ppp1b1p1/3ppn1p/8/3NP3/2N5/PPP2PPP/R1BQR1K1 b kq - 0 9",
+   "moves": [
+    "Qd7",
+    "Qg4"
+   ]
+  },
   "game": "https://www.chess.com/game/live/170510537932"
  },
  {
@@ -2787,6 +3543,13 @@
   "ownSide": true,
   "played": "a4",
   "share": 0.528,
+  "before": {
+   "fen": "8/1p5r/8/p3k3/4pB2/6PP/PPP2P1K/8 b - - 1 42",
+   "moves": [
+    "Kf5",
+    "Bc7"
+   ]
+  },
   "game": "https://www.chess.com/game/live/143826637596"
  },
  {
@@ -2814,6 +3577,13 @@
   "ownSide": false,
   "played": "Nxh5",
   "share": 0.525,
+  "before": {
+   "fen": "r1b1k2r/pp1p1pp1/1qn2n1p/2b1P3/3NP3/2P1B3/PPB3PP/RN1Q1RK1 b kq - 0 12",
+   "moves": [
+    "Nxe5",
+    "Qh5"
+   ]
+  },
   "game": "https://www.chess.com/game/live/173793027272"
  },
  {
@@ -2841,6 +3611,13 @@
   "ownSide": true,
   "played": "Qxc6+",
   "share": 0.522,
+  "before": {
+   "fen": "r1b1k2r/p3ppbp/2p3p1/4q3/2p5/8/PPPBQPPP/RN1R2K1 w kq - 0 13",
+   "moves": [
+    "Qxc4",
+    "Qxb2"
+   ]
+  },
   "game": "https://www.chess.com/game/live/108669375834"
  },
  {
@@ -2868,6 +3645,13 @@
   "ownSide": true,
   "played": "Qc4",
   "share": 0.521,
+  "before": {
+   "fen": "1k1q4/1p4p1/p1np4/3Q4/3P4/P1P1P1P1/1P1R2P1/2K2r2 w - - 2 24",
+   "moves": [
+    "Kc2",
+    "Qg5"
+   ]
+  },
   "game": "https://www.chess.com/game/live/99119123995"
  },
  {
@@ -2895,6 +3679,13 @@
   "ownSide": true,
   "played": "Rxg1",
   "share": 0.52,
+  "before": {
+   "fen": "7k/p1p2p1p/2pq1p2/3p4/3P2r1/1N2P3/1KP2P2/6RQ b - - 1 30",
+   "moves": [
+    "Rg6",
+    "Qh5"
+   ]
+  },
   "game": "https://www.chess.com/game/live/120215449192"
  },
  {
@@ -2918,6 +3709,13 @@
   "ownSide": false,
   "played": "Qxf7#",
   "share": 0.504,
+  "before": {
+   "fen": "r2qk2r/ppp2pbp/2np1np1/3N4/4P3/3BpQ1P/PPP2PP1/R4RK1 w kq - 0 11",
+   "moves": [
+    "fxe3",
+    "Nxd5"
+   ]
+  },
   "game": "https://www.chess.com/game/live/105338455633"
  },
  {
@@ -2945,6 +3743,13 @@
   "ownSide": false,
   "played": "Nc3",
   "share": 0.495,
+  "before": {
+   "fen": "rn1qkb1r/p1p1pppp/5n2/1p6/2pP2b1/2N1PN2/PP3PPP/R1BQKB1R w KQkq - 0 6",
+   "moves": [
+    "Nxb5",
+    "Qd5"
+   ]
+  },
   "game": "https://www.chess.com/game/live/119426431880"
  },
  {
@@ -2968,6 +3773,13 @@
   "ownSide": false,
   "played": "Nxa4",
   "share": 0.494,
+  "before": {
+   "fen": "1r4k1/5ppp/p7/8/8/P1N1q3/1n5P/KRR5 b - - 1 30",
+   "moves": [
+    "h6",
+    "Na4"
+   ]
+  },
   "game": "https://www.chess.com/game/live/102228239073"
  },
  {
@@ -2995,6 +3807,13 @@
   "ownSide": false,
   "played": "Qxd2",
   "share": 0.476,
+  "before": {
+   "fen": "3r2k1/pp3p1p/8/5Pp1/3p2P1/1P2q3/P2b2Q1/2R2R1K w - - 5 33",
+   "moves": [
+    "Rf3",
+    "Qe5"
+   ]
+  },
   "game": "https://www.chess.com/game/live/102825037123"
  },
  {
@@ -3020,6 +3839,13 @@
   "ownSide": true,
   "played": "Rf5+",
   "share": 0.461,
+  "before": {
+   "fen": "7k/6bp/3q2p1/6n1/2Q3K1/1B4P1/P4r1P/3R4 b - - 6 34",
+   "moves": [
+    "h5+",
+    "Kxg5"
+   ]
+  },
   "game": "https://www.chess.com/game/live/185519893582"
  },
  {
@@ -3047,6 +3873,13 @@
   "ownSide": false,
   "played": "Re3",
   "share": 0.444,
+  "before": {
+   "fen": "3k2r1/pp5p/4p3/1B1p4/1B2q1P1/PPR4P/1P3P2/1K6 w - - 6 29",
+   "moves": [
+    "Ka2",
+    "Rf8"
+   ]
+  },
   "game": "https://www.chess.com/game/live/120243694060"
  },
  {
@@ -3074,6 +3907,13 @@
   "ownSide": false,
   "played": "Nxh2+",
   "share": 0.428,
+  "before": {
+   "fen": "r6r/ppk3p1/1b3q1p/1P1N4/4R1Q1/3p1n2/P1P3PP/R4K2 b - - 1 23",
+   "moves": [
+    "Kb8",
+    "Rc1"
+   ]
+  },
   "game": "https://www.chess.com/game/live/168814872524"
  },
  {
@@ -3101,6 +3941,13 @@
   "ownSide": true,
   "played": "Bxg4",
   "share": 0.417,
+  "before": {
+   "fen": "r1b1kb1r/ppq1pp1p/3p1p2/8/4B3/1P6/P1PN1PPP/R2Q1RK1 b kq - 0 14",
+   "moves": [
+    "Bg7",
+    "Qg4"
+   ]
+  },
   "game": "https://www.chess.com/game/live/142950670896"
  },
  {
@@ -3128,6 +3975,13 @@
   "ownSide": true,
   "played": "f3",
   "share": 0.394,
+  "before": {
+   "fen": "r4k1r/2p2p1p/p2p1bp1/4q3/2Q1N2P/8/PPP1KP2/3R1B1R w - - 0 22",
+   "moves": [
+    "Rd5",
+    "Qh5+"
+   ]
+  },
   "game": "https://www.chess.com/game/live/106027135999"
  },
  {
@@ -3155,6 +4009,13 @@
   "ownSide": true,
   "played": "Qxc7+",
   "share": 0.381,
+  "before": {
+   "fen": "7r/pp1r1kp1/4b2p/8/6n1/6Q1/Pq3PPP/RN2R1K1 w - - 0 20",
+   "moves": [
+    "Nc3",
+    "Rc7"
+   ]
+  },
   "game": "https://www.chess.com/game/live/140150681428"
  },
  {
@@ -3179,6 +4040,13 @@
   "ownSide": true,
   "played": "Nc2+",
   "share": 0.37,
+  "before": {
+   "fen": "8/pp5p/2p2nk1/3pq3/1Q2p3/5nP1/P2BKP2/3R1B2 b - - 2 28",
+   "moves": [
+    "Nd4+",
+    "Ke3"
+   ]
+  },
   "game": "https://www.chess.com/game/live/119738143414"
  },
  {
@@ -3202,6 +4070,13 @@
   "ownSide": false,
   "played": "Qf8#",
   "share": 0.356,
+  "before": {
+   "fen": "6k1/6pp/b1p1rpq1/p1Bp4/3P1Q2/P1P2RPP/2r1p1P1/4R1K1 w - - 0 31",
+   "moves": [
+    "Qb8+",
+    "Kf7"
+   ]
+  },
   "game": "https://www.chess.com/game/live/139497930274"
  },
  {
@@ -3229,6 +4104,13 @@
   "ownSide": false,
   "played": "g6",
   "share": 0.318,
+  "before": {
+   "fen": "r3kb1r/p1p3pp/2pq1n2/3pNb2/8/8/PPPP1PPP/RNBQR1K1 b kq - 2 9",
+   "moves": [
+    "Be7",
+    "Qh5+"
+   ]
+  },
   "game": "https://www.chess.com/game/live/168662336418"
  },
  {
@@ -3252,6 +4134,13 @@
   "ownSide": false,
   "played": "Qxc3",
   "share": 0.314,
+  "before": {
+   "fen": "r6r/kb2b1R1/pp3p2/2pP3q/6B1/N1Q5/P1P1KPP1/3R4 b - - 5 28",
+   "moves": [
+    "Qe5+",
+    "Kf1"
+   ]
+  },
   "game": "https://www.chess.com/game/live/168621026112"
  },
  {
@@ -3277,6 +4166,13 @@
   "ownSide": false,
   "played": "c4#",
   "share": 0.306,
+  "before": {
+   "fen": "2k5/2q2p2/5P1b/ppp2R2/6N1/1KP1P3/PP5r/5R2 b - - 1 30",
+   "moves": [
+    "Qd6",
+    "Rc1"
+   ]
+  },
   "game": "https://www.chess.com/game/live/114003588853"
  },
  {
@@ -3304,6 +4200,13 @@
   "ownSide": true,
   "played": "b6",
   "share": 0.294,
+  "before": {
+   "fen": "r7/ppp1p2k/2n3p1/3B1bN1/P4P2/7P/6PK/3R4 b - - 0 29",
+   "moves": [
+    "Kh6",
+    "Rb1"
+   ]
+  },
   "game": "https://www.chess.com/game/live/98404457295"
  },
  {
@@ -3331,6 +4234,13 @@
   "ownSide": true,
   "played": "Rcxc6",
   "share": 0.286,
+  "before": {
+   "fen": "r5k1/pp4pp/2n2r2/bQ1p1p2/3P1N2/P3BqP1/1P3P1P/2RR2K1 b - - 9 27",
+   "moves": [
+    "Rc8",
+    "Rxc6"
+   ]
+  },
   "game": "https://www.chess.com/game/live/120651165458"
  },
  {
@@ -3358,6 +4268,13 @@
   "ownSide": true,
   "played": "Kb1",
   "share": 0.28,
+  "before": {
+   "fen": "r3k2r/ppB2p2/2n3pp/3qp3/3P4/4PP2/PP1Q2PP/2KR2R1 w kq - 0 16",
+   "moves": [
+    "a3",
+    "Qc5+"
+   ]
+  },
   "game": "https://www.chess.com/game/live/96486585401"
  },
  {
@@ -3381,6 +4298,13 @@
   "ownSide": true,
   "played": "Qc5#",
   "share": 0.279,
+  "before": {
+   "fen": "r1b2b1r/1pk1np1p/p1nppqp1/8/2PP1B2/Q3P3/PP3PPP/R3KBNR w KQ - 0 10",
+   "moves": [
+    "Qxd6+",
+    "Kb6"
+   ]
+  },
   "game": "https://www.chess.com/game/live/98325928851"
  },
  {
@@ -3408,6 +4332,13 @@
   "ownSide": true,
   "played": "Qxe1+",
   "share": 0.276,
+  "before": {
+   "fen": "5rk1/5pp1/7p/8/3P3q/P1P1P2P/1P4Q1/1R4K1 b - - 0 32",
+   "moves": [
+    "Re8",
+    "Re1"
+   ]
+  },
   "game": "https://www.chess.com/game/live/184975961242"
  },
  {
@@ -3435,6 +4366,13 @@
   "ownSide": true,
   "played": "Kxf3",
   "share": 0.241,
+  "before": {
+   "fen": "8/pkp3Q1/1p6/8/1P4K1/P4rPP/5r2/8 w - - 1 40",
+   "moves": [
+    "a4",
+    "Ra2"
+   ]
+  },
   "game": "https://www.chess.com/game/live/185398892840"
  },
  {
@@ -3462,6 +4400,13 @@
   "ownSide": false,
   "played": "Rxc6",
   "share": 0.225,
+  "before": {
+   "fen": "r5k1/5pp1/2Pp3p/2p1b3/8/1P2P1PK/2P2B1P/7R b - - 0 30",
+   "moves": [
+    "Rc8",
+    "Ra1"
+   ]
+  },
   "game": "https://www.chess.com/game/live/109654268443"
  },
  {
@@ -3489,6 +4434,13 @@
   "ownSide": false,
   "played": "Qxc2",
   "share": 0.198,
+  "before": {
+   "fen": "rn1qk2r/ppp2pbp/4p1p1/4Pb2/2BP2n1/5N2/PPP3PP/RNBQ1RK1 w kq - 0 9",
+   "moves": [
+    "Nh4",
+    "Bxc2"
+   ]
+  },
   "game": "https://www.chess.com/game/live/98850315207"
  },
  {
@@ -3516,6 +4468,13 @@
   "ownSide": true,
   "played": "Bxe6",
   "share": 0.195,
+  "before": {
+   "fen": "r1b2rk1/ppp2p1p/2q1p1p1/4R3/8/1B5P/PPQ2PP1/R1B3K1 b - - 0 18",
+   "moves": [
+    "Rd8",
+    "Bxe6"
+   ]
+  },
   "game": "https://www.chess.com/game/live/98154072659"
  },
  {
@@ -3543,6 +4502,13 @@
   "ownSide": false,
   "played": "Rxg8",
   "share": 0.177,
+  "before": {
+   "fen": "1kq3r1/p4R2/1p1p4/8/7r/4R1QP/PPP2P2/6K1 w - - 5 34",
+   "moves": [
+    "Rg7",
+    "Rxh3"
+   ]
+  },
   "game": "https://www.chess.com/game/live/167279058622"
  },
  {
@@ -3570,6 +4536,13 @@
   "ownSide": false,
   "played": "Nc2+",
   "share": 0.858,
+  "before": {
+   "fen": "r3k2r/2p3pp/p2b4/q4nB1/1nP2pP1/2Q5/PP1NPP1P/R3KB1R b KQkq g3 0 17",
+   "moves": [
+    "Nd4",
+    "Qxd4"
+   ]
+  },
   "game": "https://www.chess.com/game/live/52074006353"
  },
  {
@@ -3598,6 +4571,13 @@
   "ownSide": true,
   "played": "e5",
   "share": null,
+  "before": {
+   "fen": "r4rk1/5p2/1qp1p1p1/pp2n2p/3pP2P/PB1P2Q1/1PP2R1P/2K3R1 b - - 1 24",
+   "moves": [
+    "Ng4",
+    "Rf4"
+   ]
+  },
   "game": "https://www.chess.com/game/live/186187271210"
  },
  {
@@ -3625,6 +4605,13 @@
   "ownSide": false,
   "played": "Nc2+",
   "share": 0.85,
+  "before": {
+   "fen": "r1bqk1nr/ppp2ppp/3p4/3Pp3/QbPn4/2N1B3/PP2PPPP/R3KBNR b KQkq - 1 6",
+   "moves": [
+    "Bd7",
+    "Qxb4"
+   ]
+  },
   "game": "https://www.chess.com/game/live/50258483347"
  },
  {
@@ -3658,6 +4645,13 @@
   "ownSide": true,
   "played": "Nd5",
   "share": null,
+  "before": {
+   "fen": "6k1/r4ppp/8/1n2P3/7P/p4PK1/B5P1/R7 b - - 3 43",
+   "moves": [
+    "Nc3",
+    "Bb3"
+   ]
+  },
   "game": "https://www.chess.com/game/live/174297609928"
  },
  {
@@ -3685,6 +4679,13 @@
   "ownSide": false,
   "played": "Re1+",
   "share": 0.844,
+  "before": {
+   "fen": "4r3/2p2pRk/5p1p/5P1N/3p4/3Q1n2/PPP2r2/2K5 b - - 5 35",
+   "moves": [
+    "Kh8",
+    "Nxf6"
+   ]
+  },
   "game": "https://www.chess.com/game/live/115263482271"
  },
  {
@@ -3721,6 +4722,13 @@
   "ownSide": true,
   "played": "Qh4",
   "share": null,
+  "before": {
+   "fen": "r1bq1r2/pp2bppk/3p1n1p/2p5/2B1PB2/6Q1/PPP2PPP/RN2R1K1 w - - 6 12",
+   "moves": [
+    "Bd3",
+    "g6"
+   ]
+  },
   "game": "https://www.chess.com/game/live/174099308650"
  },
  {
@@ -3748,6 +4756,13 @@
   "ownSide": false,
   "played": "Qxe3+",
   "share": 0.84,
+  "before": {
+   "fen": "rn2kb1r/pp2pp1p/2pp2p1/q4bP1/1P1P1P2/P1NQ4/2P2n1P/R1B1KBNR b KQkq - 0 9",
+   "moves": [
+    "Qe5+",
+    "Qe3"
+   ]
+  },
   "game": "https://www.chess.com/game/live/61376454455"
  },
  {
@@ -3778,6 +4793,13 @@
   "ownSide": true,
   "played": "Rd2",
   "share": null,
+  "before": {
+   "fen": "rnb1r1k1/pppp4/5p2/3P4/5p1P/3P4/PPP2PP1/2KR1B1R w - - 0 18",
+   "moves": [
+    "h5",
+    "Kg7"
+   ]
+  },
   "game": "https://www.chess.com/game/live/173635929006"
  },
  {
@@ -3805,6 +4827,13 @@
   "ownSide": false,
   "played": "Ne5+",
   "share": 0.838,
+  "before": {
+   "fen": "4Q3/5qrp/2p1p1k1/2Pp4/6N1/5P2/P4PKP/8 w - - 16 39",
+   "moves": [
+    "Qxf7+",
+    "Rxf7"
+   ]
+  },
   "game": "https://www.chess.com/game/live/121715098732"
  },
  {
@@ -3836,6 +4865,13 @@
   "ownSide": true,
   "played": "c4",
   "share": null,
+  "before": {
+   "fen": "2r1k2r/4n1pp/pb2p3/1pp1Pp2/1P3P2/2P1BRP1/P3N2P/R5K1 w k - 1 23",
+   "moves": [
+    "Rc1",
+    "Nd5"
+   ]
+  },
   "game": "https://www.chess.com/game/live/172809675890"
  },
  {
@@ -3863,6 +4899,13 @@
   "ownSide": false,
   "played": "Ne4+",
   "share": 0.836,
+  "before": {
+   "fen": "8/p1p2k1p/1p2pn2/5q2/5P2/1P2P1P1/P2QK2P/5R2 b - - 0 29",
+   "moves": [
+    "Qg4+",
+    "Kf2"
+   ]
+  },
   "game": "https://www.chess.com/game/live/51167989943"
  },
  {
@@ -3893,6 +4936,13 @@
   "ownSide": true,
   "played": "b3",
   "share": null,
+  "before": {
+   "fen": "N4b2/1p1bk3/p2q2p1/Q4p2/2B1p1n1/8/PP1P1PPP/n1BK3R w - - 1 18",
+   "moves": [
+    "Ke2",
+    "Nc2"
+   ]
+  },
   "game": "https://www.chess.com/game/live/171031204398"
  },
  {
@@ -3920,6 +4970,13 @@
   "ownSide": true,
   "played": "Nxg2",
   "share": 0.81,
+  "before": {
+   "fen": "r4rk1/5p2/2p5/3nP2p/1P1p1BpP/pP1Q4/B1P3P1/2K4R b - - 0 27",
+   "moves": [
+    "Nxf4",
+    "Qxd4"
+   ]
+  },
   "game": "https://www.chess.com/game/live/108746543747"
  },
  {
@@ -3948,6 +5005,13 @@
   "ownSide": true,
   "played": "O-O-O",
   "share": null,
+  "before": {
+   "fen": "r3k2r/5pp1/p3b2p/3pN1nQ/1b1P4/8/PPP2PPP/R5K1 b kq - 1 19",
+   "moves": [
+    "Bd2",
+    "c3"
+   ]
+  },
   "game": "https://www.chess.com/game/live/170570379918"
  },
  {
@@ -3975,6 +5039,13 @@
   "ownSide": true,
   "played": "Rd1+",
   "share": 0.805,
+  "before": {
+   "fen": "3r1rk1/p1p2ppp/8/8/4P1n1/P4N2/3RbbPP/RNB4K b - - 3 21",
+   "moves": [
+    "c5",
+    "Rxe2"
+   ]
+  },
   "game": "https://www.chess.com/game/live/40597296911"
  },
  {
@@ -4013,6 +5084,13 @@
   "ownSide": true,
   "played": "Qg4",
   "share": null,
+  "before": {
+   "fen": "rn1qk2r/ppp1b1p1/3ppn1p/8/3pP3/2N2N2/PPP2PPP/R1BQR1K1 w kq - 0 9",
+   "moves": [
+    "Nxd4",
+    "Qd7"
+   ]
+  },
   "game": "https://www.chess.com/game/live/170510537932"
  },
  {
@@ -4040,6 +5118,13 @@
   "ownSide": true,
   "played": "f3",
   "share": 0.802,
+  "before": {
+   "fen": "6k1/1r3ppp/4p3/1rbpB3/8/P1P1P3/1P3PPP/3Q2K1 w - - 1 27",
+   "moves": [
+    "c4",
+    "dxc4"
+   ]
+  },
   "game": "https://www.chess.com/game/live/80592571093"
  },
  {
@@ -4078,6 +5163,13 @@
   "ownSide": true,
   "played": "Qg4",
   "share": null,
+  "before": {
+   "fen": "r1bqkbnr/1p1n1p1p/p2p2p1/2pPp3/2B1P3/5N2/PPP2PPP/RNBQR1K1 w kq - 0 8",
+   "moves": [
+    "Ng5",
+    "Qf6"
+   ]
+  },
   "game": "https://www.chess.com/game/live/169390262774"
  },
  {
@@ -4105,6 +5197,13 @@
   "ownSide": true,
   "played": "Bxf4",
   "share": 0.797,
+  "before": {
+   "fen": "rn2k3/ppq1ppb1/2p3p1/3p4/3PPB2/2P2Pnb/PPB4r/RNQ1K1R1 b Qq - 3 14",
+   "moves": [
+    "Bh6",
+    "Rxg3"
+   ]
+  },
   "game": "https://www.chess.com/game/live/78075653363"
  },
  {
@@ -4139,6 +5238,13 @@
   "ownSide": true,
   "played": "Nf6",
   "share": null,
+  "before": {
+   "fen": "2k5/pp5B/1n1r2p1/1P2p3/2p1P3/P1Pb1PN1/6P1/3R2K1 b - - 0 28",
+   "moves": [
+    "Nd7",
+    "Kf2"
+   ]
+  },
   "game": "https://www.chess.com/game/live/168762221546"
  },
  {
@@ -4166,6 +5272,13 @@
   "ownSide": false,
   "played": "Qxd2+",
   "share": 0.783,
+  "before": {
+   "fen": "r2qk2r/ppp2ppp/5n2/2b2bN1/2B5/5Q2/PP3PPP/R1B1K2R b KQkq - 0 11",
+   "moves": [
+    "Bb4+",
+    "Bd2"
+   ]
+  },
   "game": "https://www.chess.com/game/live/868463189"
  },
  {
@@ -4194,6 +5307,13 @@
   "ownSide": true,
   "played": "Nxd4",
   "share": null,
+  "before": {
+   "fen": "r1bqk2r/pppp1ppp/2n5/2b1P3/2Bp2n1/5N2/PPP2PPP/RNBQ1RK1 w kq - 1 7",
+   "moves": [
+    "Bg5",
+    "Be7"
+   ]
+  },
   "game": "https://www.chess.com/game/live/168547701614"
  },
  {
@@ -4221,6 +5341,13 @@
   "ownSide": true,
   "played": "Ng3+",
   "share": 0.766,
+  "before": {
+   "fen": "rnb1k2r/ppp2p1p/3qP1p1/4bnN1/2B5/2N4P/PPP1Q1P1/R1B2RK1 b kq - 0 14",
+   "moves": [
+    "Bh2+",
+    "Kh1"
+   ]
+  },
   "game": "https://www.chess.com/game/live/95286556721"
  },
  {
@@ -4251,6 +5378,13 @@
   "ownSide": true,
   "played": "e6",
   "share": null,
+  "before": {
+   "fen": "r1bqk2r/pppp1ppp/2n5/2b1P3/2Bp2n1/5N2/PPP2PPP/RNBQ1RK1 w kq - 1 7",
+   "moves": [
+    "Bg5",
+    "Be7"
+   ]
+  },
   "game": "https://www.chess.com/game/live/165674964960"
  },
  {
@@ -4278,6 +5412,13 @@
   "ownSide": false,
   "played": "Ne6",
   "share": 0.763,
+  "before": {
+   "fen": "r2qr1k1/pp3pp1/3p2bp/2pN2b1/2BnPBP1/2PP1P2/PP1Q4/R4RK1 b - - 0 19",
+   "moves": [
+    "Bxf4",
+    "Qxf4"
+   ]
+  },
   "game": "https://www.chess.com/game/live/121542848534"
  },
  {
@@ -4310,6 +5451,13 @@
   "ownSide": true,
   "played": "Qxg3",
   "share": null,
+  "before": {
+   "fen": "8/6pB/8/8/1P1q4/1R4PP/P2k1P1K/8 b - - 0 46",
+   "moves": [
+    "Qxf2+",
+    "Kh1"
+   ]
+  },
   "game": "https://www.chess.com/game/live/145317695876"
  },
  {
@@ -4337,6 +5485,13 @@
   "ownSide": true,
   "played": "Ne6+",
   "share": 0.762,
+  "before": {
+   "fen": "r2q1r2/1p4kp/p3ppp1/1b1pN3/3Nn3/1P2Q3/PP3PPP/2KR3R w - - 0 18",
+   "moves": [
+    "Nd3",
+    "e5"
+   ]
+  },
   "game": "https://www.chess.com/game/live/75155101051"
  },
  {
@@ -4365,6 +5520,13 @@
   "ownSide": true,
   "played": "Kd7",
   "share": null,
+  "before": {
+   "fen": "2k4r/1p1q1p2/pP1p2p1/P1p1p2r/2P2Pn1/4PQ1N/6PP/3R1RK1 b - - 4 24",
+   "moves": [
+    "Qe6",
+    "Rd5"
+   ]
+  },
   "game": "https://www.chess.com/game/live/145280933586"
  },
  {
@@ -4392,6 +5554,13 @@
   "ownSide": true,
   "played": "Nc6+",
   "share": 0.754,
+  "before": {
+   "fen": "1k1r3r/Npp1qp1p/p5p1/3pb1P1/4bN2/2P3QP/PP3P1R/R3KB2 w Q - 2 19",
+   "moves": [
+    "Qe3",
+    "b6"
+   ]
+  },
   "game": "https://www.chess.com/game/live/68315649149"
  },
  {
@@ -4430,6 +5599,13 @@
   "ownSide": true,
   "played": "dxc4",
   "share": null,
+  "before": {
+   "fen": "5r2/p2pr3/1k5p/1pp3p1/4B1P1/3P1N1P/PP3K2/2R5 w - - 2 33",
+   "moves": [
+    "a3",
+    "c4"
+   ]
+  },
   "game": "https://www.chess.com/game/live/145025271998"
  },
  {
@@ -4457,6 +5633,13 @@
   "ownSide": true,
   "played": "Bg4+",
   "share": 0.743,
+  "before": {
+   "fen": "rnb2rk1/ppq2ppp/2p2p2/7Q/1P1P4/P1NBP3/2PN2Pb/R3K2R b KQ - 1 13",
+   "moves": [
+    "Qg3+",
+    "Kd1"
+   ]
+  },
   "game": "https://www.chess.com/game/live/51834637549"
  },
  {
@@ -4494,6 +5677,13 @@
   "ownSide": true,
   "played": "Nh4",
   "share": null,
+  "before": {
+   "fen": "rn1qkbnr/pp3ppp/4p1b1/2ppP3/6P1/3P1N1P/PPP2P2/RNBQKB1R w KQkq - 0 7",
+   "moves": [
+    "Bg2",
+    "Nc6"
+   ]
+  },
   "game": "https://www.chess.com/game/live/143745135602"
  },
  {
@@ -4521,6 +5711,13 @@
   "ownSide": false,
   "played": "fxe3",
   "share": 0.735,
+  "before": {
+   "fen": "8/8/8/P7/4p3/5k2/1R3P1r/5K2 w - - 7 56",
+   "moves": [
+    "Rb3+",
+    "e3"
+   ]
+  },
   "game": "https://www.chess.com/game/live/72589992115"
  },
  {
@@ -4550,6 +5747,13 @@
   "ownSide": true,
   "played": "Bd3",
   "share": null,
+  "before": {
+   "fen": "r3kb1r/ppq1pp1p/3p2p1/3P1b2/4n3/Q2RBP2/PP2N1PP/K4B1R b kq - 1 17",
+   "moves": [
+    "Nc5",
+    "Rc3"
+   ]
+  },
   "game": "https://www.chess.com/game/live/143739761022"
  },
  {
@@ -4577,6 +5781,13 @@
   "ownSide": true,
   "played": "Qb4",
   "share": 0.721,
+  "before": {
+   "fen": "r7/p1p1rpkp/1pPp2p1/6N1/1qP2Q2/1Pn1P2P/3R1PP1/2R3K1 b - - 3 25",
+   "moves": [
+    "Qxb3",
+    "Rd3"
+   ]
+  },
   "game": "https://www.chess.com/game/live/99432733353"
  },
  {
@@ -4607,6 +5818,13 @@
   "ownSide": true,
   "played": "Rd7",
   "share": null,
+  "before": {
+   "fen": "r3k3/ppq2pr1/2p4p/4p1p1/2Q2n2/2P4P/PP3PPB/R3R1K1 b q - 1 21",
+   "moves": [
+    "f6",
+    "Rad1"
+   ]
+  },
   "game": "https://www.chess.com/game/live/143466995866"
  },
  {
@@ -4634,6 +5852,13 @@
   "ownSide": true,
   "played": "Ra7",
   "share": 0.695,
+  "before": {
+   "fen": "2kr4/3nRBp1/p6p/Pp2P3/1b3B2/8/5P1P/6K1 w - - 0 29",
+   "moves": [
+    "e6",
+    "Nf6"
+   ]
+  },
   "game": "https://www.chess.com/game/live/136348818614"
  },
  {
@@ -4663,6 +5888,13 @@
   "ownSide": true,
   "played": "Bxe5",
   "share": null,
+  "before": {
+   "fen": "2k4r/ppq1rpp1/2pb2pn/4p3/4B1P1/1P3Q1P/PBPP1PK1/R3R3 w - - 1 19",
+   "moves": [
+    "g5",
+    "Ng8"
+   ]
+  },
   "game": "https://www.chess.com/game/live/143006353122"
  },
  {
@@ -4690,6 +5922,13 @@
   "ownSide": true,
   "played": "Bd6",
   "share": 0.66,
+  "before": {
+   "fen": "r2qkr2/pQpnp2p/6P1/4b3/2P5/8/PP3P1P/RNB1K2R b KQq - 0 13",
+   "moves": [
+    "Nc5",
+    "Qb4"
+   ]
+  },
   "game": "https://www.chess.com/game/live/62955603241"
  },
  {
@@ -4728,6 +5967,13 @@
   "ownSide": true,
   "played": "Rb8",
   "share": null,
+  "before": {
+   "fen": "r1bq1rk1/5ppp/p1p2n2/3p4/3PpQ2/B1P5/P1P1NPPP/R4RK1 b - - 1 13",
+   "moves": [
+    "Re8",
+    "Bc5"
+   ]
+  },
   "game": "https://www.chess.com/game/live/139497930274"
  },
  {
@@ -4755,6 +6001,13 @@
   "ownSide": false,
   "played": "Nf3+",
   "share": 0.658,
+  "before": {
+   "fen": "2kr3r/ppp5/2n4p/2bpP1q1/8/2PBP1B1/PP1Q1P2/R3K1R1 b Q - 2 20",
+   "moves": [
+    "Nxe5",
+    "f4"
+   ]
+  },
   "game": "https://www.chess.com/game/live/65402969869"
  },
  {
@@ -4790,6 +6043,13 @@
   "ownSide": true,
   "played": "Ne5",
   "share": null,
+  "before": {
+   "fen": "r1bqk2r/pp2npbp/2n3p1/1BPp4/8/5N2/PPP2PPP/RNBQ1RK1 w kq - 1 9",
+   "moves": [
+    "Re1",
+    "O-O"
+   ]
+  },
   "game": "https://www.chess.com/game/live/123569086872"
  },
  {
@@ -4817,6 +6077,13 @@
   "ownSide": false,
   "played": "Qxe4+",
   "share": 0.643,
+  "before": {
+   "fen": "r2qk2r/pp2nppp/1bp1p3/4P3/1PB1QP2/3P4/PP1B1P1P/R3K2R b KQkq - 2 15",
+   "moves": [
+    "Qd4",
+    "Bc3"
+   ]
+  },
   "game": "https://www.chess.com/game/live/119945002010"
  },
  {
@@ -4848,6 +6115,13 @@
   "ownSide": true,
   "played": "Rfe1",
   "share": null,
+  "before": {
+   "fen": "r3r1k1/pbp3pp/1q2pn2/1Np2pN1/2P5/3PQ3/PP3PPP/R3K2R w KQ - 1 17",
+   "moves": [
+    "O-O",
+    "Qc6"
+   ]
+  },
   "game": "https://www.chess.com/game/live/127571376123"
  },
  {
@@ -4875,6 +6149,13 @@
   "ownSide": false,
   "played": "Ra1+",
   "share": 0.634,
+  "before": {
+   "fen": "1R3b1r/6pp/5p2/4p2P/2R5/kp5P/r4P2/2B3K1 b - - 5 34",
+   "moves": [
+    "b2",
+    "Bd2"
+   ]
+  },
   "game": "https://www.chess.com/game/live/863587215"
  },
  {
@@ -4908,6 +6189,13 @@
   "ownSide": true,
   "played": "Bc5+",
   "share": null,
+  "before": {
+   "fen": "8/7p/2k3p1/1B6/1K2P3/5P1P/5bP1/8 b - - 0 46",
+   "moves": [
+    "Kb6",
+    "Bd7"
+   ]
+  },
   "game": "https://www.chess.com/game/live/121186865974"
  },
  {
@@ -4935,6 +6223,13 @@
   "ownSide": true,
   "played": "Qa7+",
   "share": 0.627,
+  "before": {
+   "fen": "4Q3/7p/2K3p1/1p6/1k4P1/8/7P/q7 w - - 0 42",
+   "moves": [
+    "Qe7+",
+    "Ka5"
+   ]
+  },
   "game": "https://www.chess.com/game/live/61746683233"
  },
  {
@@ -4968,6 +6263,13 @@
   "ownSide": true,
   "played": "Kf7",
   "share": null,
+  "before": {
+   "fen": "r3kb1r/pp1n2pp/5q2/8/8/5N2/PP3PPP/1RQ1RK2 b kq - 1 20",
+   "moves": [
+    "Be7",
+    "Qe3"
+   ]
+  },
   "game": "https://www.chess.com/game/live/120877582888"
  },
  {
@@ -4995,6 +6297,13 @@
   "ownSide": true,
   "played": "Ne2+",
   "share": 0.591,
+  "before": {
+   "fen": "3r2k1/1p3p2/p5p1/2pn4/3b4/1P1P3P/5PP1/1RQ3K1 b - - 9 29",
+   "moves": [
+    "Nc3",
+    "b4"
+   ]
+  },
   "game": "https://www.chess.com/game/live/74202689637"
  },
  {
@@ -5022,6 +6331,13 @@
   "ownSide": false,
   "played": "Rxe4",
   "share": 0.588,
+  "before": {
+   "fen": "r3r2k/ppp2Q1p/3p2p1/3P4/4q3/2P5/P1P3PP/R4R1K w - - 1 21",
+   "moves": [
+    "Rf4",
+    "Rf8"
+   ]
+  },
   "game": "https://www.chess.com/game/live/64695164557"
  },
  {
@@ -5049,6 +6365,13 @@
   "ownSide": true,
   "played": "Qf3+",
   "share": 0.586,
+  "before": {
+   "fen": "1r6/2R5/kpQ5/2p1p3/4P1KP/6P1/8/7q b - - 8 54",
+   "moves": [
+    "Rg8+",
+    "Kf5"
+   ]
+  },
   "game": "https://www.chess.com/game/live/184432059452"
  },
  {
@@ -5076,6 +6399,13 @@
   "ownSide": true,
   "played": "Nf7+",
   "share": 0.577,
+  "before": {
+   "fen": "2rq1r1k/1b1n2pB/4ppP1/n2pP3/Pp1p1B2/1P3N2/2Q2PP1/1R2K2R w K - 0 24",
+   "moves": [
+    "Ng5",
+    "Rxc2"
+   ]
+  },
   "game": "https://www.chess.com/game/live/66761534269"
  },
  {
@@ -5103,6 +6433,13 @@
   "ownSide": false,
   "played": "Nf3+",
   "share": 0.55,
+  "before": {
+   "fen": "r2q1r2/1pp4k/p3p3/4P2R/1b1n4/2N5/PPPQ1P2/R3K3 b Q - 1 20",
+   "moves": [
+    "Kg6",
+    "Rh3"
+   ]
+  },
   "game": "https://www.chess.com/game/live/109570790097"
  },
  {
@@ -5130,6 +6467,13 @@
   "ownSide": true,
   "played": "Nc7+",
   "share": 0.533,
+  "before": {
+   "fen": "r3r3/p6p/2pbNk2/3p3p/3P4/1R6/PP1K1P2/4R3 w - - 4 30",
+   "moves": [
+    "Rf3+",
+    "Ke7"
+   ]
+  },
   "game": "https://www.chess.com/game/live/64621941787"
  },
  {
@@ -5157,6 +6501,13 @@
   "ownSide": true,
   "played": "Qxb4+",
   "share": 0.527,
+  "before": {
+   "fen": "2R2n2/5kpp/p3p3/3p1qB1/1P1P3P/4Q3/P5r1/4K3 b - - 0 27",
+   "moves": [
+    "Qb1+",
+    "Qc1"
+   ]
+  },
   "game": "https://www.chess.com/game/live/174241480526"
  },
  {
@@ -5184,6 +6535,13 @@
   "ownSide": true,
   "played": "exf6+",
   "share": 0.519,
+  "before": {
+   "fen": "3r4/p4pkp/p3p1p1/2p1Pb1P/5P2/P4PR1/1P1rNK2/7R w - - 4 28",
+   "moves": [
+    "hxg6",
+    "f6"
+   ]
+  },
   "game": "https://www.chess.com/game/live/108770420699"
  },
  {
@@ -5211,6 +6569,13 @@
   "ownSide": true,
   "played": "Re1+",
   "share": 0.517,
+  "before": {
+   "fen": "4r2k/6bp/1qp3p1/8/8/5R2/P1P3PP/1RQ4K b - - 1 26",
+   "moves": [
+    "Qa5",
+    "Qa3"
+   ]
+  },
   "game": "https://www.chess.com/game/live/116125183163"
  },
  {
@@ -5238,6 +6603,13 @@
   "ownSide": true,
   "played": "Rxg2+",
   "share": 0.516,
+  "before": {
+   "fen": "r5Br/pbp1b2p/1p1k1n1Q/4n3/8/4P3/PPPP1PPP/RNB2RK1 b - - 0 15",
+   "moves": [
+    "Rhxg8",
+    "Qf4"
+   ]
+  },
   "game": "https://www.chess.com/game/live/831325995"
  },
  {
@@ -5265,6 +6637,13 @@
   "ownSide": true,
   "played": "Bg5+",
   "share": 0.474,
+  "before": {
+   "fen": "rn1q1b1r/pbpp1k1p/1p2pnR1/5p1Q/2B5/3P4/PPP2P1P/RNB1K3 w Q - 1 12",
+   "moves": [
+    "Rxf6+",
+    "Kxf6"
+   ]
+  },
   "game": "https://www.chess.com/game/live/59671188861"
  },
  {
@@ -5292,6 +6671,13 @@
   "ownSide": false,
   "played": "f5+",
   "share": 0.471,
+  "before": {
+   "fen": "2r3k1/1R1B1p1p/6p1/p7/8/1bbKPN2/2n2PPP/7R b - - 1 22",
+   "moves": [
+    "Nb4+",
+    "Ke4"
+   ]
+  },
   "game": "https://www.chess.com/game/live/99156310355"
  },
  {
@@ -5319,6 +6705,13 @@
   "ownSide": false,
   "played": "Rd2+",
   "share": 0.456,
+  "before": {
+   "fen": "4k3/2R3pp/4Kp2/4p3/1P6/8/r4P1P/8 b - - 3 34",
+   "moves": [
+    "Kd8",
+    "Kd6"
+   ]
+  },
   "game": "https://www.chess.com/game/live/74562130111"
  },
  {
@@ -5346,6 +6739,13 @@
   "ownSide": true,
   "played": "Rxe1",
   "share": 0.417,
+  "before": {
+   "fen": "4rrk1/p4p1p/1p4p1/3pNbPq/3Q1P1P/2P4n/PP6/4RR1K w - - 1 22",
+   "moves": [
+    "Nd7",
+    "Rxe1"
+   ]
+  },
   "game": "https://www.chess.com/game/live/66098626711"
  },
  {
@@ -5373,6 +6773,13 @@
   "ownSide": false,
   "played": "Qd4+",
   "share": 0.387,
+  "before": {
+   "fen": "2b5/3k4/p1pq3p/6r1/Q7/3P3P/P1P2PP1/4R1K1 w - - 0 34",
+   "moves": [
+    "Qe4",
+    "Qe6"
+   ]
+  },
   "game": "https://www.chess.com/game/live/861205998"
  },
  {
@@ -5400,6 +6807,13 @@
   "ownSide": true,
   "played": "Qa1+",
   "share": 0.378,
+  "before": {
+   "fen": "3r2k1/p1p2p1p/1p4p1/q7/P7/4BQ1P/2B2PP1/2K5 b - - 0 27",
+   "moves": [
+    "Qc3",
+    "Bd2"
+   ]
+  },
   "game": "https://www.chess.com/game/live/62045928573"
  },
  {
@@ -5427,6 +6841,13 @@
   "ownSide": true,
   "played": "Qxd7+",
   "share": 0.184,
+  "before": {
+   "fen": "r3kb1r/pp1n2pp/2p5/8/4p1Pq/2P1P2B/PP3P2/R2QK2R w KQkq - 0 18",
+   "moves": [
+    "g5",
+    "Be7"
+   ]
+  },
   "game": "https://www.chess.com/game/live/108611421567"
  },
  {
@@ -5454,6 +6875,13 @@
   "ownSide": false,
   "played": "Nf5+",
   "share": 0.117,
+  "before": {
+   "fen": "8/pp1kr1b1/3p2Qp/2pN4/3N3P/1KP3P1/PP3q2/8 w - - 2 34",
+   "moves": [
+    "Nxe7",
+    "Kxe7"
+   ]
+  },
   "game": "https://www.chess.com/game/live/68244163239"
  },
  {
@@ -5481,6 +6909,13 @@
   "ownSide": false,
   "played": "Qxa8+",
   "share": 0.035,
+  "before": {
+   "fen": "r3k2r/ppp1pp1p/3q2pB/4b3/2BnQn2/2N4P/PPP2PP1/R4RK1 w kq - 4 14",
+   "moves": [
+    "Qxb7",
+    "Nxc2"
+   ]
+  },
   "game": "https://www.chess.com/game/live/76679000201"
  },
  {
@@ -5508,6 +6943,13 @@
   "ownSide": false,
   "played": "Bxf4",
   "share": null,
+  "before": {
+   "fen": "Nnbk1b1r/p3pppp/2p1n3/1p2P3/6PK/3B1q1P/PPPBNP2/R2Q3R w - - 5 20",
+   "moves": [
+    "Ng3",
+    "Nf4"
+   ]
+  },
   "game": "https://www.chess.com/game/live/165643803122"
  },
  {
@@ -5533,6 +6975,13 @@
   "ownSide": false,
   "played": "Qxb6",
   "share": 0.899,
+  "before": {
+   "fen": "1Q1br1k1/p4p1p/2pB1pp1/q2p4/3P2n1/2NP1NP1/P6P/2R3K1 w - - 5 24",
+   "moves": [
+    "Ne2",
+    "Bb6"
+   ]
+  },
   "game": "https://www.chess.com/game/live/101667700963"
  },
  {
@@ -5558,6 +7007,13 @@
   "ownSide": true,
   "played": "Qxg8+",
   "share": 0.898,
+  "before": {
+   "fen": "r2qk2r/pppbbn2/3p2QB/8/3N4/8/PPP2PPP/RN3RK1 w q - 1 14",
+   "moves": [
+    "Qg7",
+    "Rg8"
+   ]
+  },
   "game": "https://www.chess.com/game/live/171992619842"
  },
  {
@@ -5585,6 +7041,13 @@
   "ownSide": true,
   "played": "Bxf6",
   "share": 0.895,
+  "before": {
+   "fen": "r1bq1rk1/1ppp1p2/5n1p/p5p1/1nB1P3/2Q3B1/PPP2PPP/RN2K2R w KQ - 0 12",
+   "moves": [
+    "Be5",
+    "Re8"
+   ]
+  },
   "game": "https://www.chess.com/game/live/60133214087"
  },
  {
@@ -5612,6 +7075,13 @@
   "ownSide": true,
   "played": "Bxe4",
   "share": 0.888,
+  "before": {
+   "fen": "rn1q1rk1/pbppppbp/1p4p1/8/3PnBP1/2PBPN2/PP3P1P/RN1QK2R w KQ - 3 8",
+   "moves": [
+    "Qc2",
+    "Re8"
+   ]
+  },
   "game": "https://www.chess.com/game/live/72733406129"
  },
  {
@@ -5637,6 +7107,13 @@
   "ownSide": false,
   "played": "Re1+",
   "share": 0.883,
+  "before": {
+   "fen": "5rk1/pN3p2/2p1rnpp/8/8/2N5/P1PR1PPP/R5K1 b - - 0 25",
+   "moves": [
+    "Rfe8",
+    "Nc5"
+   ]
+  },
   "game": "https://www.chess.com/game/live/68362285487"
  },
  {
@@ -5664,6 +7141,13 @@
   "ownSide": true,
   "played": "Ke1",
   "share": 0.878,
+  "before": {
+   "fen": "2k5/p1p2R2/1p5p/6p1/2P1q3/6P1/P2KB2P/8 w - - 0 28",
+   "moves": [
+    "Rf8+",
+    "Kb7"
+   ]
+  },
   "game": "https://www.chess.com/game/live/51806370845"
  },
  {
@@ -5691,6 +7175,13 @@
   "ownSide": false,
   "played": "Rhf2",
   "share": 0.869,
+  "before": {
+   "fen": "5k2/1p3Pqp/pPp3r1/P1Pp2r1/3PpRp1/4P1Kp/4Q2R/8 w - - 3 45",
+   "moves": [
+    "Qf1",
+    "Rf6"
+   ]
+  },
   "game": "https://www.chess.com/game/live/115153089953"
  },
  {
@@ -5718,6 +7209,13 @@
   "ownSide": false,
   "played": "Qxc2",
   "share": 0.854,
+  "before": {
+   "fen": "1r5k/p6p/3p1pp1/1p6/2rPP2P/P2QP3/1P3q2/1K1R3R w - - 1 31",
+   "moves": [
+    "b3",
+    "Rc2"
+   ]
+  },
   "game": "https://www.chess.com/game/live/105049248307"
  },
  {
@@ -5743,6 +7241,13 @@
   "ownSide": true,
   "played": "Qxf7+",
   "share": 0.847,
+  "before": {
+   "fen": "r2q1rk1/pp2bp1p/2np2p1/3Q1b2/2B1nB2/5N2/PPP2PPP/RN2R1K1 w - - 0 12",
+   "moves": [
+    "Bh6",
+    "Re8"
+   ]
+  },
   "game": "https://www.chess.com/game/live/185236527570"
  },
  {
@@ -5770,6 +7275,13 @@
   "ownSide": false,
   "played": "Ra1+",
   "share": 0.847,
+  "before": {
+   "fen": "r2k4/2R3pp/3P4/4p3/3N4/8/5PPP/3R2K1 b - - 0 38",
+   "moves": [
+    "exd4",
+    "Rxd4"
+   ]
+  },
   "game": "https://www.chess.com/game/live/50854744695"
  },
  {
@@ -5797,6 +7309,13 @@
   "ownSide": false,
   "played": "Rxf2",
   "share": 0.843,
+  "before": {
+   "fen": "5qk1/2p1p3/3p2pp/3P3n/2P1P1P1/1PQ4P/3R4/5rK1 w - - 3 43",
+   "moves": [
+    "Kg2",
+    "Rf2+"
+   ]
+  },
   "game": "https://www.chess.com/game/live/66290519301"
  },
  {
@@ -5824,6 +7343,13 @@
   "ownSide": false,
   "played": "Rc1+",
   "share": 0.822,
+  "before": {
+   "fen": "8/p3R2p/5p2/3R2p1/2P1k3/8/2r2PPP/6K1 b - - 4 32",
+   "moves": [
+    "Kf4",
+    "c5"
+   ]
+  },
   "game": "https://www.chess.com/game/live/109875116599"
  },
  {
@@ -5849,6 +7375,13 @@
   "ownSide": false,
   "played": "Qxf7+",
   "share": 0.821,
+  "before": {
+   "fen": "2rr2k1/pR3p1p/3P4/2P2p2/2Q1p3/1K2q3/8/4b3 w - - 0 37",
+   "moves": [
+    "Ka4",
+    "Rxc5"
+   ]
+  },
   "game": "https://www.chess.com/game/live/72398555053"
  },
  {
@@ -5874,6 +7407,13 @@
   "ownSide": false,
   "played": "Rd6+",
   "share": 0.788,
+  "before": {
+   "fen": "4R3/p4pkp/5N2/p5p1/6P1/P1P2P1b/1r4rP/3R3K w - - 5 29",
+   "moves": [
+    "Nh5+",
+    "Kh6"
+   ]
+  },
   "game": "https://www.chess.com/game/live/40444178653"
  },
  {
@@ -5901,6 +7441,13 @@
   "ownSide": false,
   "played": "Rh8",
   "share": 0.784,
+  "before": {
+   "fen": "2kr1r2/2p4Q/4p3/pp2q1P1/4p3/2P1P3/PP3P2/R4RK1 b - - 4 25",
+   "moves": [
+    "Qxg5+",
+    "Kh1"
+   ]
+  },
   "game": "https://www.chess.com/game/live/63864638995"
  },
  {
@@ -5928,6 +7475,13 @@
   "ownSide": false,
   "played": "Bxd4",
   "share": 0.761,
+  "before": {
+   "fen": "2r3k1/2r2ppp/ppn2b2/8/4BP2/P4N2/3R1PPP/3R2K1 b - - 3 26",
+   "moves": [
+    "h6",
+    "Nd4"
+   ]
+  },
   "game": "https://www.chess.com/game/live/93223938237"
  },
  {
@@ -5955,6 +7509,13 @@
   "ownSide": true,
   "played": "Qb6",
   "share": 0.752,
+  "before": {
+   "fen": "1Q6/2p2p1r/4pk2/3r4/3Pp1b1/4P3/2PK1P1p/7R w - - 13 44",
+   "moves": [
+    "Qxc7",
+    "Bf3"
+   ]
+  },
   "game": "https://www.chess.com/game/live/74353419343"
  },
  {
@@ -5982,6 +7543,13 @@
   "ownSide": true,
   "played": "Rh8+",
   "share": 0.747,
+  "before": {
+   "fen": "5r2/2pR3k/1p6/P3b3/1PB1p1r1/8/5P2/4BR1K b - - 1 31",
+   "moves": [
+    "Kg6",
+    "Rxc7"
+   ]
+  },
   "game": "https://www.chess.com/game/live/62820539051"
  },
  {
@@ -6009,6 +7577,13 @@
   "ownSide": true,
   "played": "Qxa1+",
   "share": 0.722,
+  "before": {
+   "fen": "8/p5kp/2p3p1/1p3rq1/1Q6/1P1PPBP1/P1P1P2P/R5K1 b - - 0 28",
+   "moves": [
+    "Qf6",
+    "Bxc6"
+   ]
+  },
   "game": "https://www.chess.com/game/live/74233787385"
  },
  {
@@ -6036,6 +7611,13 @@
   "ownSide": true,
   "played": "Qe3",
   "share": 0.72,
+  "before": {
+   "fen": "r6r/pp1qp1k1/3p1pp1/2p3N1/5Q2/8/PPP4P/2K3R1 w - - 0 26",
+   "moves": [
+    "Ne4",
+    "Qf5"
+   ]
+  },
   "game": "https://www.chess.com/game/live/74188967081"
  },
  {
@@ -6061,6 +7643,13 @@
   "ownSide": false,
   "played": "Bxe6",
   "share": 0.714,
+  "before": {
+   "fen": "5rk1/ppr3b1/1q1pN1Q1/1P2p3/2b2B2/4P3/P4KP1/2R4R b - - 1 29",
+   "moves": [
+    "Rxf4+",
+    "Kg3"
+   ]
+  },
   "game": "https://www.chess.com/game/live/65929938575"
  },
  {
@@ -6087,6 +7676,13 @@
   "ownSide": false,
   "played": "Rxa8",
   "share": 0.712,
+  "before": {
+   "fen": "Q6r/p1p2kpp/8/3PP3/1b3q2/4P2P/P3K3/R6R b - - 2 33",
+   "moves": [
+    "Qc4+",
+    "Kd1"
+   ]
+  },
   "game": "https://www.chess.com/game/live/2573107981"
  },
  {
@@ -6114,6 +7710,13 @@
   "ownSide": false,
   "played": "Bxe7",
   "share": 0.699,
+  "before": {
+   "fen": "r3r1k1/pp2Bpp1/2p4p/2b1Rb2/B7/2P5/PP1N2PP/R6K b - - 5 19",
+   "moves": [
+    "Bd3",
+    "b4"
+   ]
+  },
   "game": "https://www.chess.com/game/live/43597199921"
  },
  {
@@ -6140,6 +7743,13 @@
   "ownSide": true,
   "played": "Qxe8+",
   "share": 0.681,
+  "before": {
+   "fen": "r1b2r1k/1p5p/nq1p2p1/5pP1/p1BP2P1/8/PPQN1P2/2KR3R w - - 1 21",
+   "moves": [
+    "Qxa4",
+    "Re8"
+   ]
+  },
   "game": "https://www.chess.com/game/live/65129985949"
  },
  {
@@ -6168,6 +7778,13 @@
   "ownSide": false,
   "played": "Rxh8",
   "share": 0.674,
+  "before": {
+   "fen": "r3r2Q/pp2p2R/4kp2/5q2/PP1Pp3/2P3P1/5PK1/R7 w - - 4 33",
+   "moves": [
+    "Qg7",
+    "Rh8"
+   ]
+  },
   "game": "https://www.chess.com/game/live/119617785496"
  },
  {
@@ -6195,6 +7812,13 @@
   "ownSide": true,
   "played": "Rxe2",
   "share": 0.633,
+  "before": {
+   "fen": "8/8/3p4/1P1k4/2p5/2Pb4/PK2p3/4R3 w - - 1 56",
+   "moves": [
+    "b6",
+    "Be4"
+   ]
+  },
   "game": "https://www.chess.com/game/live/63776431591"
  },
  {
@@ -6222,6 +7846,13 @@
   "ownSide": false,
   "played": "Qxb2+",
   "share": 0.622,
+  "before": {
+   "fen": "4r1k1/1r1p1p1p/pq4P1/3p2R1/3P4/6Q1/PP1R1PP1/2K5 b - - 0 26",
+   "moves": [
+    "Re1+",
+    "Kc2"
+   ]
+  },
   "game": "https://www.chess.com/game/live/103544544685"
  },
  {
@@ -6249,6 +7880,13 @@
   "ownSide": true,
   "played": "Qd2",
   "share": 0.607,
+  "before": {
+   "fen": "rnb1kb1r/2q2pp1/p3pn1p/1p6/2pQP3/2N1B3/PPP2PPP/2KR1BNR w kq - 0 12",
+   "moves": [
+    "Nh3",
+    "Bc5"
+   ]
+  },
   "game": "https://www.chess.com/game/live/173668415026"
  },
  {
@@ -6276,6 +7914,13 @@
   "ownSide": false,
   "played": "Rc2+",
   "share": 0.559,
+  "before": {
+   "fen": "5rk1/p5pp/1p2Q3/1q6/5BP1/P2NP2P/P3K3/2r5 b - - 1 28",
+   "moves": [
+    "Kh8",
+    "Bd6"
+   ]
+  },
   "game": "https://www.chess.com/game/live/73237487445"
  },
  {
@@ -6302,6 +7947,13 @@
   "ownSide": true,
   "played": "Rh8+",
   "share": 0.559,
+  "before": {
+   "fen": "2r5/p2k1pn1/q3pQp1/1p1p2P1/3P1P2/P4P2/1PP5/2K4R w - - 0 32",
+   "moves": [
+    "Qxf7+",
+    "Kd8"
+   ]
+  },
   "game": "https://www.chess.com/game/live/68319285767"
  },
  {
@@ -6329,6 +7981,13 @@
   "ownSide": true,
   "played": "Rxf8",
   "share": 0.552,
+  "before": {
+   "fen": "1R4k1/p7/2p1Nrpp/8/1Pn3K1/2P5/1P6/4Rr2 b - - 2 37",
+   "moves": [
+    "Kh7",
+    "Nf8+"
+   ]
+  },
   "game": "https://www.chess.com/game/live/107231392899"
  },
  {
@@ -6356,6 +8015,13 @@
   "ownSide": true,
   "played": "Qh3+",
   "share": 0.53,
+  "before": {
+   "fen": "N1k5/p2n2rp/2pb4/1p5b/1P1Pp1P1/1BP2Pq1/P2BQ3/R4R1K b - - 0 27",
+   "moves": [
+    "Bxg4",
+    "Rg1"
+   ]
+  },
   "game": "https://www.chess.com/game/live/53719825357"
  },
  {
@@ -6383,6 +8049,13 @@
   "ownSide": true,
   "played": "a6+",
   "share": 0.504,
+  "before": {
+   "fen": "8/ppk1nR1Q/8/2b3q1/2K5/7P/PPP5/8 b - - 1 31",
+   "moves": [
+    "Qd5+",
+    "Kb5"
+   ]
+  },
   "game": "https://www.chess.com/game/live/48652774121"
  },
  {
@@ -6410,6 +8083,13 @@
   "ownSide": false,
   "played": "Kf7",
   "share": 0.489,
+  "before": {
+   "fen": "2r1k2Q/4q3/b1P5/4p2N/p1p1P1P1/P7/1PP5/1K6 b - - 4 47",
+   "moves": [
+    "Qf8",
+    "Ng7+"
+   ]
+  },
   "game": "https://www.chess.com/game/live/185373442794"
  },
  {
@@ -6435,6 +8115,13 @@
   "ownSide": true,
   "played": "Qd1+",
   "share": 0.478,
+  "before": {
+   "fen": "8/7p/8/4B3/3P3q/4k2n/P1P3Q1/5K2 b - - 4 47",
+   "moves": [
+    "Qh5",
+    "Qh2"
+   ]
+  },
   "game": "https://www.chess.com/game/live/169820937574"
  },
  {
@@ -6461,6 +8148,13 @@
   "ownSide": false,
   "played": "Qd1+",
   "share": 0.452,
+  "before": {
+   "fen": "7k/5p2/4p2p/3p3P/8/1Npq4/P7/4K1Q1 b - - 1 42",
+   "moves": [
+    "c2",
+    "Nc5"
+   ]
+  },
   "game": "https://www.chess.com/game/live/75087758599"
  },
  {
@@ -6486,6 +8180,13 @@
   "ownSide": true,
   "played": "Qe8+",
   "share": 0.428,
+  "before": {
+   "fen": "r1b2rk1/pp4pp/4p3/2p1p3/Q2pN1Pb/3BqP2/PPP1K2P/5R1R w - - 0 19",
+   "moves": [
+    "Kd1",
+    "Rxf3"
+   ]
+  },
   "game": "https://www.chess.com/game/live/72781252825"
  },
  {
@@ -6513,6 +8214,13 @@
   "ownSide": true,
   "played": "Qxg5+",
   "share": 0.41,
+  "before": {
+   "fen": "8/p1p1pQ2/1r5k/K5b1/3PP2p/2P5/P1q1B1P1/5R1R w - - 1 35",
+   "moves": [
+    "Qh5+",
+    "Kg7"
+   ]
+  },
   "game": "https://www.chess.com/game/live/74285737375"
  },
  {
@@ -6540,6 +8248,13 @@
   "ownSide": false,
   "played": "gxf5",
   "share": 0.393,
+  "before": {
+   "fen": "8/5pkp/p3qnp1/4B3/5P2/2Q5/PP1rB1PP/5RK1 b - - 4 23",
+   "moves": [
+    "Rxe2",
+    "f5"
+   ]
+  },
   "game": "https://www.chess.com/game/live/51365440203"
  },
  {
@@ -6567,6 +8282,13 @@
   "ownSide": false,
   "played": "Re3",
   "share": 0.343,
+  "before": {
+   "fen": "r3k2r/pp2pp1p/3Bq1p1/8/8/6R1/P2Q4/5RK1 w kq - 1 30",
+   "moves": [
+    "Bxe7",
+    "Qxe7"
+   ]
+  },
   "game": "https://www.chess.com/game/live/76066842545"
  },
  {
@@ -6594,6 +8316,13 @@
   "ownSide": true,
   "played": "Qxf4+",
   "share": 0.307,
+  "before": {
+   "fen": "2k4N/1pq3bp/p1b2pp1/8/2Q1pP2/2PrB3/PP4PP/R3K2R b KQ - 0 24",
+   "moves": [
+    "Rxe3+",
+    "Kf1"
+   ]
+  },
   "game": "https://www.chess.com/game/live/52161590493"
  },
  {
@@ -6619,6 +8348,13 @@
   "ownSide": true,
   "played": "Qh2+",
   "share": 0.281,
+  "before": {
+   "fen": "4r1k1/1Q1R3p/1p4p1/4bp2/Pq6/2N4P/1P3PP1/6K1 b - - 2 28",
+   "moves": [
+    "Qf4",
+    "Rxh7"
+   ]
+  },
   "game": "https://www.chess.com/game/live/85098142407"
  },
  {
@@ -6646,6 +8382,13 @@
   "ownSide": false,
   "played": "Rxe8",
   "share": 0.272,
+  "before": {
+   "fen": "3r1r1k/pp4qp/2p2pp1/8/P6Q/1P5P/1B3PP1/4R1K1 w - - 6 30",
+   "moves": [
+    "Re6",
+    "Rde8"
+   ]
+  },
   "game": "https://www.chess.com/game/live/117264597545"
  },
  {
@@ -6673,6 +8416,13 @@
   "ownSide": true,
   "played": "Rxg4",
   "share": 0.201,
+  "before": {
+   "fen": "2k3r1/ppp5/8/6b1/6R1/1PN2P1P/P5p1/6K1 b - - 5 32",
+   "moves": [
+    "Be3+",
+    "Kh2"
+   ]
+  },
   "game": "https://www.chess.com/game/live/36391179467"
  },
  {
@@ -6700,6 +8450,13 @@
   "ownSide": true,
   "played": "Nxe3",
   "share": 0.105,
+  "before": {
+   "fen": "r3r1k1/ppq2p1p/2p3p1/4nb2/1PP1NP2/P1B1P1P1/1Q4BP/R5K1 b - - 0 21",
+   "moves": [
+    "Nxc4",
+    "Qb3"
+   ]
+  },
   "game": "https://www.chess.com/game/live/107833984451"
  },
  {
@@ -6727,6 +8484,13 @@
   "ownSide": false,
   "played": "Rxg7",
   "share": 0.077,
+  "before": {
+   "fen": "2kr4/pp2prb1/2p3R1/8/3PQ3/4B3/PPP1K2q/R7 w - - 1 24",
+   "moves": [
+    "Qg2",
+    "Qh4"
+   ]
+  },
   "game": "https://www.chess.com/game/live/108480695003"
  },
  {
@@ -6754,6 +8518,13 @@
   "ownSide": false,
   "played": "Qxf6",
   "share": 0.051,
+  "before": {
+   "fen": "1r3rkn/5p1p/p4PpQ/3R4/6P1/2P2q2/P2K1P1P/4R3 b - - 11 34",
+   "moves": [
+    "Qf4+",
+    "Ke2"
+   ]
+  },
   "game": "https://www.chess.com/game/live/102909632035"
  },
  {
@@ -6781,6 +8552,13 @@
   "ownSide": false,
   "played": "Kc5",
   "share": 0.051,
+  "before": {
+   "fen": "8/pp1n1r2/3k4/8/3b1p1B/8/P5PP/5R1K b - - 3 30",
+   "moves": [
+    "Re7",
+    "Rxf4"
+   ]
+  },
   "game": "https://www.chess.com/game/live/48308347089"
  },
  {
@@ -6806,6 +8584,13 @@
   "ownSide": true,
   "played": "Nd6+",
   "share": 0.018,
+  "before": {
+   "fen": "3rk2r/pp3ppp/2pQn3/5q2/4N3/8/PPP2PPP/3RR1K1 w - - 3 18",
+   "moves": [
+    "Qxd8+",
+    "Nxd8"
+   ]
+  },
   "game": "https://www.chess.com/game/live/166341379194"
  },
  {
@@ -6832,6 +8617,13 @@
   "ownSide": true,
   "played": "c8=Q+",
   "share": 0.002,
+  "before": {
+   "fen": "6k1/p4ppp/2P2n2/r4B2/8/8/P1P3PP/4K3 w - - 0 27",
+   "moves": [
+    "c7",
+    "Rxf5"
+   ]
+  },
   "game": "https://www.chess.com/game/live/85080115215"
  },
  {
@@ -6859,6 +8651,13 @@
   "ownSide": false,
   "played": "Qd4+",
   "share": null,
+  "before": {
+   "fen": "8/p1b1Rpkp/1qP3p1/1p6/5P2/6PP/8/3Q2K1 w - - 3 34",
+   "moves": [
+    "Kh2",
+    "Qxc6"
+   ]
+  },
   "game": "https://www.chess.com/game/live/116255452409"
  },
  {
@@ -6886,6 +8685,13 @@
   "ownSide": true,
   "played": "Kxf8",
   "share": null,
+  "before": {
+   "fen": "1n3r1k/pp6/6N1/1Q5p/3P1pbP/4bN2/PPq2nPR/R3KB2 b Q - 2 22",
+   "moves": [
+    "Kg8",
+    "Nxf8"
+   ]
+  },
   "game": "https://www.chess.com/game/live/2579210830"
  }
 ]
