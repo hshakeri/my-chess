@@ -15,7 +15,7 @@ describe('The moves hoot65 plays instead of the repertoire\'s, answered with the
     expect([games('black', ['d4', 'Nf6']).length, games('black', ['d4']).length, points(games('black', ['d4', 'Nf6']))]).toEqual([29, 30, 11]);
     const caro = allCurriculumLessons.filter((l) => l.targetColor === 'black' && l.relevance === 'core' && l.moves[0]?.san === 'e4' && l.moves[1]?.san === 'c6');
     const wall = allCurriculumLessons.filter((l) => l.targetColor === 'black' && l.relevance === 'core' && l.moves[0]?.san === 'd4' && l.moves[1]?.san === 'd5');
-    expect(caro.length).toBe(5);
+    expect(caro.length).toBe(6);
     expect(wall.length).toBe(3);
     for (const l of caro) expect(l.moves[1].wrongMoveFeedback?.d6, l.id).toMatch(/41 of your games, 20 points; the Caro-Kann scored 36 in 67/);
     for (const l of wall) expect(l.moves[1].wrongMoveFeedback?.Nf6, l.id).toMatch(/29 of your 30 games against 1\.d4 \(11 points\)/);

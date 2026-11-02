@@ -105,6 +105,7 @@ describe('Curriculum Move Legality & Verification (chess.js)', () => {
       'lesson-black-caro-kann-advance',
       'lesson-black-caro-kann-classical',
       'lesson-black-caro-vs-bc4',
+      'lesson-black-caro-vs-f4',
       'lesson-black-slav-wall',
       'lesson-black-wall-vs-flank',
       'lesson-black-wall-vs-london',

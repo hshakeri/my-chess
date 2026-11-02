@@ -98,7 +98,7 @@ export const patternPath: PatternGroup[] = [
     idea:
       'The same Classical line twice: as Black the bishop goes f5, g6 and h7 ahead of the h-pawn, and as White Ng3 and h4 chase it to gain time. In the Exchange the bishop on f5 meets Bd3 by trading or going back to g6, and as White against 3...Bg4, h3 and g4 chase it.',
     check: 'When a piece is chased: where is its next safe square, and does the chasing move also develop?',
-    lessonIds: ['lesson-black-caro-kann-classical', 'lesson-caro-kann-discipline-drill', 'lesson-black-caro-exchange', 'lesson-white-vs-caro-kann'],
+    lessonIds: ['lesson-black-caro-kann-classical', 'lesson-caro-kann-discipline-drill', 'lesson-black-caro-exchange', 'lesson-black-caro-vs-f4', 'lesson-white-vs-caro-kann'],
   },
   {
     id: 'pattern-finish-the-game',

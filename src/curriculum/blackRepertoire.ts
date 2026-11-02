@@ -1030,6 +1030,107 @@ export const caroKannExchangeLesson: CurriculumLesson = buildVerifiedLesson({
   ],
 });
 
+export const caroKannF4Lesson: CurriculumLesson = buildVerifiedLesson({
+  ...SOURCE,
+  id: 'lesson-black-caro-vs-f4',
+  title: 'Caro-Kann vs 2.f4',
+  subtitle: 'The usual Caro-Kann ideas against an early f-pawn',
+  category: 'opening',
+  eco: 'B10',
+  targetColor: 'black',
+  targetRatingBand: 'intermediate',
+  relevance: 'core',
+  description:
+    '2.f4 came up in 2 of your Caro-Kann games, and you lost both. Meet it as you meet the other second moves: strike with ...d5, bring the bishop out to f5 before ...e6, and hit d4 with ...c5. If White develops the knight to f3 before anything else, take on e4, and when the knight jumps to e5, never open the e8-h5 diagonal with ...f6.',
+  thematicObjective: '2...d5. Against 3.e5: Bf5, ...e6, ...c5 and ...Nc6. Against 3.Nf3: dxe4 and, after 4.Ne5, 4...Nd7.',
+  keyTacticalMotif: 'After ...f6 the queen checks on h5 and the knight on e5 takes on g6',
+  moves: [
+    { san: 'e4', isUserMove: false },
+    { san: 'c6', isUserMove: true, wrongMoveFeedback: AGAINST_E4 },
+    // After 1.e4 c6: 2.d4 25, 2.Nf3 20, 2.Bc4 8, 2.Nc3 4, 2.e5 3, 2.d3 3, 2.f4 2.
+    { san: 'f4', isUserMove: false, frequency: 2 },
+    {
+      san: 'd5',
+      isUserMove: true,
+      annotation: 'Strike at the centre, as against every second move.',
+      hintTheme: 'Strike at the centre',
+      wrongMoveFeedback: {
+        d6: '2...d6 was your move in one of your two games against 2.f4, and you lost it; Stockfish rates it about a quarter of a pawn below 2...d5.',
+      },
+    },
+    {
+      san: 'e5',
+      isUserMove: false,
+      // After 2...d5: 3.e5 1.
+      frequency: 1,
+      annotation: 'The pawn chain e5-f4, as in the Advance.',
+      alternatives: {
+        exd5: [
+          { san: 'cxd5', isUserMove: true, annotation: 'Take back with the pawn: Black has the centre pawn.' },
+          { san: 'Nf3', isUserMove: false },
+          { san: 'Nc6', isUserMove: true, annotation: 'Develop: Black has the freer game.' },
+        ],
+        Nf3: [
+          { san: 'dxe4', isUserMove: true, annotation: 'Take: the pawn on e4 now attacks the f3 knight.', hintTheme: 'Take the pawn' },
+          { san: 'Ne5', isUserMove: false },
+          {
+            san: 'Nd7',
+            isUserMove: true,
+            annotation: 'Challenge the knight.',
+            hintTheme: 'Challenge the knight',
+            wrongMoveFeedback: {
+              f6: '4...f6?? opens the e8-h5 diagonal: 5.Qh5+ g6 6.Nxg6, and 6...hxg6 7.Qxh8 takes the rook.',
+            },
+          },
+        ],
+        Nc3: [
+          { san: 'dxe4', isUserMove: true, annotation: 'Take on e4.' },
+          { san: 'Nxe4', isUserMove: false },
+          {
+            san: 'Nf6',
+            isUserMove: true,
+            annotation: 'Challenge the knight on e4.',
+            wrongMoveFeedback: {
+              Bf5: '4...Bf5 is playable, but Stockfish rates 4...Nf6 a quarter of a pawn higher. This lesson challenges the knight first.',
+            },
+          },
+        ],
+        d3: [
+          { san: 'dxe4', isUserMove: true, annotation: 'Take: after 4.dxe4 Qxd1+ 5.Kxd1 White can no longer castle.' },
+        ],
+      },
+    },
+    { san: 'Bf5', isUserMove: true, annotation: 'The bishop comes out before ...e6, as against the Advance.', hintTheme: 'The bishop before the pawn' },
+    { san: 'd4', isUserMove: false, frequency: 1 },
+    { san: 'e6', isUserMove: true, annotation: 'Close the wall behind the bishop.' },
+    { san: 'Nf3', isUserMove: false, frequency: 1 },
+    { san: 'c5', isUserMove: true, annotation: 'Strike at d4, the base of the chain, as in the Advance.', hintTheme: 'Hit the base of the chain' },
+    { san: 'c3', isUserMove: false, frequency: 1 },
+    {
+      san: 'Nc6',
+      isUserMove: true,
+      annotation: 'Develop with a second attacker on d4. In your game 6...Nh6 came here.',
+      wrongMoveFeedback: {
+        Nh6: '6...Nh6 was your move in this game; Stockfish rates 6...Nc6, which adds a second attacker on d4, a third of a pawn higher.',
+      },
+    },
+  ],
+  exercises: [
+    {
+      id: 'ex-caro-f4-qh5',
+      title: 'The Diagonal to e8',
+      // 1.e4 c6 2.f4 d5 3.Nf3 dxe4 4.Ne5 f6??
+      fen: 'rnbqkbnr/pp2p1pp/2p2p2/4N3/4pP2/8/PPPP2PP/RNBQKB1R w KQkq - 0 5',
+      turn: 'w',
+      difficultyRating: 2,
+      prompt: 'White to play. Black has just played 4...f6, attacking the knight. What does White play?',
+      solutionSan: ['Qh5+', 'g6', 'Nxg6'],
+      explanation:
+        '5.Qh5+ g6 6.Nxg6: the knight takes on g6 and attacks the rook on h8, and 6...hxg6 7.Qxh8 wins it. That is why Black challenges the knight with 4...Nd7 instead.',
+    },
+  ],
+});
+
 export const caroKannClassicalLesson: CurriculumLesson = buildVerifiedLesson({
   ...SOURCE,
   id: 'lesson-black-caro-kann-classical',
@@ -1322,5 +1423,6 @@ export const blackRepertoireLessons: CurriculumLesson[] = [
   caroKannBg4TimingLesson,
   caroKannBc4Lesson,
   caroKannExchangeLesson,
+  caroKannF4Lesson,
   caroKannClassicalLesson,
 ];
