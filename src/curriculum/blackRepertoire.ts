@@ -1052,7 +1052,7 @@ export const caroKannF4Lesson: CurriculumLesson = buildVerifiedLesson({
     {
       san: 'd5',
       isUserMove: true,
-      annotation: 'Strike at the centre, as against every second move.',
+      annotation: 'Strike at the centre, as against most second moves.',
       hintTheme: 'Strike at the centre',
       wrongMoveFeedback: {
         d6: '2...d6 was your move in one of your two games against 2.f4, and you lost it; Stockfish rates it about a quarter of a pawn below 2...d5.',
@@ -1416,7 +1416,7 @@ export const wallVsFlankLesson: CurriculumLesson = buildVerifiedLesson({
 
 // Stockfish 19 at depth 20-22: after 2.e5, 2...d6 +0.01, 2...d5 -0.44, 2...f6 -0.58; after 2...d6, 3.exd6 +0.04
 // (exd6 -0.04, Qxd6 -0.16; 4.d4 d5 0.0), 3.d4? dxe5 4.dxe5 Qa5+! +0.69 (4...Qxd1+ 0.0); after 2...f6 3.d4,
-// 3...fxe5 -0.21 and 3...Qa5+? -2.04. After 2.d3 d5 3.Nc3: 3...d4 +0.08, 3...e5 +0.04, 3...dxe4 -0.21; after
+// 3...fxe5 -0.2 to -0.3 and 3...Qa5+? -1.7 to -2.0. After 2.d3 d5 3.Nc3: 3...d4 +0.08, 3...e5 +0.04, 3...dxe4 -0.21; after
 // 3.exd5, 3...cxd5 +0.11 and 3...Qxd5 -0.46.
 export const caroKannE5D3Lesson: CurriculumLesson = buildVerifiedLesson({
   ...SOURCE,
@@ -1447,7 +1447,7 @@ export const caroKannE5D3Lesson: CurriculumLesson = buildVerifiedLesson({
             san: 'd5',
             isUserMove: true,
             frequency: 3,
-            annotation: 'Strike at the centre, as against every second move.',
+            annotation: 'Strike at the centre, as against most second moves.',
             hintTheme: 'Strike at the centre',
           },
           {

@@ -4,7 +4,7 @@ import { CardService } from '../services/cards';
 import { summarizeProgress, type ProgressSummary } from '../analytics/progress';
 import { labelAt } from '../analytics/review';
 import { allCurriculumLessons } from '../curriculum';
-import { readTacticSessions, readTacticStates, tacticsDeck, tacticsProgress, type TacticsProgress } from '../services/tacticsDeck';
+import { practiceDeck, readTacticSessions, readTacticStates, tacticsProgress, type TacticsProgress } from '../services/tacticsDeck';
 import { cctBySource, readCctLog, type CctSourceStats } from '../services/cctLog';
 import type { StoredCard, StoredRevlog } from '../types/db';
 
@@ -166,7 +166,8 @@ export const ProgressPanel: React.FC<ProgressPanelProps> = ({ onClose, onOpenLes
   }, []);
 
   const summary = useMemo(() => (data ? summarizeProgress(data.cards, data.revlog) : null), [data]);
-  const tactics = useMemo(() => tacticsProgress(tacticsDeck, readTacticStates(), readTacticSessions()), []);
+  // The deck less the mastered positions, as the tactics sessions see it
+  const tactics = useMemo(() => tacticsProgress(practiceDeck, readTacticStates(), readTacticSessions()), []);
   const questions = useMemo(() => cctBySource(readCctLog()), []);
 
   return (
