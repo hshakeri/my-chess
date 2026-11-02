@@ -55,6 +55,30 @@ describe('Practice clock (DC-3)', () => {
     expect(clock('b')?.textContent).toBe('Maia 0:00');
   });
 
+  it('after the student\'s move N compares the clock with the opponents\' pace at the same control', () => {
+    vi.useFakeTimers();
+    let t = 0;
+    const now = () => t;
+    const pace = { control: '600+0', targets: { 2: 590 } };
+    const props = { resetKey: 0, student: 'w' as const, live: true, onFlag: () => undefined, pace, now };
+    const view = render(<PracticeClock {...props} turn="w" ply={0} />);
+    fireEvent.change(view.container.querySelector('select[data-select="practice-clock"]')!, { target: { value: '600+0' } });
+    t += 3_000;
+    view.rerender(<PracticeClock {...props} turn="b" ply={1} />);
+    t += 1_000;
+    view.rerender(<PracticeClock {...props} turn="w" ply={2} />);
+    expect(view.container.querySelector('[data-pace-note]')).toBeNull();
+    // White's second move after 4 s: 593 s left against the opponents' 590
+    t += 4_000;
+    view.rerender(<PracticeClock {...props} turn="b" ply={3} />);
+    const note = view.container.querySelector('[data-pace-note]')!;
+    expect(note.getAttribute('data-pace-note')).toBe('3');
+    expect(note.textContent).toBe("After move 2: 9:53 left, 3 s ahead of your opponents' 9:50");
+    // Another control: no pace
+    fireEvent.change(view.container.querySelector('select[data-select="practice-clock"]')!, { target: { value: '300+0' } });
+    expect(view.container.querySelector('[data-pace-note]')).toBeNull();
+  });
+
   it('adds the increment from the first move on, and starts again on a new game', () => {
     vi.useFakeTimers();
     let t = 0;

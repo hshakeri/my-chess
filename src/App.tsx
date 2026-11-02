@@ -13,7 +13,8 @@ import { Square, PieceColor, ChessPosition, ChessMoveRecord } from './types/ches
 import { HumanElo } from './types/engine';
 import { Chessboard } from './components/Chessboard';
 import { BoardControls } from './components/BoardControls';
-import { PracticeClock } from './components/PracticeClock';
+import { PracticeClock, type PaceTargets } from './components/PracticeClock';
+import { summarizeClock } from './analytics/clock';
 import { MoveList } from './components/MoveList';
 import { PositionSetupModal } from './components/PositionSetupModal';
 import { EngineControls } from './components/EngineControls';
@@ -289,6 +290,13 @@ export const App: React.FC = () => {
       setIsThinking(false);
     }
   }, [elo, isThinking, spar, flagged]);
+
+  // The opponents' pace in the student's own games, for the practice clock at the same time control
+  const pace = useMemo<PaceTargets | undefined>(() => {
+    const summary = dbGames ? summarizeClock(dbGames) : null;
+    if (!summary) return undefined;
+    return { control: `${summary.base}+${summary.increment}`, targets: Object.fromEntries(summary.pace.map((p) => [p.move, p.theirs])) };
+  }, [dbGames]);
 
   // Trigger engine move when it's engine's turn and at the live position
   useEffect(() => {
@@ -708,6 +716,7 @@ export const App: React.FC = () => {
                 live={!rulesRef.current.isGameOver() && !flagged}
                 onFlag={onFlag}
                 onReset={onClockReset}
+                pace={rulesRef.current.getInitialFen() === START_POSITION ? pace : undefined}
               />
               <Chessboard
                 board={displayBoard}

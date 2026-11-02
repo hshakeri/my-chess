@@ -46,7 +46,7 @@ export const PointsCard: React.FC<{ onOpenClock?: () => void }> = ({ onOpenClock
         const lesson = row.group ? patternPath.find((g) => g.id === row.group)?.lessonIds[0] : undefined;
         return (
           <li key={row.key} data-points-row={row.key} className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
-            <span className="font-mono text-emerald-300 w-20 shrink-0">{row.points}</span>
+            <span className="font-mono text-emerald-300 w-24 shrink-0 whitespace-nowrap">{row.points}</span>
             <span className="text-slate-200 flex-1 min-w-[12rem]">
               {k + 1}. {row.habit}
             </span>

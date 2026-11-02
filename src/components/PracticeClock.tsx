@@ -31,6 +31,14 @@ const mmss = (ms: number) => {
   return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
 };
 
+/** The opponents' median clock after given moves, from the student's own games at one time control (the pace to keep). */
+export interface PaceTargets {
+  /** The control it applies to, as a CLOCK_CONTROLS key ("600+0"). */
+  control: string;
+  /** Move number to seconds left. */
+  targets: Record<number, number>;
+}
+
 interface PracticeClockProps {
   /** The side to move in the live position, and the number of plies played. */
   turn: Side;
@@ -44,10 +52,12 @@ interface PracticeClockProps {
   onFlag: (side: Side) => void;
   /** Called when the clocks start again, so a flag is cleared. */
   onReset?: () => void;
+  /** The pace of the opponents in the student's games; shown after the student's moves it names. */
+  pace?: PaceTargets;
   now?: () => number;
 }
 
-export const PracticeClock: React.FC<PracticeClockProps> = ({ turn, ply, resetKey, student, live, onFlag, onReset, now = Date.now }) => {
+export const PracticeClock: React.FC<PracticeClockProps> = ({ turn, ply, resetKey, student, live, onFlag, onReset, pace, now = Date.now }) => {
   const [key, setKey] = useState('off');
   const control = CLOCK_CONTROLS.find((c) => c.key === key)!.control;
   const leftRef = useRef<Clocks>({ w: 0, b: 0 });
@@ -57,6 +67,7 @@ export const PracticeClock: React.FC<PracticeClockProps> = ({ turn, ply, resetKe
   const turnStartRef = useRef(now());
   const flaggedRef = useRef(false);
   const [longThinks, setLongThinks] = useState(0);
+  const [paceNote, setPaceNote] = useState<{ move: number; left: number; target: number } | null>(null);
   const [, setTick] = useState(0);
   const mine = (side: Side) => student === 'both' || side === student;
 
@@ -70,6 +81,7 @@ export const PracticeClock: React.FC<PracticeClockProps> = ({ turn, ply, resetKe
     turnStartRef.current = now();
     flaggedRef.current = false;
     setLongThinks(0);
+    setPaceNote(null);
     onReset?.();
     setTick((t) => t + 1);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -86,6 +98,10 @@ export const PracticeClock: React.FC<PracticeClockProps> = ({ turn, ply, resetKe
         if (mine(mover) && spent > THINK_CAP_MS) setLongThinks((n) => n + 1);
         leftRef.current = { ...leftRef.current, [mover]: Math.max(0, leftRef.current[mover] - spent) + control.inc * 1000 };
         stackRef.current[ply - basePlyRef.current] = { ...leftRef.current };
+        // After the student's move N (counted from the start), the clock against the opponents' pace
+        const moveNo = Math.floor((ply - 1) / 2) + 1;
+        const target = pace && pace.control === key && student !== 'both' && mover === student ? pace.targets[moveNo] : undefined;
+        if (target !== undefined) setPaceNote({ move: moveNo, left: leftRef.current[mover] / 1000, target });
       } else {
         leftRef.current = { ...(stackRef.current[ply - basePlyRef.current] ?? leftRef.current) };
       }
@@ -151,6 +167,15 @@ export const PracticeClock: React.FC<PracticeClockProps> = ({ turn, ply, resetKe
       {control && (
         <span className="text-slate-500" data-long-thinks={longThinks}>
           Moves over 30 s: {longThinks}
+        </span>
+      )}
+      {paceNote && (
+        <span
+          className={`px-2 py-1 rounded-md border ${paceNote.left >= paceNote.target ? 'border-emerald-500/40 text-emerald-300' : 'border-rose-500/40 text-rose-300'}`}
+          data-pace-note={Math.round(paceNote.left - paceNote.target)}
+        >
+          After move {paceNote.move}: {mmss(paceNote.left * 1000)} left,{' '}
+          {Math.abs(Math.round(paceNote.left - paceNote.target))} s {paceNote.left >= paceNote.target ? 'ahead of' : 'behind'} your opponents' {mmss(paceNote.target * 1000)}
         </span>
       )}
       {cue && (

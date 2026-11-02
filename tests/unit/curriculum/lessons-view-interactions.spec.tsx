@@ -117,6 +117,23 @@ describe('LessonsView interactions (jsdom)', () => {
     await waitFor(() => expect(document.querySelector('[data-srs-message]')?.textContent).toMatch(/Good: next review in/));
   });
 
+  it('records a paper attempt: every decision card of the lesson is reviewed with the grade given (DC-5)', async () => {
+    render(<LessonsView initialLessonId="lesson-stalemate-catastrophes" />);
+    const missed = await waitFor(() => {
+      const btn = document.querySelector('[data-section="paper-attempt"] button[data-paper="again"]');
+      expect(btn).toBeTruthy();
+      return btn as HTMLButtonElement;
+    });
+    fireEvent.click(missed);
+    await waitFor(() => expect(document.querySelector('[data-paper-recorded]')?.textContent).toBe('Paper attempt recorded on 1 card.'));
+    const log = await db.revlog.where('cardId').equals(STALEMATE_KEY).toArray();
+    expect(log).toHaveLength(1);
+    // ts-fsrs Rating.Again
+    expect(log[0].rating).toBe(1);
+    expect(log[0].lessonId).toBe('lesson-stalemate-catastrophes');
+    expect((await CardService.getCard(STALEMATE_KEY))?.reps).toBe(1);
+  });
+
   it('a wrong first try rates the decision Again, records the wrong move, and the card comes back within minutes', async () => {
     render(<LessonsView initialLessonId="lesson-stalemate-catastrophes" />);
     await waitFor(() => expect(sq('d6').querySelector('img[alt="White q"]')).toBeTruthy());

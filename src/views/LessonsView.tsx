@@ -343,6 +343,10 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
     };
   }, [allSpecs, refreshDue]);
 
+  // A paper attempt (DC-5): the student solved the lesson's sheet of the book and grades it here, which
+  // reviews every decision card of the lesson with that grade; kept per lesson for this visit
+  const [paperDone, setPaperDone] = useState<string | null>(null);
+
   const loadLessonCards = useCallback(async (lesson: CurriculumLesson) => {
     try {
       const map = new Map<string, StoredCard>();
@@ -1249,6 +1253,49 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
               >
                 End session
               </button>
+            </div>
+          )}
+
+          {!session && lessonCards.size > 0 && (
+            <div className="bg-slate-950/80 border border-slate-700/60 rounded-lg px-3 py-2 text-xs flex flex-wrap items-center gap-1.5" data-section="paper-attempt">
+              {paperDone === currentLesson.id ? (
+                <span className="text-emerald-300" data-paper-recorded>
+                  Paper attempt recorded on {lessonCards.size} card{lessonCards.size === 1 ? '' : 's'}.
+                </span>
+              ) : (
+                <>
+                  <span className="text-slate-400" title="Solved this lesson's sheet in the book? Grade it here and its cards are scheduled from it">
+                    On paper:
+                  </span>
+                  {(
+                    [
+                      ['good', 'All right'],
+                      ['hard', 'Some trouble'],
+                      ['again', 'Missed'],
+                    ] as Array<[CardRating, string]>
+                  ).map(([rating, label]) => (
+                    <button
+                      key={rating}
+                      type="button"
+                      data-paper={rating}
+                      onClick={async () => {
+                        const now = Date.now();
+                        try {
+                          for (const c of lessonCards.values()) await CardService.review(c.id, rating, { now, lessonId: currentLesson.id, sessionId: 'paper' });
+                        } catch (err) {
+                          console.warn('Error recording the paper attempt:', err);
+                        }
+                        setPaperDone(currentLesson.id);
+                        await loadLessonCards(currentLesson);
+                        await refreshDue();
+                      }}
+                      className="px-2 py-0.5 rounded border border-slate-600 text-slate-200 hover:border-slate-400"
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </>
+              )}
             </div>
           )}
 

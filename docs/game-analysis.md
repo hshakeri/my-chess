@@ -112,6 +112,28 @@ mate-in-one positions are left out of the Diagnostics list (`src/analytics/endin
 whole archive, 24 games ended in stalemate, 20 of them with hoot65 three points or more ahead and 22
 of them by hoot65's own move; none since 2024-11.
 
+**Habits measured before building them (2026-11-02).** Three habits the roadmap proposed were
+checked in the archive first:
+
+- *Trading pieces when ahead.* In the 1,634 games where hoot65 was three points of material ahead
+  after move 8, the score was about 82% whenever the lead was still there ten moves later, with or
+  without trades, and 35% in the 27% of games where it was gone. Keeping the lead is what matters;
+  the scorecard counts that instead.
+- *The king in the centre in the endgame.* In 751 endgames (no queens, at most a rook and two minor
+  pieces a side), a king that reached c3-f6 within ten moves went with no better score: 43% against
+  44% in level endgames, 54% against 65% when ahead. Not on the scorecard.
+- *Fast moves at critical moments.* In the 27,608 moves of the 10+0 games from move 6 on, a move
+  costing 0.2 or more of Maia's expected score came 3.0% of the time after under 3 seconds and 4.3%
+  after over 30 seconds (3.4% against 5.3% in positions with a threat, a check or a capture just
+  made). Quick moves are not the costly ones, so there is no flag for them.
+
+**The tactics deck.** `tactics.mjs` scanned the 1,118 moments of the archive where a move cost its
+player 0.3 or more of Maia's expected score (either player, the other not already clearly winning):
+Stockfish 19 finds one clearly winning reply in 725. After the picks and a deeper check, the app's
+deck holds 234 of them, and 24 quiet control positions where nothing was to be won
+(`tactics-quiet.mjs`: 24 of 195 such positions scored). Maia's players of the game's ratings find
+the winning move a median 70% of the time.
+
 **King and pawn against king.** An exact retrograde solver of the ending
 (`scripts/game-analysis/kpk-solve.mjs`) checked the 15 archive games in which hoot65 had a lone
 pawn against a lone king: 13 were won positions when the ending arose and hoot65 won 6 of them.
