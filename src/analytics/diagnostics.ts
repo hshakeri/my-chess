@@ -18,6 +18,7 @@ import {
   RepertoireNode,
 } from './repertoire';
 import { CANONICAL_HOOT65_GAMES } from './canonicalGames';
+import { finalFen, leadInFen } from './finalPosition';
 
 /**
  * Real hoot65 archive games used as test fixtures for the detectors below.
@@ -131,6 +132,41 @@ function replayGame(moves: string[], mover: 'w' | 'b'): { chess: Chess; fenBefor
   return { chess, fenBeforeLast };
 }
 
+/**
+ * One SAN move from a position, by chess.js, remembered by (position, move). The games of an archive
+ * share their first moves, and parsing SAN (chess.js generates the legal moves to read it) is nearly
+ * all the cost of reading thousands of games, so the opening walks below parse each such move once,
+ * not once a game. Null on an illegal move.
+ */
+const stepCache = new Map<string, { fen: string; san: string } | null>();
+function stepSan(fen: string, san: string): { fen: string; san: string } | null {
+  const key = `${fen}|${san}`;
+  const hit = stepCache.get(key);
+  if (hit !== undefined) return hit;
+  let next: { fen: string; san: string } | null = null;
+  try {
+    const chess = new Chess(fen);
+    const move = chess.move(san);
+    next = { fen: chess.fen(), san: move.san };
+  } catch {
+    next = null;
+  }
+  if (stepCache.size >= 200_000) stepCache.clear();
+  stepCache.set(key, next);
+  return next;
+}
+
+/**
+ * The material `mover` has on the final position, from the PGN's [CurrentPosition] (see finalFen),
+ * when `moves` are the game's own: a result-based finding needs a replay only when this is two points
+ * or more. Null when it cannot be read without a replay.
+ */
+function finalLeadOf(game: StoredGame, moves: string[], mover: 'w' | 'b'): number | null {
+  if (moves !== game.movesSan) return null;
+  const fen = finalFen(game);
+  return fen ? leadInFen(fen, mover) : null;
+}
+
 /** 0-based index of the last ply played by `mover` in a game of `length` plies, or -1. */
 function lastPlyOf(length: number, mover: 'w' | 'b'): number {
   const wanted = mover === 'w' ? 0 : 1;
@@ -219,8 +255,8 @@ function queenAttacks(chess: Chess, from: string, to: string): boolean {
 }
 
 /** True when `san` moves the queen off its starting square: a genuine sortie, not a retreat or regrouping move. */
-function queenLeavesHome(chess: Chess, san: string, mover: 'w' | 'b'): boolean {
-  const probe = new Chess(chess.fen());
+function queenLeavesHome(fen: string, san: string, mover: 'w' | 'b'): boolean {
+  const probe = new Chess(fen);
   try {
     const mv = probe.move(san);
     return mv.piece === 'q' && mv.from === (mover === 'w' ? 'd1' : 'd8');
@@ -241,6 +277,23 @@ function undevelopedMinors(chess: Chess, color: 'w' | 'b'): number {
     if (piece && piece.color === color && (piece.type === 'n' || piece.type === 'b')) count++;
   }
   return count;
+}
+
+/** One analysis between its games (see DiagnosticAnalyzer.startRun): what the detectors found so far. */
+export interface AnalysisRun {
+  playerHandle: 'hoot65';
+  whiteGames: StoredGame[];
+  blackGames: StoredGame[];
+  whiteRepertoire: RepertoirePlan;
+  blackRepertoire: RepertoirePlan;
+  whiteTree: RepertoireNode;
+  blackTree: RepertoireNode;
+  lineNames: Record<string, string>;
+  patternDeviations: Record<DetectorPatternId, OpeningDeviation[]>;
+  patternGameIds: Record<DetectorPatternId, Set<string>>;
+  divergences: Array<{ game: StoredGame; deviation: OpeningDeviation }>;
+  /** Games read so far, White's then Black's. */
+  read: number;
 }
 
 /**
@@ -312,12 +365,14 @@ export class DiagnosticAnalyzer {
     moves: string[]
   ): OpeningDeviation | null {
     if (moves.length < 6) return null;
+    // Only a game with ...Bg4 in its first six moves needs walking
+    if (!moves.slice(0, 12).some((m, i) => i % 2 === 1 && cleanSan(m) === 'Bg4')) return null;
 
-    const chess = new Chess(START_FEN);
+    let fen = START_FEN;
     for (let i = 0; i < Math.min(moves.length, 12); i++) {
       const san = cleanSan(moves[i]);
       const isBlackTurn = i % 2 === 1;
-      const fenBefore = chess.fen();
+      const fenBefore = fen;
 
       if (isBlackTurn && san === 'Bg4') {
         const tax = this.classifyBg4Aftermath(fenBefore, moves, i);
@@ -337,11 +392,9 @@ export class DiagnosticAnalyzer {
         };
       }
 
-      try {
-        chess.move(san);
-      } catch {
-        return null; // corrupted move list
-      }
+      const next = stepSan(fen, san);
+      if (!next) return null; // corrupted move list
+      fen = next.fen;
     }
     return null;
   }
@@ -432,14 +485,20 @@ export class DiagnosticAnalyzer {
     color: 'white' | 'black'
   ): OpeningDeviation | null {
     const mover: 'w' | 'b' = color === 'white' ? 'w' : 'b';
-    const chess = new Chess(START_FEN);
-    for (let i = 0; i < Math.min(moves.length, 10); i++) {
+    // Only a game with a queen move of the player's that takes nothing in the first five moves needs
+    // walking, and only as far as the last such move (the walk starts from the start position, White to move)
+    let lastQueenMove = -1;
+    for (let i = mover === 'w' ? 0 : 1; i < Math.min(moves.length, 10); i += 2) {
+      if (moves[i].startsWith('Q') && !moves[i].includes('x')) lastQueenMove = i;
+    }
+    let fen = START_FEN;
+    for (let i = 0; i <= lastQueenMove; i++) {
       const san = cleanSan(moves[i]);
-      const turn = chess.turn();
-      const fenBefore = chess.fen();
+      const turn = fen.split(' ')[1];
+      const fenBefore = fen;
 
-      if (turn === mover && san.startsWith('Q') && !san.includes('x') && queenLeavesHome(chess, san, mover)) {
-        const undeveloped = undevelopedMinors(chess, mover);
+      if (turn === mover && san.startsWith('Q') && !san.includes('x') && queenLeavesHome(fen, san, mover)) {
+        const undeveloped = undevelopedMinors(new Chess(fen), mover);
         if (undeveloped >= 2) {
           const opponentName = color === 'white' ? game.black?.name : game.white?.name;
           return {
@@ -458,11 +517,9 @@ export class DiagnosticAnalyzer {
         }
       }
 
-      try {
-        chess.move(san);
-      } catch {
-        return null;
-      }
+      const next = stepSan(fen, san);
+      if (!next) return null;
+      fen = next.fen;
     }
     return null;
   }
@@ -503,6 +560,8 @@ export class DiagnosticAnalyzer {
     // Only a game that ended in mate needs replaying: SAN marks the mating move with '#'
     if (moves.length === 0 || !moves[moves.length - 1].includes('#')) return null;
     const mover: 'w' | 'b' = color === 'white' ? 'w' : 'b';
+    const lead = finalLeadOf(game, moves, mover);
+    if (lead !== null && lead < 2) return null;
     const replay = replayGame(moves, mover);
     if (!replay || !replay.chess.isCheckmate()) return null;
     if (replay.chess.turn() !== mover) return null; // the mated side is the side to move
@@ -536,6 +595,8 @@ export class DiagnosticAnalyzer {
     // Chess.com writes '<username> won on time'; strip the username so a handle containing 'time' cannot match
     if (!termination || !/\b(won on time|timeout)\b/i.test(termination.replace(/^\S+\s+/, ''))) return null;
     const mover: 'w' | 'b' = color === 'white' ? 'w' : 'b';
+    const lead = finalLeadOf(game, moves, mover);
+    if (lead !== null && lead < 2) return null;
     const replay = replayGame(moves, mover);
     if (!replay) return null;
     const material = materialBalance(replay.chess, mover);
@@ -572,20 +633,17 @@ export class DiagnosticAnalyzer {
   ): OpeningDeviation | null {
     const moves = game.movesSan || [];
     const mover: 'w' | 'b' = color === 'white' ? 'w' : 'b';
-    const chess = new Chess(tree.fen);
+    let fen = new Chess(tree.fen).fen();
     let node = tree;
 
     for (let i = 0; i < moves.length; i++) {
       if (node.children.length === 0) return null; // the plan ends here
-      const fenBefore = chess.fen();
-      const turn = chess.turn();
-      let played;
-      try {
-        played = chess.move(cleanSan(moves[i]));
-      } catch {
-        return null; // corrupted move list
-      }
-      const next = findChildByFen(node, chess.fen());
+      const fenBefore = fen;
+      const turn = fen.split(' ')[1];
+      const played = stepSan(fen, cleanSan(moves[i]));
+      if (!played) return null; // corrupted move list
+      fen = played.fen;
+      const next = findChildByFen(node, fen);
       if (next) {
         node = next;
         continue;
@@ -734,6 +792,13 @@ export class DiagnosticAnalyzer {
     games: StoredGame[] = [],
     playerHandle: 'hoot65' = 'hoot65'
   ): DiagnosticReport {
+    const run = this.startRun(games, playerHandle);
+    while (this.readNextGame(run));
+    return this.finishRun(run);
+  }
+
+  /** An analysis before its games are read: the games by colour, and the repertoire trees they are walked down. */
+  public static startRun(games: StoredGame[], playerHandle: 'hoot65'): AnalysisRun {
     const whiteGames: StoredGame[] = [];
     const blackGames: StoredGame[] = [];
 
@@ -742,6 +807,71 @@ export class DiagnosticAnalyzer {
       if (color === 'white') whiteGames.push(g);
       else if (color === 'black') blackGames.push(g);
     }
+
+    const whiteRepertoire = getRecommendedWhiteRepertoire();
+    const blackRepertoire = getRecommendedBlackRepertoire();
+    const lineNames: Record<string, string> = {};
+    for (const plan of [whiteRepertoire, blackRepertoire] as RepertoirePlan[]) {
+      for (const line of plan.lines) lineNames[line.id] = line.name;
+    }
+    const patternDeviations = {} as Record<DetectorPatternId, OpeningDeviation[]>;
+    const patternGameIds = {} as Record<DetectorPatternId, Set<string>>;
+    for (const id of Object.keys(PATTERN_META) as DetectorPatternId[]) {
+      patternDeviations[id] = [];
+      patternGameIds[id] = new Set();
+    }
+    return {
+      playerHandle,
+      whiteGames,
+      blackGames,
+      whiteRepertoire,
+      blackRepertoire,
+      whiteTree: buildRepertoireTree(whiteRepertoire),
+      blackTree: buildRepertoireTree(blackRepertoire),
+      lineNames,
+      patternDeviations,
+      patternGameIds,
+      divergences: [],
+      read: 0,
+    };
+  }
+
+  /** Run the detectors on the run's next game (White's games first, then Black's); false once every game is read. */
+  public static readNextGame(run: AnalysisRun): boolean {
+    const { whiteGames, blackGames, lineNames } = run;
+    if (run.read >= whiteGames.length + blackGames.length) return false;
+    const record = (id: DetectorPatternId, g: StoredGame, dev: OpeningDeviation | null) => {
+      if (!dev) return;
+      run.patternDeviations[id].push(dev);
+      run.patternGameIds[id].add(g.id);
+    };
+    if (run.read < whiteGames.length) {
+      const g = whiteGames[run.read];
+      const moves = g.movesSan || [];
+      record('white-scandi-e5', g, this.detectWhiteScandinavianLeak(g, moves));
+      record('early-queen-sortie', g, this.detectEarlyQueenSortie(g, moves, 'white'));
+      record('blackburne-shilling-handling', g, this.detectBlackburneShillingHandling(g, moves));
+      record('mated-while-ahead', g, this.detectMatedWhileAhead(g, moves, 'white'));
+      record('lost-on-time-while-ahead', g, this.detectLostOnTimeWhileAhead(g, moves, 'white'));
+      const divergence = this.detectRepertoireDivergence(g, run.whiteTree, 'white', { lineNames });
+      if (divergence) run.divergences.push({ game: g, deviation: divergence });
+    } else {
+      const g = blackGames[run.read - whiteGames.length];
+      const moves = g.movesSan || [];
+      record('black-bg4-chase', g, this.detectBlackBg4ChaseLeak(g, moves));
+      record('early-queen-sortie', g, this.detectEarlyQueenSortie(g, moves, 'black'));
+      record('mated-while-ahead', g, this.detectMatedWhileAhead(g, moves, 'black'));
+      record('lost-on-time-while-ahead', g, this.detectLostOnTimeWhileAhead(g, moves, 'black'));
+      const divergence = this.detectRepertoireDivergence(g, run.blackTree, 'black', { lineNames });
+      if (divergence) run.divergences.push({ game: g, deviation: divergence });
+    }
+    run.read += 1;
+    return true;
+  }
+
+  /** The report of a run whose games are all read. */
+  public static finishRun(run: AnalysisRun): DiagnosticReport {
+    const { playerHandle, whiteGames, blackGames, whiteRepertoire, blackRepertoire, patternDeviations, patternGameIds, divergences } = run;
 
     const tally = (list: StoredGame[], color: 'white' | 'black') => {
       let wins = 0, losses = 0, draws = 0;
@@ -757,49 +887,6 @@ export class DiagnosticAnalyzer {
 
     const whiteTally = tally(whiteGames, 'white');
     const blackTally = tally(blackGames, 'black');
-
-    const whiteRepertoire = getRecommendedWhiteRepertoire();
-    const blackRepertoire = getRecommendedBlackRepertoire();
-    const whiteTree = buildRepertoireTree(whiteRepertoire);
-    const blackTree = buildRepertoireTree(blackRepertoire);
-    const lineNames: Record<string, string> = {};
-    for (const plan of [whiteRepertoire, blackRepertoire] as RepertoirePlan[]) {
-      for (const line of plan.lines) lineNames[line.id] = line.name;
-    }
-
-    // Run detectors
-    const patternDeviations = {} as Record<DetectorPatternId, OpeningDeviation[]>;
-    const patternGameIds = {} as Record<DetectorPatternId, Set<string>>;
-    for (const id of Object.keys(PATTERN_META) as DetectorPatternId[]) {
-      patternDeviations[id] = [];
-      patternGameIds[id] = new Set();
-    }
-    const record = (id: DetectorPatternId, g: StoredGame, dev: OpeningDeviation | null) => {
-      if (!dev) return;
-      patternDeviations[id].push(dev);
-      patternGameIds[id].add(g.id);
-    };
-    const divergences: Array<{ game: StoredGame; deviation: OpeningDeviation }> = [];
-
-    for (const g of whiteGames) {
-      const moves = g.movesSan || [];
-      record('white-scandi-e5', g, this.detectWhiteScandinavianLeak(g, moves));
-      record('early-queen-sortie', g, this.detectEarlyQueenSortie(g, moves, 'white'));
-      record('blackburne-shilling-handling', g, this.detectBlackburneShillingHandling(g, moves));
-      record('mated-while-ahead', g, this.detectMatedWhileAhead(g, moves, 'white'));
-      record('lost-on-time-while-ahead', g, this.detectLostOnTimeWhileAhead(g, moves, 'white'));
-      const divergence = this.detectRepertoireDivergence(g, whiteTree, 'white', { lineNames });
-      if (divergence) divergences.push({ game: g, deviation: divergence });
-    }
-    for (const g of blackGames) {
-      const moves = g.movesSan || [];
-      record('black-bg4-chase', g, this.detectBlackBg4ChaseLeak(g, moves));
-      record('early-queen-sortie', g, this.detectEarlyQueenSortie(g, moves, 'black'));
-      record('mated-while-ahead', g, this.detectMatedWhileAhead(g, moves, 'black'));
-      record('lost-on-time-while-ahead', g, this.detectLostOnTimeWhileAhead(g, moves, 'black'));
-      const divergence = this.detectRepertoireDivergence(g, blackTree, 'black', { lineNames });
-      if (divergence) divergences.push({ game: g, deviation: divergence });
-    }
 
     const repertoireLeaks = this.aggregateRepertoireLeaks(
       divergences,
@@ -891,4 +978,37 @@ export function analyzeGames(
   playerHandle: 'hoot65' = 'hoot65'
 ): DiagnosticReport {
   return DiagnosticAnalyzer.analyze(games, playerHandle);
+}
+
+/**
+ * The same report as analyzeGames, read in slices of about `budgetMs` between frames, so an archive of
+ * thousands of games does not freeze the page. `onProgress` gets the games read so far after each
+ * slice. Returns a function that stops the reading (then `onDone` is never called).
+ */
+export function analyzeGamesInSlices(
+  games: StoredGame[],
+  playerHandle: 'hoot65',
+  onDone: (report: DiagnosticReport) => void,
+  onProgress?: (read: number, total: number) => void,
+  budgetMs = 25
+): () => void {
+  let cancelled = false;
+  let run: AnalysisRun | null = null;
+  const step = () => {
+    if (cancelled) return;
+    run ??= DiagnosticAnalyzer.startRun(games, playerHandle);
+    const total = run.whiteGames.length + run.blackGames.length;
+    const t0 = performance.now();
+    while (performance.now() - t0 < budgetMs && DiagnosticAnalyzer.readNextGame(run));
+    if (run.read < total) {
+      onProgress?.(run.read, total);
+      setTimeout(step, 0);
+    } else {
+      onDone(DiagnosticAnalyzer.finishRun(run));
+    }
+  };
+  setTimeout(step, 0);
+  return () => {
+    cancelled = true;
+  };
 }

@@ -27,7 +27,7 @@ import {
   RepertoireLine,
   RepertoireLeak,
 } from '../types/diagnostics';
-import { analyzeGames } from '../analytics/diagnostics';
+import { analyzeGames, analyzeGamesInSlices } from '../analytics/diagnostics';
 import {
   getRecommendedWhiteRepertoire,
   getRecommendedBlackRepertoire,
@@ -56,8 +56,8 @@ interface DiagnosticsViewProps {
 
 const EMPTY_GAMES: StoredGame[] = [];
 
-// The archive array from App is stable while nothing changed, so the (about one second) analysis
-// runs once per archive, not once per visit to the tab.
+// The archive array from App is stable while nothing changed, so the analysis runs once per archive,
+// not once per visit to the tab.
 const reportCache = new WeakMap<StoredGame[], DiagnosticReport>();
 function cachedReport(games: StoredGame[]): DiagnosticReport {
   const hit = reportCache.get(games);
@@ -66,6 +66,11 @@ function cachedReport(games: StoredGame[]): DiagnosticReport {
   reportCache.set(games, report);
   return report;
 }
+// Up to this many games the analysis runs at once (about a fifth of a second); a bigger archive is read
+// in slices between frames, so the page does not freeze, and the report's tabs say how far it is.
+export const READ_AT_ONCE = 800;
+let emptyReport: DiagnosticReport | null = null;
+const noGamesReport = () => (emptyReport ??= analyzeGames([], 'hoot65'));
 
 function pct(score: number): string {
   return `${(score * 100).toFixed(1)}%`;
@@ -110,7 +115,29 @@ export const DiagnosticsView: React.FC<DiagnosticsViewProps> = ({
 
   const games = propGames ?? EMPTY_GAMES;
 
-  const report: DiagnosticReport = useMemo(() => cachedReport(games), [games]);
+  const atOnce = useMemo(() => reportCache.get(games) ?? (games.length <= READ_AT_ONCE ? cachedReport(games) : null), [games]);
+  const [sliced, setSliced] = useState<{ games: StoredGame[]; report: DiagnosticReport } | null>(null);
+  const [progress, setProgress] = useState({ read: 0, total: 0 });
+  useEffect(() => {
+    if (atOnce) return;
+    setProgress({ read: 0, total: games.length });
+    return analyzeGamesInSlices(
+      games,
+      'hoot65',
+      (done) => {
+        reportCache.set(games, done);
+        setSliced({ games, report: done });
+      },
+      (read, total) => setProgress({ read, total })
+    );
+  }, [games, atOnce]);
+  const report: DiagnosticReport = atOnce ?? (sliced?.games === games ? sliced.report : noGamesReport());
+  const reading = !atOnce && sliced?.games !== games;
+  const readingNote = (
+    <p className="text-sm text-slate-400 bg-slate-900 border border-slate-800 rounded-xl p-4" data-section="diagnostics-reading">
+      Reading the openings of your {games.length} games: {progress.read} of {progress.total}…
+    </p>
+  );
 
   const patterns: PatternSummary[] = report.patterns || [];
   const leakPatterns = patterns.filter((p) => p.isLeak);
@@ -228,16 +255,16 @@ export const DiagnosticsView: React.FC<DiagnosticsViewProps> = ({
 
           <div className="flex items-center gap-1 sm:gap-4 bg-slate-900/60 p-3 sm:p-4 rounded-xl border border-slate-800">
             <div className="text-center px-1.5 sm:px-3 border-r border-slate-800">
-              <div className="text-2xl font-black text-white" data-stat="games-analyzed">{report.totalGamesAnalyzed}</div>
+              <div className="text-2xl font-black text-white" data-stat="games-analyzed">{reading ? '…' : report.totalGamesAnalyzed}</div>
               <div className="text-xs text-slate-400 uppercase tracking-wider">Games Analyzed</div>
             </div>
             <div className="text-center px-1.5 sm:px-3 border-r border-slate-800">
-              <div className="text-2xl font-black text-emerald-400">{pct(report.whiteStats.winRate)}</div>
+              <div className="text-2xl font-black text-emerald-400">{reading ? '…' : pct(report.whiteStats.winRate)}</div>
               <div className="text-xs text-slate-400 uppercase tracking-wider">White Win Rate</div>
               <div className="text-[10px] text-slate-500">score; draws count half</div>
             </div>
             <div className="text-center px-1.5 sm:px-3">
-              <div className="text-2xl font-black text-amber-400">{pct(report.blackStats.winRate)}</div>
+              <div className="text-2xl font-black text-amber-400">{reading ? '…' : pct(report.blackStats.winRate)}</div>
               <div className="text-xs text-slate-400 uppercase tracking-wider">Black Win Rate</div>
               <div className="text-[10px] text-slate-500">score; draws count half</div>
             </div>
@@ -285,7 +312,7 @@ export const DiagnosticsView: React.FC<DiagnosticsViewProps> = ({
         >
           <AlertTriangle className="w-4 h-4 text-rose-400" />
           Weakness Diagnostics & Key Leaks
-          <span className="ml-1.5 px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 text-xs font-mono">{totalLeaks}</span>
+          <span className="ml-1.5 px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 text-xs font-mono">{reading ? '…' : totalLeaks}</span>
         </button>
 
         <button
@@ -350,6 +377,10 @@ export const DiagnosticsView: React.FC<DiagnosticsViewProps> = ({
         <div className="space-y-6">
           {/* The archive analysis first: the board checks and the clock, each with its trainer */}
           <PointsCard onOpenClock={() => setActiveTab('clock')} />
+          {reading ? (
+            readingNote
+          ) : (
+            <>
           {/* Measured patterns strip */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3" data-section="patterns">
             {patterns.map((p) => {
@@ -688,6 +719,8 @@ export const DiagnosticsView: React.FC<DiagnosticsViewProps> = ({
               </div>
             </div>
           </div>
+            </>
+          )}
         </div>
       )}
 
@@ -960,7 +993,8 @@ export const DiagnosticsView: React.FC<DiagnosticsViewProps> = ({
       )}
 
       {/* 5. Opening Performance Matrix Tab */}
-      {activeTab === 'openings' && (
+      {activeTab === 'openings' && reading && readingNote}
+      {activeTab === 'openings' && !reading && (
         <div className="space-y-6">
           <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6">
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-3 mb-6">
