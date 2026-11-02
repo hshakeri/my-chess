@@ -24,6 +24,10 @@ describe('Caro-Kann vs 2.Bc4: every fact the lesson states, replayed', () => {
     expect(attacks(after(...MAIN), 'c4', 'b')).toContain('d5');
     const blunder = after('e4', 'c6', 'Bc4', 'd5', 'exd5', 'Qxd5');
     expect(blunder.move('Bxd5').captured).toBe('q');
+    // "After 4...cxd5 White has the queen for a bishop"
+    expect(blunder.move('cxd5').captured).toBe('b');
+    const v: Record<string, number> = { p: 1, n: 3, b: 3, r: 5, q: 9, k: 0 };
+    expect(blunder.board().flat().reduce((n, p) => n + (p ? (p.color === 'w' ? 1 : -1) * v[p.type] : 0), 0)).toBe(6);
   });
 
   it('4.Bb3 Nf6: the queen and the knight defend d5; 5.d4 Bg4 attacks the queen, and the f6 knight defends g4', () => {
@@ -69,7 +73,8 @@ describe('Caro-Kann vs 2.Bc4: every fact the lesson states, replayed', () => {
     }
     const nc3 = after(...MAIN, 'Bb5+', 'Nc6', 'd3', 'Qa5+', 'Nc3');
     expect(attacks(nc3, 'b5', 'w')).toContain('c3');
-    expect(nc3.moves({ square: 'c3' })).toEqual([]);
+    // With White to move after 6...d4, the pinned knight still has no move
+    expect(after(...MAIN, 'Bb5+', 'Nc6', 'd3', 'Qa5+', 'Nc3', 'd4').moves({ square: 'c3' })).toEqual([]);
     const trap = after(...MAIN, 'Bb5+', 'Nc6', 'd3', 'Qa5+', 'Nc3', 'Qxb5');
     expect(trap.move('Nxb5').captured).toBe('q');
     expect(attacks(after(...MAIN, 'Bb5+', 'Nc6', 'd3', 'Qa5+', 'Nc3', 'd4'), 'c3', 'b')).toContain('d4');
@@ -116,6 +121,6 @@ describe('Caro-Kann vs 2.Bc4: every fact the lesson states, replayed', () => {
   it('sits in the study path with the other lessons on loose pieces on long lines', () => {
     const group = patternPath.find((g) => g.lessonIds.includes(caroKannBc4Lesson.id));
     expect(group?.id).toBe('pattern-loose-pieces-long-lines');
-    expect(caroKannBc4Lesson.title).not.toMatch(/cxd5|Qa5/);
+    for (const header of [caroKannBc4Lesson.title, caroKannBc4Lesson.subtitle ?? '']) expect(header).not.toMatch(/cxd5|Qa5|pawn|queen/i);
   });
 });

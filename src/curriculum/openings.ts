@@ -656,7 +656,7 @@ export const adamsAttackSicilian: CurriculumLesson = buildVerifiedLesson({
 export const twoKnightsD4Lesson: CurriculumLesson = buildVerifiedLesson({
   id: 'lesson-two-knights-d4',
   title: 'Two Knights with 4.d4: The Pin on the e-File',
-  subtitle: 'Castle first; then the rook on e1 looks at the king on e8',
+  subtitle: 'The open e-file, with Black\'s king still on e8',
   category: 'opening',
   sourceBook: 'Chess.com Live Archive',
   author: 'hoot65 Diagnostic Analysis',
@@ -667,7 +667,7 @@ export const twoKnightsD4Lesson: CurriculumLesson = buildVerifiedLesson({
   relevance: 'core',
   startPly: 8,
   description:
-    'Against 3...Nf6 you played 4.d4 in 10 of your 12 games (5 points). After 4...exd4 5.O-O Black chose 5...Bc5 (3 games), 5...Nxe4 (2) or 5...d6 (2). Against 5...Bc5 and 5...Nxe4 your next move cost about a pawn, and against 5...d6 you lost both games after 6.Re1. With Black\'s king still on e8, the e-file decides: a rook on e1 pins a knight on e4, and a check on e1 comes first.',
+    'Against 3...Nf6 you played 4.d4 in 10 of your 12 games (5 points). After 4...exd4 5.O-O Black chose 5...Bc5 (3 games), 5...Nxe4 (2) or 5...d6 (2). Against 5...Bc5 your next move cost about a pawn, and against 5...Nxe4 your seventh did (after 6.Re1 d5 you played 7.Nxd4, not 7.Bxd5). Against 5...d6 you lost both games, though your 6.Re1 there was only a little worse than taking the pawn back. With Black\'s king still on e8, the e-file decides: a rook on e1 pins a knight on e4, and a check on e1 comes first.',
   thematicObjective:
     'Against 5...Nxe4: 6.Re1 d5 7.Bxd5! Qxd5 8.Nc3 wins the piece back. Against 5...Bc5: 6.e5 d5 7.exf6 dxc4 8.Re1+. Against 5...d6: take the pawn back with 6.Nxd4.',
   keyTacticalMotif: 'A knight on e4 pinned to the king by the rook on e1, attacked again by Nc3',
@@ -715,11 +715,9 @@ export const twoKnightsD4Lesson: CurriculumLesson = buildVerifiedLesson({
             san: 'Nxd4',
             isUserMove: true,
             frequency: 2,
-            annotation: 'Take the pawn back: White has the centre and the freer game.',
+            annotation: 'Take the pawn back: White has the centre and the freer game. 6.Re1, your move in both of these games, is nearly as good.',
             hintTheme: 'Win back the pawn',
-            wrongMoveFeedback: {
-              Re1: '6.Re1 was your move in both of these games, and you lost both. Take the pawn back first with 6.Nxd4.',
-            },
+            accept: { san: ['Re1'] },
           },
         ],
       },

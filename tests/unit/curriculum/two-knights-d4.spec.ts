@@ -76,6 +76,8 @@ describe('Two Knights with 4.d4: every fact the lesson states, replayed', () => 
 
   it('starts the drill after 4.d4 exd4, so it never shares a decision with the Evans lesson\'s 4.d3', () => {
     expect(twoKnightsD4Lesson.startPly).toBe(8);
+    // The header names no answer
+    for (const header of [twoKnightsD4Lesson.title, twoKnightsD4Lesson.subtitle ?? '']) expect(header).not.toMatch(/O-O|castle|Re1|Bxd5|Nc3|e5|Nxd4/i);
     const group = patternPath.find((g) => g.lessonIds.includes(twoKnightsD4Lesson.id));
     expect(group?.id).toBe('pattern-king-in-the-centre');
   });

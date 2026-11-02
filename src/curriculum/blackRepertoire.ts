@@ -756,7 +756,7 @@ export const caroKannBc4Lesson: CurriculumLesson = buildVerifiedLesson({
   ...SOURCE,
   id: 'lesson-black-caro-vs-bc4',
   title: 'Caro-Kann vs 2.Bc4: The Recapture on d5',
-  subtitle: 'The c4 bishop watches d5, and on b5 it can be loose',
+  subtitle: 'Against 4.Bb5+ and 4.Bb3, from your own games',
   category: 'opening',
   eco: 'B10',
   targetColor: 'black',
@@ -765,7 +765,7 @@ export const caroKannBc4Lesson: CurriculumLesson = buildVerifiedLesson({
   description:
     '2.Bc4 came up in 8 of your 67 Caro-Kann games (5.5 points). You met it with 2...d5 every time, and after 3.exd5 took back with 3...cxd5. Then the d5 pawn attacks the bishop again; in your games it went to b5 with check (5 games, 4.5 points) or back to b3 (3 games, 1 point). Two things to watch: the queen may not take on d5 while the bishop sees it, and a bishop on b5 that nothing defends can be hit together with the king.',
   thematicObjective:
-    'Take back on d5 with the pawn, never the queen. Once White\'s d-pawn has left d2, with nothing on c3 or b4, ...Qa5+ checks and attacks a loose bishop on b5 at once.',
+    'Take back on d5 with the pawn, never the queen. Once d2, c3 and b4 are empty, ...Qa5+ checks and attacks a loose bishop on b5 at once.',
   keyTacticalMotif: 'A queen check from a5 that also attacks an undefended bishop on b5',
   moves: [
     { san: 'e4', isUserMove: false },
@@ -913,7 +913,7 @@ export const caroKannBc4Lesson: CurriculumLesson = buildVerifiedLesson({
       severity: 'blunder',
       explanatoryFeedback: '3...Qxd5?? puts the queen on the bishop\'s diagonal: 4.Bxd5 takes it.',
       refutationSanList: ['Bxd5'],
-      punishmentSummary: 'White wins the queen for a pawn.',
+      punishmentSummary: 'After 4...cxd5 White has the queen for a bishop.',
     },
   ],
 });
@@ -921,7 +921,7 @@ export const caroKannBc4Lesson: CurriculumLesson = buildVerifiedLesson({
 export const caroKannExchangeLesson: CurriculumLesson = buildVerifiedLesson({
   ...SOURCE,
   id: 'lesson-black-caro-exchange',
-  title: 'Caro-Kann Exchange: The Bishop on f5',
+  title: 'Caro-Kann Exchange: The Light-Squared Bishop',
   subtitle: 'When White\'s bishop comes to d3 or b5',
   category: 'opening',
   eco: 'B13',
@@ -973,11 +973,11 @@ export const caroKannExchangeLesson: CurriculumLesson = buildVerifiedLesson({
             san: 'Bxd3',
             isUserMove: true,
             frequency: 1,
-            annotation: 'Trade the bishops, or retreat with 5...Bg6 as you did. The bishop may not just stay there.',
+            annotation: 'Trade the bishops, or retreat with 5...Bg6 as you did. Left on f5 without a defender, it is taken.',
             hintTheme: 'Trade or retreat',
             accept: { san: ['Bg6'] },
             wrongMoveFeedback: {
-              e6: '5...e6?? leaves the f5 bishop to be taken: after 6.Bxf5 exf5 7.Qe2+ Be7 8.Qb5+ Nc6 9.Nxd5 White has won the d5 pawn.',
+              e6: '5...e6 lets 6.Bxf5 exf5 7.Qe2+: after 7...Be7 8.Qb5+ Nc6 9.Nxd5 White has won the d5 pawn.',
             },
           },
         ],
@@ -1013,17 +1013,6 @@ export const caroKannExchangeLesson: CurriculumLesson = buildVerifiedLesson({
       solutionSan: ['Nc6'],
       explanation:
         '6...Nc6 blocks with the knight that belongs on c6. 6...Nd7?? leaves the d7 knight pinned to the king, and 7.Ne5 attacks it a second time; after 7...Nf6 8.Bg5 Be7 9.Bxf6 gxf6 10.Nxd7 White has won it (10...Qxd7 11.Bxd7+).',
-    },
-  ],
-  mistakesAndTraps: [
-    {
-      triggerFen: 'rn1qkbnr/pp2pppp/8/3p1b2/3P4/2NB4/PPP2PPP/R1BQK1NR b KQkq - 3 5',
-      attemptedSan: 'e6',
-      isTrap: false,
-      severity: 'blunder',
-      explanatoryFeedback: '5...e6?? leaves the f5 bishop to be taken: 6.Bxf5 exf5 7.Qe2+ and the d5 pawn falls.',
-      refutationSanList: ['Bxf5', 'exf5', 'Qe2+', 'Be7', 'Qb5+', 'Nc6', 'Nxd5'],
-      punishmentSummary: 'White has won the d5 pawn, and Black\'s f-pawns are doubled.',
     },
   ],
 });

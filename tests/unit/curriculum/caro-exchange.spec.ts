@@ -28,9 +28,12 @@ describe('Caro-Kann Exchange: every fact the lesson states, replayed', () => {
     expect(after(...X, 'Nc3', 'Bf5').get('e6')).toBeUndefined();
   });
 
-  it('against 5.Bd3 the lesson trades or retreats; 5...e6?? 6.Bxf5 exf5 7.Qe2+ Be7 8.Qb5+ Nc6 9.Nxd5 wins the d5 pawn', () => {
+  it('against 5.Bd3 the lesson trades or retreats; an undefended bishop on f5 is taken; 5...e6 6.Bxf5 exf5 7.Qe2+ Be7 8.Qb5+ Nc6 9.Nxd5 wins the d5 pawn', () => {
     const bd3 = after(...X, 'Nc3', 'Bf5', 'Bd3');
     expect(attacks(bd3, 'f5', 'w')).toContain('d3');
+    expect(attacks(bd3, 'f5', 'b')).toEqual([]);
+    // After 5...e6 the bishop is defended, and 6.Bxf5 is a trade
+    expect(attacks(after(...X, 'Nc3', 'Bf5', 'Bd3', 'e6'), 'f5', 'b')).toEqual(['e6']);
     const line = after(...X, 'Nc3', 'Bf5', 'Bd3', 'e6', 'Bxf5', 'exf5', 'Qe2+', 'Be7', 'Qb5+', 'Nc6');
     const before = material(line);
     expect(line.move('Nxd5').captured).toBe('p');
@@ -86,5 +89,7 @@ describe('Caro-Kann Exchange: every fact the lesson states, replayed', () => {
   it('sits in the study path with the Caro-Kann bishop lessons', () => {
     const group = patternPath.find((g) => g.lessonIds.includes(caroKannExchangeLesson.id));
     expect(group?.id).toBe('pattern-caro-bishop-both-sides');
+    // The header names no answer: not the square f5, the knight's c6 or the trade
+    for (const header of [caroKannExchangeLesson.title, caroKannExchangeLesson.subtitle ?? '']) expect(header).not.toMatch(/f5|g6|c6|Bxd3/);
   });
 });
