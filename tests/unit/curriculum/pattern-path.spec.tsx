@@ -133,6 +133,43 @@ describe('Study path: every core lesson once, grouped by a pattern its lessons r
     expect(drill.exercises[0].solutionSan.slice(0, 3)).toEqual(['Ng3', 'Bg6', 'h4']);
   });
 
+  it('group 5: the rook mate keeps the king on the back rank, waits a move, and mates without stalemate', () => {
+    const l = lesson('lesson-rook-back-rank-mate');
+    const at = (ply: number) => {
+      const x = new Chess(l.initialFen);
+      for (const m of l.moves.slice(0, ply)) x.move(m.san);
+      return x;
+    };
+    // 1.Rh7: every move of the black king stays on the back rank (1.Rh8+ would let it up)
+    expect(at(1).moves({ verbose: true }).every((m) => m.to[1] === '8')).toBe(true);
+    const check = at(0);
+    check.move('Rh8+');
+    expect(check.moves().some((m) => m.startsWith('K') && /7$/.test(m))).toBe(true);
+    // 6.Kd6: the kings face to face, Black to move and only stepping aside
+    expect(at(11).moves().sort()).toEqual(['Kc8', 'Ke8']);
+    // 7.Ra7: if the king steps in front of yours, Ra8 is mate; the same after 8.Ke6 and 9.Kf6
+    for (const [ply, step] of [[13, 'Kd8'], [15, 'Ke8'], [17, 'Kf8']] as const) {
+      const x = at(ply);
+      x.move(step);
+      x.move('Ra8#');
+      expect(x.isCheckmate(), `${ply} ${step}`).toBe(true);
+    }
+    // 10.Kg6 leaves one move, Kg8; 10.Rg7?? is stalemate
+    expect(at(19).moves()).toEqual(['Kg8']);
+    const trap = at(18);
+    trap.move('Rg7');
+    expect(trap.isStalemate()).toBe(true);
+    // The mate: the king on g6 covers f7, g7 and h7
+    const end = at(21);
+    expect(end.isCheckmate()).toBe(true);
+    expect(['f7', 'g7', 'h7'].every((sq) => end.attackers(sq as Square, 'w').includes('g6' as Square))).toBe(true);
+    // The exercises: face to face Rh8# is the only mate; in the corner 1.Kg6 and 1.Rg7?? stalemates
+    expect(new Chess(l.exercises[0].fen).moves().filter((m) => m.endsWith('#'))).toEqual(['Rh8#']);
+    const corner = new Chess(l.exercises[1].fen);
+    corner.move('Rg7');
+    expect(corner.isStalemate()).toBe(true);
+  });
+
   it('shows the groups in the lesson list, each with its check, in path order', () => {
     const html = renderToString(<LessonsView />);
     const positions = patternPath.map((g) => html.indexOf(`data-pattern-group="${g.id}"`));

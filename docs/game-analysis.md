@@ -116,7 +116,8 @@ heading shows the check that catches the pattern at the board.
 3. **The king in the centre.** The Evans Gambit, Legal's mate, the wall against 2.Nc3 and 2.Bg5,
    and the Blackburne-Shilling drill: knight mates against a king that has not castled.
 4. **The Caro-Kann bishop from both sides.** The Classical as Black, then the same line as White.
-5. **Finish the game.** Mate with the queen, and mate rather than stalemate.
+5. **Finish the game.** Mate with the queen, mate with the rook (rook on the seventh, king to the
+   sixth, a waiting move, mate on the back rank), and mate rather than stalemate.
 
 The first two groups train the most expensive checks in the games: a piece left where it can be
 taken, a threat not answered, a free piece not taken. The third trains the costliest single error,

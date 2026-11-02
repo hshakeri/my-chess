@@ -209,7 +209,147 @@ export const stalemateCatastrophes: CurriculumLesson = buildVerifiedLesson({
   ],
 });
 
+export const rookBackRankMate: CurriculumLesson = buildVerifiedLesson({
+  id: 'lesson-rook-back-rank-mate',
+  title: 'Checkmate with the Rook: The Back-Rank Cage',
+  subtitle: 'The rook keeps the king on the edge while your king walks up the board',
+  category: 'fundamentals',
+  sourceBook: 'Chess Fundamentals',
+  author: 'José Raúl Capablanca',
+  publicationYear: 1921,
+  pagesRef: 'Some simple mates',
+  eco: 'KRK',
+  relevance: 'core',
+  // Each White move is Stockfish 19's fastest mate (depth 18) and each Black move its longest defence
+  initialFen: '4k3/8/8/8/8/8/8/4K2R w - - 0 1',
+  targetColor: 'white',
+  targetRatingBand: 'beginner',
+  description:
+    'King and rook against a lone king: the mate that turns a won endgame into a win. The rook on the seventh rank keeps the black king on the back rank, your king walks up to the sixth, and when the two kings stand face to face the rook mates on the back rank. When they stand a knight\'s move apart, a waiting move with the rook makes the black king choose.',
+  thematicObjective:
+    'Rook to the seventh rank, king up to the sixth; a waiting rook move when the kings are a knight\'s move apart; mate on the back rank when they stand face to face, never a quiet move that leaves the king no move at all.',
+  keyTacticalMotif: 'Cut-off on the seventh rank, kings face to face, waiting move, back-rank mate, stalemate check',
+  moves: [
+    {
+      san: 'Rh7',
+      isUserMove: true,
+      annotation: 'The rook takes the seventh rank, so the black king cannot leave the back rank.',
+      hintPiece: 'Rook',
+      hintSquare: 'h7',
+      hintTheme: 'Cut the king off on the edge',
+      wrongMoveFeedback: {
+        'Rh8+': 'A check that lets the king off the back rank: after 1.Rh8+ it steps up to the seventh. Put the rook on the seventh rank first.',
+      },
+    },
+    { san: 'Kd8', isUserMove: false },
+    {
+      san: 'Kd2',
+      isUserMove: true,
+      annotation: 'The rook holds the seventh rank on its own, so the king can walk up the board toward the black king.',
+      hintPiece: 'King',
+      hintSquare: 'd2',
+      hintTheme: 'Bring the king',
+    },
+    { san: 'Ke8', isUserMove: false },
+    { san: 'Ke3', isUserMove: true, annotation: 'Up again, toward the black king.', hintPiece: 'King', hintSquare: 'e3' },
+    { san: 'Kd8', isUserMove: false },
+    { san: 'Kd4', isUserMove: true, hintPiece: 'King', hintSquare: 'd4' },
+    { san: 'Kc8', isUserMove: false },
+    { san: 'Kc5', isUserMove: true, hintPiece: 'King', hintSquare: 'c5' },
+    { san: 'Kd8', isUserMove: false },
+    {
+      san: 'Kd6',
+      isUserMove: true,
+      annotation: 'Your king reaches the sixth rank. The kings stand face to face with Black to move, so the black king has to step aside.',
+      hintPiece: 'King',
+      hintSquare: 'd6',
+      hintTheme: 'Face the king',
+    },
+    { san: 'Ke8', isUserMove: false },
+    {
+      san: 'Ra7',
+      isUserMove: true,
+      annotation:
+        'A waiting move. The kings are a knight\'s move apart, and 7.Ke6 would put them face to face with Black to move again. The rook passes the move instead, along the seventh rank and away from the black king: if the king now steps to d8, in front of yours, Ra8 is mate.',
+      hintPiece: 'Rook',
+      hintSquare: 'a7',
+      hintTheme: 'Pass the move with the rook',
+      wrongMoveFeedback: {
+        Ke6: '7.Ke6 puts the kings face to face with Black to move, and the black king simply steps aside again. Pass the move with the rook along the seventh rank instead.',
+      },
+    },
+    { san: 'Kf8', isUserMove: false },
+    {
+      san: 'Ke6',
+      isUserMove: true,
+      annotation: 'Follow along the sixth rank, a knight\'s move away. If the king steps back to e8, in front of yours, Ra8 is mate.',
+      hintPiece: 'King',
+      hintSquare: 'e6',
+    },
+    { san: 'Kg8', isUserMove: false },
+    { san: 'Kf6', isUserMove: true, annotation: 'A knight\'s move away again: f8 would be in front of your king.', hintPiece: 'King', hintSquare: 'f6' },
+    { san: 'Kh8', isUserMove: false },
+    {
+      san: 'Kg6',
+      isUserMove: true,
+      annotation: 'The king in the corner has one move left, to g8, in front of yours.',
+      hintPiece: 'King',
+      hintSquare: 'g6',
+      hintTheme: 'Mate, not stalemate',
+      wrongMoveFeedback: {
+        Rg7: '10.Rg7?? leaves the black king no legal move while it is not in check: stalemate, a draw.',
+      },
+    },
+    { san: 'Kg8', isUserMove: false },
+    {
+      san: 'Ra8#',
+      isUserMove: true,
+      annotation: 'Mate: the rook checks along the back rank, and your king covers f7, g7 and h7.',
+      hintPiece: 'Rook',
+      hintSquare: 'a8',
+      hintTheme: 'Back-rank mate',
+      accept: { predicate: 'checkmate' },
+    },
+  ],
+  exercises: [
+    {
+      id: 'ex-rook-mate-face-to-face',
+      title: 'Face to Face',
+      fen: '3k4/7R/3K4/8/8/8/8/8 w - - 0 1',
+      turn: 'w',
+      difficultyRating: 1,
+      prompt: 'White to play. The kings stand face to face and the rook holds the seventh rank. Give mate.',
+      solutionSan: ['Rh8#'],
+      explanation: '1.Rh8# checks along the back rank, and the white king covers c7, d7 and e7.',
+    },
+    {
+      id: 'ex-rook-mate-corner',
+      title: 'The Corner, Without Stalemate',
+      fen: '7k/R7/5K2/8/8/8/8/8 w - - 0 1',
+      turn: 'w',
+      difficultyRating: 2,
+      prompt: 'White to play and mate in two. Careful: one natural rook move leaves Black no legal move at all.',
+      solutionSan: ['Kg6', 'Kg8', 'Ra8#'],
+      explanation:
+        '1.Kg6 leaves the king one move, to g8, and 2.Ra8# follows. 1.Rg7?? would be stalemate: the king on h8 is not in check and every square around it is covered.',
+    },
+  ],
+  mistakesAndTraps: [
+    {
+      // The position after 9...Kh8 (kings f6 and h8, rook a7)
+      plyIndex: 18,
+      attemptedSan: 'Rg7',
+      isTrap: true,
+      severity: 'blunder',
+      explanatoryFeedback: '10.Rg7?? is stalemate: the black king is not in check and has no legal move, so the game is drawn. 10.Kg6 Kg8 11.Ra8# mates instead.',
+      refutationSanList: [],
+      punishmentSummary: 'A draw by stalemate in a position where White has mate in two.',
+    },
+  ],
+});
+
 export const fundamentalsLessons: CurriculumLesson[] = [
   queenCageBoxMate,
+  rookBackRankMate,
   stalemateCatastrophes,
 ];
