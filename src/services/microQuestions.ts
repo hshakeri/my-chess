@@ -1,5 +1,5 @@
 import { Chess, type Square } from 'chess.js';
-import { enPrise } from '../analytics/errorTaxonomy';
+import { losesMaterial } from '../analytics/errorTaxonomy';
 
 /**
  * One-click board questions (CL-5): the checks a player makes before moving, asked with answers
@@ -112,22 +112,28 @@ export function knightSquares(square: string): string[] {
 }
 
 /**
- * Whether `san` from `fen` leaves nothing to take: after it no piece of the mover's (a minor piece or
- * more) can be won, by an undefended capture or a cheaper attacker, that could not be won before,
- * and the opponent has no mate in one.
+ * Whether `san` from `fen` is safe: the opponent has no mate in one after it, and it loses no material
+ * the review's search can see (two plies, then the captures): at least two pawns against what the
+ * mover could keep. A trade is safe (4.Bxc6 dxc6 in the Exchange Ruy Lopez), and so is a move that
+ * only leaves a capture untaken.
  */
 export function isMoveSafe(fen: string, san: string): { safe: boolean; reason: string } {
-  const before = new Chess(fen);
   const after = new Chess(fen);
   const move = after.move(san);
-  const mover = move.color;
   const mates = after.moves().filter((m) => m.endsWith('#'));
   if (mates.length) return { safe: false, reason: `After ${move.san} the opponent mates with ${mates[0]}.` };
-  const looseBefore = new Set(enPrise(before, mover).map((p) => p.square));
-  const newlyLoose = enPrise(after, mover).filter((p) => !looseBefore.has(p.square) || p.square === move.to);
-  if (newlyLoose.length) {
-    const p = newlyLoose[0];
-    return { safe: false, reason: `After ${move.san}, ${pieceOn(after.fen(), p.square)} can be taken.` };
+  const { loses, refutation } = losesMaterial(fen, move.san);
+  if (loses) {
+    // Name the piece when the winning reply takes one at once; otherwise the reply that starts it
+    const target = refutation?.includes('x') ? (refutation.match(/[a-h][1-8]/g) || []).pop() : undefined;
+    const victim = target ? after.get(target as Square) : undefined;
+    return {
+      safe: false,
+      reason:
+        victim && victim.type !== 'p'
+          ? `After ${move.san}, ${pieceOn(after.fen(), target!)} can be taken.`
+          : `After ${move.san}, ${refutation} wins material.`,
+    };
   }
   return { safe: true, reason: `After ${move.san} nothing of yours can be won and there is no mate in one.` };
 }

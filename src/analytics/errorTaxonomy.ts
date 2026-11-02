@@ -210,6 +210,22 @@ function bestReply(fen: string): string | undefined {
   return best;
 }
 
+/**
+ * Whether `played` from `fenBefore` loses material the search can see: at least MIN_LOSS against what
+ * the mover can keep, which is the material on the board, or the best move's score when every move
+ * loses some. A trade is no loss, and neither is a capture left untaken. With the reply that wins it.
+ */
+export function losesMaterial(fenBefore: string, played: string): { loses: boolean; refutation?: string } {
+  const before = new Chess(fenBefore);
+  const after = new Chess(fenBefore);
+  const san = after.move(played).san;
+  const playedScore = scoreOf(fenBefore, san);
+  // Keeping the material on the board within MIN_LOSS is never a loss, whatever the best move gains
+  if (material(before) - playedScore < MIN_LOSS) return { loses: false };
+  const beaten = before.moves().some((m) => m !== san && reaches(fenBefore, m, playedScore + MIN_LOSS));
+  return beaten ? { loses: true, refutation: bestReply(after.fen()) } : { loses: false };
+}
+
 /** Every move in `fen` that gives mate at once. */
 export function matesInOne(fen: string): string[] {
   const chess = new Chess(fen);
