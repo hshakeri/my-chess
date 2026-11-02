@@ -7,7 +7,8 @@ import { isMoveSafe, knightSquares, opponentChecks, type MicroQuestion, type Que
 import { cctStats, logCct, readCctLog } from '../services/cctLog';
 import { gamesRepo } from '../db/gamesRepo';
 import { RulesEngine } from '../engine/rules';
-import { moveLabel } from '../analytics/review';
+import { labelAt, moveLabel } from '../analytics/review';
+import { gameDrillData, type GameDrill } from '../curriculum/gameDrills';
 import type { Square } from '../types/chess';
 import type { StoredGame } from '../types/db';
 import seedGamesRaw from '../data/seed_hoot65_games.json';
@@ -46,6 +47,37 @@ function pickPosition(games: StoredGame[], random: () => number): { fen: string;
     return { fen: chess.fen(), color, played: game.movesSan[ply], ply };
   }
   return null;
+}
+
+const PIECE: Record<string, string> = { p: 'pawn', n: 'knight', b: 'bishop', r: 'rook', q: 'queen', k: 'king' };
+
+/**
+ * Moves of the student's that were not safe: the threat and mate drill sets (an attacked piece left
+ * where it was, a move that allowed mate), each refutation checked by chess.js where the drills are
+ * built. Half of the "Was it safe?" questions come from these: most moves played are safe, so on
+ * random positions alone "Yes" would nearly always be right.
+ */
+export const UNSAFE_DRILLS: GameDrill[] = [...gameDrillData.threat, ...(gameDrillData.mate ?? [])];
+
+/** A "Was it safe?" question on one of UNSAFE_DRILLS, the answer No, with the reply that punishes the move. */
+export function unsafeItem(random: () => number): WarmupItem | null {
+  const d = UNSAFE_DRILLS[Math.floor(random() * UNSAFE_DRILLS.length)];
+  if (!d?.refutation) return null;
+  const chess = new Chess(d.fenBefore);
+  chess.move(d.lastSan);
+  const fen = chess.fen();
+  const after = new Chess(fen);
+  const played = after.move(d.played);
+  const taken = after.get(new Chess(after.fen()).move(d.refutation).to as Square);
+  const reply = after.move(d.refutation);
+  const reason = reply.san.endsWith('#')
+    ? `After ${played.san} the opponent mates with ${reply.san}.`
+    : `After ${played.san}, ${reply.san} takes the ${PIECE[taken?.type ?? 'p']} on ${reply.to}.`;
+  return {
+    fen,
+    orientation: d.color === 'black' ? 'b' : 'w',
+    question: { kind: 'safe', prompt: `In this game you played ${labelAt(fen, played.san)} here. Was it safe?`, answer: false, move: played.san, reason },
+  };
 }
 
 /** The kind to ask next: the slower the student answers a kind, the more often it comes up. */
@@ -105,6 +137,10 @@ export function makeWarmupItem(games: StoredGame[], random: () => number = Math.
           focus: [],
         },
       };
+    }
+    if (random() < 0.5) {
+      const item = unsafeItem(random);
+      if (item) return item;
     }
     const verdict = withinNodes(SAFE_NODES, () => isMoveSafe(fen, played));
     if (!verdict) continue;

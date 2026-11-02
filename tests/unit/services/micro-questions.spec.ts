@@ -111,6 +111,7 @@ describe('warm-up questions on positions from the student\'s games (CL-5)', () =
     let state = 7;
     const random = () => ((state = (state * 48271) % 2147483647) / 2147483647);
     const kinds = new Set<string>();
+    const safeAnswers = new Set<boolean>();
     for (let i = 0; i < 30; i++) {
       const item = makeWarmupItem(seed, random)!;
       expect(item).toBeTruthy();
@@ -125,6 +126,7 @@ describe('warm-up questions on positions from the student\'s games (CL-5)', () =
         expect(q.answer).toEqual(enPrise(chess, item.orientation).map((p) => p.square).sort());
       } else if (q.kind === 'safe') {
         expect(q.answer).toBe(isMoveSafe(item.fen, q.move).safe);
+        safeAnswers.add(q.answer);
       } else if (q.kind === 'checks') {
         // The checks the opponent would have, counted on the position with the turn passed to them
         expect(chess.inCheck()).toBe(false);
@@ -137,5 +139,24 @@ describe('warm-up questions on positions from the student\'s games (CL-5)', () =
       }
     }
     expect(kinds).toEqual(new Set(['knight', 'loose', 'safe', 'checks']));
-  });
+    // "Was it safe?" is not always yes
+    expect(safeAnswers).toEqual(new Set([true, false]));
+  }, 60_000);
+
+  it('takes the unsafe half of "Was it safe?" from moves the same search calls unsafe, with the reply that punishes them', async () => {
+    const { UNSAFE_DRILLS, unsafeItem } = await import('../../../src/views/WarmupPanel');
+    expect(UNSAFE_DRILLS.length).toBeGreaterThanOrEqual(30);
+    // The first threat drill (7.Bxf7+? Nxf7, the queen on f3 still attacked) and the first mate drill
+    const threat = unsafeItem(() => 0)!;
+    expect(threat.question).toMatchObject({ kind: 'safe', answer: false, move: 'Bxf7+', reason: 'After Bxf7+, Nxf7 takes the bishop on f7.' });
+    expect(threat.question.kind === 'safe' && threat.question.prompt).toBe('In this game you played 7.Bxf7+ here. Was it safe?');
+    const mateIndex = UNSAFE_DRILLS.findIndex((d) => d.id.startsWith('mate-'));
+    const mate = unsafeItem(() => (mateIndex + 0.5) / UNSAFE_DRILLS.length)!;
+    expect(mate.question).toMatchObject({ answer: false, move: 'Qxb2', reason: 'After Qxb2 the opponent mates with Qxh7#.' });
+    for (const d of UNSAFE_DRILLS) {
+      const position = new Chess(d.fenBefore);
+      position.move(d.lastSan);
+      expect(isMoveSafe(position.fen(), d.played).safe, d.id).toBe(false);
+    }
+  }, 120_000);
 });
