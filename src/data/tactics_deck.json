@@ -4615,42 +4615,6 @@
   "game": "https://www.chess.com/game/live/80592571093"
  },
  {
-  "id": "174297609928-87",
-  "fen": "6k1/r4ppp/8/4P3/7P/pBn2PK1/6P1/R7 b - - 5 44",
-  "lastMove": {
-   "from": "a2",
-   "to": "b3",
-   "san": "Bb3"
-  },
-  "solution": "Kf8",
-  "accepted": [
-   "Kf8",
-   "a2",
-   "Ra5"
-  ],
-  "line": [
-   "Kf8",
-   "Kg4",
-   "a2",
-   "f4",
-   "g6"
-  ],
-  "motif": "quiet",
-  "mateIn": null,
-  "date": "2026-09-11",
-  "ownSide": true,
-  "played": "Nd5",
-  "share": null,
-  "before": {
-   "fen": "6k1/r4ppp/8/1n2P3/7P/p4PK1/B5P1/R7 b - - 3 43",
-   "moves": [
-    "Nc3",
-    "Bb3"
-   ]
-  },
-  "game": "https://www.chess.com/game/live/174297609928"
- },
- {
   "id": "99432733353-51",
   "fen": "r7/p1p1rpkp/1pPp2p1/6N1/2P2Q2/1qnRP2P/5PP1/2R3K1 b - - 1 26",
   "lastMove": {
@@ -5815,43 +5779,6 @@
   "game": "https://www.chess.com/game/live/78075653363"
  },
  {
-  "id": "143006353122-38",
-  "fen": "2k3nr/ppq1rpp1/2pb2p1/4p1P1/4B3/1P3Q1P/PBPP1PK1/R3R3 w - - 1 20",
-  "lastMove": {
-   "from": "h6",
-   "to": "g8",
-   "san": "Ng8"
-  },
-  "solution": "d4",
-  "accepted": [
-   "d4",
-   "Rad1",
-   "Kf1",
-   "d3"
-  ],
-  "line": [
-   "d4",
-   "exd4",
-   "Bxd4",
-   "Qd7",
-   "Bc3"
-  ],
-  "motif": "quiet",
-  "mateIn": null,
-  "date": "2025-09-11",
-  "ownSide": true,
-  "played": "Bxe5",
-  "share": null,
-  "before": {
-   "fen": "2k4r/ppq1rpp1/2pb2pn/4p3/4B1P1/1P3Q1P/PBPP1PK1/R3R3 w - - 1 19",
-   "moves": [
-    "g5",
-    "Ng8"
-   ]
-  },
-  "game": "https://www.chess.com/game/live/143006353122"
- },
- {
   "id": "868463189-23",
   "fen": "r2qk2r/ppp2ppp/5n2/5bN1/1bB5/5Q2/PP1B1PPP/R3K2R b KQkq - 2 12",
   "lastMove": {
@@ -6916,7 +6843,8 @@
   },
   "solution": "Ba5+",
   "accepted": [
-   "Ba5+"
+   "Ba5+",
+   "Qxf3"
   ],
   "line": [
    "Ba5+",
@@ -8308,8 +8236,7 @@
   "solution": "Rh8+",
   "accepted": [
    "Rh8+",
-   "Bxc7",
-   "Rf3"
+   "Bxc7"
   ],
   "line": [
    "Rh8+",
@@ -8973,7 +8900,8 @@
   "accepted": [
    "a6+",
    "Bd6+",
-   "Bd4+"
+   "Bd4+",
+   "Qc6+"
   ],
   "line": [
    "a6+",
@@ -9496,7 +9424,9 @@
   },
   "solution": "Rxg4",
   "accepted": [
-   "Rxg4"
+   "Rxg4",
+   "g1=Q+",
+   "g1=R"
   ],
   "line": [
    "Rxg4",
