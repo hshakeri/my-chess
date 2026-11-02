@@ -146,4 +146,17 @@ test.describe('04. Personalized Diagnostics & Repertoire Recommendation (F13 - F
     }
     await expect(habits.locator('[data-habit="nothing_hung"]')).toContainText('review some games first');
   });
+
+  test('Your clock: games lost on time, the pace against the opponents, and the games lost on time while ahead (DC-3)', async ({ page }) => {
+    const view = page.locator('.diagnostics-view, [data-view="diagnostics"]').first();
+    await view.locator('[data-diag-tab="clock"]').click();
+    const clock = page.locator('[data-section="clock-panel"] [data-section="clock"]');
+    // The seed: 300 games at 10+0 with clock times; hoot65 lost 25 on time, the opponents 5
+    await expect(clock).toHaveAttribute('data-games', '300', { timeout: 15000 });
+    await expect(clock).toHaveAttribute('data-lost-on-time', '25');
+    await expect(clock).toHaveAttribute('data-won-on-time', '5');
+    await expect(clock.locator('[data-pace-move]')).toHaveCount(4);
+    await expect(clock.locator('[data-lost-ahead]')).toHaveCount(5);
+    await expect(clock.locator('[data-section="clock-advice"]')).toContainText('cap a think at 30 seconds');
+  });
 });

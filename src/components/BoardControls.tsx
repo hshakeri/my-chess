@@ -96,8 +96,8 @@ export const BoardControls: React.FC<BoardControlsProps> = ({
         </button>
       </div>
 
-      {/* Action buttons */}
-      <div className="flex items-center space-x-1">
+      {/* Action buttons (they wrap on the narrowest phones) */}
+      <div className="flex flex-wrap items-center gap-1">
         {/* Flip Orientation */}
         <button
           type="button"
@@ -154,7 +154,7 @@ export const BoardControls: React.FC<BoardControlsProps> = ({
           data-action="new-game"
           title="Start fresh game"
           onClick={onNewGame}
-          className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded bg-emerald-600 hover:bg-emerald-500 text-white transition-colors shadow-sm ml-1"
+          className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded bg-emerald-600 hover:bg-emerald-500 text-white transition-colors shadow-sm"
         >
           <PlusCircle className="w-3.5 h-3.5" />
           <span>New Game</span>

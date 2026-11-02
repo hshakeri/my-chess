@@ -16,6 +16,7 @@ import {
   Play,
   Info,
   ListChecks,
+  Timer,
 } from 'lucide-react';
 import { StoredGame } from '../types/db';
 import {
@@ -34,6 +35,7 @@ import {
 import { Chessboard, BoardArrow } from '../components/Chessboard';
 import { RulesEngine } from '../engine/rules';
 import { MistakePatternsPanel } from './MistakePatternsPanel';
+import { ClockPanel } from './ClockPanel';
 
 interface DiagnosticsViewProps {
   /** The games to analyze (the live IndexedDB archive in the app). */
@@ -92,7 +94,7 @@ export const DiagnosticsView: React.FC<DiagnosticsViewProps> = ({
   onAdoptRepertoire,
   adoptedRepertoireIds = [],
 }) => {
-  const [activeTab, setActiveTab] = useState<'leaks' | 'repertoires' | 'openings' | 'mistakes'>('leaks');
+  const [activeTab, setActiveTab] = useState<'leaks' | 'repertoires' | 'openings' | 'mistakes' | 'clock'>('leaks');
   const [leakFilter, setLeakFilter] = useState<'all' | 'white' | 'black' | string>('all');
   const [selectedRepColor, setSelectedRepColor] = useState<'white' | 'black'>('white');
   const [selectedLineId, setSelectedLineId] = useState<string>('white-scandi-refutation');
@@ -200,16 +202,16 @@ export const DiagnosticsView: React.FC<DiagnosticsViewProps> = ({
   const totalLeaks = report.whiteStats.keyLeaks.length + report.blackStats.keyLeaks.length;
 
   return (
-    <div className="diagnostics-view max-w-7xl mx-auto px-4 py-8 space-y-8 text-slate-100" data-view="diagnostics">
+    <div className="diagnostics-view w-full min-w-0 max-w-7xl mx-auto px-0 sm:px-4 py-4 sm:py-8 space-y-6 sm:space-y-8 text-slate-100" data-view="diagnostics">
       {/* 1. Header Profile Banner */}
-      <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 border border-indigo-500/30 rounded-2xl p-6 shadow-xl">
+      <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 border border-indigo-500/30 rounded-2xl p-4 sm:p-6 shadow-xl">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-2">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-400/20 text-indigo-300 text-xs font-semibold tracking-wide uppercase">
               <Sparkles className="w-3.5 h-3.5" />
               Computed from your Chess.com game archive
             </div>
-            <h1 className="text-3xl font-bold tracking-tight text-white flex items-center gap-3">
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white flex flex-wrap items-center gap-x-3">
               Personalized Diagnostics: <span className="text-indigo-400">hoot65</span>
             </h1>
             <p className="text-slate-400 text-sm max-w-2xl">
@@ -219,17 +221,17 @@ export const DiagnosticsView: React.FC<DiagnosticsViewProps> = ({
             </p>
           </div>
 
-          <div className="flex items-center gap-4 bg-slate-900/60 p-4 rounded-xl border border-slate-800">
-            <div className="text-center px-3 border-r border-slate-800">
+          <div className="flex items-center gap-1 sm:gap-4 bg-slate-900/60 p-3 sm:p-4 rounded-xl border border-slate-800">
+            <div className="text-center px-1.5 sm:px-3 border-r border-slate-800">
               <div className="text-2xl font-black text-white" data-stat="games-analyzed">{report.totalGamesAnalyzed}</div>
               <div className="text-xs text-slate-400 uppercase tracking-wider">Games Analyzed</div>
             </div>
-            <div className="text-center px-3 border-r border-slate-800">
+            <div className="text-center px-1.5 sm:px-3 border-r border-slate-800">
               <div className="text-2xl font-black text-emerald-400">{pct(report.whiteStats.winRate)}</div>
               <div className="text-xs text-slate-400 uppercase tracking-wider">White Win Rate</div>
               <div className="text-[10px] text-slate-500">score; draws count half</div>
             </div>
-            <div className="text-center px-3">
+            <div className="text-center px-1.5 sm:px-3">
               <div className="text-2xl font-black text-amber-400">{pct(report.blackStats.winRate)}</div>
               <div className="text-xs text-slate-400 uppercase tracking-wider">Black Win Rate</div>
               <div className="text-[10px] text-slate-500">score; draws count half</div>
@@ -317,10 +319,26 @@ export const DiagnosticsView: React.FC<DiagnosticsViewProps> = ({
           <ListChecks className="w-4 h-4 text-amber-400" />
           Your Mistake Patterns
         </button>
+
+        <button
+          data-diag-tab="clock"
+          onClick={() => setActiveTab('clock')}
+          className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${
+            activeTab === 'clock'
+              ? 'bg-sky-500/10 text-sky-300 border border-sky-500/30 shadow-sm'
+              : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
+          }`}
+        >
+          <Timer className="w-4 h-4 text-sky-400" />
+          Your Clock
+        </button>
       </div>
 
       {/* The game reviews, counted (CL-3) */}
       {activeTab === 'mistakes' && <MistakePatternsPanel games={games} />}
+
+      {/* Your clock (DC-3) */}
+      {activeTab === 'clock' && <ClockPanel games={games} />}
 
       {/* 3. Leaks Tab */}
       {activeTab === 'leaks' && (
@@ -721,7 +739,7 @@ export const DiagnosticsView: React.FC<DiagnosticsViewProps> = ({
                 <p className="text-sm text-slate-400 mt-1">{activeRepertoire.description}</p>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 {onAdoptRepertoire && (
                   <button
                     onClick={() => onAdoptRepertoire(activeRepertoire)}
