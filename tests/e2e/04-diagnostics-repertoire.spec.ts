@@ -2,6 +2,8 @@ import { test, expect } from '@playwright/test';
 
 test.describe('04. Personalized Diagnostics & Repertoire Recommendation (F13 - F15)', () => {
   test.beforeEach(async ({ page }) => {
+    // These tests drive lesson moves; the board question before each move (CL-5) is tested on its own, with it on
+    await page.addInitScript(() => window.localStorage.setItem('my_chess_cct_gate', 'off'));
     await page.goto('/');
     const diagTab = page.locator('button:has-text("Opening Diagnostics"), button:has-text("Diagnostics"), [data-tab="diagnostics"]').first();
     await expect(diagTab).toBeVisible();

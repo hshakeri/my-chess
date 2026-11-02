@@ -5,6 +5,8 @@ test.describe('09. Tier 4 Real-World User Scenarios (Journeys 1 - 15)', () => {
   let unmocked: string[] = [];
 
   test.beforeEach(async ({ page }) => {
+    // These tests drive lesson moves; the board question before each move (CL-5) is tested on its own, with it on
+    await page.addInitScript(() => window.localStorage.setItem('my_chess_cct_gate', 'off'));
     // Every Chess.com request the tests do not mock is answered 404 and recorded, so no test reaches the live API
     unmocked = [];
     await page.route('https://api.chess.com/**', async (route) => {

@@ -33,6 +33,10 @@ import { StoredCard } from '../types/db';
 import { CardService, CardRating } from '../services/cards';
 import { canonicalFenKey } from '../services/fenKey';
 import { buildQueue, isGameCard, LearningSteps } from '../services/sessionQueue';
+import { questionBeforeDecision, type MicroQuestion } from '../services/microQuestions';
+import { logCct, readGateEnabled, writeGateEnabled } from '../services/cctLog';
+import { BoardQuestion, isRight, questionSquareStyles, type QuestionAnswer, type QuestionStatus } from '../components/BoardQuestion';
+import { WarmupPanel } from './WarmupPanel';
 
 type LessonPhase = 'line' | 'exercises' | 'complete';
 
@@ -233,6 +237,15 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
   const [coachArrows, setCoachArrows] = useState<BoardArrow[]>([]);
   const [coachHighlights, setCoachHighlights] = useState<BoardHighlight[]>([]);
 
+  // CL-5: a board question before each decision of the line (on unless switched off). The board waits
+  // for the answer; a wrong answer counts like a first hint in the decision's grade.
+  const [gateEnabled, setGateEnabled] = useState<boolean>(() => readGateEnabled());
+  const [gate, setGate] = useState<{ question: MicroQuestion; fen: string; picked: string[]; status: QuestionStatus; askedAt: number } | null>(null);
+  const [decisionTick, setDecisionTick] = useState(0);
+  const [warmupOpen, setWarmupOpen] = useState(false);
+  const lastOpponentMoveRef = useRef<{ fenBefore: string; san: string } | null>(null);
+  const gatePenaltyRef = useRef(0);
+
   // Hints and per-run performance
   const [hintLevel, setHintLevel] = useState<number>(0);
   const [attemptsThisDecision, setAttemptsThisDecision] = useState<number>(0);
@@ -379,6 +392,9 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
     decisionStartedAtRef.current = Date.now();
     firstWrongSanRef.current = null;
     setHintLevel(0); // a hint opened during the opponent's reply must not count against the next decision
+    gatePenaltyRef.current = 0;
+    setGate(null);
+    setDecisionTick((t) => t + 1);
   }, []);
 
   const playOpponentMoveIfNeeded = useCallback(
@@ -390,6 +406,7 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
       }
       setIsOpponentThinking(true);
       schedule(() => {
+        lastOpponentMoveRef.current = { fenBefore: game.getFen(), san: next.san };
         game.makeMove(next.san);
         setPosition(game.getPosition());
         setCurrentPlyIndex(plyIndex + 1);
@@ -414,9 +431,14 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
       const jumped = opts.path ? lineForPath(lesson, opts.path) : null;
       const startPly = jumped ? opts.path!.length : targetPly !== undefined ? targetPly : lesson.startPly ?? 0;
       const line = jumped ?? resolveLine(lesson, startPly, opts.vary ?? false);
+      // The move before the first decision, when the opponent made it, is what the first board question asks about
+      lastOpponentMoveRef.current = null;
       for (let i = 0; i < startPly && i < line.length; i++) {
+        const fenBefore = rules.getFen();
         rules.makeMove(line[i].san);
+        lastOpponentMoveRef.current = line[i].isUserMove ? null : { fenBefore, san: line[i].san };
       }
+      setGate(null);
       rulesRef.current = rules;
       setActiveLine(line);
       setPosition(rules.getPosition());
@@ -468,6 +490,48 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
   const isLessonComplete = phase === 'complete';
   const studentColor: 'w' | 'b' = currentLesson.targetColor === 'black' ? 'b' : 'w';
   const isStudentTurn = position.turn === studentColor || currentLesson.targetColor === 'both';
+
+  // ---- CL-5: the board question before a decision -----------------------------------------
+
+  const gateOpen = !!gate && gate.status === 'asking';
+
+  // Each decision of the line opens with a question about the position, while the switch is on
+  useEffect(() => {
+    if (decisionTick === 0 || !gateEnabled || phase !== 'line') return;
+    const fen = rulesRef.current.getFen();
+    const toMove = new Chess(fen).turn();
+    if (toMove !== studentColor && currentLesson.targetColor !== 'both') return;
+    try {
+      setGate({ question: questionBeforeDecision(fen, lastOpponentMoveRef.current), fen, picked: [], status: 'asking', askedAt: Date.now() });
+    } catch (err) {
+      console.warn('No board question for this position:', err);
+    }
+    // Asked once per decision: the tick is the decision
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [decisionTick]);
+
+  const pickGateSquare = useCallback((square: Square) => {
+    setGate((g) => (g && g.status === 'asking' ? { ...g, picked: g.picked.includes(square) ? g.picked.filter((x) => x !== square) : [...g.picked, square] } : g));
+  }, []);
+
+  const submitGate = (answer: QuestionAnswer) => {
+    if (!gate || gate.status !== 'asking') return;
+    const right = isRight(gate.question, answer);
+    const now = Date.now();
+    if (!right) gatePenaltyRef.current = 1;
+    logCct({ at: now, kind: gate.question.kind, correct: right, ms: now - gate.askedAt, source: 'lesson', fen: gate.fen, lessonId: currentLesson.id });
+    // The move's own time starts after the question, so answering it does not make the decision look slow
+    decisionStartedAtRef.current = now;
+    setGate({ ...gate, picked: Array.isArray(answer) ? answer : gate.picked, status: right ? 'right' : 'wrong' });
+  };
+
+  const toggleGate = (on: boolean) => {
+    setGateEnabled(on);
+    writeGateEnabled(on);
+    if (!on) setGate(null);
+    // Switched on in the middle of a decision: ask about the position on the board now
+    else if (phase === 'line' && isStudentTurn && !isOpponentThinking && !isRollingBack && !isLessonComplete) setDecisionTick((t) => t + 1);
+  };
 
   const lastMove = useMemo<{ from: Square; to: Square } | null>(() => {
     const history = rulesRef.current.getHistory();
@@ -618,8 +682,9 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
       setCorrectFeedback(`Correct! Great move! ${expected.annotation || ''}`.trim());
       setCoachArrows(expected.arrows || []);
       setCoachHighlights(expected.highlights || []);
-      const hintUsed = hintLevel;
+      const hintUsed = Math.max(hintLevel, gatePenaltyRef.current);
       setHintLevel(0);
+      setGate(null);
       setAttemptsThisDecision(0);
       setRunStats((s) => ({ ...s, decisions: s.decisions + 1 }));
       void recordDecisionReview(fenBefore, hintUsed);
@@ -1004,6 +1069,7 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
 
   return (
     <div className="lessons-view w-full max-w-7xl mx-auto flex flex-col gap-6" data-view="lessons">
+      {warmupOpen && <WarmupPanel onClose={() => setWarmupOpen(false)} />}
       {/* Header Banner */}
       <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-lg flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
@@ -1026,6 +1092,21 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
         </div>
 
         <div className="flex items-center gap-3 flex-wrap">
+          <button
+            type="button"
+            data-action="warmup"
+            onClick={() => setWarmupOpen(true)}
+            className="bg-slate-950/80 border border-sky-500/40 rounded-lg px-3 py-2 text-xs font-semibold text-sky-300 hover:bg-sky-950/40"
+            title="Two minutes of board-vision questions on positions from your own games"
+          >
+            Warm-up · 2 min
+          </button>
+
+          <label className="flex items-center gap-1.5 text-xs text-slate-300" title="Before each move of a line, answer one question about the position: what the last move attacks, what is undefended, or how many checks the opponent has">
+            <input type="checkbox" data-toggle="cct-gate" checked={gateEnabled} onChange={(e) => toggleGate(e.target.checked)} className="accent-sky-500" />
+            Board question before each move
+          </label>
+
           {/* Due queue */}
           <button
             type="button"
@@ -1313,6 +1394,10 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
             </div>
           </div>
 
+          {gate && phase === 'line' && !isLessonComplete && (
+            <BoardQuestion question={gate.question} fen={gate.fen} picked={gate.picked} status={gate.status} onSubmit={submitGate} />
+          )}
+
           {/* Board */}
           <div className="flex flex-col items-center">
             <div className={`relative transition-transform duration-200 ${isShaking ? 'animate-shake' : ''}`}>
@@ -1321,8 +1406,10 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
                 position={position}
                 orientation={studentColor}
                 lastMove={lastMove}
-                interactive={!isLessonComplete && !isOpponentThinking && !isRollingBack && !isLineHold && (phase !== 'line' || isStudentTurn)}
+                interactive={!isLessonComplete && !isOpponentThinking && !isRollingBack && !isLineHold && !gateOpen && (phase !== 'line' || isStudentTurn)}
                 onMove={handleBoardMove}
+                onSquarePick={gateOpen && gate && gate.question.kind !== 'checks' && gate.question.kind !== 'safe' ? pickGateSquare : undefined}
+                customSquareStyles={gate ? questionSquareStyles(gate.question, gate.picked, gate.status) : undefined}
                 getLegalMovesForSquare={(sq) => rulesRef.current.getLegalMovesForSquare(sq)}
                 arrows={boardArrows}
                 highlights={boardHighlights}

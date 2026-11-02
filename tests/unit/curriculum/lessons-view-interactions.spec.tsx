@@ -55,6 +55,8 @@ describe('LessonsView interactions (jsdom)', () => {
     await CardService.resetAll();
     try {
       window.localStorage.clear();
+      // These tests drive the moves; the board question before each move (CL-5) has its own tests, which switch it on
+      window.localStorage.setItem('my_chess_cct_gate', 'off');
     } catch {
       // ignore
     }
@@ -240,5 +242,63 @@ describe('LessonsView interactions (jsdom)', () => {
     expect(document.querySelector('[data-section="drill-next"]')?.textContent).toMatch(/Position 1 of 12/);
     fireEvent.click(document.querySelector('button[data-action="next-drill"]') as HTMLButtonElement);
     await waitFor(() => expect(document.querySelector(`[data-lesson-id="${second.id}"]`)?.className).toMatch(/border-emerald-500/));
+  });
+  it('a board question comes before the move: the board waits for the answer, and the right answer leaves the grade alone (CL-5)', async () => {
+    window.localStorage.setItem('my_chess_cct_gate', 'on');
+    render(<LessonsView initialLessonId="lesson-scandinavian-refutation-drill" />);
+    // The drill starts after 1.e4 d5: the question asks what 1...d5 attacks, which is no piece (pawns don't count)
+    const question = await waitFor(() => {
+      const el = document.querySelector('[data-section="board-question"]');
+      expect(el).toBeTruthy();
+      return el as HTMLElement;
+    });
+    expect(question.getAttribute('data-question-kind')).toBe('attacks');
+    expect(question.textContent).toContain('which of your pieces does d5 attack?');
+
+    // Until it is answered the board takes no move
+    clickMove('e4', 'd5');
+    await new Promise((r) => setTimeout(r, 300));
+    expect(sq('e4').querySelector('img[alt="White p"]')).toBeTruthy();
+    expect(reviewLog()).toEqual([]);
+
+    fireEvent.click(document.querySelector('button[data-action="question-none"]')!);
+    await waitFor(() => expect(document.querySelector('[data-section="board-question"]')?.getAttribute('data-question-status')).toBe('right'));
+    expect(document.querySelector('[data-question-feedback]')?.textContent).toContain('It attacks none of your pieces.');
+
+    clickMove('e4', 'd5');
+    await waitFor(() => expect(reviewLog()).toEqual(['good']));
+    expect(JSON.parse(window.localStorage.getItem('my_chess_cct_log_v1') || '[]')).toMatchObject([{ kind: 'attacks', correct: true, source: 'lesson' }]);
+  });
+
+  it('a wrong answer shows the answer on the board and counts like a hint: the decision is rated Hard (CL-5)', async () => {
+    window.localStorage.setItem('my_chess_cct_gate', 'on');
+    render(<LessonsView initialLessonId="lesson-stalemate-catastrophes" />);
+    // No opponent move before the first decision: which of your pieces has no defender? The queen on d6.
+    const question = await waitFor(() => {
+      const el = document.querySelector('[data-section="board-question"]');
+      expect(el?.getAttribute('data-question-kind')).toBe('undefended');
+      return el as HTMLElement;
+    });
+    expect(question).toBeTruthy();
+    // Pick the king instead, and answer
+    fireEvent.click(sq('b6'));
+    fireEvent.click(document.querySelector('button[data-action="question-done"]')!);
+    await waitFor(() => expect(document.querySelector('[data-section="board-question"]')?.getAttribute('data-question-status')).toBe('wrong'));
+    expect(sq('d6').className).toContain('ring-emerald-400');
+    expect(sq('b6').className).toContain('ring-rose-500');
+
+    clickMove('d6', 'd8');
+    await waitFor(() => expect(reviewLog()).toEqual(['hard']));
+  });
+
+  it('the switch turns the question off and remembers it', async () => {
+    window.localStorage.setItem('my_chess_cct_gate', 'on');
+    render(<LessonsView initialLessonId="lesson-stalemate-catastrophes" />);
+    await waitFor(() => expect(document.querySelector('[data-section="board-question"]')).toBeTruthy());
+    fireEvent.click(document.querySelector('input[data-toggle="cct-gate"]')!);
+    await waitFor(() => expect(document.querySelector('[data-section="board-question"]')).toBeNull());
+    expect(window.localStorage.getItem('my_chess_cct_gate')).toBe('off');
+    clickMove('d6', 'd8');
+    await waitFor(() => expect(reviewLog()).toEqual(['good']));
   });
 });

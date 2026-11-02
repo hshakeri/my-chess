@@ -49,6 +49,8 @@ export interface ChessboardProps {
   arrows?: BoardArrow[];
   /** Coaching square highlights drawn as an SVG overlay (first three are used). */
   highlights?: BoardHighlight[];
+  /** When set, a click on any square answers a board question (CL-5) instead of moving a piece. */
+  onSquarePick?: (square: Square) => void;
   className?: string;
 }
 
@@ -66,6 +68,7 @@ export const Chessboard: React.FC<ChessboardProps> = ({
   customSquareStyles = {},
   arrows = [],
   highlights = [],
+  onSquarePick,
   className = '',
 }) => {
   const overlayId = useId().replace(/:/g, '');
@@ -133,6 +136,10 @@ export const Chessboard: React.FC<ChessboardProps> = ({
   );
 
   const handleSquareClick = (square: Square) => {
+    if (onSquarePick) {
+      onSquarePick(square);
+      return;
+    }
     if (!interactive) return;
 
     const clickedPiece = pieceMap.get(square);

@@ -8,6 +8,8 @@ const gameDrills: { threat: GameDrill[]; free: GameDrill[]; hang: GameDrill[] } 
 
 test.describe('05. Interactive Lessons, Feedback Loops & Spaced Repetition (F16 - F18)', () => {
   test.beforeEach(async ({ page }) => {
+    // These tests drive lesson moves; the board question before each move (CL-5) is tested on its own, with it on
+    await page.addInitScript(() => window.localStorage.setItem('my_chess_cct_gate', 'off'));
     await page.goto('/');
     const lessonTab = page.locator('button:has-text("Interactive Lessons"), button:has-text("Lessons"), [data-tab="lessons"]').first();
     await expect(lessonTab).toBeVisible();
@@ -271,6 +273,53 @@ test.describe('05. Interactive Lessons, Feedback Loops & Spaced Repetition (F16 
     await expect(page.locator('[data-square="e4"] img[alt="White p"]')).toBeVisible({ timeout: 3000 });
     await expect(page.getByText(/Your turn: find Black/)).toBeVisible();
   });
+
+  test('With the switch on, a board question comes before each move: the board waits for the answer (CL-5)', async ({ page }) => {
+    await page.locator('input[data-toggle="cct-gate"]').check();
+    await page.locator('[data-lesson-id="lesson-scandinavian-refutation-drill"]').click();
+    const question = page.locator('[data-section="board-question"]');
+    await expect(question).toHaveAttribute('data-question-kind', 'attacks');
+    await expect(question).toContainText('which of your pieces does d5 attack?');
+
+    // The board waits for the answer
+    await page.locator('[data-square="e4"]').click();
+    await page.locator('[data-square="d5"]').click();
+    await expect(page.locator('[data-square="e4"] img[alt="White p"]')).toBeVisible();
+
+    // 1...d5 attacks only a pawn: the answer is Nothing
+    await question.locator('button[data-action="question-none"]').click();
+    await expect(question).toHaveAttribute('data-question-status', 'right');
+    await page.locator('[data-square="e4"]').click();
+    await page.locator('[data-square="d5"]').click();
+    await expect(page.locator('.correct-feedback')).toBeVisible();
+
+    // After the reply the next decision opens with a question about 2...Qxd5
+    await expect(question).toHaveAttribute('data-question-status', 'asking', { timeout: 5000 });
+    await expect(question).toContainText('Qxd5');
+  });
+
+  test('The two-minute warm-up asks board questions on positions from your games (CL-5)', async ({ page }) => {
+    await page.locator('button[data-action="warmup"]').click();
+    const modal = page.locator('[data-modal="warmup"]');
+    await expect(modal).toBeVisible();
+    const question = modal.locator('[data-section="board-question"]');
+    await expect(question).toHaveAttribute('data-question-status', 'asking', { timeout: 10000 });
+    // The kind of question is chosen at random: answer whichever it is
+    const kind = await question.getAttribute('data-question-kind');
+    expect(['knight', 'loose', 'safe']).toContain(kind);
+    if (kind === 'safe') await question.locator('button[data-answer="yes"]').click();
+    else if (kind === 'loose') await question.locator('button[data-action="question-none"]').click();
+    else {
+      await modal.locator('[data-square="a1"]').click();
+      await question.locator('button[data-action="question-done"]').click();
+    }
+    await expect(question).toHaveAttribute('data-question-status', /right|wrong/);
+    await expect(modal.locator('[data-warmup-score]')).toContainText('of 1 right so far');
+    await question.locator('button[data-action="question-next"]').click();
+    await expect(question).toHaveAttribute('data-question-status', 'asking');
+    await modal.locator('button[data-action="warmup-close"]').click();
+    await expect(modal).toHaveCount(0);
+  });
 });
 
 test.describe('05b. Lessons on a phone (iPhone viewport)', () => {
@@ -293,6 +342,11 @@ test.describe('05b. Lessons on a phone (iPhone viewport)', () => {
 
     await picker.selectOption('lesson-scandinavian-refutation-drill');
     await expect(page.locator('[data-square="d5"] img[alt="Black p"]')).toBeVisible();
+    // The board question before the move (CL-5, on by default) works by tapping too: 1...d5 attacks no piece
+    const question = page.locator('[data-section="board-question"]');
+    await expect(question).toHaveAttribute('data-question-kind', 'attacks');
+    await question.locator('button[data-action="question-none"]').tap();
+    await expect(question).toHaveAttribute('data-question-status', 'right');
     await page.locator('[data-square="e4"]').tap();
     await page.locator('[data-square="d5"]').tap();
     await expect(page.locator('.correct-feedback')).toBeVisible({ timeout: 5000 });
