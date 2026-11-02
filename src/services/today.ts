@@ -23,8 +23,11 @@ export interface TodayStep {
 export const WARMUP_ANSWERS = 5;
 /** Tactics positions that make a day's tactics, in one session or several. */
 export const TACTICS_PER_DAY = 10;
-/** Board questions and safety checks answered in games that make a day's game with the checks (about one game). */
-export const GAME_CHECKS = 10;
+/**
+ * Board questions and safety checks answered in games that make a day's game with the checks: with
+ * both switched on each move of the student's brings two, so about fifteen moves.
+ */
+export const GAME_CHECKS = 30;
 /** When today's session of cards was last finished (new cards are always waiting, so "none due" never comes). */
 export const SESSION_DONE_KEY = 'my_chess_session_done_v1';
 

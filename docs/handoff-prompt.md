@@ -243,7 +243,7 @@ Next: the roadmap below.
   solves in a row; a Worksheets sheet (also as "two moves ahead", a visualization format) and three
   lesson-book sheets. The Lessons header shows the
   day's routine (warm-up, due cards, ten tactics, plans, and a game with the Play tab's two checks,
-  ticked after ten answers in games) with each step ticked when done.
+  ticked after thirty answers in games) with each step ticked when done.
 - A full archive stays responsive (2026-11-02, checked on all 4,097 of hoot65's games): Diagnostics
   reads the openings in 1.6 s instead of 10.7 (each position and move parsed once for the archive),
   in slices between frames beyond 800 games; the Games tab filters in memory and draws 500 rows at a
