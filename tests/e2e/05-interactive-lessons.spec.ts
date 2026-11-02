@@ -472,6 +472,35 @@ test.describe('05. Interactive Lessons, Feedback Loops & Spaced Repetition (F16 
     await expect(page.locator('.correct-feedback').first()).toContainText('5.Nb5 attacks c7', { timeout: 10000 });
   });
 
+  test('Against 2...f6 as White: take on e5, and the queen check if the pawn takes back', async ({ page }) => {
+    await page.goto('/#/lesson/lesson-white-vs-damiano');
+    const move = async (from: string, to: string) => {
+      await page.locator(`[data-square="${from}"]`).click();
+      await page.locator(`[data-square="${to}"]`).click();
+    };
+    const yourTurn = page.getByText(/Your turn: find White/);
+    await expect(page.locator('[data-square="f6"] img[alt="Black p"]')).toBeVisible({ timeout: 5000 });
+    await expect(yourTurn).toBeVisible({ timeout: 5000 });
+    // Your move in both games: answered, then the knight takes
+    await move('f1', 'c4');
+    await expect(page.locator('.wrong-move-feedback, [data-feedback="wrong"]').first()).toContainText('3.Bc4 was your move', { timeout: 5000 });
+    await expect(page.locator('[data-square="f1"] img[alt="White b"]')).toBeVisible({ timeout: 8000 });
+    await expect(yourTurn).toBeVisible({ timeout: 8000 });
+    await move('f3', 'e5');
+    await expect(page.locator('[data-square="e7"] img[alt="Black q"]')).toBeVisible({ timeout: 5000 });
+    await expect(yourTurn).toBeVisible({ timeout: 5000 });
+    await move('e5', 'f3');
+    await expect(page.locator('[data-square="e4"] img[alt="Black q"]')).toBeVisible({ timeout: 5000 });
+    await expect(yourTurn).toBeVisible({ timeout: 5000 });
+    await move('f1', 'e2');
+    // The exercise: 3...fxe5?? and the two queen checks
+    await expect(page.locator('[data-square="f3"] img')).toHaveCount(0, { timeout: 10000 });
+    await move('d1', 'h5');
+    await expect(page.locator('[data-square="e7"] img[alt="Black k"]')).toBeVisible({ timeout: 5000 });
+    await move('h5', 'e5');
+    await expect(page.locator('.correct-feedback').first()).toContainText('4.Qh5+ Ke7 5.Qxe5+', { timeout: 10000 });
+  });
+
   test('Black-perspective lessons play the opponent\'s first move for the student', async ({ page }) => {
     await page.locator('[data-course="pattern-library"]').click();
     await page.locator('[data-lesson-id="lesson-siberian-trap"]').click();

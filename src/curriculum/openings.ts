@@ -1013,11 +1013,111 @@ export const nimzowitschForWhiteLesson: CurriculumLesson = buildVerifiedLesson({
   ],
 });
 
+/**
+ * White against 2...f6, the Damiano: the pawn leaves e5 with one defender and opens the e8-h5
+ * diagonal. Evaluations are Stockfish 19's at depth 20; the counts are the seed games'.
+ */
+export const damianoForWhiteLesson: CurriculumLesson = buildVerifiedLesson({
+  id: 'lesson-white-vs-damiano',
+  title: 'Against 2...f6 as White',
+  subtitle: 'From your two games against it',
+  category: 'opening',
+  sourceBook: 'Chess.com Live Archive',
+  author: 'hoot65 Diagnostic Analysis',
+  publicationYear: 2026,
+  eco: 'C40',
+  targetColor: 'white',
+  targetRatingBand: 'beginner',
+  relevance: 'core',
+  startPly: 4,
+  description:
+    '2...f6 came up in 2 of your White games, and you lost both after 3.Bc4. The move defends e5 with the f-pawn alone and opens the diagonal from h5 to the king on e8, so the knight can take on e5 at once: if the pawn takes back, the queen checks on h5 and comes to e5 with another check.',
+  thematicObjective: '3.Nxe5! Against 3...fxe5?? 4.Qh5+ and 5.Qxe5+; against 3...Qe7, retreat with 4.Nf3, and after 4...Qxe4+ block with 5.Be2.',
+  keyTacticalMotif: 'The queen check on h5 along the diagonal the f-pawn opened',
+  moves: [
+    { san: 'e4', isUserMove: true },
+    { san: 'e5', isUserMove: false },
+    { san: 'Nf3', isUserMove: true },
+    // After 2.Nf3: 2...Nc6 53, 2...d6 12, 2...f6 2, and one game each of 2...Nf6, 2...d5, 2...Qf6, 2...Bc5.
+    { san: 'f6', isUserMove: false, frequency: 2, annotation: 'The f-pawn defends e5 and opens the diagonal from h5 to e8.' },
+    {
+      san: 'Nxe5',
+      isUserMove: true,
+      annotation: 'Take: the pawn that would take back opens the king to a queen check.',
+      hintTheme: 'Take the pawn',
+      wrongMoveFeedback: {
+        Bc4: '3.Bc4 was your move in both of these games, and you lost both. It is a good move (Stockfish +1.9), but 3.Nxe5! is stronger (+2.3).',
+      },
+    },
+    {
+      san: 'Qe7',
+      isUserMove: false,
+      annotation: 'The best defence: the queen attacks the knight, and behind it the e4 pawn.',
+      alternatives: {
+        fxe5: [
+          { san: 'Qh5+', isUserMove: true, annotation: 'Check along the diagonal the f-pawn opened.', hintTheme: 'Check on the open diagonal' },
+          {
+            san: 'Ke7',
+            isUserMove: false,
+            alternatives: {
+              g6: [
+                { san: 'Qxe5+', isUserMove: true, annotation: 'Check, and the queen attacks the rook on h8.' },
+              ],
+            },
+          },
+          { san: 'Qxe5+', isUserMove: true, annotation: 'Check again: the king is driven up the board.' },
+          { san: 'Kf7', isUserMove: false },
+          { san: 'Bc4+', isUserMove: true, annotation: 'The bishop joins with check; Stockfish rates White about five pawns ahead.' },
+        ],
+      },
+    },
+    {
+      san: 'Nf3',
+      isUserMove: true,
+      annotation: 'Retreat: the knight is safe on f3.',
+      hintTheme: 'Save the knight',
+      wrongMoveFeedback: {
+        'Qh5+': '4.Qh5+?? g6 5.Nxg6 Qxe4+! 6.Be2 Qxg6: the check on e4 frees the queen to take the knight on g6.',
+      },
+    },
+    {
+      san: 'Qxe4+',
+      isUserMove: false,
+      annotation: 'The queen takes the pawn with check.',
+      alternatives: {
+        d5: [
+          { san: 'd3', isUserMove: true, annotation: 'Hold e4 with a pawn and open the bishop\'s diagonal.', accept: { san: ['Be2', 'Nc3'] } },
+        ],
+      },
+    },
+    {
+      san: 'Be2',
+      isUserMove: true,
+      annotation: 'Block with a developing move: Black\'s queen has moved twice, and the king is still on e8.',
+    },
+  ],
+  exercises: [
+    {
+      id: 'ex-white-damiano-qh5',
+      title: 'The Pawn Takes Back',
+      // 1.e4 e5 2.Nf3 f6 3.Nxe5 fxe5??
+      fen: 'rnbqkbnr/pppp2pp/8/4p3/4P3/8/PPPP1PPP/RNBQKB1R w KQkq - 0 4',
+      turn: 'w',
+      difficultyRating: 2,
+      prompt: 'White to play. Black has taken the knight on e5. What does White play?',
+      solutionSan: ['Qh5+', 'Ke7', 'Qxe5+'],
+      explanation:
+        '4.Qh5+ Ke7 5.Qxe5+: the queen checks along the diagonal the f-pawn opened and takes e5 with another check, and the king is driven up the board (5...Kf7 6.Bc4+). After 4...g6 instead, 5.Qxe5+ checks and attacks the rook on h8.',
+    },
+  ],
+});
+
 export const openingLessons: CurriculumLesson[] = [
   scotchGambitBreakthrough,
   evansGambitDestruction,
   twoKnightsD4Lesson,
   caroKannForWhiteLesson,
   nimzowitschForWhiteLesson,
+  damianoForWhiteLesson,
   adamsAttackSicilian,
 ];

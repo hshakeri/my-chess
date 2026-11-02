@@ -16,9 +16,9 @@ also runs on every push to another branch).
 
 - React 18 + Vite 6 + TypeScript (strict) + Tailwind; chess.js 1.4; Dexie 4 (IndexedDB); ts-fsrs 5
   for scheduling; maia3-js + onnxruntime-web in a Web Worker for the human-like engine.
-- Tests: Vitest (`npm test`, 506 tests: SSR `renderToString` specs, jsdom interaction specs under
+- Tests: Vitest (`npm test`, 512 tests: SSR `renderToString` specs, jsdom interaction specs under
   `tests/unit/curriculum/lessons-view-interactions.spec.tsx`, fake-indexeddb for the database) and
-  Playwright (`npm run test:e2e`, 110 tests incl. iPhone-viewport tests). Keep both green or update
+  Playwright (`npm run test:e2e`, 111 tests incl. iPhone-viewport tests). Keep both green or update
   tests deliberately and say why. The board question before each lesson move (CL-5) is on by default:
   a test that plays lesson moves either answers it or sets localStorage `my_chess_cct_gate` to `off`
   first (`page.addInitScript` in e2e, the jsdom spec's beforeEach). No `if (await ...isVisible())` guards in specs: a missing control
@@ -159,7 +159,7 @@ Compromised Defence plays 9.Bg5; the Konikowski 9.Bf4 and the Elephant 7.Nxf6+ a
   start on a back (rendering again after each), fills in the page numbers (contents and each chapter's pointer to its
   practice), renders the book, and fails if any sheet is not a front page followed by its answers.
   88 US Letter pages, 26 sheets (the four drill sheets, three tactics sheets at the end of Part I,
-  nineteen practice sheets), 485 answers. Diagrams are SVG drawings with the app's
+  nineteen practice sheets), 494 answers. Diagrams are SVG drawings with the app's
   piece set (`public/pieces`); the fonts are Times New Roman and Arial, whose metric twins Liberation
   Serif and Sans the Linux runner has, so pages break the same way there. All text is black and dark
   squares are a light grey.
@@ -265,7 +265,8 @@ Next: the roadmap below.
   "Against the Caro-Kann as White" (`lesson-white-vs-caro-kann`, 2.Nc3 d5 3.Nf3, the largest gap in
   the last year's 475 games), in the group on the Caro-Kann bishop, and "Caro-Kann vs 2.f4"
   (`lesson-black-caro-vs-f4`; hoot65 lost all six archive games against it), in the same group, and
-  "Against 1...Nc6 as White" (`lesson-white-vs-nimzowitsch`), in the group on the king in the centre. Every
+  "Against 1...Nc6 as White" (`lesson-white-vs-nimzowitsch`) and "Against 2...f6 as White"
+  (`lesson-white-vs-damiano`), in the group on the king in the centre. Every
   stated fact is replayed in `tests/unit/curriculum/caro-*.spec.ts`, `two-knights-d4.spec.ts` and
   `white-vs-caro.spec.ts`.
   Other gaps that analysis showed, by seed games: 1.e4 e6 (10), 1.e4 g6 (7), 1.e4 Nc6 (5) as White
