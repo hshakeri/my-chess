@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useRef, useCallback, useDeferredValue } from 'react';
 import { Chess } from 'chess.js';
 import {
   Upload,
@@ -21,9 +21,9 @@ import {
   AlertCircle,
   CheckCircle2,
 } from 'lucide-react';
-import { gamesRepo } from '../db/gamesRepo';
+import { gamesRepo, filterGameList } from '../db/gamesRepo';
 import { syncPlayerGames, type SyncProgress } from '../services/chesscom';
-import type { StoredGame, GameFilter } from '../types/db';
+import type { StoredGame } from '../types/db';
 import { ChessPiece } from '../components/ChessPiece';
 import { GameReviewPanel } from './GameReviewPanel';
 import seedGamesRaw from '../data/seed_hoot65_games.json';
@@ -38,8 +38,14 @@ interface DatabaseViewProps {
   openGame?: { id: string; seq: number };
 }
 
+// Rows drawn at once, and added by "Show more": a full archive is thousands of games, and drawing every
+// row froze the tab for over half a second
+export const ROWS_AT_ONCE = 500;
+const DATE_FORMAT = new Intl.DateTimeFormat(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+
 export const DatabaseView: React.FC<DatabaseViewProps> = ({ onSpar, openGame }) => {
-  const [games, setGames] = useState<StoredGame[]>([]);
+  // The whole archive, read once and again after each change to it; the filters work on it in memory
+  const [allGames, setAllGames] = useState<StoredGame[]>([]);
   const [loading, setLoading] = useState(true);
   const [totalDbCount, setTotalDbCount] = useState(0);
 
@@ -69,7 +75,7 @@ export const DatabaseView: React.FC<DatabaseViewProps> = ({ onSpar, openGame }) 
     return () => {
       alive = false;
     };
-  }, [openGame?.id, openGame?.seq, games]);
+  }, [openGame?.id, openGame?.seq, allGames]);
   const [isSyncing, setIsSyncing] = useState(false);
   const [syncProgress, setSyncProgress] = useState<SyncProgress | null>(null);
   const [showUploadModal, setShowUploadModal] = useState(false);
@@ -84,26 +90,17 @@ export const DatabaseView: React.FC<DatabaseViewProps> = ({ onSpar, openGame }) 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const jsonImportRef = useRef<HTMLInputElement>(null);
 
-  // Load games from IndexedDB with current filters
-  const loadFilteredGames = useCallback(async () => {
-    setLoading(true);
+  const reloadGames = useCallback(async () => {
     try {
-      const activeFilter: GameFilter = {
-        color: filterColor,
-        result: filterResult,
-        timeClass: filterTimeClass,
-        search: searchQuery,
-      };
-      const filtered = await gamesRepo.filterGames(activeFilter);
-      setGames(filtered);
-      const total = await gamesRepo.getGamesCount();
-      setTotalDbCount(total);
+      const all = await gamesRepo.getAllGames();
+      setAllGames(all);
+      setTotalDbCount(all.length);
     } catch (err) {
       console.error('Failed to load games:', err);
     } finally {
       setLoading(false);
     }
-  }, [filterColor, filterResult, filterTimeClass, searchQuery]);
+  }, []);
 
   // Initial load and seed if empty
   useEffect(() => {
@@ -116,16 +113,20 @@ export const DatabaseView: React.FC<DatabaseViewProps> = ({ onSpar, openGame }) 
       } catch (err) {
         console.error('Error during initial DB seed check:', err);
       } finally {
-        loadFilteredGames();
+        await reloadGames();
       }
     }
     initialize();
-  }, [loadFilteredGames]);
+  }, [reloadGames]);
 
-  // Re-fetch whenever filters change
-  useEffect(() => {
-    loadFilteredGames();
-  }, [loadFilteredGames]);
+  // Typing in the search box stays quick: the list follows at a lower priority
+  const search = useDeferredValue(searchQuery);
+  const games = useMemo(
+    () => filterGameList(allGames, { color: filterColor, result: filterResult, timeClass: filterTimeClass, search }),
+    [allGames, filterColor, filterResult, filterTimeClass, search]
+  );
+  const [rowsShown, setRowsShown] = useState(ROWS_AT_ONCE);
+  useEffect(() => setRowsShown(ROWS_AT_ONCE), [filterColor, filterResult, filterTimeClass, search]);
 
   // Summary statistics
   const stats = useMemo(() => {
@@ -150,7 +151,7 @@ export const DatabaseView: React.FC<DatabaseViewProps> = ({ onSpar, openGame }) 
         username: 'hoot65',
         onProgress: (p) => setSyncProgress(p),
       });
-      await loadFilteredGames();
+      await reloadGames();
       setFeedbackModal({
         type: 'success',
         title: 'Chess.com Sync Complete',
@@ -174,7 +175,7 @@ export const DatabaseView: React.FC<DatabaseViewProps> = ({ onSpar, openGame }) 
     if (!pgnContent.trim()) return;
     try {
       const res = await gamesRepo.importPgnText(pgnContent, 'hoot65');
-      await loadFilteredGames();
+      await reloadGames();
       setShowUploadModal(false);
       setPastedPgn('');
       setFeedbackModal({
@@ -253,7 +254,7 @@ export const DatabaseView: React.FC<DatabaseViewProps> = ({ onSpar, openGame }) 
       try {
         const text = event.target?.result as string;
         const res = await gamesRepo.importDatabaseJson(text);
-        await loadFilteredGames();
+        await reloadGames();
         setFeedbackModal({
           type: 'success',
           title: 'Database Import Complete',
@@ -538,18 +539,12 @@ export const DatabaseView: React.FC<DatabaseViewProps> = ({ onSpar, openGame }) 
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/60">
-                {games.map((game) => {
+                {games.slice(0, rowsShown).map((game) => {
                   const isUserWhite = game.userColor === 'white';
                   const opponentName = isUserWhite ? game.black.name : game.white.name;
                   const opponentRating = isUserWhite ? game.black.rating : game.white.rating;
                   const userRating = isUserWhite ? game.white.rating : game.black.rating;
-                  const dateStr = game.timestamp
-                    ? new Date(game.timestamp).toLocaleDateString(undefined, {
-                        year: 'numeric',
-                        month: 'short',
-                        day: 'numeric',
-                      })
-                    : 'Unknown';
+                  const dateStr = game.timestamp ? DATE_FORMAT.format(game.timestamp) : 'Unknown';
 
                   return (
                     <tr
@@ -653,6 +648,16 @@ export const DatabaseView: React.FC<DatabaseViewProps> = ({ onSpar, openGame }) 
                 })}
               </tbody>
             </table>
+            {games.length > rowsShown && (
+              <button
+                type="button"
+                data-action="more-games"
+                onClick={() => setRowsShown((n) => n + ROWS_AT_ONCE)}
+                className="w-full py-3 text-sm text-emerald-300 hover:text-white hover:bg-slate-800/60 border-t border-slate-800"
+              >
+                Show {Math.min(ROWS_AT_ONCE, games.length - rowsShown)} more ({games.length - rowsShown} not shown)
+              </button>
+            )}
           </div>
         )}
       </div>

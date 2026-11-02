@@ -244,40 +244,7 @@ export class GamesRepository {
    * Search and filter stored games
    */
   async filterGames(filter: GameFilter): Promise<StoredGame[]> {
-    let all = await this.getAllGames();
-
-    if (filter.color && filter.color !== 'all') {
-      all = all.filter((g) => g.userColor === filter.color);
-    }
-
-    if (filter.result && filter.result !== 'all') {
-      all = all.filter((g) => g.userResult === filter.result);
-    }
-
-    if (filter.timeClass && filter.timeClass !== 'all') {
-      all = all.filter((g) => (g.timeClass || '').toLowerCase() === filter.timeClass?.toLowerCase());
-    }
-
-    if (filter.startDate) {
-      all = all.filter((g) => g.timestamp >= filter.startDate!);
-    }
-
-    if (filter.endDate) {
-      all = all.filter((g) => g.timestamp <= filter.endDate!);
-    }
-
-    if (filter.search && filter.search.trim()) {
-      const q = filter.search.trim().toLowerCase();
-      all = all.filter((g) => {
-        const white = (g.white?.name || '').toLowerCase();
-        const black = (g.black?.name || '').toLowerCase();
-        const eco = (g.eco || '').toLowerCase();
-        const opening = (g.openingName || '').toLowerCase();
-        return white.includes(q) || black.includes(q) || eco.includes(q) || opening.includes(q);
-      });
-    }
-
-    return all;
+    return filterGameList(await this.getAllGames(), filter);
   }
 
   /**
@@ -485,3 +452,41 @@ export class GamesRepository {
 }
 
 export const gamesRepo = new GamesRepository();
+
+/** The games that pass a filter (see GameFilter), in their order: the Games tab filters the archive it holds with it. */
+export function filterGameList(games: StoredGame[], filter: GameFilter): StoredGame[] {
+  let all = games;
+
+  if (filter.color && filter.color !== 'all') {
+    all = all.filter((g) => g.userColor === filter.color);
+  }
+
+  if (filter.result && filter.result !== 'all') {
+    all = all.filter((g) => g.userResult === filter.result);
+  }
+
+  if (filter.timeClass && filter.timeClass !== 'all') {
+    all = all.filter((g) => (g.timeClass || '').toLowerCase() === filter.timeClass?.toLowerCase());
+  }
+
+  if (filter.startDate) {
+    all = all.filter((g) => g.timestamp >= filter.startDate!);
+  }
+
+  if (filter.endDate) {
+    all = all.filter((g) => g.timestamp <= filter.endDate!);
+  }
+
+  if (filter.search && filter.search.trim()) {
+    const q = filter.search.trim().toLowerCase();
+    all = all.filter((g) => {
+      const white = (g.white?.name || '').toLowerCase();
+      const black = (g.black?.name || '').toLowerCase();
+      const eco = (g.eco || '').toLowerCase();
+      const opening = (g.openingName || '').toLowerCase();
+      return white.includes(q) || black.includes(q) || eco.includes(q) || opening.includes(q);
+    });
+  }
+
+  return all;
+}
