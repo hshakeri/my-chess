@@ -16,7 +16,7 @@ also runs on every push to another branch).
 
 - React 18 + Vite 6 + TypeScript (strict) + Tailwind; chess.js 1.4; Dexie 4 (IndexedDB); ts-fsrs 5
   for scheduling; maia3-js + onnxruntime-web in a Web Worker for the human-like engine.
-- Tests: Vitest (`npm test`, 393 tests: SSR `renderToString` specs, jsdom interaction specs under
+- Tests: Vitest (`npm test`, 395 tests: SSR `renderToString` specs, jsdom interaction specs under
   `tests/unit/curriculum/lessons-view-interactions.spec.tsx`, fake-indexeddb for the database) and
   Playwright (`npm run test:e2e`, 89 tests incl. iPhone-viewport tests). Keep both green or update
   tests deliberately and say why. The board question before each lesson move (CL-5) is on by default:
@@ -198,7 +198,8 @@ Next: the roadmap below.
   of the lesson book.
 - DC-8 first slice done (2026-11-01): a Progress panel in the Lessons header (cards by state, recall
   today, the riskiest positions by `reachProb x (1 - recall)`, the moves mixed up, reviews due over
-  two weeks). Next: the per-game habit scorecard.
+  two weeks), and a habit scorecard on the Diagnostics "Your Mistake Patterns" tab (castled by move
+  10, minor pieces out by move 10, queen kept home, nothing left hanging in reviewed games).
 - CL-7 visual coaching grammar.
 - DC-1 re-scoped curriculum content for the lines above (this is where the opening order applies).
 

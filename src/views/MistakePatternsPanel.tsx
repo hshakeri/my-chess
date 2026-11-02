@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { db } from '../db/database';
 import { reviewGame, type ReviewInput } from '../analytics/review';
 import { summarizeReviews, type MistakeSummary, type RateRow } from '../analytics/mistakePatterns';
+import { summarizeHabits, type HabitRow } from '../analytics/habits';
 import type { ReviewProgress } from '../engine/worker/engineClient';
 import { useEngineClient } from '../engine/EngineContext';
 import type { StoredGame } from '../types/db';
@@ -57,6 +58,48 @@ function RateTable<K extends string>({ title, rows, attr }: { title: string; row
     </div>
   );
 }
+
+const pct = (x: number | null) => (x === null ? '-' : `${Math.round(x * 100)}%`);
+
+/** The habit scorecard (DC-8): how often each habit held, lately, and the score with and without it. */
+export const HabitScorecard: React.FC<{ rows: HabitRow[] }> = ({ rows }) => (
+  <div className="space-y-2" data-section="habits">
+    <h4 className="text-xs font-semibold uppercase tracking-wide text-slate-400">Habits in your games</h4>
+    <p className="text-xs text-slate-400">How often each habit held, in all your games and in the newest 20, and your score in the games with it and without it.</p>
+    <table className="w-full text-sm text-slate-300">
+      <thead>
+        <tr className="text-xs text-slate-500 text-left">
+          <th className="font-normal py-1">Habit</th>
+          <th className="font-normal">Kept</th>
+          <th className="font-normal">Newest 20</th>
+          <th className="font-normal">Score with / without</th>
+        </tr>
+      </thead>
+      <tbody>
+        {rows.map((r) => (
+          <tr key={r.key} data-habit={r.key} data-rate={r.rate.toFixed(3)} className="border-t border-slate-800">
+            <td className="py-1 pr-2">{r.label}</td>
+            {r.games ? (
+              <>
+                <td className="font-mono text-xs">
+                  {pct(r.rate)} <span className="text-slate-500">of {r.games}</span>
+                </td>
+                <td className="font-mono text-xs">{pct(r.recentRate)}</td>
+                <td className="font-mono text-xs">
+                  {pct(r.scoreWith)} / {pct(r.scoreWithout)}
+                </td>
+              </>
+            ) : (
+              <td colSpan={3} className="text-xs text-slate-500">
+                No game yet{r.key === 'nothing_hung' ? ': review some games first' : ''}
+              </td>
+            )}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+);
 
 /** The summary of every reviewed game: mistakes per 100 moves by kind, phase, clock and month. */
 export const MistakeSummaryView: React.FC<{ summary: MistakeSummary }> = ({ summary }) => {
@@ -154,6 +197,7 @@ export const MistakePatternsPanel: React.FC<{ games: StoredGame[] }> = ({ games 
   }, [load]);
 
   const summary = useMemo(() => (reviews ? summarizeReviews(reviews, games) : null), [reviews, games]);
+  const habits = useMemo(() => summarizeHabits(games, reviews ?? []), [games, reviews]);
   const reviewedIds = useMemo(() => new Set((reviews ?? []).map((r) => r.gameId)), [reviews]);
   const waiting = useMemo(() => batchQueue(games, reviewedIds, Number.MAX_SAFE_INTEGER).length, [games, reviewedIds]);
 
@@ -252,6 +296,8 @@ export const MistakePatternsPanel: React.FC<{ games: StoredGame[] }> = ({ games 
             : `${waiting} of your games are not reviewed yet.`}
         </span>
       </div>
+
+      <HabitScorecard rows={habits} />
 
       {!summary && <p className="text-sm text-slate-400">Reading the reviews…</p>}
       {summary && summary.games === 0 && (

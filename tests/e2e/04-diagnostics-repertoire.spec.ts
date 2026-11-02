@@ -139,5 +139,11 @@ test.describe('04. Personalized Diagnostics & Repertoire Recommendation (F13 - F
     await expect(panel.locator('[data-batch-status]')).toHaveText(`${waiting} of your games are not reviewed yet.`, { timeout: 15000 });
     await expect(panel.locator('[data-action="batch-review"]')).toBeEnabled();
     await expect(panel.locator('select[data-select="batch-size"]')).toHaveValue('10');
+    // The habit scorecard reads the opening habits from every game; the board habit waits for reviews
+    const habits = panel.locator('[data-section="habits"]');
+    for (const key of ['castled', 'developed', 'queen_home']) {
+      await expect(habits.locator(`[data-habit="${key}"]`)).toHaveAttribute('data-rate', /^0\.\d{3}$/);
+    }
+    await expect(habits.locator('[data-habit="nothing_hung"]')).toContainText('review some games first');
   });
 });
