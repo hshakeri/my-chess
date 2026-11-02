@@ -96,7 +96,7 @@ describe('Curriculum Move Legality & Verification (chess.js)', () => {
     // the Konikowski lesson a 9...Bd7 branch (unobserved in the archive, so unweighted). The king and pawn
     // ending has the other way to give way, 1...Kc8 (an ending, so unweighted too). The Caro-Kann
     // lesson against 2.Bc4 (2026-11-02) branches on White's fourth and fifth moves, and the Exchange lesson on
-    // White's fourth and fifth, weighted from the seed.
+    // White's fourth and fifth, and the Two Knights lesson with 4.d4 on Black's fifth, weighted from the seed.
     expect([...lessonsWithBranches].sort()).toEqual([
       'lesson-alapin-sicilian-centre',
       'lesson-black-caro-bg4-timing',
@@ -114,6 +114,7 @@ describe('Curriculum Move Legality & Verification (chess.js)', () => {
       'lesson-king-pawn-opposition',
       'lesson-refuting-konikowski-gambit',
       'lesson-scandinavian-refutation-drill',
+      'lesson-two-knights-d4',
     ]);
   });
 

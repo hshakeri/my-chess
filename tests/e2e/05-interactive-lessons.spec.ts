@@ -343,6 +343,41 @@ test.describe('05. Interactive Lessons, Feedback Loops & Spaced Repetition (F16 
     await expect(page.locator('.correct-feedback').first()).toContainText('6...Nc6 blocks', { timeout: 10000 });
   });
 
+  test('Two Knights with 4.d4: castle, pin on the e-file, and take the defender on d5', async ({ page }) => {
+    await page.goto('/#/lesson/lesson-two-knights-d4');
+    const move = async (from: string, to: string) => {
+      await page.locator(`[data-square="${from}"]`).click();
+      await page.locator(`[data-square="${to}"]`).click();
+    };
+    const yourTurn = page.getByText(/Your turn: find White/);
+    // The drill starts after 4.d4 exd4
+    await expect(page.locator('[data-square="d4"] img[alt="Black p"]')).toBeVisible({ timeout: 5000 });
+    await expect(yourTurn).toBeVisible({ timeout: 5000 });
+    await move('e1', 'g1');
+    await expect(page.locator('[data-square="e4"] img[alt="Black n"]')).toBeVisible({ timeout: 5000 });
+    await expect(yourTurn).toBeVisible({ timeout: 5000 });
+    await move('f1', 'e1');
+    await expect(page.locator('[data-square="d5"] img[alt="Black p"]')).toBeVisible({ timeout: 5000 });
+    await expect(yourTurn).toBeVisible({ timeout: 5000 });
+    // Your move in both games: answered, and the position comes back
+    await move('f3', 'd4');
+    await expect(page.locator('.wrong-move-feedback, [data-feedback="wrong"]').first()).toContainText('7.Nxd4 was your move', { timeout: 5000 });
+    await expect(page.locator('[data-square="f3"] img[alt="White n"]')).toBeVisible({ timeout: 8000 });
+    await expect(yourTurn).toBeVisible({ timeout: 8000 });
+    await move('c4', 'd5');
+    await expect(page.locator('[data-square="d5"] img[alt="Black q"]')).toBeVisible({ timeout: 5000 });
+    await expect(yourTurn).toBeVisible({ timeout: 5000 });
+    await move('b1', 'c3');
+    await expect(page.locator('[data-square="a5"] img[alt="Black q"]')).toBeVisible({ timeout: 5000 });
+    await expect(yourTurn).toBeVisible({ timeout: 5000 });
+    await move('c3', 'e4');
+    // The exercise: the same position, without the line before it
+    await expect(page.locator('[data-square="c4"] img[alt="White b"]')).toBeVisible({ timeout: 10000 });
+    await expect(page.locator('[data-square="e4"] img[alt="Black n"]')).toBeVisible({ timeout: 10000 });
+    await move('c4', 'd5');
+    await expect(page.locator('.correct-feedback').first()).toContainText('7.Bxd5! takes the pawn', { timeout: 10000 });
+  });
+
   test('Black-perspective lessons play the opponent\'s first move for the student', async ({ page }) => {
     await page.locator('[data-course="pattern-library"]').click();
     await page.locator('[data-lesson-id="lesson-siberian-trap"]').click();

@@ -648,8 +648,122 @@ export const adamsAttackSicilian: CurriculumLesson = buildVerifiedLesson({
   ],
 });
 
+/**
+ * The Two Knights with 4.d4, the move hoot65 plays against 3...Nf6 (the Evans lesson's branch
+ * teaches 4.d3, so this drill starts after 4.d4 exd4 and the two never share a decision). Every
+ * evaluation quoted is Stockfish 19's at depth 20; the counts are the seed games'.
+ */
+export const twoKnightsD4Lesson: CurriculumLesson = buildVerifiedLesson({
+  id: 'lesson-two-knights-d4',
+  title: 'Two Knights with 4.d4: The Pin on the e-File',
+  subtitle: 'Castle first; then the rook on e1 looks at the king on e8',
+  category: 'opening',
+  sourceBook: 'Chess.com Live Archive',
+  author: 'hoot65 Diagnostic Analysis',
+  publicationYear: 2026,
+  eco: 'C55',
+  targetColor: 'white',
+  targetRatingBand: 'beginner',
+  relevance: 'core',
+  startPly: 8,
+  description:
+    'Against 3...Nf6 you played 4.d4 in 10 of your 12 games (5 points). After 4...exd4 5.O-O Black chose 5...Bc5 (3 games), 5...Nxe4 (2) or 5...d6 (2). Against 5...Bc5 and 5...Nxe4 your next move cost about a pawn, and against 5...d6 you lost both games after 6.Re1. With Black\'s king still on e8, the e-file decides: a rook on e1 pins a knight on e4, and a check on e1 comes first.',
+  thematicObjective:
+    'Against 5...Nxe4: 6.Re1 d5 7.Bxd5! Qxd5 8.Nc3 wins the piece back. Against 5...Bc5: 6.e5 d5 7.exf6 dxc4 8.Re1+. Against 5...d6: take the pawn back with 6.Nxd4.',
+  keyTacticalMotif: 'A knight on e4 pinned to the king by the rook on e1, attacked again by Nc3',
+  moves: [
+    { san: 'e4', isUserMove: true },
+    { san: 'e5', isUserMove: false },
+    { san: 'Nf3', isUserMove: true },
+    { san: 'Nc6', isUserMove: false },
+    { san: 'Bc4', isUserMove: true },
+    { san: 'Nf6', isUserMove: false },
+    { san: 'd4', isUserMove: true },
+    // After 4.d4: 4...exd4 7, 4...Bb4+ 1, 4...Bd6 1, 4...d5 1.
+    { san: 'exd4', isUserMove: false, frequency: 7 },
+    { san: 'O-O', isUserMove: true, annotation: 'Castle before taking back: the rook is ready for the e-file.', hintTheme: 'King to safety, rook to the centre' },
+    {
+      san: 'Nxe4',
+      isUserMove: false,
+      // After 5.O-O: 5...Bc5 3, 5...Nxe4 2, 5...d6 2.
+      frequency: 2,
+      alternatives: {
+        Bc5: [
+          {
+            san: 'e5',
+            isUserMove: true,
+            frequency: 3,
+            annotation: 'Hit the f6 knight at once.',
+            hintTheme: 'Gain time on the knight',
+            wrongMoveFeedback: {
+              b4: '6.b4 was your move in two of these games; Stockfish rates it about a pawn worse than 6.e5, which hits the f6 knight at once.',
+              Re1: '6.Re1 was your move in one of these games; Stockfish rates it about a pawn worse than 6.e5, which hits the f6 knight at once.',
+            },
+          },
+          { san: 'd5', isUserMove: false, annotation: 'Black counterattacks the bishop on c4.' },
+          { san: 'exf6', isUserMove: true, annotation: 'Take the knight.' },
+          { san: 'dxc4', isUserMove: false },
+          {
+            san: 'Re1+',
+            isUserMove: true,
+            annotation: 'Check first, with the king still on e8. 8...Be7?? 9.fxe7 takes the bishop and attacks the queen.',
+            hintTheme: 'Check on the open file',
+          },
+        ],
+        d6: [
+          {
+            san: 'Nxd4',
+            isUserMove: true,
+            frequency: 2,
+            annotation: 'Take the pawn back: White has the centre and the freer game.',
+            hintTheme: 'Win back the pawn',
+            wrongMoveFeedback: {
+              Re1: '6.Re1 was your move in both of these games, and you lost both. Take the pawn back first with 6.Nxd4.',
+            },
+          },
+        ],
+      },
+    },
+    { san: 'Re1', isUserMove: true, annotation: 'The rook comes to the e-file with the knight on e4 in front of the king.', hintTheme: 'The open e-file' },
+    // After 6.Re1: 6...d5 2.
+    { san: 'd5', isUserMove: false, frequency: 2, annotation: 'Black defends the knight with the pawn and attacks the bishop.' },
+    {
+      san: 'Bxd5',
+      isUserMove: true,
+      annotation: 'Take the defender: after 7...Qxd5 the knight on c3 comes with an attack on the queen and on the pinned knight.',
+      hintTheme: 'Remove the defender',
+      wrongMoveFeedback: {
+        Nxd4: '7.Nxd4 was your move in both of these games; Stockfish rates it about a pawn worse than 7.Bxd5, which gets the piece back.',
+      },
+    },
+    { san: 'Qxd5', isUserMove: false },
+    {
+      san: 'Nc3',
+      isUserMove: true,
+      annotation: 'The knight attacks the queen and the knight on e4, which cannot move: it shields the king from the rook.',
+      hintTheme: 'Attack the pinned piece',
+    },
+    { san: 'Qa5', isUserMove: false, annotation: 'The queen steps away and keeps an eye on the c3 knight.' },
+    { san: 'Nxe4', isUserMove: true, annotation: 'The piece is back, and the knight stays on the e-file in front of the rook.' },
+  ],
+  exercises: [
+    {
+      id: 'ex-two-knights-remove-defender',
+      title: 'The Knight on e4',
+      // 1.e4 e5 2.Nf3 Nc6 3.Bc4 Nf6 4.d4 exd4 5.O-O Nxe4 6.Re1 d5 (your games, where you played 7.Nxd4)
+      fen: 'r1bqkb1r/ppp2ppp/2n5/3p4/2Bpn3/5N2/PPP2PPP/RNBQR1K1 w kq - 0 7',
+      turn: 'w',
+      difficultyRating: 2,
+      prompt: 'White to play. The knight on e4 is pinned to the king. How does White win it back?',
+      solutionSan: ['Bxd5'],
+      explanation: '7.Bxd5! takes the pawn that defends the knight. After 7...Qxd5 8.Nc3 the knight on c3 attacks the queen and the pinned knight on e4, and White gets the piece back.',
+    },
+  ],
+});
+
 export const openingLessons: CurriculumLesson[] = [
   scotchGambitBreakthrough,
   evansGambitDestruction,
+  twoKnightsD4Lesson,
   adamsAttackSicilian,
 ];
