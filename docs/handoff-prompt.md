@@ -16,7 +16,7 @@ also runs on every push to another branch).
 
 - React 18 + Vite 6 + TypeScript (strict) + Tailwind; chess.js 1.4; Dexie 4 (IndexedDB); ts-fsrs 5
   for scheduling; maia3-js + onnxruntime-web in a Web Worker for the human-like engine.
-- Tests: Vitest (`npm test`, 443 tests: SSR `renderToString` specs, jsdom interaction specs under
+- Tests: Vitest (`npm test`, 444 tests: SSR `renderToString` specs, jsdom interaction specs under
   `tests/unit/curriculum/lessons-view-interactions.spec.tsx`, fake-indexeddb for the database) and
   Playwright (`npm run test:e2e`, 99 tests incl. iPhone-viewport tests). Keep both green or update
   tests deliberately and say why. The board question before each lesson move (CL-5) is on by default:
@@ -230,8 +230,8 @@ Next: the roadmap below.
   (`lesson-king-pawn-opposition`), checked by an exact retrograde solver
   (`scripts/game-analysis/kpk-solve.mjs`, its twin `tests/unit/curriculum/kpk-solver.ts`).
 - DC-2 tactics deck done (2026-11-02): 234 tactics from the archive, right after a mistake by
-  either player, one clearly winning move by Stockfish 19, and 24 quiet control positions (nothing to
-  win, several solid moves) (`scripts/game-analysis/tactics.mjs`,
+  either player, one clearly winning move by Stockfish 19, plus 23 quiet control positions (nothing
+  to win, several solid moves) and 23 keep-the-lead positions (ahead, several safe moves) (`scripts/game-analysis/tactics.mjs`,
   `tactics-pick.mjs`, `src/data/tactics_deck.json`), Woodpecker-lite in the Lessons header
   (`src/views/TacticsDeckPanel.tsx`): graded by solve time, Again first, retired after three Good
   solves in a row; a Worksheets sheet (also as "two moves ahead", a visualization format) and three

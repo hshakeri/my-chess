@@ -5,13 +5,14 @@ import deckData from '../data/tactics_deck.json';
  * by either player, where the side to move has one clearly winning move (Stockfish 19; the build is
  * in `scripts/game-analysis/tactics.mjs`), and a few quiet control positions where nothing is to be
  * won and the right answer is any of several solid moves (`tactics-quiet.mjs`), so the deck does not
- * teach that there is always a tactic. A position is graded by the time to the right move: under
+ * teach that there is always a tactic, and keep-the-lead positions where hoot65 was ahead and any of
+ * several safe moves keeps the win (`tactics-lead.mjs`). A position is graded by the time to the right move: under
  * five seconds Good, up to twenty Hard, slower or wrong Again. A session takes the Again ones first,
  * then the Hard ones, then new ones, then the Good ones seen longest ago, mixing the motifs; a
  * position retires after three Good solves in a row. Kept in this browser.
  */
 
-export type TacticMotif = 'mate-in-one' | 'mate' | 'free-piece' | 'fork' | 'check' | 'promotion' | 'other' | 'quiet';
+export type TacticMotif = 'mate-in-one' | 'mate' | 'free-piece' | 'fork' | 'check' | 'promotion' | 'other' | 'quiet' | 'lead';
 
 export const MOTIF_LABEL: Record<TacticMotif, string> = {
   'mate-in-one': 'Mate in one',
@@ -22,6 +23,7 @@ export const MOTIF_LABEL: Record<TacticMotif, string> = {
   promotion: 'A promotion',
   other: 'A winning combination',
   quiet: 'Nothing to win: a solid move',
+  lead: 'Ahead: a safe move keeps it',
 };
 
 export interface TacticPosition {
@@ -134,6 +136,9 @@ export function logTacticSession(session: TacticSession): TacticSession[] {
   }
   return all;
 }
+
+/** Positions where several moves are right and the game move gave something away: no single winning move to find. */
+export const isControl = (t: TacticPosition) => t.motif === 'quiet' || t.motif === 'lead';
 
 /** Positions last graded Again or Hard, and not retired: the ones a session takes first. */
 export function toRedo(deck: TacticPosition[], states: Record<string, TacticState>): number {

@@ -91,6 +91,11 @@ app build. The results and what they mean are in `docs/game-analysis.md`.
    `node tactics-merge.mjs <deck.json> <quiet.json> <deck.json>` spreads them through the deck's
    middle tier, and `node tactics-before.mjs <deck.json>` adds to each position the one two plies
    earlier and the two moves played (for the "two moves ahead" sheet; it checks they replay).
+   `node tactics-lead.mjs lead-cands.csv <out.json> [max] [depth]` finds the keep-the-lead positions
+   (hoot65 three points up and a costly move; Stockfish: still winning by 2.5, the game move 2 pawns
+   worse, two or more moves keeping the win), merged into the last tier with `tactics-merge.mjs ...
+   mate,promotion,other`; `node tactics-complete.mjs <deck.json>` then scores every legal move of each
+   control position so every right move is accepted, and drops those left with a single one.
 12. **Opening book** (`opening-book.mjs`): `node opening-book.mjs games.jsonl
    ../../src/data/openingBook.json [min] [plies]` rebuilds the book Maia plays from on the Play tab
    out of the archive: every position of the first 16 plies where the opponent was to move and that

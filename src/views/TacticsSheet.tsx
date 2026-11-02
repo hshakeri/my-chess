@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { WorksheetBoard } from './WorksheetsView';
-import { MOTIF_LABEL, numberLine, pickSession, readTacticStates, tacticsDeck, type TacticPosition } from '../services/tacticsDeck';
+import { MOTIF_LABEL, isControl, numberLine, pickSession, readTacticStates, tacticsDeck, type TacticPosition } from '../services/tacticsDeck';
 
 /** Positions on one sheet; the answers fill the back. */
 export const SHEET_TACTICS = 12;
@@ -18,7 +18,7 @@ const toMove = (t: TacticPosition) => (t.fen.split(' ')[1] === 'b' ? 'Black' : '
  */
 export const TacticsSheet: React.FC<{ deck?: TacticPosition[]; ahead?: boolean }> = ({ deck = tacticsDeck, ahead = false }) => {
   const items = useMemo(
-    () => pickSession(ahead ? deck.filter((t) => t.before && t.motif !== 'quiet') : deck, readTacticStates(), SHEET_TACTICS),
+    () => pickSession(ahead ? deck.filter((t) => t.before && !isControl(t)) : deck, readTacticStates(), SHEET_TACTICS),
     [deck, ahead]
   );
   if (!items.length) {
@@ -80,7 +80,7 @@ export const TacticsSheet: React.FC<{ deck?: TacticPosition[]; ahead?: boolean }
           {items.map((t, k) => (
             <li key={t.id} data-tactics-answer={k + 1}>
               <b>{k + 1}.</b> {t.solution}: {MOTIF_LABEL[t.motif].toLowerCase()}
-              {t.motif === 'quiet' ? ` (as good: ${t.accepted.filter((m) => m !== t.solution).slice(0, 3).join(', ')}; in the game, ${t.played} gave something away)` : ''}.
+              {isControl(t) ? ` (as good: ${t.accepted.filter((m) => m !== t.solution).slice(0, 3).join(', ')}; in the game, ${t.played} gave something away)` : ''}.
               Stockfish's line: {numberLine(t.fen, t.line)}. From your game of {t.date}.
             </li>
           ))}

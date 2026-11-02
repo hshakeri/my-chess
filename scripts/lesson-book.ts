@@ -25,7 +25,7 @@ import { allCurriculumLessons, curriculumCourses } from '../src/curriculum';
 import { PatternGroup, patternGroupOf, patternPath, inPatternOrder } from '../src/curriculum/patternPath';
 import { plyLabel, replyOptions } from '../src/curriculum/builder';
 import { drillSetOf, gameDrillData } from '../src/curriculum/gameDrills';
-import { MOTIF_LABEL, numberLine, tacticsDeck, type TacticPosition } from '../src/services/tacticsDeck';
+import { MOTIF_LABEL, isControl, numberLine, tacticsDeck, type TacticPosition } from '../src/services/tacticsDeck';
 import { lessonUrl } from '../src/router';
 import { getRecommendedWhiteRepertoire, getRecommendedBlackRepertoire } from '../src/analytics/repertoire';
 import { CurriculumLesson, CurriculumMove } from '../src/types/curriculum';
@@ -382,7 +382,7 @@ function renderTacticsSheet(positions: TacticPosition[], n: number, sheetNo: num
     const also = t.accepted.filter((san) => san !== t.solution);
     const others = !also.length
       ? ''
-      : t.motif === 'quiet'
+      : isControl(t)
       ? ` (as good: ${also.slice(0, 3).join(', ')})`
       : ` (${also.join(' and ')} also win${also.length === 1 ? 's' : ''})`;
     answers += `<p><b>${esc(label)}</b> ${esc(`${t.solution}: ${MOTIF_LABEL[t.motif].toLowerCase()}${others}. Stockfish's line: ${numberLine(t.fen, t.line)}. From your game of ${t.date}.`)}</p>`;
@@ -467,7 +467,7 @@ const bookTactics = tacticsDeck.slice(0, BOOK_TACTICS);
 const tacticSheets = Math.ceil(bookTactics.length / SHEET_DRILLS);
 for (let k = 0; k < tacticSheets; k++) chapters.push(renderTacticsSheet(bookTactics.slice(k * SHEET_DRILLS, (k + 1) * SHEET_DRILLS), ++n, k + 1, tacticSheets));
 // Then a visualization sheet: the next twelve tactics (quiet positions left out), each two moves before it
-const aheadTactics = tacticsDeck.filter((t) => t.before && t.motif !== 'quiet' && !bookTactics.includes(t)).slice(0, SHEET_DRILLS);
+const aheadTactics = tacticsDeck.filter((t) => t.before && !isControl(t) && !bookTactics.includes(t)).slice(0, SHEET_DRILLS);
 if (aheadTactics.length) chapters.push(renderTacticsSheet(aheadTactics, ++n, 1, 1, true));
 chapters.push(
   partHead(

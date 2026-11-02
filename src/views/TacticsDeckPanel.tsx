@@ -212,6 +212,8 @@ export const TacticsDeckPanel: React.FC<{ onClose: () => void; deck?: TacticPosi
                         ? `${GRADE_LABEL[result.grade]}: ${result.san} in ${seconds(result.ms)}.`
                         : current.motif === 'quiet'
                         ? `Again: ${result.san} gives something away. Solid moves here: ${current.accepted.slice(0, 4).join(', ')}.`
+                        : current.motif === 'lead'
+                        ? `Again: ${result.san} gives material back. Safe moves here: ${current.accepted.slice(0, 4).join(', ')}.`
                         : `Again: ${result.san} does not win. The move is ${current.solution}.`}
                     </p>
                     <p>
@@ -233,7 +235,7 @@ export const TacticsDeckPanel: React.FC<{ onClose: () => void; deck?: TacticPosi
                         {index + 1 >= session.length ? 'Finish' : 'Next'}
                       </button>
                       {/* After a mate in one there is nothing left to play */}
-                      {onSpar && current.motif !== 'mate-in-one' && (
+                      {onSpar && current.motif !== 'mate-in-one' && current.motif !== 'quiet' && (
                         <button
                           type="button"
                           data-action="tactics-spar"

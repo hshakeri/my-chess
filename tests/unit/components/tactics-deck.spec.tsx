@@ -151,6 +151,26 @@ describe('Tactics deck (DC-2)', () => {
     expect(view.container.querySelector('[data-tactic-result]')?.textContent).toContain('Again: h3 gives something away. Solid moves here: Nf3, Nc3, Bc4.');
   });
 
+  it('in a keep-the-lead position a safe move is right, a wrong one is shown the safe moves, and it can be played on', () => {
+    const lead = tactic('l', 'lead', {
+      // White a rook up; the rook on d1 is attacked by nothing, any quiet move keeps the win
+      fen: '6k1/5ppp/8/8/8/8/5PPP/3R2K1 w - - 0 30',
+      lastMove: { from: 'h8', to: 'g8', san: 'Kg8' },
+      solution: 'h3',
+      accepted: ['h3', 'g3', 'Kf1'],
+      line: ['h3'],
+      played: 'Rd7',
+    });
+    const requests: unknown[] = [];
+    const view = render(<TacticsDeckPanel deck={[lead]} onClose={() => undefined} onSpar={(r) => requests.push(r)} />);
+    fireEvent.click(view.container.querySelector('[data-action="tactics-start"]')!);
+    play(lead.fen, 'Rd2');
+    expect(view.container.querySelector('[data-tactic-result]')?.textContent).toContain('Again: Rd2 gives material back. Safe moves here: h3, g3, Kf1.');
+    expect(view.container.querySelector('[data-tactic-result]')?.textContent).toContain('Ahead: a safe move keeps it.');
+    fireEvent.click(view.container.querySelector('[data-action="tactics-spar"]')!);
+    expect(requests).toHaveLength(1);
+  });
+
   it('sums up the deck for the Progress panel: seen, retired, to redo, and the solve time then and now', () => {
     const deck = [tactic('a', 'fork'), tactic('b', 'fork'), tactic('c', 'mate')];
     const states = { a: { tries: 3, streak: 3, grade: 'good' as const, at: 3 }, b: { tries: 1, streak: 0, grade: 'again' as const, at: 2 } };
@@ -217,7 +237,7 @@ describe('Tactics deck (DC-2)', () => {
         const defended = new Chess(t.fen).attackers(m.to, m.color === 'w' ? 'b' : 'w').length > 0;
         expect(!defended || V[m.captured!] > V[m.piece], t.id).toBe(true);
       }
-      if (t.motif === 'quiet') {
+      if (t.motif === 'quiet' || t.motif === 'lead') {
         // A control position: several solid moves, and the game move not among them
         expect(t.accepted.length, t.id).toBeGreaterThanOrEqual(2);
         expect(t.accepted, t.id).not.toContain(t.played);
