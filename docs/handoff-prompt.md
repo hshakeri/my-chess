@@ -16,7 +16,7 @@ also runs on every push to another branch).
 
 - React 18 + Vite 6 + TypeScript (strict) + Tailwind; chess.js 1.4; Dexie 4 (IndexedDB); ts-fsrs 5
   for scheduling; maia3-js + onnxruntime-web in a Web Worker for the human-like engine.
-- Tests: Vitest (`npm test`, 398 tests: SSR `renderToString` specs, jsdom interaction specs under
+- Tests: Vitest (`npm test`, 400 tests: SSR `renderToString` specs, jsdom interaction specs under
   `tests/unit/curriculum/lessons-view-interactions.spec.tsx`, fake-indexeddb for the database) and
   Playwright (`npm run test:e2e`, 90 tests incl. iPhone-viewport tests). Keep both green or update
   tests deliberately and say why. The board question before each lesson move (CL-5) is on by default:
@@ -204,7 +204,8 @@ Next: the roadmap below.
   10, minor pieces out by move 10, queen kept home, nothing left hanging in reviewed games).
 - CL-7 first slice done (2026-11-01): plan review, one FSRS idea card per opening lesson (the
   position the line reaches, the plan on demand, a self-grade), in localStorage. Not built: the
-  automatic relation cues, multiple-choice plans, idea cards in Today's session and the backup.
+  automatic relation cues, multiple-choice plans, idea cards in Today's session. The JSON backup
+  carries the localStorage data too (`src/services/localData.ts`).
 - DC-1 re-scoped curriculum content for the lines above (this is where the opening order applies).
 
 ## How to verify before pushing

@@ -163,6 +163,8 @@ export interface DatabaseExportData {
   revlog?: StoredRevlog[];
   /** Game reviews (CL-3), one per game; absent from backups made before reviews were exported. */
   reviews?: StoredReview[];
+  /** This browser's localStorage data, by key (`src/services/localData.ts`). */
+  local?: Record<string, string>;
 }
 
 export const DATABASE_EXPORT_VERSION = 2;

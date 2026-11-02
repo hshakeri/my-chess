@@ -1,4 +1,5 @@
 import { ChessDatabase, db as defaultDb } from './database';
+import { readLocalData, restoreLocalData } from '../services/localData';
 import { PgnHandler } from '../engine/pgn';
 import {
   DATABASE_EXPORT_VERSION,
@@ -321,6 +322,7 @@ export class GamesRepository {
       cards,
       revlog,
       reviews,
+      local: readLocalData(),
     };
   }
 
@@ -367,6 +369,7 @@ export class GamesRepository {
     if (Array.isArray(parsed.reviews) && parsed.reviews.length > 0) {
       await this.importReviews(parsed.reviews);
     }
+    restoreLocalData(parsed.local);
 
     return {
       gamesAdded: result.added,
