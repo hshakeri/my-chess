@@ -9,7 +9,10 @@
  *   - an accepted alternative that loses 150 or more,
  *   - a warned-against move ("Not X?!") that loses less than 20 (as good as the answer),
  *   - an exercise solution that loses 70 or more,
- *   - a drill whose move from the game loses less than 100 (the drill's premise is weak).
+ *   - a drill whose move from the game loses less than 100 (the drill's premise is weak),
+ *   - a recorded mistake or trap that loses less than its severity says (a blunder or a trap less than
+ *     150, an inaccuracy less than 30), or whose refutation starts with a reply 100 or more worse than
+ *     the best one.
  *
  * The engine is the `stockfish` npm package (WASM), which is not a dependency of the app: install it
  * in scripts/game-analysis (npm install there) or point STOCKFISH_JS at a Stockfish .js file.
@@ -28,7 +31,7 @@ const [depthArg = '18', outFile, only = ''] = process.argv.slice(2);
 const DEPTH = Number(depthArg);
 
 interface Finding {
-  kind: 'answer' | 'alternative' | 'warning' | 'exercise' | 'drill_played' | 'drill_accepted';
+  kind: 'answer' | 'alternative' | 'warning' | 'exercise' | 'drill_played' | 'drill_accepted' | 'mistake' | 'refutation';
   lessonId: string;
   label: string;
   fen: string;
@@ -101,6 +104,27 @@ async function main() {
         }
       }
     }
+    // The recorded mistakes and traps: the move must cost what its severity says, and the refutation must
+    // start with a reply close to the best one
+    if (!drill) {
+      for (const t of lesson.commonMistakesAndTraps ?? []) {
+        const r = await lossOf(t.triggerFen, t.attemptedSan);
+        if (!r) continue;
+        const floor = t.severity === 'inaccuracy' ? 30 : 150;
+        const label = `${t.severity} ${plyLabel(t.triggerFen, 0, t.attemptedSan)}`;
+        record({ kind: 'mistake', lessonId: lesson.id, label, fen: t.triggerFen, move: t.attemptedSan, loss: r.loss, best: r.move, bestScore: r.score }, r.loss < floor);
+        const reply = t.refutationSanList[0];
+        if (!reply) continue;
+        const after = new Chess(t.triggerFen);
+        after.move(t.attemptedSan);
+        const rr = await lossOf(after.fen(), reply);
+        if (!rr) continue;
+        record(
+          { kind: 'refutation', lessonId: lesson.id, label: `after ${plyLabel(t.triggerFen, 0, t.attemptedSan)}`, fen: after.fen(), move: reply, loss: rr.loss, best: rr.move, bestScore: rr.score },
+          rr.loss >= 100
+        );
+      }
+    }
     for (const [k, ex] of lesson.exercises.entries()) {
       const r = await lossOf(ex.fen, ex.solutionSan[0]);
       if (!r) continue;
@@ -110,7 +134,7 @@ async function main() {
     process.stderr.write(`\r${done}/${lessons.length} lessons, ${findings.length} moves scored`);
   }
   // The move from each drill's game must be a real mistake
-  for (const d of [...gameDrillData.threat, ...gameDrillData.free, ...gameDrillData.hang]) {
+  for (const d of [...gameDrillData.threat, ...gameDrillData.free, ...gameDrillData.hang, ...(gameDrillData.mate ?? [])]) {
     if (!`lesson-game-${d.id}`.startsWith(only)) continue;
     const c = new Chess(d.fenBefore);
     c.move(d.lastSan);
@@ -125,7 +149,7 @@ async function main() {
   const flagged = findings.filter((f) => f.flagged);
   console.log(`# Engine audit (Stockfish 19, depth ${DEPTH})\n`);
   console.log(`${findings.length} moves scored, ${flagged.length} flagged.\n`);
-  for (const kind of ['answer', 'alternative', 'warning', 'exercise', 'drill_accepted', 'drill_played'] as const) {
+  for (const kind of ['answer', 'alternative', 'warning', 'exercise', 'mistake', 'refutation', 'drill_accepted', 'drill_played'] as const) {
     const rows = flagged.filter((f) => f.kind === kind).sort((a, b) => b.loss - a.loss);
     if (!rows.length) continue;
     console.log(`\n## ${kind} (${rows.length})\n`);

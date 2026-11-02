@@ -132,7 +132,8 @@ export const refutingKonikowskiGambit: CurriculumLesson = buildVerifiedLesson({
       plyIndex: 10,
       attemptedSan: 'Nxc6',
       isTrap: false,
-      severity: 'inaccuracy',
+      // Stockfish 19: 6.Nxc6 gives away 2.9 pawns against 6.O-O
+      severity: 'blunder',
       explanatoryFeedback: 'Taking on c6 with 6.Nxc6 lets Black play 6...Qxg2!, hitting the rook on h1. After 7.Rf1 the queen takes on e4 with check, and once White has blocked it, ...bxc6 takes the knight back.',
       refutationSanList: ['Qxg2', 'Rf1', 'Qxe4+', 'Be2', 'bxc6'],
       punishmentSummary: 'Black has the knight back and is a pawn up, and White can no longer castle kingside.',
