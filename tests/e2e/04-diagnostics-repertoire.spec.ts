@@ -145,6 +145,8 @@ test.describe('04. Personalized Diagnostics & Repertoire Recommendation (F13 - F
       await expect(habits.locator(`[data-habit="${key}"]`)).toHaveAttribute('data-rate', /^0\.\d{3}$/);
     }
     await expect(habits.locator('[data-habit="nothing_hung"]')).toContainText('review some games first');
+    // Kept a three-point lead for ten moves: 84 of the 116 seed games with such a lead
+    await expect(habits.locator('[data-habit="kept_lead"]')).toHaveAttribute('data-rate', '0.724');
   });
 
   test('Your clock: games lost on time, the pace against the opponents, and the games lost on time while ahead (DC-3)', async ({ page }) => {
