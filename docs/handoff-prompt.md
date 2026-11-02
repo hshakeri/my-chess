@@ -16,7 +16,7 @@ also runs on every push to another branch).
 
 - React 18 + Vite 6 + TypeScript (strict) + Tailwind; chess.js 1.4; Dexie 4 (IndexedDB); ts-fsrs 5
   for scheduling; maia3-js + onnxruntime-web in a Web Worker for the human-like engine.
-- Tests: Vitest (`npm test`, 437 tests: SSR `renderToString` specs, jsdom interaction specs under
+- Tests: Vitest (`npm test`, 438 tests: SSR `renderToString` specs, jsdom interaction specs under
   `tests/unit/curriculum/lessons-view-interactions.spec.tsx`, fake-indexeddb for the database) and
   Playwright (`npm run test:e2e`, 97 tests incl. iPhone-viewport tests). Keep both green or update
   tests deliberately and say why. The board question before each lesson move (CL-5) is on by default:
@@ -39,22 +39,27 @@ also runs on every push to another branch).
 
 - **Play vs Maia** (worker engine with opening book, Maia neural net, heuristic fallback; a
   main-thread fallback answers within 4 s if the worker is slow). Phone layout has an engine strip
-  above the board.
+  above the board. The opening book is the archive opponents' moves; a practice clock (off by
+  default) runs 10+0, 5+0 or 3+2 with a cue after 30 seconds on one move.
 - **Game Database**: Chess.com sync, PGN upload, replay, JSON export/import (schema v2 with FSRS
   cards and review log).
 - **Opening Diagnostics** (`src/analytics/diagnostics.ts`, `repertoire.ts`): measured habit
   detectors (Scandinavian 2.e5, early queen sortie, ...Bg4 aftermath, Blackburne-Shilling
   handling, mated/lost on time while ahead), repertoire trees for both colours with first-divergence
   detection ("Where you leave the repertoire"), "Practice this" (one-decision drill from a deviation
-  via `src/curriculum/factories.ts`) and "Adopt Repertoire".
+  via `src/curriculum/factories.ts`) and "Adopt Repertoire". Tabs "Your Mistake Patterns" (reviewed
+  games counted, batch review, habit scorecard) and "Clock & Endings" (time losses, pace against the
+  opponents, how games ended, resignations playable on against Maia).
 - **Interactive Lessons** (`src/views/LessonsView.tsx`): branching lessons, lesson tree beside the
   board (click a node to jump there), hint ladder theme/piece/square, refutation playback on
   mistakes, exercises, per-decision FSRS cards (`src/services/cards.ts`, `sessionQueue.ts`,
   `fenKey.ts`) with inferred ratings, "Due today" review sessions. Phone: lesson picker above the
   board. The default list ("My Lessons") is the study path in `src/curriculum/patternPath.ts`:
-  four drill sets from hoot65's own games, then the 15 core lessons in five groups, each group
+  four drill sets from hoot65's own games, then the core lessons in five groups (the last, "Finish
+  the game", has the queen and rook mates, king and pawn against king and stalemate), each group
   repeating one pattern and headed by the check that catches it; the phone picker and Part I of the
-  lesson book use the same order.
+  lesson book use the same order. The header holds today's routine and the trainers: warm-up,
+  tactics deck, speed run, progress (with mastery by group), plan review.
 - **Printable Worksheets** and the generated **lesson book** (`scripts/lesson-book.ts`).
 
 ## Maintainer decisions already taken (do not reopen)
@@ -148,10 +153,11 @@ Compromised Defence plays 9.Bg5; the Konikowski 9.Bf4 and the Elephant 7.Nxf6+ a
   practice for every lesson (the line and each reply as scoresheet rows with blanks, and the exercises)
   is gathered at the end as blocks that `npm run book:pdf` packs onto practice sheets in the browser,
   moving each sheet's answers to its back. Chromium cannot force a front page, so the PDF step renders
-  a draft, reads from its bookmarks where each heading landed, puts a notes page where a practice sheet
-  would start on a back, fills in the page numbers (contents and each chapter's pointer to its
+  a draft, reads from its bookmarks where each heading landed, puts a notes page wherever a sheet would
+  start on a back (rendering again after each), fills in the page numbers (contents and each chapter's pointer to its
   practice), renders the book, and fails if any sheet is not a front page followed by its answers.
-  62 US Letter pages (62 on A4), 17 sheets, 351 answers. Diagrams are SVG drawings with the app's
+  70 US Letter pages (70 on A4), 20 sheets (the four drill sheets, two tactics sheets at the end of
+  Part I, fourteen practice sheets), 401 answers. Diagrams are SVG drawings with the app's
   piece set (`public/pieces`); the fonts are Times New Roman and Arial, whose metric twins Liberation
   Serif and Sans the Linux runner has, so pages break the same way there. All text is black and dark
   squares are a light grey.
@@ -222,8 +228,9 @@ Next: the roadmap below.
 - DC-2 slice done (2026-11-02): King and Pawn against King in "Finish the game"
   (`lesson-king-pawn-opposition`), checked by an exact retrograde solver
   (`scripts/game-analysis/kpk-solve.mjs`, its twin `tests/unit/curriculum/kpk-solver.ts`).
-- DC-2 tactics deck done (2026-11-02): 234 positions from the archive, right after a mistake by
-  either player, one clearly winning move by Stockfish 19 (`scripts/game-analysis/tactics.mjs`,
+- DC-2 tactics deck done (2026-11-02): 234 tactics from the archive, right after a mistake by
+  either player, one clearly winning move by Stockfish 19, and 24 quiet control positions (nothing to
+  win, several solid moves) (`scripts/game-analysis/tactics.mjs`,
   `tactics-pick.mjs`, `src/data/tactics_deck.json`), Woodpecker-lite in the Lessons header
   (`src/views/TacticsDeckPanel.tsx`): graded by solve time, Again first, retired after three Good
   solves in a row; a Worksheets sheet and two lesson-book sheets. The Lessons header shows the

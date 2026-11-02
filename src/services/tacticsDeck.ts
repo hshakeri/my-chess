@@ -3,13 +3,15 @@ import deckData from '../data/tactics_deck.json';
 /**
  * The tactics deck (DC-2), Woodpecker style: positions from hoot65's own games right after a blunder,
  * by either player, where the side to move has one clearly winning move (Stockfish 19; the build is
- * in `scripts/game-analysis/tactics.mjs`). A position is graded by the time to the right move: under
+ * in `scripts/game-analysis/tactics.mjs`), and a few quiet control positions where nothing is to be
+ * won and the right answer is any of several solid moves (`tactics-quiet.mjs`), so the deck does not
+ * teach that there is always a tactic. A position is graded by the time to the right move: under
  * five seconds Good, up to twenty Hard, slower or wrong Again. A session takes the Again ones first,
  * then the Hard ones, then new ones, then the Good ones seen longest ago, mixing the motifs; a
  * position retires after three Good solves in a row. Kept in this browser.
  */
 
-export type TacticMotif = 'mate-in-one' | 'mate' | 'free-piece' | 'fork' | 'check' | 'promotion' | 'other';
+export type TacticMotif = 'mate-in-one' | 'mate' | 'free-piece' | 'fork' | 'check' | 'promotion' | 'other' | 'quiet';
 
 export const MOTIF_LABEL: Record<TacticMotif, string> = {
   'mate-in-one': 'Mate in one',
@@ -19,6 +21,7 @@ export const MOTIF_LABEL: Record<TacticMotif, string> = {
   check: 'A check that wins material',
   promotion: 'A promotion',
   other: 'A winning combination',
+  quiet: 'Nothing to win: a solid move',
 };
 
 export interface TacticPosition {

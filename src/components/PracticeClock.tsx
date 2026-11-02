@@ -103,6 +103,8 @@ export const PracticeClock: React.FC<PracticeClockProps> = ({ turn, ply, resetKe
     const id = setInterval(() => {
       if (leftRef.current[turn] - (now() - turnStartRef.current) <= 0 && !flaggedRef.current) {
         flaggedRef.current = true;
+        // The stopped clock shows the zero it ran down to
+        leftRef.current = { ...leftRef.current, [turn]: 0 };
         onFlag(turn);
       }
       setTick((k) => k + 1);

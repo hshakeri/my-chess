@@ -83,7 +83,13 @@ app build. The results and what they mean are in `docs/game-analysis.md`.
    <src/data/tactics_deck.json> [depth]` leaves out plain recaptures, positions with two legal moves
    or fewer and the ones Maia's players find nine times in ten, keeps one per game and a capped number
    per motif, checks each again deeper, and orders the deck along the study path (pieces to take and
-   mates in one first).
+   mates in one first). `node tactics-quiet.mjs quiet-cands.csv <out.json> [max] [depth]` finds the
+   control positions: hoot65's costly moves (by Maia) in positions with no threat, nothing free, no
+   mate, no check and no capture just made (`quiet-cands.csv` comes from the feature table), kept when
+   Stockfish finds the position open (within 2 pawns), no single winning move, at least two moves
+   within 0.8 pawns of the best (all accepted), and the game move 1.5 pawns or more worse.
+   `node tactics-merge.mjs <deck.json> <quiet.json> <deck.json>` spreads them through the deck's
+   middle tier.
 12. **Opening book** (`opening-book.mjs`): `node opening-book.mjs games.jsonl
    ../../src/data/openingBook.json [min] [plies]` rebuilds the book Maia plays from on the Play tab
    out of the archive: every position of the first 16 plies where the opponent was to move and that

@@ -10,7 +10,7 @@ const toMove = (t: TacticPosition) => (t.fen.split(' ')[1] === 'b' ? 'Black' : '
 /**
  * A printable sheet of the tactics deck (DC-2, DC-4): the next twelve positions a session would
  * take (the ones to redo first, then new ones), each drawn from the side to move with the move that
- * had just been played; the back holds the winning move, the motif and Stockfish's line.
+ * had just been played; the back holds the answer, the motif and Stockfish's line.
  */
 export const TacticsSheet: React.FC<{ deck?: TacticPosition[] }> = ({ deck = tacticsDeck }) => {
   const items = useMemo(() => pickSession(deck, readTacticStates(), SHEET_TACTICS), [deck]);
@@ -32,8 +32,9 @@ export const TacticsSheet: React.FC<{ deck?: TacticPosition[] }> = ({ deck = tac
         <span className="text-xs uppercase font-bold tracking-widest text-slate-500">Your own games</span>
         <h2 className="text-2xl font-extrabold text-slate-950">Tactics from your games</h2>
         <p className="text-sm text-slate-700 mt-1">
-          Each diagram is the position just after a mistake in one of your games, yours or your opponent's, drawn from the side to move. One move wins
-          clearly: find it and write it down, in under a minute each. The answers are on the back.
+          Each diagram is the position just after a mistake in one of your games, yours or your opponent's, drawn from the side to move. In most of
+          them one move wins clearly; in a few nothing does and a solid move is right. Find the best move and write it down, in under a minute each. The
+          answers are on the back.
         </p>
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4" data-printable="tactics-front">
@@ -55,7 +56,9 @@ export const TacticsSheet: React.FC<{ deck?: TacticPosition[] }> = ({ deck = tac
         <ol className="space-y-2 text-sm text-slate-800">
           {items.map((t, k) => (
             <li key={t.id} data-tactics-answer={k + 1}>
-              <b>{k + 1}.</b> {t.solution}: {MOTIF_LABEL[t.motif].toLowerCase()}. Stockfish's line: {numberLine(t.fen, t.line)}. From your game of {t.date}.
+              <b>{k + 1}.</b> {t.solution}: {MOTIF_LABEL[t.motif].toLowerCase()}
+              {t.motif === 'quiet' ? ` (as good: ${t.accepted.filter((m) => m !== t.solution).slice(0, 3).join(', ')}; in the game, ${t.played} gave something away)` : ''}.
+              Stockfish's line: {numberLine(t.fen, t.line)}. From your game of {t.date}.
             </li>
           ))}
         </ol>

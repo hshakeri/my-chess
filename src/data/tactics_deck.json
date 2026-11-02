@@ -3434,6 +3434,33 @@
   "game": "https://www.chess.com/game/live/52074006353"
  },
  {
+  "id": "186187271210-49",
+  "fen": "r4rk1/5p2/1qp1p1p1/pp5p/3pPRnP/PB1P2Q1/1PP4P/2K3R1 b - - 3 25",
+  "lastMove": {
+   "from": "f2",
+   "to": "f4",
+   "san": "Rf4"
+  },
+  "solution": "Rae8",
+  "accepted": [
+   "Rae8",
+   "Qc5"
+  ],
+  "line": [
+   "Rae8",
+   "h3",
+   "Ne5",
+   "Qg5",
+   "Qc7"
+  ],
+  "motif": "quiet",
+  "mateIn": null,
+  "date": "2026-10-29",
+  "ownSide": true,
+  "played": "e5",
+  "game": "https://www.chess.com/game/live/186187271210"
+ },
+ {
   "id": "50258483347-13",
   "fen": "r2qk1nr/pppb1ppp/3p4/3Pp3/1QPn4/2N1B3/PP2PPPP/R3KBNR b KQkq - 0 7",
   "lastMove": {
@@ -3458,6 +3485,38 @@
   "ownSide": false,
   "played": "Nc2+",
   "game": "https://www.chess.com/game/live/50258483347"
+ },
+ {
+  "id": "174297609928-87",
+  "fen": "6k1/r4ppp/8/4P3/7P/pBn2PK1/6P1/R7 b - - 5 44",
+  "lastMove": {
+   "from": "a2",
+   "to": "b3",
+   "san": "Bb3"
+  },
+  "solution": "Kf8",
+  "accepted": [
+   "Kf8",
+   "a2",
+   "Ra6",
+   "Ra5",
+   "Ra8",
+   "Ne2+",
+   "h6"
+  ],
+  "line": [
+   "Kf8",
+   "Kg4",
+   "a2",
+   "f4",
+   "g6"
+  ],
+  "motif": "quiet",
+  "mateIn": null,
+  "date": "2026-09-11",
+  "ownSide": true,
+  "played": "Nd5",
+  "game": "https://www.chess.com/game/live/174297609928"
  },
  {
   "id": "115263482271-71",
@@ -3486,6 +3545,41 @@
   "game": "https://www.chess.com/game/live/115263482271"
  },
  {
+  "id": "174099308650-24",
+  "fen": "r1bq1r2/pp2bp1k/3p1npp/2p5/4PB2/3B2Q1/PPP2PPP/RN2R1K1 w - - 0 13",
+  "lastMove": {
+   "from": "g7",
+   "to": "g6",
+   "san": "g6"
+  },
+  "solution": "Qf3",
+  "accepted": [
+   "Qf3",
+   "Qe3",
+   "Bd2",
+   "Bc1",
+   "a4",
+   "Bc4",
+   "c3",
+   "Nc3",
+   "Bf1",
+   "Rd1"
+  ],
+  "line": [
+   "Qf3",
+   "Be6",
+   "Nc3",
+   "Ng4",
+   "Be2"
+  ],
+  "motif": "quiet",
+  "mateIn": null,
+  "date": "2026-09-06",
+  "ownSide": true,
+  "played": "Qh4",
+  "game": "https://www.chess.com/game/live/174099308650"
+ },
+ {
   "id": "61376454455-19",
   "fen": "rn2kb1r/pp2pp1p/2pp2p1/4qbP1/1P1P1P2/P1N1Q3/2P2n1P/R1B1KBNR b KQkq - 2 10",
   "lastMove": {
@@ -3510,6 +3604,35 @@
   "ownSide": false,
   "played": "Qxe3+",
   "game": "https://www.chess.com/game/live/61376454455"
+ },
+ {
+  "id": "173635929006-36",
+  "fen": "rnb1r3/pppp2k1/5p2/3P3P/5p2/3P4/PPP2PP1/2KR1B1R w - - 1 19",
+  "lastMove": {
+   "from": "g8",
+   "to": "g7",
+   "san": "Kg7"
+  },
+  "solution": "h6+",
+  "accepted": [
+   "h6+",
+   "Rh4",
+   "d4",
+   "d6"
+  ],
+  "line": [
+   "h6+",
+   "Kh8",
+   "d4",
+   "d6",
+   "Bd3"
+  ],
+  "motif": "quiet",
+  "mateIn": null,
+  "date": "2026-08-28",
+  "ownSide": true,
+  "played": "Rd2",
+  "game": "https://www.chess.com/game/live/173635929006"
  },
  {
   "id": "121715098732-78",
@@ -3538,6 +3661,36 @@
   "game": "https://www.chess.com/game/live/121715098732"
  },
  {
+  "id": "172809675890-46",
+  "fen": "2r1k2r/6pp/pb2p3/1ppnPp2/1P3P2/2P1BRP1/P3N2P/2R3K1 w k - 3 24",
+  "lastMove": {
+   "from": "e7",
+   "to": "d5",
+   "san": "Nd5"
+  },
+  "solution": "bxc5",
+  "accepted": [
+   "bxc5",
+   "Bxc5",
+   "Bf2",
+   "Kg2",
+   "Kf1"
+  ],
+  "line": [
+   "bxc5",
+   "Bxc5",
+   "Bxc5",
+   "Rxc5",
+   "a4"
+  ],
+  "motif": "quiet",
+  "mateIn": null,
+  "date": "2026-08-10",
+  "ownSide": true,
+  "played": "c4",
+  "game": "https://www.chess.com/game/live/172809675890"
+ },
+ {
   "id": "51167989943-59",
   "fen": "8/p1p2k1p/1p2pn2/8/5Pq1/1P2P1P1/P2Q1K1P/5R2 b - - 2 30",
   "lastMove": {
@@ -3562,6 +3715,35 @@
   "ownSide": false,
   "played": "Ne4+",
   "game": "https://www.chess.com/game/live/51167989943"
+ },
+ {
+  "id": "171031204398-36",
+  "fen": "N4b2/1p1bk3/p2q2p1/Q4p2/2B1p1n1/8/PPnPKPPP/2B4R w - - 3 19",
+  "lastMove": {
+   "from": "a1",
+   "to": "c2",
+   "san": "Nc2"
+  },
+  "solution": "Nb6",
+  "accepted": [
+   "Nb6",
+   "d3",
+   "d4",
+   "Qb6"
+  ],
+  "line": [
+   "Nb6",
+   "Be6",
+   "Nd5+",
+   "Kf7",
+   "Qb6"
+  ],
+  "motif": "quiet",
+  "mateIn": null,
+  "date": "2026-07-02",
+  "ownSide": true,
+  "played": "b3",
+  "game": "https://www.chess.com/game/live/171031204398"
  },
  {
   "id": "108746543747-55",
@@ -3590,6 +3772,33 @@
   "game": "https://www.chess.com/game/live/108746543747"
  },
  {
+  "id": "170570379918-39",
+  "fen": "r3k2r/5pp1/p3b2p/3pN1nQ/3P4/2P5/PP1b1PPP/R5K1 b kq - 0 20",
+  "lastMove": {
+   "from": "c2",
+   "to": "c3",
+   "san": "c3"
+  },
+  "solution": "Bf4",
+  "accepted": [
+   "Bf4",
+   "O-O"
+  ],
+  "line": [
+   "Bf4",
+   "h4",
+   "Ne4",
+   "c4",
+   "O-O"
+  ],
+  "motif": "quiet",
+  "mateIn": null,
+  "date": "2026-06-22",
+  "ownSide": true,
+  "played": "O-O-O",
+  "game": "https://www.chess.com/game/live/170570379918"
+ },
+ {
   "id": "40597296911-43",
   "fen": "3r1rk1/p4ppp/8/2p5/4P1n1/P4N2/4RbPP/RNB4K b - - 0 22",
   "lastMove": {
@@ -3614,6 +3823,43 @@
   "ownSide": true,
   "played": "Rd1+",
   "game": "https://www.chess.com/game/live/40597296911"
+ },
+ {
+  "id": "170510537932-18",
+  "fen": "rn2k2r/pppqb1p1/3ppn1p/8/3NP3/2N5/PPP2PPP/R1BQR1K1 w kq - 1 10",
+  "lastMove": {
+   "from": "d8",
+   "to": "d7",
+   "san": "Qd7"
+  },
+  "solution": "Qd3",
+  "accepted": [
+   "Qd3",
+   "Qe2",
+   "e5",
+   "Nce2",
+   "Be3",
+   "f4",
+   "Qf3",
+   "Re3",
+   "Nf3",
+   "a3",
+   "h3",
+   "a4"
+  ],
+  "line": [
+   "Qd3",
+   "Kf7",
+   "f4",
+   "Nc6",
+   "Be3"
+  ],
+  "motif": "quiet",
+  "mateIn": null,
+  "date": "2026-06-21",
+  "ownSide": true,
+  "played": "Qg4",
+  "game": "https://www.chess.com/game/live/170510537932"
  },
  {
   "id": "80592571093-54",
@@ -3642,6 +3888,43 @@
   "game": "https://www.chess.com/game/live/80592571093"
  },
  {
+  "id": "169390262774-16",
+  "fen": "r1b1kbnr/1p1n1p1p/p2p1qp1/2pPp1N1/2B1P3/8/PPP2PPP/RNBQR1K1 w kq - 2 9",
+  "lastMove": {
+   "from": "d8",
+   "to": "f6",
+   "san": "Qf6"
+  },
+  "solution": "Nf3",
+  "accepted": [
+   "Nf3",
+   "Bd3",
+   "Bf1",
+   "a4",
+   "Bd2",
+   "Be2",
+   "h3",
+   "b3",
+   "a3",
+   "Be3",
+   "g3",
+   "Qd2"
+  ],
+  "line": [
+   "Nf3",
+   "Bh6",
+   "Nbd2",
+   "b6",
+   "Bf1"
+  ],
+  "motif": "quiet",
+  "mateIn": null,
+  "date": "2026-05-29",
+  "ownSide": true,
+  "played": "Qg4",
+  "game": "https://www.chess.com/game/live/169390262774"
+ },
+ {
   "id": "78075653363-29",
   "fen": "rn2k3/ppq1pp2/2p3pb/3p4/3PPB2/2P2PRb/PPB4r/RNQ1K3 b Qq - 0 15",
   "lastMove": {
@@ -3666,6 +3949,39 @@
   "ownSide": true,
   "played": "Bxf4",
   "game": "https://www.chess.com/game/live/78075653363"
+ },
+ {
+  "id": "168762221546-57",
+  "fen": "2k5/pp1n3B/3r2p1/1P2p3/2p1P3/P1Pb1PN1/5KP1/3R4 b - - 2 29",
+  "lastMove": {
+   "from": "g1",
+   "to": "f2",
+   "san": "Kf2"
+  },
+  "solution": "Kc7",
+  "accepted": [
+   "Kc7",
+   "Nb6",
+   "Nc5",
+   "a6",
+   "Rf6",
+   "Kd8",
+   "Rb6",
+   "Nf8"
+  ],
+  "line": [
+   "Kc7",
+   "Rh1",
+   "Nb6",
+   "Rh6",
+   "Na4"
+  ],
+  "motif": "quiet",
+  "mateIn": null,
+  "date": "2026-05-15",
+  "ownSide": true,
+  "played": "Nf6",
+  "game": "https://www.chess.com/game/live/168762221546"
  },
  {
   "id": "868463189-23",
@@ -3694,6 +4010,33 @@
   "game": "https://www.chess.com/game/live/868463189"
  },
  {
+  "id": "168547701614-14",
+  "fen": "r1bqk2r/ppppbppp/2n5/4P1B1/2Bp2n1/5N2/PPP2PPP/RN1Q1RK1 w kq - 3 8",
+  "lastMove": {
+   "from": "c5",
+   "to": "e7",
+   "san": "Be7"
+  },
+  "solution": "Bxe7",
+  "accepted": [
+   "Bxe7",
+   "Bf4"
+  ],
+  "line": [
+   "Bxe7",
+   "Qxe7",
+   "Re1",
+   "O-O",
+   "Nbd2"
+  ],
+  "motif": "quiet",
+  "mateIn": null,
+  "date": "2026-05-11",
+  "ownSide": true,
+  "played": "Nxd4",
+  "game": "https://www.chess.com/game/live/168547701614"
+ },
+ {
   "id": "95286556721-29",
   "fen": "rnb1k2r/ppp2p1p/3qP1p1/5nN1/2B5/2N4P/PPP1Q1Pb/R1B2R1K b kq - 2 15",
   "lastMove": {
@@ -3718,6 +4061,35 @@
   "ownSide": true,
   "played": "Ng3+",
   "game": "https://www.chess.com/game/live/95286556721"
+ },
+ {
+  "id": "165674964960-14",
+  "fen": "r1bqk2r/ppppbppp/2n5/4P1B1/2Bp2n1/5N2/PPP2PPP/RN1Q1RK1 w kq - 3 8",
+  "lastMove": {
+   "from": "c5",
+   "to": "e7",
+   "san": "Be7"
+  },
+  "solution": "Bxe7",
+  "accepted": [
+   "Bxe7",
+   "Bf4",
+   "h3",
+   "h4"
+  ],
+  "line": [
+   "Bxe7",
+   "Qxe7",
+   "c3",
+   "dxc3",
+   "Nxc3"
+  ],
+  "motif": "quiet",
+  "mateIn": null,
+  "date": "2026-03-08",
+  "ownSide": true,
+  "played": "e6",
+  "game": "https://www.chess.com/game/live/165674964960"
  },
  {
   "id": "121542848534-39",
@@ -3746,6 +4118,37 @@
   "game": "https://www.chess.com/game/live/121542848534"
  },
  {
+  "id": "145317695876-93",
+  "fen": "8/6pB/8/8/1P6/1R4PP/P2k1q2/7K b - - 1 47",
+  "lastMove": {
+   "from": "h2",
+   "to": "h1",
+   "san": "Kh1"
+  },
+  "solution": "Qf1+",
+  "accepted": [
+   "Qf1+",
+   "Qe1+",
+   "Qf6",
+   "Qa7",
+   "Qf7",
+   "Qf8",
+   "Qb6"
+  ],
+  "line": [
+   "Qf1+",
+   "Kh2",
+   "Qf2+",
+   "Kh1"
+  ],
+  "motif": "quiet",
+  "mateIn": null,
+  "date": "2025-11-09",
+  "ownSide": true,
+  "played": "Qxg3",
+  "game": "https://www.chess.com/game/live/145317695876"
+ },
+ {
   "id": "75155101051-36",
   "fen": "r2q1r2/1p4kp/p4pp1/1b1pp3/3Nn3/1P1NQ3/PP3PPP/2KR3R w - - 0 19",
   "lastMove": {
@@ -3770,6 +4173,33 @@
   "ownSide": true,
   "played": "Ne6+",
   "game": "https://www.chess.com/game/live/75155101051"
+ },
+ {
+  "id": "145280933586-49",
+  "fen": "2k4r/1p3p2/pP1pq1p1/P1pRp2r/2P2Pn1/4PQ1N/6PP/5RK1 b - - 6 25",
+  "lastMove": {
+   "from": "d1",
+   "to": "d5",
+   "san": "Rd5"
+  },
+  "solution": "e4",
+  "accepted": [
+   "e4",
+   "exf4"
+  ],
+  "line": [
+   "e4",
+   "f5",
+   "exf3",
+   "fxe6",
+   "fxe6"
+  ],
+  "motif": "quiet",
+  "mateIn": null,
+  "date": "2025-11-08",
+  "ownSide": true,
+  "played": "Kd7",
+  "game": "https://www.chess.com/game/live/145280933586"
  },
  {
   "id": "68315649149-38",
@@ -3798,6 +4228,43 @@
   "game": "https://www.chess.com/game/live/68315649149"
  },
  {
+  "id": "145025271998-66",
+  "fen": "5r2/p2pr3/1k5p/1p4p1/2p1B1P1/P2P1N1P/1P3K2/2R5 w - - 0 34",
+  "lastMove": {
+   "from": "c5",
+   "to": "c4",
+   "san": "c4"
+  },
+  "solution": "b3",
+  "accepted": [
+   "b3",
+   "Rd1",
+   "Rc3",
+   "Bf5",
+   "Rc2",
+   "b4",
+   "Kg3",
+   "Kg2",
+   "Bg6",
+   "a4",
+   "Ra1",
+   "Rf1"
+  ],
+  "line": [
+   "b3",
+   "cxb3",
+   "Rc3",
+   "a5",
+   "Rxb3"
+  ],
+  "motif": "quiet",
+  "mateIn": null,
+  "date": "2025-11-02",
+  "ownSide": true,
+  "played": "dxc4",
+  "game": "https://www.chess.com/game/live/145025271998"
+ },
+ {
   "id": "51834637549-27",
   "fen": "rnb2rk1/pp3ppp/2p2p2/7Q/1P1P4/P1NBP1q1/2PN2Pb/R2K3R b - - 3 14",
   "lastMove": {
@@ -3822,6 +4289,42 @@
   "ownSide": true,
   "played": "Bg4+",
   "game": "https://www.chess.com/game/live/51834637549"
+ },
+ {
+  "id": "143745135602-14",
+  "fen": "r2qkbnr/pp3ppp/2n1p1b1/2ppP3/6P1/3P1N1P/PPP2PB1/RNBQK2R w KQkq - 2 8",
+  "lastMove": {
+   "from": "b8",
+   "to": "c6",
+   "san": "Nc6"
+  },
+  "solution": "Nc3",
+  "accepted": [
+   "Nc3",
+   "O-O",
+   "Bg5",
+   "Kf1",
+   "Bf4",
+   "Nbd2",
+   "Be3",
+   "a3",
+   "Bd2",
+   "Na3",
+   "a4"
+  ],
+  "line": [
+   "Nc3",
+   "h5",
+   "g5",
+   "h4",
+   "Ne2"
+  ],
+  "motif": "quiet",
+  "mateIn": null,
+  "date": "2025-09-30",
+  "ownSide": true,
+  "played": "Nh4",
+  "game": "https://www.chess.com/game/live/143745135602"
  },
  {
   "id": "72589992115-112",
@@ -3850,6 +4353,34 @@
   "game": "https://www.chess.com/game/live/72589992115"
  },
  {
+  "id": "143739761022-35",
+  "fen": "r3kb1r/ppq1pp1p/3p2p1/2nP1b2/8/Q1R1BP2/PP2N1PP/K4B1R b kq - 3 18",
+  "lastMove": {
+   "from": "d3",
+   "to": "c3",
+   "san": "Rc3"
+  },
+  "solution": "Qd8",
+  "accepted": [
+   "Qd8",
+   "Bg7",
+   "Qb8"
+  ],
+  "line": [
+   "Qd8",
+   "b4",
+   "Bg7",
+   "bxc5",
+   "dxc5"
+  ],
+  "motif": "quiet",
+  "mateIn": null,
+  "date": "2025-09-30",
+  "ownSide": true,
+  "played": "Bd3",
+  "game": "https://www.chess.com/game/live/143739761022"
+ },
+ {
   "id": "99432733353-51",
   "fen": "r7/p1p1rpkp/1pPp2p1/6N1/2P2Q2/1qnRP2P/5PP1/2R3K1 b - - 1 26",
   "lastMove": {
@@ -3874,6 +4405,35 @@
   "ownSide": true,
   "played": "Qb4",
   "game": "https://www.chess.com/game/live/99432733353"
+ },
+ {
+  "id": "143466995866-43",
+  "fen": "r3k3/ppq3r1/2p2p1p/4p1p1/2Q2n2/2P4P/PP3PPB/3RR1K1 b q - 1 22",
+  "lastMove": {
+   "from": "a1",
+   "to": "d1",
+   "san": "Rad1"
+  },
+  "solution": "Qf7",
+  "accepted": [
+   "Qf7",
+   "Nd5",
+   "Kf8",
+   "Ng6"
+  ],
+  "line": [
+   "Qf7",
+   "Qa4",
+   "Kf8",
+   "Bxf4",
+   "gxf4"
+  ],
+  "motif": "quiet",
+  "mateIn": null,
+  "date": "2025-09-23",
+  "ownSide": true,
+  "played": "Rd7",
+  "game": "https://www.chess.com/game/live/143466995866"
  },
  {
   "id": "136348818614-58",
@@ -3902,6 +4462,34 @@
   "game": "https://www.chess.com/game/live/136348818614"
  },
  {
+  "id": "143006353122-38",
+  "fen": "2k3nr/ppq1rpp1/2pb2p1/4p1P1/4B3/1P3Q1P/PBPP1PK1/R3R3 w - - 1 20",
+  "lastMove": {
+   "from": "h6",
+   "to": "g8",
+   "san": "Ng8"
+  },
+  "solution": "d4",
+  "accepted": [
+   "d4",
+   "Rad1",
+   "Kf1"
+  ],
+  "line": [
+   "d4",
+   "exd4",
+   "Bxd4",
+   "Qd7",
+   "Bc3"
+  ],
+  "motif": "quiet",
+  "mateIn": null,
+  "date": "2025-09-11",
+  "ownSide": true,
+  "played": "Bxe5",
+  "game": "https://www.chess.com/game/live/143006353122"
+ },
+ {
   "id": "62955603241-27",
   "fen": "r2qkr2/p1p1p2p/6P1/2n1b3/1QP5/8/PP3P1P/RNB1K2R b KQq - 2 14",
   "lastMove": {
@@ -3926,6 +4514,43 @@
   "ownSide": true,
   "played": "Bd6",
   "game": "https://www.chess.com/game/live/62955603241"
+ },
+ {
+  "id": "139497930274-27",
+  "fen": "r1bqr1k1/5ppp/p1p2n2/2Bp4/3PpQ2/2P5/P1P1NPPP/R4RK1 b - - 3 14",
+  "lastMove": {
+   "from": "a3",
+   "to": "c5",
+   "san": "Bc5"
+  },
+  "solution": "Nh5",
+  "accepted": [
+   "Nh5",
+   "a5",
+   "Nd7",
+   "h6",
+   "Re6",
+   "Bg4",
+   "g6",
+   "Be6",
+   "h5",
+   "Ng4",
+   "e3",
+   "Qa5"
+  ],
+  "line": [
+   "Nh5",
+   "Qe3",
+   "a5",
+   "Rfe1",
+   "Ba6"
+  ],
+  "motif": "quiet",
+  "mateIn": null,
+  "date": "2025-06-12",
+  "ownSide": true,
+  "played": "Rb8",
+  "game": "https://www.chess.com/game/live/139497930274"
  },
  {
   "id": "65402969869-41",
@@ -3954,6 +4579,40 @@
   "game": "https://www.chess.com/game/live/65402969869"
  },
  {
+  "id": "123569086872-18",
+  "fen": "r1bq1rk1/pp2npbp/2n3p1/1BPp4/8/5N2/PPP2PPP/RNBQR1K1 w - - 3 10",
+  "lastMove": {
+   "from": "e8",
+   "to": "g8",
+   "san": "O-O"
+  },
+  "solution": "Nbd2",
+  "accepted": [
+   "Nbd2",
+   "Nc3",
+   "h3",
+   "a4",
+   "c3",
+   "Bxc6",
+   "Bf1",
+   "Na3",
+   "Ba4"
+  ],
+  "line": [
+   "Nbd2",
+   "Bg4",
+   "h3",
+   "Qa5",
+   "Bxc6"
+  ],
+  "motif": "quiet",
+  "mateIn": null,
+  "date": "2025-03-05",
+  "ownSide": true,
+  "played": "Ne5",
+  "game": "https://www.chess.com/game/live/123569086872"
+ },
+ {
   "id": "119945002010-31",
   "fen": "r3k2r/pp2nppp/1bp1p3/4P3/1PBqQP2/2BP4/PP3P1P/R3K2R b KQkq - 4 16",
   "lastMove": {
@@ -3978,6 +4637,36 @@
   "ownSide": false,
   "played": "Qxe4+",
   "game": "https://www.chess.com/game/live/119945002010"
+ },
+ {
+  "id": "127571376123-34",
+  "fen": "r3r1k1/pbp3pp/2q1pn2/1Np2pN1/2P5/3PQ3/PP3PPP/R4RK1 w - - 3 18",
+  "lastMove": {
+   "from": "b6",
+   "to": "c6",
+   "san": "Qc6"
+  },
+  "solution": "Nf3",
+  "accepted": [
+   "Nf3",
+   "Qf3",
+   "Qg3",
+   "f3",
+   "Qh3"
+  ],
+  "line": [
+   "Nf3",
+   "a6",
+   "Nc3",
+   "Rad8",
+   "Rfe1"
+  ],
+  "motif": "quiet",
+  "mateIn": null,
+  "date": "2024-12-10",
+  "ownSide": true,
+  "played": "Rfe1",
+  "game": "https://www.chess.com/game/live/127571376123"
  },
  {
   "id": "863587215-69",
@@ -4006,6 +4695,38 @@
   "game": "https://www.chess.com/game/live/863587215"
  },
  {
+  "id": "121186865974-93",
+  "fen": "8/3B3p/1k4p1/8/1K2P3/5P1P/5bP1/8 b - - 2 47",
+  "lastMove": {
+   "from": "b5",
+   "to": "d7",
+   "san": "Bd7"
+  },
+  "solution": "Kc7",
+  "accepted": [
+   "Kc7",
+   "Be1+",
+   "Kb7",
+   "Be3",
+   "g5",
+   "Bg1",
+   "Bg3"
+  ],
+  "line": [
+   "Kc7",
+   "Ba4",
+   "Kd6",
+   "f4",
+   "Bg3"
+  ],
+  "motif": "quiet",
+  "mateIn": null,
+  "date": "2024-11-30",
+  "ownSide": true,
+  "played": "Bc5+",
+  "game": "https://www.chess.com/game/live/121186865974"
+ },
+ {
   "id": "61746683233-84",
   "fen": "8/4Q2p/2K3p1/kp6/6P1/8/7P/q7 w - - 2 43",
   "lastMove": {
@@ -4030,6 +4751,38 @@
   "ownSide": true,
   "played": "Qa7+",
   "game": "https://www.chess.com/game/live/61746683233"
+ },
+ {
+  "id": "120877582888-41",
+  "fen": "r3k2r/pp1nb1pp/5q2/8/8/4QN2/PP3PPP/1R2RK2 b kq - 3 21",
+  "lastMove": {
+   "from": "c1",
+   "to": "e3",
+   "san": "Qe3"
+  },
+  "solution": "Rd8",
+  "accepted": [
+   "Rd8",
+   "Rc8",
+   "h6",
+   "Rf8",
+   "Nf8",
+   "Nb6",
+   "h5"
+  ],
+  "line": [
+   "Rd8",
+   "Ng5",
+   "Nb6",
+   "Ne6",
+   "Rd6"
+  ],
+  "motif": "quiet",
+  "mateIn": null,
+  "date": "2024-11-14",
+  "ownSide": true,
+  "played": "Kf7",
+  "game": "https://www.chess.com/game/live/120877582888"
  },
  {
   "id": "74202689637-59",

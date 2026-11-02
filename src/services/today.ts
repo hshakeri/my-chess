@@ -26,12 +26,13 @@ export function startOfDay(now: number): number {
   return d.getTime();
 }
 
+/** `dueCards` is the size of today's session (the queue of due reviews and new cards), not every card due. */
 export function todayRoutine(input: { now: number; cct: CctEvent[]; tacticSessions: TacticSession[]; dueCards: number; plansDue: number }): TodayStep[] {
   const since = startOfDay(input.now);
   const warmups = input.cct.filter((e) => e.source === 'warmup' && e.at >= since).length;
   return [
     { key: 'warmup', label: 'Warm-up', done: warmups >= WARMUP_ANSWERS },
-    { key: 'cards', label: 'Due cards', done: input.dueCards === 0, left: input.dueCards },
+    { key: 'cards', label: "Today's cards", done: input.dueCards === 0, left: input.dueCards },
     { key: 'tactics', label: 'Ten tactics', done: input.tacticSessions.some((s) => s.at >= since) },
     { key: 'plans', label: 'Plans', done: input.plansDue === 0, left: input.plansDue },
   ];

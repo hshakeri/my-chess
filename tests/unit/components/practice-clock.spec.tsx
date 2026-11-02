@@ -50,6 +50,9 @@ describe('Practice clock (DC-3)', () => {
     t += 600_000;
     act(() => vi.advanceTimersByTime(200));
     expect(flags).toEqual(['b']);
+    // The flagged clock stays at zero once the clocks stop
+    view.rerender(<PracticeClock {...props} live={false} turn="b" ply={1} />);
+    expect(clock('b')?.textContent).toBe('Maia 0:00');
   });
 
   it('adds the increment from the first move on, and starts again on a new game', () => {

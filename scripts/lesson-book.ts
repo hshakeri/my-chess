@@ -368,7 +368,7 @@ function renderTacticsSheet(positions: TacticPosition[], n: number, sheetNo: num
   toc.push({ heading: chapter, id: `ch-${n}`, no: `${n}.`, title: `${name} (${positions.length} positions)` });
   const intro =
     sheetNo === 1
-      ? `<p>Positions from your games, each just after a mistake, yours or your opponent's: one move wins clearly (checked with Stockfish 19). Each diagram is drawn from the side to move, with the move that had just been played. Aim for under a minute each. The answers are on the back. The app's Tactics deck holds ${tacticsDeck.length} of them and brings back the ones you miss.</p>`
+      ? `<p>Positions from your games, each just after a mistake, yours or your opponent's: in most of them one move wins clearly, and in a few nothing does and a solid move is right (checked with Stockfish 19). Each diagram is drawn from the side to move, with the move that had just been played. Aim for under a minute each. The answers are on the back. The app's Tactics deck holds ${tacticsDeck.length} of them and brings back the ones you miss.</p>`
       : '';
   let front = `<section class="sheet sheet-front drill-set" id="ch-${n}">${chapterHead(chapter, undefined, intro)}<div class="drills">`;
   let answers = '';
@@ -377,7 +377,11 @@ function renderTacticsSheet(positions: TacticPosition[], n: number, sheetNo: num
     const label = `${n}.${k + 1}`;
     front += `<div class="drill"><figure class="diagram">${diagram(t.fen, side)}<figcaption><b>${esc(label)}</b> ${esc(`${side === 'w' ? 'White' : 'Black'} to play, after ${t.lastMove.san}.`)}</figcaption></figure><p class="blankline">Your move: __________</p></div>`;
     const also = t.accepted.filter((san) => san !== t.solution);
-    const others = also.length ? ` (${also.join(' and ')} also win${also.length === 1 ? 's' : ''})` : '';
+    const others = !also.length
+      ? ''
+      : t.motif === 'quiet'
+      ? ` (as good: ${also.slice(0, 3).join(', ')})`
+      : ` (${also.join(' and ')} also win${also.length === 1 ? 's' : ''})`;
     answers += `<p><b>${esc(label)}</b> ${esc(`${t.solution}: ${MOTIF_LABEL[t.motif].toLowerCase()}${others}. Stockfish's line: ${numberLine(t.fen, t.line)}. From your game of ${t.date}.`)}</p>`;
     answerCount++;
   });

@@ -1086,10 +1086,15 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
   const lessonDueCount = Array.from(lessonCards.values()).filter((c) => c.due <= Date.now()).length;
   const sessionFinished = !!session && session.current === null && session.index >= session.cards.length;
   // Read again whenever one of the trainers closes or the due counts change
+  // Today's share of the due cards is one session: at most the queue's reviews and new cards, not every card due
+  const sessionSize = useMemo(() => {
+    const now = Date.now();
+    return buildQueue(dueCards, { now, retrievability: (c) => CardService.retrievability(c, now) }).length;
+  }, [dueCards]);
   const today = useMemo(
-    () => todayRoutine({ now: Date.now(), cct: readCctLog(), tacticSessions: readTacticSessions(), dueCards: dueCount, plansDue }),
+    () => todayRoutine({ now: Date.now(), cct: readCctLog(), tacticSessions: readTacticSessions(), dueCards: sessionSize, plansDue }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [warmupOpen, tacticsOpen, plansOpen, dueCount, plansDue]
+    [warmupOpen, tacticsOpen, plansOpen, sessionSize, plansDue]
   );
   const openStep = (key: TodayKey) => {
     if (key === 'warmup') setWarmupOpen(true);
@@ -1174,7 +1179,7 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
             data-action="tactics"
             onClick={() => setTacticsOpen(true)}
             className="bg-slate-950/80 border border-rose-500/40 rounded-lg px-3 py-2 text-xs font-semibold text-rose-300 hover:bg-rose-950/40"
-            title="Positions from your own games where one move wins: solve them fast, ten at a time"
+            title="Positions from your own games, most with one winning move: solve them fast, ten at a time"
           >
             <span data-tactics-redo={tacticsRedo}>Tactics{tacticsRedo ? ` · ${tacticsRedo} to redo` : ''}</span>
           </button>
@@ -1796,7 +1801,7 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
                       setTacticsOpen(true);
                     }}
                     className="px-3 py-1.5 rounded-lg bg-rose-700 hover:bg-rose-600 text-white text-xs font-semibold"
-                    title="Ten positions from your own games where one move wins"
+                    title="Ten positions from your own games, most with one winning move"
                   >
                     Now ten tactics
                   </button>

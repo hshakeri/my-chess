@@ -91,7 +91,7 @@ describe('Tactics deck (DC-2)', () => {
     const modal = () => view.container.querySelector('[data-modal="tactics"]')!;
     fireEvent.click(view.container.querySelector('[data-action="tactics-start"]')!);
     expect(modal().getAttribute('data-tactics-phase')).toBe('solving');
-    expect(view.container.textContent).toContain('White to play, after Kg8: find the winning move.');
+    expect(view.container.textContent).toContain('White to play, after Kg8: find the best move.');
     play(deck[0].fen, 'Rd8#');
     const first = view.container.querySelector('[data-tactic-result]')!;
     expect(first.getAttribute('data-correct')).toBe('true');
@@ -129,6 +129,25 @@ describe('Tactics deck (DC-2)', () => {
     play(tactic('m', 'mate-in-one').fen, 'Rd8#');
     expect(view.container.querySelector('[data-tactic-result]')?.getAttribute('data-correct')).toBe('true');
     expect(view.container.querySelector('[data-action="tactics-spar"]')).toBeNull();
+  });
+
+  it('in a quiet control position any solid move is right, and a wrong one is shown the solid moves', () => {
+    const quiet = tactic('q', 'quiet', {
+      fen: 'rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq e6 0 2',
+      lastMove: { from: 'e7', to: 'e5', san: 'e5' },
+      solution: 'Nf3',
+      accepted: ['Nf3', 'Nc3', 'Bc4'],
+      line: ['Nf3'],
+      played: 'Qh5',
+    });
+    const view = render(<TacticsDeckPanel deck={[quiet, { ...quiet, id: 'q2' }]} onClose={() => undefined} />);
+    fireEvent.click(view.container.querySelector('[data-action="tactics-start"]')!);
+    play(quiet.fen, 'Bc4');
+    expect(view.container.querySelector('[data-tactic-result]')?.getAttribute('data-correct')).toBe('true');
+    expect(view.container.querySelector('[data-tactic-result]')?.textContent).toContain('Nothing to win: a solid move.');
+    fireEvent.click(view.container.querySelector('[data-action="tactics-next"]')!);
+    play(quiet.fen, 'h3');
+    expect(view.container.querySelector('[data-tactic-result]')?.textContent).toContain('Again: h3 gives something away. Solid moves here: Nf3, Nc3, Bc4.');
   });
 
   it('sums up the deck for the Progress panel: seen, retired, to redo, and the solve time then and now', () => {
@@ -181,6 +200,12 @@ describe('Tactics deck (DC-2)', () => {
         expect(m.captured, t.id).toBeTruthy();
         const defended = new Chess(t.fen).attackers(m.to, m.color === 'w' ? 'b' : 'w').length > 0;
         expect(!defended || V[m.captured!] > V[m.piece], t.id).toBe(true);
+      }
+      if (t.motif === 'quiet') {
+        // A control position: several solid moves, and the game move not among them
+        expect(t.accepted.length, t.id).toBeGreaterThanOrEqual(2);
+        expect(t.accepted, t.id).not.toContain(t.played);
+        expect(t.ownSide, t.id).toBe(true);
       }
       if (t.motif === 'fork') {
         const them = m.color === 'w' ? 'b' : 'w';

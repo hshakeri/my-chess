@@ -133,7 +133,8 @@ export const TacticsDeckPanel: React.FC<{ onClose: () => void; deck?: TacticPosi
           <div>
             <h2 className="text-lg font-bold text-white">Tactics from your games</h2>
             <p className="text-xs text-slate-400" data-tactics-deck={deck.length} data-tactics-retired={retired}>
-              {deck.length} positions, each right after a mistake in one of your games, yours or your opponent's; one move wins clearly. Under{' '}
+              {deck.length} positions, each right after a mistake in one of your games, yours or your opponent's. In most of them one move wins clearly; in a few nothing
+              does, and any solid move is right. Under{' '}
               {GOOD_MS / 1000} seconds is Good, up to {HARD_MS / 1000} Hard, slower or wrong Again. A position retires after {RETIRE_STREAK} Good solves in
               a row: {retired} retired so far.
             </p>
@@ -202,13 +203,15 @@ export const TacticsDeckPanel: React.FC<{ onClose: () => void; deck?: TacticPosi
                   {phase === 'solving' && <span className={`font-mono ${elapsed > GOOD_MS ? 'text-amber-300' : 'text-emerald-300'}`}>{seconds(elapsed)}</span>}
                 </div>
                 <p className="text-white font-semibold">
-                  {toMove} to play, after {current.lastMove.san}: find the winning move.
+                  {toMove} to play, after {current.lastMove.san}: find the best move.
                 </p>
                 {phase === 'answered' && result && (
                   <div className="space-y-2" data-tactic-result={result.grade} data-correct={result.correct}>
                     <p className={result.correct ? 'text-emerald-300' : 'text-rose-300'}>
                       {result.correct
                         ? `${GRADE_LABEL[result.grade]}: ${result.san} in ${seconds(result.ms)}.`
+                        : current.motif === 'quiet'
+                        ? `Again: ${result.san} gives something away. Solid moves here: ${current.accepted.slice(0, 4).join(', ')}.`
                         : `Again: ${result.san} does not win. The move is ${current.solution}.`}
                     </p>
                     <p>
