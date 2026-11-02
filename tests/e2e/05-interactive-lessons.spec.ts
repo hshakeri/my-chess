@@ -267,6 +267,82 @@ test.describe('05. Interactive Lessons, Feedback Loops & Spaced Repetition (F16 
     await expect(page.locator('.correct-feedback')).toBeVisible();
   });
 
+  test('Caro-Kann vs 2.Bc4: the line from your games, 3...Qxd5?? answered, and the Qa5+ exercise', async ({ page }) => {
+    await page.goto('/#/lesson/lesson-black-caro-vs-bc4');
+    const move = async (from: string, to: string) => {
+      await page.locator(`[data-square="${from}"]`).click();
+      await page.locator(`[data-square="${to}"]`).click();
+    };
+    const yourTurn = page.getByText(/Your turn: find Black/);
+    await expect(page.locator('[data-square="e4"] img[alt="White p"]')).toBeVisible({ timeout: 5000 });
+    await expect(yourTurn).toBeVisible();
+    await move('c7', 'c6');
+    await expect(page.locator('[data-square="c4"] img[alt="White b"]')).toBeVisible({ timeout: 5000 });
+    await move('d7', 'd5');
+    await expect(page.locator('[data-square="d5"] img[alt="White p"]')).toBeVisible({ timeout: 5000 });
+    // The queen may not take back: the c4 bishop sees d5
+    await move('d8', 'd5');
+    await expect(page.locator('.wrong-move-feedback, [data-feedback="wrong"]').first()).toContainText('takes the queen', { timeout: 5000 });
+    await expect(page.locator('[data-square="d8"] img[alt="Black q"]')).toBeVisible({ timeout: 8000 });
+    await expect(yourTurn).toBeVisible({ timeout: 8000 });
+    await move('c6', 'd5');
+    for (const [check, from, to] of [
+      ['b5', 'b8', 'c6'],
+      ['f3', 'a7', 'a6'],
+      ['c6', 'b7', 'c6'],
+      ['d4', 'e7', 'e6'],
+    ] as const) {
+      await expect(page.locator(`[data-square="${check}"] img[alt^="White"]`)).toBeVisible({ timeout: 5000 });
+      await expect(yourTurn).toBeVisible({ timeout: 5000 });
+      await move(from, to);
+    }
+    // The exercise: 5.d3? and the check that wins the b5 bishop
+    await expect(page.locator('[data-square="b5"] img[alt="White b"]')).toBeVisible({ timeout: 10000 });
+    await expect(page.locator('[data-square="d3"] img[alt="White p"]')).toBeVisible();
+    await move('d8', 'a5');
+    await expect(page.locator('.correct-feedback').first()).toContainText('5...Qa5+ checks along a5-e1', { timeout: 10000 });
+    // Seven decisions scheduled: the slip on move 3 rated Again, the rest Good
+    await expect(page.getByText(/7 decisions scheduled this run: 1 again, 6 good/)).toBeVisible();
+  });
+
+  test('Caro-Kann Exchange: the knight before ...e6, and the block on c6 against Bb5+', async ({ page }) => {
+    await page.goto('/#/lesson/lesson-black-caro-exchange');
+    const move = async (from: string, to: string) => {
+      await page.locator(`[data-square="${from}"]`).click();
+      await page.locator(`[data-square="${to}"]`).click();
+    };
+    const yourTurn = page.getByText(/Your turn: find Black/);
+    for (const [check, from, to] of [
+      ['e4', 'c7', 'c6'],
+      ['d4', 'd7', 'd5'],
+      ['d5', 'c6', 'd5'],
+      ['c3', 'c8', 'f5'],
+    ] as const) {
+      await expect(page.locator(`[data-square="${check}"] img[alt^="White"]`)).toBeVisible({ timeout: 5000 });
+      await expect(yourTurn).toBeVisible({ timeout: 5000 });
+      await move(from, to);
+    }
+    // After 5.Nf3, ...e6 would let Bb5+ come with check: the lesson wants the knight first
+    await expect(page.locator('[data-square="f3"] img[alt="White n"]')).toBeVisible({ timeout: 5000 });
+    await move('e7', 'e6');
+    await expect(page.locator('.wrong-move-feedback, [data-feedback="wrong"]').first()).toContainText('6.Bb5+', { timeout: 5000 });
+    await expect(page.locator('[data-square="e7"] img[alt="Black p"]')).toBeVisible({ timeout: 8000 });
+    await expect(yourTurn).toBeVisible({ timeout: 8000 });
+    await move('b8', 'c6');
+    for (const [check, from, to] of [
+      ['b5', 'a7', 'a6'],
+      ['c6', 'b7', 'c6'],
+    ] as const) {
+      await expect(page.locator(`[data-square="${check}"] img[alt^="White"]`)).toBeVisible({ timeout: 5000 });
+      await expect(yourTurn).toBeVisible({ timeout: 5000 });
+      await move(from, to);
+    }
+    // The exercise: block 6.Bb5+ with the knight that belongs on c6
+    await expect(page.locator('[data-square="e6"] img[alt="Black p"]')).toBeVisible({ timeout: 10000 });
+    await move('b8', 'c6');
+    await expect(page.locator('.correct-feedback').first()).toContainText('6...Nc6 blocks', { timeout: 10000 });
+  });
+
   test('Black-perspective lessons play the opponent\'s first move for the student', async ({ page }) => {
     await page.locator('[data-course="pattern-library"]').click();
     await page.locator('[data-lesson-id="lesson-siberian-trap"]').click();
