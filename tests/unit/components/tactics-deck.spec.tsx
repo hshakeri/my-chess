@@ -86,7 +86,7 @@ describe('Tactics deck (DC-2)', () => {
   });
 
   it('runs a session: the right move graded, a wrong one shown the answer, and the summary at the end', () => {
-    const deck = [tactic('one', 'mate-in-one'), tactic('two', 'mate-in-one', { ownSide: false, played: 'Rd8#' })];
+    const deck = [tactic('one', 'mate-in-one', { share: 0.42 }), tactic('two', 'mate-in-one', { ownSide: false, played: 'Rd8#' })];
     const view = render(<TacticsDeckPanel deck={deck} onClose={() => undefined} />);
     const modal = () => view.container.querySelector('[data-modal="tactics"]')!;
     fireEvent.click(view.container.querySelector('[data-action="tactics-start"]')!);
@@ -97,6 +97,7 @@ describe('Tactics deck (DC-2)', () => {
     expect(first.getAttribute('data-correct')).toBe('true');
     expect(first.textContent).toContain('Mate in one. Stockfish\'s line: 30.Rd8#');
     expect(first.textContent).toContain('In the game you played h3.');
+    expect(first.textContent).toContain('Players of your rating find Rd8# about 42% of the time (Maia).');
     fireEvent.click(view.container.querySelector('[data-action="tactics-next"]')!);
     // A wrong move: Again, and the answer on the board
     play(deck[1].fen, 'h3');
@@ -186,6 +187,7 @@ describe('Tactics deck (DC-2)', () => {
       // The piece that just moved stands on its square, and it is the other side's
       expect(c.get(t.lastMove.to as never)?.color, t.id).toBe(c.turn() === 'w' ? 'b' : 'w');
       expect(t.accepted, t.id).toContain(t.solution);
+      expect(t.share === null || t.share === undefined || (t.share > 0 && t.share < 0.9), t.id).toBe(true);
       for (const san of [...t.accepted, t.played]) expect(() => new Chess(t.fen).move(san), `${t.id} ${san}`).not.toThrow();
       const line = new Chess(t.fen);
       for (const san of t.line) line.move(san);

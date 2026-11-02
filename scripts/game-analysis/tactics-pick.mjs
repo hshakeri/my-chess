@@ -76,7 +76,8 @@ for (const [k, c] of picked.entries()) {
 sf.quit();
 const TIER = { 'free-piece': 0, 'mate-in-one': 0, fork: 1, check: 1, mate: 2, promotion: 2, other: 2 };
 deck.sort((a, b) => TIER[a.motif] - TIER[b.motif] || (b.maiaShare ?? 0) - (a.maiaShare ?? 0));
-fs.writeFileSync(outFile, JSON.stringify(deck.map(({ maiaShare, ...t }) => t), null, 1) + '\n');
+// `share`: how often Maia's players of the game's ratings play the winning move (null when it is not among Maia's three likeliest)
+fs.writeFileSync(outFile, JSON.stringify(deck.map(({ maiaShare, game, ...t }) => ({ ...t, share: maiaShare, game })), null, 1) + '\n');
 const byMotif = {};
 for (const t of deck) byMotif[t.motif] = (byMotif[t.motif] ?? 0) + 1;
 console.error(`deck: ${deck.length}`, byMotif, 'own side', deck.filter((t) => t.ownSide).length);

@@ -149,6 +149,18 @@ test.describe('04. Personalized Diagnostics & Repertoire Recommendation (F13 - F
     await expect(habits.locator('[data-habit="kept_lead"]')).toHaveAttribute('data-rate', '0.724');
   });
 
+  test('Where your points go: the archive analysis on the first tab, each habit linked to its drill (DC-8)', async ({ page }) => {
+    const card = page.locator('[data-section="points"]');
+    await expect(card.locator('[data-points-row]')).toHaveCount(6);
+    await expect(card.locator('[data-points-row="hang"]')).toContainText('5.7');
+    await card.locator('[data-points-clock="clock"]').click();
+    await expect(page.locator('[data-section="clock-panel"]')).toBeVisible();
+    await page.locator('[data-view="diagnostics"] .overflow-x-auto > button').first().click();
+    await card.locator('[data-points-train="hang"]').click();
+    await expect(page).toHaveURL(/#\/lesson\/lesson-game-/);
+    await expect(page.locator('[data-view="lessons"]')).toBeVisible();
+  });
+
   test('Your clock: games lost on time, the pace against the opponents, and the games lost on time while ahead (DC-3)', async ({ page }) => {
     const view = page.locator('.diagnostics-view, [data-view="diagnostics"]').first();
     await view.locator('[data-diag-tab="clock"]').click();

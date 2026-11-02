@@ -36,6 +36,7 @@ import { Chessboard, BoardArrow } from '../components/Chessboard';
 import { RulesEngine } from '../engine/rules';
 import { MistakePatternsPanel } from './MistakePatternsPanel';
 import { ClockPanel } from './ClockPanel';
+import { PointsCard } from './PointsCard';
 import type { SparRequest } from '../services/sparLog';
 
 interface DiagnosticsViewProps {
@@ -347,6 +348,8 @@ export const DiagnosticsView: React.FC<DiagnosticsViewProps> = ({
       {/* 3. Leaks Tab */}
       {activeTab === 'leaks' && (
         <div className="space-y-6">
+          {/* The archive analysis first: the board checks and the clock, each with its trainer */}
+          <PointsCard onOpenClock={() => setActiveTab('clock')} />
           {/* Measured patterns strip */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3" data-section="patterns">
             {patterns.map((p) => {

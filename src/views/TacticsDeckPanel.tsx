@@ -218,6 +218,11 @@ export const TacticsDeckPanel: React.FC<{ onClose: () => void; deck?: TacticPosi
                       {MOTIF_LABEL[current.motif]}. Stockfish's line: <span className="font-mono">{numberLine(current.fen, current.line)}</span>
                     </p>
                     <p className="text-xs text-slate-400">{context(current)}</p>
+                    {current.share != null && (
+                      <p className="text-xs text-slate-400" data-tactic-share={current.share}>
+                        Players of your rating find {current.solution} about {Math.max(1, Math.round(current.share * 100))}% of the time (Maia).
+                      </p>
+                    )}
                     <div className="flex flex-wrap gap-2">
                       <button
                         type="button"

@@ -7,7 +7,7 @@ import fs from 'node:fs';
 
 const [deckFile, quietFile, outFile] = process.argv.slice(2);
 const deck = JSON.parse(fs.readFileSync(deckFile, 'utf8')).filter((t) => t.motif !== 'quiet');
-const quiet = JSON.parse(fs.readFileSync(quietFile, 'utf8')).map(({ cost, ...t }) => t);
+const quiet = JSON.parse(fs.readFileSync(quietFile, 'utf8')).map(({ cost, game, ...t }) => ({ ...t, share: null, game }));
 const middle = deck.map((t, i) => ['fork', 'check'].includes(t.motif) ? i : -1).filter((i) => i >= 0);
 if (!middle.length) throw new Error('no middle tier');
 const first = middle[0];

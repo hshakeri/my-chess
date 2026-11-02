@@ -40,6 +40,8 @@ export interface TacticPosition {
   /** Whether hoot65 is the side to move (the opponent had blundered), and the move played in the game. */
   ownSide: boolean;
   played: string;
+  /** How often players of the game's ratings play the winning move, by Maia (null when unknown, and for quiet positions). */
+  share?: number | null;
   game?: string;
 }
 

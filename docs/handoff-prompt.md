@@ -16,9 +16,9 @@ also runs on every push to another branch).
 
 - React 18 + Vite 6 + TypeScript (strict) + Tailwind; chess.js 1.4; Dexie 4 (IndexedDB); ts-fsrs 5
   for scheduling; maia3-js + onnxruntime-web in a Web Worker for the human-like engine.
-- Tests: Vitest (`npm test`, 438 tests: SSR `renderToString` specs, jsdom interaction specs under
+- Tests: Vitest (`npm test`, 440 tests: SSR `renderToString` specs, jsdom interaction specs under
   `tests/unit/curriculum/lessons-view-interactions.spec.tsx`, fake-indexeddb for the database) and
-  Playwright (`npm run test:e2e`, 97 tests incl. iPhone-viewport tests). Keep both green or update
+  Playwright (`npm run test:e2e`, 98 tests incl. iPhone-viewport tests). Keep both green or update
   tests deliberately and say why. The board question before each lesson move (CL-5) is on by default:
   a test that plays lesson moves either answers it or sets localStorage `my_chess_cct_gate` to `off`
   first (`page.addInitScript` in e2e, the jsdom spec's beforeEach). No `if (await ...isVisible())` guards in specs: a missing control
@@ -47,7 +47,8 @@ also runs on every push to another branch).
   detectors (Scandinavian 2.e5, early queen sortie, ...Bg4 aftermath, Blackburne-Shilling
   handling, mated/lost on time while ahead), repertoire trees for both colours with first-divergence
   detection ("Where you leave the repertoire"), "Practice this" (one-decision drill from a deviation
-  via `src/curriculum/factories.ts`) and "Adopt Repertoire". Tabs "Your Mistake Patterns" (reviewed
+  via `src/curriculum/factories.ts`) and "Adopt Repertoire". The first tab opens with "Where your
+  points go" (the archive analysis's six habits, each linked to its drill). Tabs "Your Mistake Patterns" (reviewed
   games counted, batch review, habit scorecard) and "Clock & Endings" (time losses, pace against the
   opponents, how games ended, resignations playable on against Maia).
 - **Interactive Lessons** (`src/views/LessonsView.tsx`): branching lessons, lesson tree beside the
