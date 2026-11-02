@@ -71,14 +71,14 @@ const playedNote = (l: CurriculumLesson, d: GameDrill) => {
 };
 
 describe('Drill positions from hoot65 games: the data', () => {
-  it('holds twelve positions per set from the newest games, one per game, inside the stated dates', () => {
+  it('holds sixteen positions per set from the newest games, one per game, inside the stated dates', () => {
     for (const [kind, set] of [
       ['threat', gameDrillData.threat],
       ['free', gameDrillData.free],
       ['hang', gameDrillData.hang],
       ['mate', gameDrillData.mate ?? []],
     ] as const) {
-      expect(set).toHaveLength(12);
+      expect(set).toHaveLength(16);
       const dates = set.map((d) => d.date);
       expect([...dates].sort().reverse(), `${kind} newest first`).toEqual(dates);
       for (const d of set) {

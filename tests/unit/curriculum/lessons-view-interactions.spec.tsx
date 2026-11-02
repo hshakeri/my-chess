@@ -239,7 +239,7 @@ describe('LessonsView interactions (jsdom)', () => {
     clickMove('f3', 'g3');
     await waitFor(() => expect(screen.getByText(/Lesson Completed!/)).toBeTruthy());
     expect(screen.getByText(/took the bishop on f7/)).toBeTruthy();
-    expect(document.querySelector('[data-section="drill-next"]')?.textContent).toMatch(/Position 1 of 12/);
+    expect(document.querySelector('[data-section="drill-next"]')?.textContent).toMatch(/Position 1 of 16/);
     fireEvent.click(document.querySelector('button[data-action="next-drill"]') as HTMLButtonElement);
     await waitFor(() => expect(document.querySelector(`[data-lesson-id="${second.id}"]`)?.className).toMatch(/border-emerald-500/));
   });

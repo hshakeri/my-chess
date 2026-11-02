@@ -44,7 +44,7 @@ app build. The results and what they mean are in `docs/game-analysis.md`.
    piece; a hang drill accepts the moves that keep the balance and leave nothing in danger (or
    capture, or check), and the capture that punishes the move played must take the piece it left.
    The move played must come out at least two pawns worse. A mate drill accepts the moves that allow
-   no mate in one and keep the balance. `pick` keeps the twelve newest per set, one per game, and
+   no mate in one and keep the balance. `pick` keeps the newest N per set (16 today), one per game, and
    writes `src/data/game_drills.json` (`add` replaces one set and keeps the others);
    `src/curriculum/gameDrills.ts` turns each into a lesson and states only facts it works out from
    the position with chess.js.

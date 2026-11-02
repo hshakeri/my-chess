@@ -130,16 +130,16 @@ Compromised Defence plays 9.Bg5; the Konikowski 9.Bf4 and the Elephant 7.Nxf6+ a
   measurable cost in opening choices; the points go to loose pieces, unanswered threats, missed free
   pieces and the clock. Re-run it as more games are played.
 - Game drills (2026-11-01): `src/curriculum/gameDrills.ts` turns `src/data/game_drills.json` (picked
-  by `scripts/game-analysis/drills.mjs`) into 48 one-decision lessons: 12 positions where the
-  opponent's last move attacked a piece that hoot65 left, 12 where an enemy piece could be won and
-  was not, 12 where nothing was in danger until hoot65's own move left a piece to take, and 12 where
+  by `scripts/game-analysis/drills.mjs`) into 64 one-decision lessons: 16 positions where the
+  opponent's last move attacked a piece that hoot65 left, 16 where an enemy piece could be won and
+  was not, 16 where nothing was in danger until hoot65's own move left a piece to take, and 16 where
   hoot65's move let the opponent mate at once (scanned back to January 2024). Every set is vetted
   by Stockfish with `scripts/game-analysis/verify-drills.mjs` (no lost games, a game move that cost
   at least 1.5 pawns, answers within 1.5 pawns of the best or still winning by 3). Each accepts the
   moves that keep (or win) the material and pass that cut, plays out the punishment after the game
   move, and has its own review card.
   They open the study path as four rows of numbered tiles ("From Your Games" course), print as four
-  one-page chapters of 12 diagrams in the book, and
+  one-page chapters of the newest 12 diagrams in the book, and
   `tests/unit/curriculum/game-drills.spec.ts` works out every fact their text states. Re-run the scan,
   `verify-drills.mjs vet` and `pick` as new games come in (`scripts/game-analysis/README.md`).
 - Lesson book print layout (2026-11-01): printed double-sided, every page with questions is the

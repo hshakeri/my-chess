@@ -323,6 +323,9 @@ function renderLesson(lesson: CurriculumLesson, n: number, group?: PatternGroup,
   return html;
 }
 
+/** Diagrams on one drill sheet: three rows of four. */
+const SHEET_DRILLS = 12;
+
 const drillById = new Map(
   [...gameDrillData.threat, ...gameDrillData.free, ...gameDrillData.hang, ...(gameDrillData.mate ?? [])].map((d) => [`lesson-game-${d.id}`, d] as const)
 );
@@ -410,7 +413,8 @@ for (const lesson of openingLessons) {
     // A drill set is one sheet of positions, printed where its first position falls; the first one carries the part heading
     if (!renderedSets.has(set)) {
       const before = renderedSets.size === 0 ? partHead('Part I · Your drills and repertoire lessons', '') : '';
-      chapters.push(renderDrillSet(set, ++n, group !== previousGroup ? group : undefined, before));
+      // One sheet holds twelve diagrams: the newest twelve of the set (the app has them all)
+      chapters.push(renderDrillSet(set.slice(0, SHEET_DRILLS), ++n, group !== previousGroup ? group : undefined, before));
     }
     renderedSets.add(set);
   } else {

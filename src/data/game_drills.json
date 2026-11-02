@@ -1,6 +1,6 @@
 {
   "source": "hoot65 Chess.com archive",
-  "from": "2024-08-25",
+  "from": "2024-06-08",
   "to": "2026-10-31",
   "threat": [
     {
@@ -233,6 +233,74 @@
       "target": "c5",
       "refutation": "Qxc5",
       "refutationPlayed": true
+    },
+    {
+      "id": "threat-169390262774-18",
+      "url": "https://www.chess.com/game/live/169390262774",
+      "date": "2026-05-29",
+      "opponent": "troubledoc79",
+      "color": "white",
+      "fenBefore": "r1b1kbnr/1p1n1p1p/p2p1qp1/2pPp1N1/2B1P1Q1/8/PPP2PPP/RNB1R1K1 b kq - 3 9",
+      "lastSan": "Nb6",
+      "played": "Bb3",
+      "accepted": [
+        "Qe2"
+      ],
+      "target": "g4",
+      "refutation": "Bxg4",
+      "refutationPlayed": true
+    },
+    {
+      "id": "threat-169323633640-28",
+      "url": "https://www.chess.com/game/live/169323633640",
+      "date": "2026-05-27",
+      "opponent": "Rokrock9",
+      "color": "white",
+      "fenBefore": "r3kbnr/1pq2ppp/p1n5/2pN4/Q4P2/3PB2P/PP4P1/R3KB1R b KQkq - 0 14",
+      "lastSan": "Qd6",
+      "played": "Rc1",
+      "accepted": [
+        "Nb6",
+        "Qe4+",
+        "Nc3",
+        "Qb3",
+        "Qc4"
+      ],
+      "target": "d5",
+      "refutation": "Qxd5",
+      "refutationPlayed": true
+    },
+    {
+      "id": "threat-167800865568-32",
+      "url": "https://www.chess.com/game/live/167800865568",
+      "date": "2026-04-25",
+      "opponent": "Turash10",
+      "color": "white",
+      "fenBefore": "r1bq1rk1/1p3pbp/p1n1p1pB/3p2N1/8/3B3Q/PPP2PPP/R3R1K1 b - - 1 16",
+      "lastSan": "e5",
+      "played": "Bxg7",
+      "accepted": [
+        "Qh4"
+      ],
+      "target": "h3",
+      "refutation": "Bxh3",
+      "refutationPlayed": true
+    },
+    {
+      "id": "threat-165717772570-24",
+      "url": "https://www.chess.com/game/live/165717772570",
+      "date": "2026-03-09",
+      "opponent": "ThuYa1125",
+      "color": "white",
+      "fenBefore": "rn1q1rk1/ppp1bpp1/5nbp/4R3/2BN2P1/2N4P/PPP2P2/R1BQ2K1 b - - 2 12",
+      "lastSan": "Nc6",
+      "played": "Bxh6",
+      "accepted": [
+        "Nxc6"
+      ],
+      "target": "e5",
+      "refutation": "Nxe5",
+      "refutationPlayed": true
     }
   ],
   "free": [
@@ -416,6 +484,66 @@
       ],
       "target": "a3",
       "reply": "Qxf3"
+    },
+    {
+      "id": "free-169910125784-74",
+      "url": "https://www.chess.com/game/live/169910125784",
+      "date": "2026-06-08",
+      "opponent": "abdulmohaimin",
+      "color": "white",
+      "fenBefore": "2r5/4ppkp/5qp1/3r4/6N1/1P3P2/P3Q1PP/4R2K b - - 2 37",
+      "lastSan": "Rcd8",
+      "played": "h3",
+      "accepted": [
+        "Nxf6"
+      ],
+      "target": "f6",
+      "reply": "Qf4"
+    },
+    {
+      "id": "free-169705508510-34",
+      "url": "https://www.chess.com/game/live/169705508510",
+      "date": "2026-06-04",
+      "opponent": "Gabriel-Fernandess",
+      "color": "white",
+      "fenBefore": "r1bq4/pp1kpn1Q/3p1rp1/2p3B1/4P2P/3P4/PPP2PP1/R3K2R b KQ - 2 17",
+      "lastSan": "Re6",
+      "played": "Qg7",
+      "accepted": [
+        "Qxf7"
+      ],
+      "target": "f7",
+      "reply": "Nxg5"
+    },
+    {
+      "id": "free-169275085832-31",
+      "url": "https://www.chess.com/game/live/169275085832",
+      "date": "2026-05-26",
+      "opponent": "Ajinkya-Jadhav",
+      "color": "black",
+      "fenBefore": "r4rk1/pp3ppp/2p1p3/3pPbq1/PPnP4/2B5/2PNQPPP/R4RK1 w - - 3 16",
+      "lastSan": "Nxc4",
+      "played": "Bh3",
+      "accepted": [
+        "dxc4"
+      ],
+      "target": "c4",
+      "reply": "g3"
+    },
+    {
+      "id": "free-168814872524-44",
+      "url": "https://www.chess.com/game/live/168814872524",
+      "date": "2026-05-17",
+      "opponent": "OXOTHNKds",
+      "color": "white",
+      "fenBefore": "r6r/ppk3p1/1b3q1p/1P6/3nR1Q1/2Np1N2/P1P3PP/R4K2 b - - 2 22",
+      "lastSan": "Nxf3",
+      "played": "Nd5+",
+      "accepted": [
+        "gxf3"
+      ],
+      "target": "f3",
+      "reply": "Kb8"
     }
   ],
   "hang": [
@@ -668,6 +796,86 @@
       "target": "e5",
       "refutation": "Qxe5",
       "refutationPlayed": false
+    },
+    {
+      "id": "hang-174297609928-87",
+      "url": "https://www.chess.com/game/live/174297609928",
+      "date": "2026-09-11",
+      "opponent": "ali12e3456",
+      "color": "black",
+      "fenBefore": "6k1/r4ppp/8/4P3/7P/p1n2PK1/B5P1/R7 w - - 4 44",
+      "lastSan": "Bb3",
+      "played": "Nd5",
+      "accepted": [
+        "Kf8",
+        "a2",
+        "Ra5",
+        "Ra6",
+        "Ra8",
+        "h6"
+      ],
+      "target": "d5",
+      "refutation": "Bxd5",
+      "refutationPlayed": true
+    },
+    {
+      "id": "hang-174203506826-22",
+      "url": "https://www.chess.com/game/live/174203506826",
+      "date": "2026-09-09",
+      "opponent": "forkman777",
+      "color": "white",
+      "fenBefore": "r3k1nr/1pp3pp/p3pq2/2b1N3/3p4/8/PPP2PPP/RNBQR1K1 b kq - 2 11",
+      "lastSan": "d3",
+      "played": "Be3",
+      "accepted": [
+        "Nxd3",
+        "Nf3",
+        "Qd2",
+        "Ng4"
+      ],
+      "target": "e5",
+      "refutation": "Qxe5",
+      "refutationPlayed": false
+    },
+    {
+      "id": "hang-173793027272-24",
+      "url": "https://www.chess.com/game/live/173793027272",
+      "date": "2026-08-31",
+      "opponent": "17AndreiV",
+      "color": "white",
+      "fenBefore": "r1b1k2r/pp1p1pp1/1qn2n1p/2b1P3/3NP3/2P1B3/PPB3PP/RN1Q1RK1 b kq - 0 12",
+      "lastSan": "Nxe5",
+      "played": "Qh5",
+      "accepted": [
+        "b4"
+      ],
+      "target": "h5",
+      "refutation": "Nxh5",
+      "refutationPlayed": true
+    },
+    {
+      "id": "hang-173635929006-18",
+      "url": "https://www.chess.com/game/live/173635929006",
+      "date": "2026-08-28",
+      "opponent": "Qashqai_14cherik",
+      "color": "white",
+      "fenBefore": "rnb2rk1/pppp1ppp/3b1q2/3P4/6N1/3P4/PPP1QPPP/R1B1KB1R b KQ - 2 9",
+      "lastSan": "Qd8",
+      "played": "Bh6",
+      "accepted": [
+        "Qf3",
+        "h4",
+        "Ne3",
+        "Kd1",
+        "d4",
+        "g3",
+        "Qd1",
+        "Qd2",
+        "Kd2"
+      ],
+      "target": "h6",
+      "refutation": "gxh6",
+      "refutationPlayed": false
     }
   ],
   "mate": [
@@ -917,6 +1125,70 @@
       ],
       "target": "b2",
       "refutation": "Qxb2#",
+      "refutationPlayed": true
+    },
+    {
+      "id": "mate-116606462407-49",
+      "url": "https://www.chess.com/game/live/116606462407",
+      "date": "2024-08-05",
+      "opponent": "pappawiking",
+      "color": "black",
+      "fenBefore": "2kr4/1p3p1p/1Pp3p1/8/4BP2/3nP1QP/P5PK/3q4 w - - 2 25",
+      "lastSan": "f5",
+      "played": "Qe1",
+      "accepted": [
+        "Rd7"
+      ],
+      "target": "c7",
+      "refutation": "Qc7#",
+      "refutationPlayed": true
+    },
+    {
+      "id": "mate-116109062981-60",
+      "url": "https://www.chess.com/game/live/116109062981",
+      "date": "2024-07-30",
+      "opponent": "link",
+      "color": "white",
+      "fenBefore": "8/6pp/2pqp1k1/8/6nP/8/5P2/1Q3RK1 b - - 3 30",
+      "lastSan": "Kf7",
+      "played": "Qe4",
+      "accepted": [
+        "Qb7+"
+      ],
+      "target": "h2",
+      "refutation": "Qh2#",
+      "refutationPlayed": true
+    },
+    {
+      "id": "mate-115794024027-45",
+      "url": "https://www.chess.com/game/live/115794024027",
+      "date": "2024-07-27",
+      "opponent": "Gol_d_rogr",
+      "color": "black",
+      "fenBefore": "rn3bkr/pp2p1pp/2p5/2qpQRP1/8/3P4/P6P/R5K1 w - - 3 23",
+      "lastSan": "d4",
+      "played": "Qc3",
+      "accepted": [
+        "Qd6"
+      ],
+      "target": "e6",
+      "refutation": "Qe6#",
+      "refutationPlayed": true
+    },
+    {
+      "id": "mate-111556974861-22",
+      "url": "https://www.chess.com/game/live/111556974861",
+      "date": "2024-06-08",
+      "opponent": "Punch1120",
+      "color": "white",
+      "fenBefore": "rn1qk2r/pp3ppp/2p1pP2/8/3p1B2/2N1PQ2/PPP4P/R3KB1R b KQkq - 0 11",
+      "lastSan": "dxc3",
+      "played": "fxg7",
+      "accepted": [
+        "bxc3"
+      ],
+      "target": "d2",
+      "refutation": "Qd2#",
       "refutationPlayed": true
     }
   ]
