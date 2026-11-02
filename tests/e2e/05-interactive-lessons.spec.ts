@@ -378,6 +378,44 @@ test.describe('05. Interactive Lessons, Feedback Loops & Spaced Repetition (F16 
     await expect(page.locator('.correct-feedback').first()).toContainText('7.Bxd5! takes the pawn', { timeout: 10000 });
   });
 
+  test('Against the Caro-Kann as White: ask the bishop, take on d5 first, then chase it', async ({ page }) => {
+    await page.goto('/#/lesson/lesson-white-vs-caro-kann');
+    const move = async (from: string, to: string) => {
+      await page.locator(`[data-square="${from}"]`).click();
+      await page.locator(`[data-square="${to}"]`).click();
+    };
+    const yourTurn = page.getByText(/Your turn: find White/);
+    await expect(page.locator('[data-square="c6"] img[alt="Black p"]')).toBeVisible({ timeout: 5000 });
+    for (const [check, from, to] of [
+      ['c6', 'b1', 'c3'],
+      ['d5', 'g1', 'f3'],
+      ['g4', 'h2', 'h3'],
+    ] as const) {
+      await expect(page.locator(`[data-square="${check}"] img[alt^="Black"]`)).toBeVisible({ timeout: 5000 });
+      await expect(yourTurn).toBeVisible({ timeout: 5000 });
+      await move(from, to);
+    }
+    // 4...Bh5: chasing at once is your habit; the lesson takes on d5 first
+    await expect(page.locator('[data-square="h5"] img[alt="Black b"]')).toBeVisible({ timeout: 5000 });
+    await move('g2', 'g4');
+    await expect(page.locator('.wrong-move-feedback, [data-feedback="wrong"]').first()).toContainText('5.g4 at once', { timeout: 5000 });
+    await expect(page.locator('[data-square="g2"] img[alt="White p"]')).toBeVisible({ timeout: 8000 });
+    await expect(yourTurn).toBeVisible({ timeout: 8000 });
+    await move('e4', 'd5');
+    for (const [check, from, to] of [
+      ['d5', 'g2', 'g4'],
+      ['g6', 'f3', 'e5'],
+    ] as const) {
+      await expect(page.locator(`[data-square="${check}"] img[alt^="Black"]`)).toBeVisible({ timeout: 5000 });
+      await expect(yourTurn).toBeVisible({ timeout: 5000 });
+      await move(from, to);
+    }
+    // The exercise: 6...Bxg4?? and the pawn that takes it
+    await expect(page.locator('[data-square="g4"] img[alt="Black b"]')).toBeVisible({ timeout: 10000 });
+    await move('h3', 'g4');
+    await expect(page.locator('.correct-feedback').first()).toContainText('7.hxg4 takes the bishop', { timeout: 10000 });
+  });
+
   test('Black-perspective lessons play the opponent\'s first move for the student', async ({ page }) => {
     await page.locator('[data-course="pattern-library"]').click();
     await page.locator('[data-lesson-id="lesson-siberian-trap"]').click();

@@ -362,6 +362,9 @@ export const evansGambitDestruction: CurriculumLesson = buildVerifiedLesson({
       hintPiece: 'b-Pawn',
       hintSquare: 'b4',
       hintTheme: 'Wing sacrifice for central tempo',
+      wrongMoveFeedback: {
+        'O-O': '4.O-O is sound (Stockfish even rates it a little higher), but this repertoire plays the Evans Gambit: in your games 4.b4 scored 6 points in 7 and 4.O-O none in 3.',
+      },
     },
     {
       san: 'Bxb4',
@@ -681,7 +684,15 @@ export const twoKnightsD4Lesson: CurriculumLesson = buildVerifiedLesson({
     { san: 'd4', isUserMove: true },
     // After 4.d4: 4...exd4 7, 4...Bb4+ 1, 4...Bd6 1, 4...d5 1.
     { san: 'exd4', isUserMove: false, frequency: 7 },
-    { san: 'O-O', isUserMove: true, annotation: 'Castle before taking back: the rook is ready for the e-file.', hintTheme: 'King to safety, rook to the centre' },
+    {
+      san: 'O-O',
+      isUserMove: true,
+      annotation: 'Castle before taking back: the rook is ready for the e-file.',
+      hintTheme: 'King to safety, rook to the centre',
+      wrongMoveFeedback: {
+        e5: '5.e5 is just as good by Stockfish. This lesson castles first, so that the rook comes to e1 against the king.',
+      },
+    },
     {
       san: 'Nxe4',
       isUserMove: false,
@@ -759,9 +770,153 @@ export const twoKnightsD4Lesson: CurriculumLesson = buildVerifiedLesson({
   ],
 });
 
+/**
+ * White against the Caro-Kann along hoot65's own games: 2.Nc3 and 3.Nf3, the knights first (the
+ * plan in docs/pedagogy-audit.md, DC-1: keep what scores). Evaluations are Stockfish 19's at depth
+ * 20; the counts are the seed games' in this move order.
+ */
+export const caroKannForWhiteLesson: CurriculumLesson = buildVerifiedLesson({
+  id: 'lesson-white-vs-caro-kann',
+  title: 'Against the Caro-Kann as White',
+  subtitle: 'When Black pins with the bishop',
+  category: 'opening',
+  sourceBook: 'Chess.com Live Archive',
+  author: 'hoot65 Diagnostic Analysis',
+  publicationYear: 2026,
+  eco: 'B11',
+  targetColor: 'white',
+  targetRatingBand: 'beginner',
+  relevance: 'core',
+  startPly: 2,
+  description:
+    '1...c6 came up in 19 of your White games. You answered 2.Nc3 (10 games) or 2.Nf3 (8), and after 2...d5 the second knight came out too. After 2.Nc3 d5 3.Nf3 Black played 3...Bg4 in 3 games and 3...dxe4 in 2, and you scored 4 points of 5. When the bishop pins the knight, ask it with h3; if it retreats to h5, take on d5 first and then chase it with g4.',
+  thematicObjective:
+    '2.Nc3 d5 3.Nf3 Bg4 4.h3: after 4...Bxf3 5.Qxf3 White has the two bishops; after 4...Bh5 5.exd5 cxd5 6.g4 Bg6 7.Ne5 the knight attacks the bishop on g6.',
+  keyTacticalMotif: 'A bishop chased by h3 and g4, with 6...Bxg4?? 7.hxg4 losing it',
+  moves: [
+    { san: 'e4', isUserMove: true },
+    { san: 'c6', isUserMove: false },
+    {
+      san: 'Nc3',
+      isUserMove: true,
+      annotation: 'Develop the knight and guard e4.',
+      hintTheme: 'Develop and guard e4',
+      wrongMoveFeedback: {
+        Nf3: '2.Nf3 is good too (you played it 8 times): after 2...d5 3.Nc3 it is the same position. This lesson plays 2.Nc3 first.',
+        d4: '2.d4 is good too, and leads to the main lines. This lesson keeps the knights\' plan you play.',
+      },
+    },
+    // After 2.Nc3: 2...d5 9, 2...d6 1.
+    { san: 'd5', isUserMove: false, frequency: 9, annotation: 'Black attacks e4.' },
+    {
+      san: 'Nf3',
+      isUserMove: true,
+      annotation: 'The second knight.',
+      hintTheme: 'The second knight',
+      wrongMoveFeedback: {
+        h3: '3.h3?! spends a move before Black\'s bishop has come out; 3.Nf3 develops. You lost the game with 3.h3.',
+        d4: '3.d4 is good too, and leads to the main lines. This lesson keeps the knights\' plan you play.',
+      },
+    },
+    {
+      san: 'Bg4',
+      isUserMove: false,
+      // After 3.Nf3: 3...Bg4 3, 3...dxe4 2.
+      frequency: 3,
+      annotation: 'The bishop pins the knight to the queen.',
+      alternatives: {
+        dxe4: [
+          { san: 'Nxe4', isUserMove: true, frequency: 2, annotation: 'Take back.' },
+          // After 4.Nxe4: 4...Nf6 1, 4...Bg4 1.
+          { san: 'Nf6', isUserMove: false, frequency: 1 },
+          {
+            san: 'Nxf6+',
+            isUserMove: true,
+            annotation: 'Trade the knights: after 5...exf6 Black\'s f-pawns are doubled.',
+            wrongMoveFeedback: {
+              Qe2: '5.Qe2 is a good move too (Stockfish even prefers it slightly). This lesson trades on f6.',
+            },
+          },
+          { san: 'exf6', isUserMove: false, frequency: 1 },
+          {
+            san: 'Bc4',
+            isUserMove: true,
+            annotation: 'Develop: the bishop on c4 aims at f7.',
+            accept: { san: ['d4', 'Be2'] },
+          },
+        ],
+      },
+    },
+    {
+      san: 'h3',
+      isUserMove: true,
+      annotation: 'Ask the bishop at once: take on f3 or retreat.',
+      hintTheme: 'Ask the bishop',
+    },
+    {
+      san: 'Bh5',
+      isUserMove: false,
+      // After 4.h3: 4...Bh5 2.
+      frequency: 2,
+      annotation: 'Black keeps the bishop, but on h5 it can be chased.',
+      alternatives: {
+        Bxf3: [
+          { san: 'Qxf3', isUserMove: true, annotation: 'Take back with the queen: White has the two bishops.' },
+          { san: 'e6', isUserMove: false },
+          {
+            san: 'g3',
+            isUserMove: true,
+            annotation: 'A quiet plan: Bg2 and castling, with the two bishops.',
+            accept: { san: ['d4', 'Be2', 'a3'] },
+          },
+        ],
+      },
+    },
+    {
+      san: 'exd5',
+      isUserMove: true,
+      annotation: 'Take on d5 first.',
+      hintTheme: 'Exchange before you chase',
+      wrongMoveFeedback: {
+        g4: '5.g4 at once, your move in both of these games, is playable; Stockfish rates 5.exd5 cxd5 first stronger by about a third of a pawn.',
+      },
+    },
+    { san: 'cxd5', isUserMove: false },
+    {
+      san: 'g4',
+      isUserMove: true,
+      annotation: 'Now chase the bishop: 6...Bxg4?? 7.hxg4 would lose it.',
+      hintTheme: 'Chase the bishop',
+      wrongMoveFeedback: {
+        'Bb5+': '6.Bb5+ is playable, but Stockfish rates 6.g4 first stronger by about half a pawn.',
+      },
+    },
+    { san: 'Bg6', isUserMove: false },
+    {
+      san: 'Ne5',
+      isUserMove: true,
+      annotation: 'The knight attacks the bishop on g6: after Nxg6 hxg6 White has the two bishops.',
+    },
+  ],
+  exercises: [
+    {
+      id: 'ex-white-caro-bxg4',
+      title: 'The Bishop on g4',
+      // 1.e4 c6 2.Nc3 d5 3.Nf3 Bg4 4.h3 Bh5 5.exd5 cxd5 6.g4 Bxg4??
+      fen: 'rn1qkbnr/pp2pppp/8/3p4/6b1/2N2N1P/PPPP1P2/R1BQKB1R w KQkq - 0 7',
+      turn: 'w',
+      difficultyRating: 1,
+      prompt: 'White to play. Black has just taken on g4. What does White play?',
+      solutionSan: ['hxg4'],
+      explanation: '7.hxg4 takes the bishop: the h3 pawn guards g4, and Black has only a pawn for the piece.',
+    },
+  ],
+});
+
 export const openingLessons: CurriculumLesson[] = [
   scotchGambitBreakthrough,
   evansGambitDestruction,
   twoKnightsD4Lesson,
+  caroKannForWhiteLesson,
   adamsAttackSicilian,
 ];

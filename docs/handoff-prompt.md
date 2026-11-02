@@ -16,9 +16,9 @@ also runs on every push to another branch).
 
 - React 18 + Vite 6 + TypeScript (strict) + Tailwind; chess.js 1.4; Dexie 4 (IndexedDB); ts-fsrs 5
   for scheduling; maia3-js + onnxruntime-web in a Web Worker for the human-like engine.
-- Tests: Vitest (`npm test`, 488 tests: SSR `renderToString` specs, jsdom interaction specs under
+- Tests: Vitest (`npm test`, 497 tests: SSR `renderToString` specs, jsdom interaction specs under
   `tests/unit/curriculum/lessons-view-interactions.spec.tsx`, fake-indexeddb for the database) and
-  Playwright (`npm run test:e2e`, 107 tests incl. iPhone-viewport tests). Keep both green or update
+  Playwright (`npm run test:e2e`, 108 tests incl. iPhone-viewport tests). Keep both green or update
   tests deliberately and say why. The board question before each lesson move (CL-5) is on by default:
   a test that plays lesson moves either answers it or sets localStorage `my_chess_cct_gate` to `off`
   first (`page.addInitScript` in e2e, the jsdom spec's beforeEach). No `if (await ...isVisible())` guards in specs: a missing control
@@ -158,8 +158,8 @@ Compromised Defence plays 9.Bg5; the Konikowski 9.Bf4 and the Elephant 7.Nxf6+ a
   a draft, reads from its bookmarks where each heading landed, puts a notes page wherever a sheet would
   start on a back (rendering again after each), fills in the page numbers (contents and each chapter's pointer to its
   practice), renders the book, and fails if any sheet is not a front page followed by its answers.
-  78 US Letter pages, 23 sheets (the four drill sheets, three tactics sheets at the end of Part I,
-  sixteen practice sheets), 449 answers. Diagrams are SVG drawings with the app's
+  82 US Letter pages, 24 sheets (the four drill sheets, three tactics sheets at the end of Part I,
+  seventeen practice sheets), 461 answers. Diagrams are SVG drawings with the app's
   piece set (`public/pieces`); the fonts are Times New Roman and Arial, whose metric twins Liberation
   Serif and Sans the Linux runner has, so pages break the same way there. All text is black and dark
   squares are a light grey.
@@ -261,8 +261,11 @@ Next: the roadmap below.
   pieces on long lines, and "Caro-Kann Exchange" (`lesson-black-caro-exchange`, 4 games), in the
   group on the Caro-Kann bishop; and as White "Two Knights with 4.d4" (`lesson-two-knights-d4`, the
   move hoot65 plays in 10 of 12 games against 3...Nf6; its drill starts after 4...exd4 so it never
-  shares a decision with the Evans lesson's 4.d3), in the group on the king in the centre. Every
-  stated fact is replayed in `tests/unit/curriculum/caro-*.spec.ts` and `two-knights-d4.spec.ts`.
+  shares a decision with the Evans lesson's 4.d3), in the group on the king in the centre, and
+  "Against the Caro-Kann as White" (`lesson-white-vs-caro-kann`, 2.Nc3 d5 3.Nf3, the largest gap in
+  the last year's 475 games), in the group on the Caro-Kann bishop. Every
+  stated fact is replayed in `tests/unit/curriculum/caro-*.spec.ts`, `two-knights-d4.spec.ts` and
+  `white-vs-caro.spec.ts`.
   Other gaps that analysis showed, by seed games: 1.e4 e6 (10), 1.e4 g6 (7), 1.e4 Nc6 (5) as White
   (the French needs a choice of system first: hoot65's own second moves vary; against 1...g6 hoot65
   already scores 5 of 7), and 2.d3 (3) as Black. Against the Two Knights (3...Nf6) the lessons teach

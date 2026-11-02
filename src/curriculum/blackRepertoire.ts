@@ -18,6 +18,18 @@ const SOURCE = {
   publicationYear: 2026,
 } as const;
 
+/**
+ * hoot65's own first moves as Black, answered where a lesson asks for the repertoire's: 1...d6
+ * against 1.e4 and 1...Nf6 against 1.d4 are what the seed games show most after the repertoire's
+ * moves (counts and points from src/data/seed_hoot65_games.json).
+ */
+const AGAINST_E4 = {
+  d6: '1...d6 is your other answer to 1.e4 (41 of your games, 20 points; the Caro-Kann scored 36 in 67). This course trains the Caro-Kann: 1...c6.',
+};
+const AGAINST_D4 = {
+  Nf6: '1...Nf6 was your move in 29 of your 30 games against 1.d4 (11 points). This course trains the c6-d5 wall: 1...d5, then ...c6.',
+};
+
 export const slavWallLesson: CurriculumLesson = buildVerifiedLesson({
   ...SOURCE,
   id: 'lesson-black-slav-wall',
@@ -40,6 +52,7 @@ export const slavWallLesson: CurriculumLesson = buildVerifiedLesson({
       isUserMove: true,
       annotation: 'The same pawn as the Caro-Kann\'s ...d5: it claims e4 and c4.',
       hintTheme: 'Claim the centre',
+      wrongMoveFeedback: AGAINST_D4,
     },
     {
       san: 'c4',
@@ -203,7 +216,7 @@ export const londonWallLesson: CurriculumLesson = buildVerifiedLesson({
   keyTacticalMotif: 'Attack on the undefended b2 pawn after the c1 bishop has left',
   moves: [
     { san: 'd4', isUserMove: false },
-    { san: 'd5', isUserMove: true, annotation: 'The wall starts with d5, as against 2.c4.' },
+    { san: 'd5', isUserMove: true, annotation: 'The wall starts with d5, as against 2.c4.', wrongMoveFeedback: AGAINST_D4 },
     {
       san: 'Bf4',
       isUserMove: false,
@@ -338,7 +351,7 @@ export const wallVsNc3Bg5Lesson: CurriculumLesson = buildVerifiedLesson({
   keyTacticalMotif: 'Transposition into the Caro-Kann; attack on b2 after the c1 bishop leaves',
   moves: [
     { san: 'd4', isUserMove: false },
-    { san: 'd5', isUserMove: true },
+    { san: 'd5', isUserMove: true, wrongMoveFeedback: AGAINST_D4 },
     {
       san: 'Nc3',
       isUserMove: false,
@@ -439,7 +452,7 @@ export const caroKannAdvanceLesson: CurriculumLesson = buildVerifiedLesson({
   keyTacticalMotif: 'Undermining the pawn chain at d4; counting attackers on d4',
   moves: [
     { san: 'e4', isUserMove: false },
-    { san: 'c6', isUserMove: true },
+    { san: 'c6', isUserMove: true, wrongMoveFeedback: AGAINST_E4 },
     { san: 'd4', isUserMove: false },
     { san: 'd5', isUserMove: true },
     { san: 'e5', isUserMove: false, frequency: 14, annotation: 'The Advance Variation: White gains space and closes the centre.' },
@@ -590,7 +603,7 @@ export const caroKannBg4TimingLesson: CurriculumLesson = buildVerifiedLesson({
   keyTacticalMotif: 'Queen check on a4 that also hits g4 along an open fourth rank',
   moves: [
     { san: 'e4', isUserMove: false },
-    { san: 'c6', isUserMove: true },
+    { san: 'c6', isUserMove: true, wrongMoveFeedback: AGAINST_E4 },
     {
       san: 'Nf3',
       isUserMove: false,
@@ -769,7 +782,7 @@ export const caroKannBc4Lesson: CurriculumLesson = buildVerifiedLesson({
   keyTacticalMotif: 'A queen check from a5 that also attacks an undefended bishop on b5',
   moves: [
     { san: 'e4', isUserMove: false },
-    { san: 'c6', isUserMove: true },
+    { san: 'c6', isUserMove: true, wrongMoveFeedback: AGAINST_E4 },
     // After 1.e4 c6: 2.d4 25, 2.Nf3 20, 2.Bc4 8, 2.Nc3 4.
     { san: 'Bc4', isUserMove: false, frequency: 8 },
     {
@@ -935,7 +948,7 @@ export const caroKannExchangeLesson: CurriculumLesson = buildVerifiedLesson({
   keyTacticalMotif: 'A pinned knight on d7 attacked twice, by the b5 bishop and a knight on e5',
   moves: [
     { san: 'e4', isUserMove: false },
-    { san: 'c6', isUserMove: true },
+    { san: 'c6', isUserMove: true, wrongMoveFeedback: AGAINST_E4 },
     { san: 'd4', isUserMove: false },
     { san: 'd5', isUserMove: true },
     // After 2...d5: 3.e5 14, 3.exd5 4, 3.Nc3 3, 3.f3 2, 3.Nd2 1.
@@ -1033,7 +1046,7 @@ export const caroKannClassicalLesson: CurriculumLesson = buildVerifiedLesson({
   keyTacticalMotif: 'Escape square for the bishop before the h-pawn arrives',
   moves: [
     { san: 'e4', isUserMove: false },
-    { san: 'c6', isUserMove: true },
+    { san: 'c6', isUserMove: true, wrongMoveFeedback: AGAINST_E4 },
     { san: 'd4', isUserMove: false },
     { san: 'd5', isUserMove: true },
     { san: 'Nc3', isUserMove: false, annotation: 'The knight defends e4.' },
