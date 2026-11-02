@@ -13,7 +13,8 @@ import { Square, PieceColor, ChessPosition, ChessMoveRecord } from './types/ches
 import { HumanElo } from './types/engine';
 import { Chessboard } from './components/Chessboard';
 import { BoardControls } from './components/BoardControls';
-import { PracticeClock, type PaceTargets } from './components/PracticeClock';
+import { PracticeClock, newClockStore, type PaceTargets } from './components/PracticeClock';
+import { cannotMate } from './analytics/finalPosition';
 import { summarizeClock } from './analytics/clock';
 import { MoveList } from './components/MoveList';
 import { PositionSetupModal } from './components/PositionSetupModal';
@@ -194,6 +195,8 @@ export const App: React.FC = () => {
   const [flagged, setFlagged] = useState<'w' | 'b' | null>(null);
   const onFlag = useCallback((side: 'w' | 'b') => setFlagged(side), []);
   const onClockReset = useCallback(() => setFlagged(null), []);
+  // The clock's state outlives the Play tab, so another tab and back neither restarts it nor revives a flagged game
+  const clockStore = useRef(newClockStore());
   const [tierUsed, setTierUsed] = useState<'human_opening_book' | 'maia_neural' | 'heuristic_fallback' | undefined>(undefined);
   const [centipawns, setCentipawns] = useState<number | undefined>(undefined);
   const [modelLoaded, setModelLoaded] = useState<boolean>(false);
@@ -546,6 +549,15 @@ export const App: React.FC = () => {
   }, [spar, history]);
 
   const gameOverStatus = rulesRef.current.getGameOverStatus();
+  // A flag loses, unless the other side cannot mate (a lone king, or a king and one minor piece): a draw
+  const flagResult = (() => {
+    if (!flagged) return null;
+    const name = (c: 'w' | 'b') => (c === 'w' ? 'White' : 'Black');
+    const other = flagged === 'w' ? 'b' : 'w';
+    return cannotMate(position.fen, other)
+      ? { result: '1/2-1/2', reason: `${name(flagged)} ran out of time, but ${name(other)} cannot mate: a draw` }
+      : { result: flagged === 'w' ? '0-1' : '1-0', reason: `${name(flagged)} lost on time` };
+  })();
 
   return (
     <EngineContext.Provider value={engineClient}>
@@ -721,6 +733,7 @@ export const App: React.FC = () => {
                 live={!rulesRef.current.isGameOver() && !flagged}
                 onFlag={onFlag}
                 onReset={onClockReset}
+                store={clockStore.current}
                 pace={rulesRef.current.getInitialFen() === START_POSITION ? pace : undefined}
               />
               <Chessboard
@@ -790,8 +803,8 @@ export const App: React.FC = () => {
                 history={history}
                 currentPly={currentPly}
                 onSelectPly={setCurrentPly}
-                result={flagged ? (flagged === 'w' ? '0-1' : '1-0') : gameOverStatus.result || '*'}
-                gameOverReason={flagged ? `${flagged === 'w' ? 'White' : 'Black'} lost on time` : gameOverStatus.reason}
+                result={flagResult ? flagResult.result : gameOverStatus.result || '*'}
+                gameOverReason={flagResult ? flagResult.reason : gameOverStatus.reason}
                 onCopyPgn={handleExportPgn}
               />
             </div>

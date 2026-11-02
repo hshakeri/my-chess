@@ -1,5 +1,5 @@
-import { Chess } from 'chess.js';
 import { clocksFromPgn, timeControlFromPgn } from './review';
+import { finalFen, leadInFen } from './finalPosition';
 import type { StoredGame } from '../types/db';
 
 /**
@@ -18,7 +18,6 @@ export const PACE_MOVES = [10, 20, 30, 40];
 /** A lead of at least this much material at the end (a knight or a bishop) counts as ahead. */
 export const AHEAD_POINTS = 3;
 
-const VALUE: Record<string, number> = { p: 1, n: 3, b: 3, r: 5, q: 9, k: 0 };
 
 export interface PaceRow {
   /** The move number: hoot65's clock after their move N against the opponent's after theirs. */
@@ -72,16 +71,8 @@ export function timeLoser(game: StoredGame): 'me' | 'them' | null {
 
 /** hoot65's material lead in the game's final position, or null when the moves do not replay. */
 export function finalLead(game: StoredGame): number | null {
-  const chess = new Chess();
-  try {
-    for (const san of game.movesSan) chess.move(san);
-  } catch {
-    return null;
-  }
-  const me = game.userColor === 'black' ? 'b' : 'w';
-  let lead = 0;
-  for (const row of chess.board()) for (const sq of row) if (sq) lead += (sq.color === me ? 1 : -1) * VALUE[sq.type];
-  return lead;
+  const fen = finalFen(game);
+  return fen ? leadInFen(fen, game.userColor === 'black' ? 'b' : 'w') : null;
 }
 
 const median = (xs: number[]): number => {

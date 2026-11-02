@@ -19,6 +19,26 @@ export interface TodayStep {
 
 /** Warm-up answers that make a day's warm-up (it asks about one question every ten seconds). */
 export const WARMUP_ANSWERS = 5;
+/** Tactics positions that make a day's tactics, in one session or several. */
+export const TACTICS_PER_DAY = 10;
+/** When today's session of cards was last finished (new cards are always waiting, so "none due" never comes). */
+export const SESSION_DONE_KEY = 'my_chess_session_done_v1';
+
+export function readSessionDoneAt(): number {
+  try {
+    return Number(window.localStorage.getItem(SESSION_DONE_KEY)) || 0;
+  } catch {
+    return 0;
+  }
+}
+
+export function writeSessionDoneAt(at: number): void {
+  try {
+    window.localStorage.setItem(SESSION_DONE_KEY, String(at));
+  } catch {
+    // the step is not ticked then, that is all
+  }
+}
 
 export function startOfDay(now: number): number {
   const d = new Date(now);
@@ -26,14 +46,26 @@ export function startOfDay(now: number): number {
   return d.getTime();
 }
 
-/** `dueCards` is the size of today's session (the queue of due reviews and new cards), not every card due. */
-export function todayRoutine(input: { now: number; cct: CctEvent[]; tacticSessions: TacticSession[]; dueCards: number; plansDue: number }): TodayStep[] {
+/**
+ * `dueCards` is the size of today's session (the queue of due reviews and new cards), not every card
+ * due; `sessionDoneAt` is when a session was last finished, which ticks the step for the day.
+ */
+export function todayRoutine(input: {
+  now: number;
+  cct: CctEvent[];
+  tacticSessions: TacticSession[];
+  dueCards: number;
+  plansDue: number;
+  sessionDoneAt?: number;
+}): TodayStep[] {
   const since = startOfDay(input.now);
   const warmups = input.cct.filter((e) => e.source === 'warmup' && e.at >= since).length;
+  const tactics = input.tacticSessions.filter((s) => s.at >= since).reduce((n, s) => n + s.good + s.hard + s.again, 0);
+  const cardsDone = input.dueCards === 0 || (input.sessionDoneAt ?? 0) >= since;
   return [
     { key: 'warmup', label: 'Warm-up', done: warmups >= WARMUP_ANSWERS },
-    { key: 'cards', label: "Today's cards", done: input.dueCards === 0, left: input.dueCards },
-    { key: 'tactics', label: 'Ten tactics', done: input.tacticSessions.some((s) => s.at >= since) },
+    { key: 'cards', label: "Today's cards", done: cardsDone, left: cardsDone ? undefined : input.dueCards },
+    { key: 'tactics', label: 'Ten tactics', done: tactics >= TACTICS_PER_DAY },
     { key: 'plans', label: 'Plans', done: input.plansDue === 0, left: input.plansDue },
   ];
 }

@@ -145,8 +145,8 @@ test.describe('04. Personalized Diagnostics & Repertoire Recommendation (F13 - F
       await expect(habits.locator(`[data-habit="${key}"]`)).toHaveAttribute('data-rate', /^0\.\d{3}$/);
     }
     await expect(habits.locator('[data-habit="nothing_hung"]')).toContainText('review some games first');
-    // Kept a three-point lead for ten moves: 84 of the 116 seed games with such a lead
-    await expect(habits.locator('[data-habit="kept_lead"]')).toHaveAttribute('data-rate', '0.724');
+    // Kept a three-point lead for ten moves: 88 of the 116 seed games with such a lead
+    await expect(habits.locator('[data-habit="kept_lead"]')).toHaveAttribute('data-rate', '0.759');
   });
 
   test('Where your points go: the archive analysis on the first tab, each habit linked to its drill (DC-8)', async ({ page }) => {

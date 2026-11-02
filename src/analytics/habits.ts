@@ -12,7 +12,8 @@ import type { GameReview, MistakeType } from '../types/review';
  * - queen_home: the queen did not move before two knights or bishops were out;
  * - nothing_hung: the review of the game found no piece left where it could be taken;
  * - kept_lead: once hoot65 was three points of material ahead after move 8 (two plies running), still
- *   three ahead ten moves later, or at the end of a shorter game. Judged only in games with such a
+ *   three ahead ten moves later (on that ply or the next, so a recapture still to come is no loss), or
+ *   at the end of a shorter game. Judged only in games with such a
  *   lead. In the archive this, not trading pieces, is what the score follows: with the lead kept,
  *   hoot65 scored about 82% whether pieces were traded or not, and 35% in the 27% of games where the
  *   lead was gone ten moves later.
@@ -63,8 +64,26 @@ export interface HabitRow {
 
 const HOME: Record<'w' | 'b', string[]> = { w: ['b1', 'g1', 'c1', 'f1'], b: ['b8', 'g8', 'c8', 'f8'] };
 
+// The habits read from the moves, kept per game: a replay is the slow part (tens of seconds for a full archive)
+const moveHabitsCache = new Map<string, GameHabits | null>();
+
 /** The habits of one game of hoot65's, or null when the game is too short or unreadable. */
 export function habitsOfGame(game: StoredGame, review?: GameReview): GameHabits | null {
+  const key = `${game.id}:${game.movesSan.length}:${game.userColor}:${game.userResult}`;
+  let base = moveHabitsCache.get(key);
+  if (base === undefined) {
+    base = moveHabitsOf(game);
+    moveHabitsCache.set(key, base);
+  }
+  if (!base) return null;
+  if (!review) return base;
+  return { ...base, habits: { ...base.habits, nothing_hung: !review.criticalMoments.some((m) => HANGING.includes(m.type)) } };
+}
+
+/** Whether a game's habits are already read (so a summary of it is quick). */
+export const habitsReady = (game: StoredGame): boolean => moveHabitsCache.has(`${game.id}:${game.movesSan.length}:${game.userColor}:${game.userResult}`);
+
+function moveHabitsOf(game: StoredGame): GameHabits | null {
   if (!game.userColor || game.movesSan.length < MIN_PLIES) return null;
   const me: 'w' | 'b' = game.userColor === 'white' ? 'w' : 'b';
   const chess = new Chess();
@@ -72,8 +91,10 @@ export function habitsOfGame(game: StoredGame, review?: GameReview): GameHabits 
   let castled = false;
   let queenEarly = false;
   let ownMoves = 0;
-  // hoot65's material lead after each ply (index 0 is the start)
+  // hoot65's material lead after each ply (index 0 is the start), followed from captures and promotions
   const leads = [0];
+  let lead = 0;
+  let ahead = -1;
   for (const san of game.movesSan) {
     let move;
     try {
@@ -81,20 +102,29 @@ export function habitsOfGame(game: StoredGame, review?: GameReview): GameHabits 
     } catch {
       return null;
     }
-    let lead = 0;
-    for (const row of chess.board()) for (const sq of row) if (sq) lead += (sq.color === me ? 1 : -1) * VALUE[sq.type];
+    const sign = move.color === me ? 1 : -1;
+    if (move.captured) lead += sign * VALUE[move.captured];
+    if (move.promotion) lead += sign * (VALUE[move.promotion] - VALUE.p);
     leads.push(lead);
-    if (move.color !== me) continue;
-    ownMoves++;
-    if (ownMoves > OPENING_MOVES) continue;
-    if (move.flags.includes('k') || move.flags.includes('q')) castled = true;
-    if (HOME[me].includes(move.from) && (move.piece === 'n' || move.piece === 'b')) leftHome.add(move.from);
-    if (move.piece === 'q' && leftHome.size < 2) queenEarly = true;
+    const ply = leads.length - 1;
+    if (ahead < 0 && ply >= LEAD_FROM_PLY && lead >= LEAD && leads[ply - 1] >= LEAD) ahead = ply;
+    if (move.color === me) {
+      ownMoves++;
+      if (ownMoves <= OPENING_MOVES) {
+        if (move.flags.includes('k') || move.flags.includes('q')) castled = true;
+        if (HOME[me].includes(move.from) && (move.piece === 'n' || move.piece === 'b')) leftHome.add(move.from);
+        if (move.piece === 'q' && leftHome.size < 2) queenEarly = true;
+      }
+    }
+    // Both questions answered: the opening's ten moves, and the lead's ten moves after it appeared
+    if (ownMoves > OPENING_MOVES && ahead >= 0 && ply > ahead + HOLD_PLIES) break;
   }
   const habits: GameHabits['habits'] = { castled, developed: leftHome.size === 4, queen_home: !queenEarly };
-  if (review) habits.nothing_hung = !review.criticalMoments.some((m) => HANGING.includes(m.type));
-  const ahead = leads.findIndex((lead, ply) => ply >= LEAD_FROM_PLY && lead >= LEAD && leads[ply - 1] >= LEAD);
-  if (ahead >= 0) habits.kept_lead = leads[Math.min(ahead + HOLD_PLIES, leads.length - 1)] >= LEAD;
+  // Kept unless the lead is gone on both plies at the end of the window, so a recapture still to come is not a loss
+  if (ahead >= 0) {
+    const end = Math.min(ahead + HOLD_PLIES, leads.length - 1);
+    habits.kept_lead = Math.max(leads[end], leads[end + 1] ?? -Infinity) >= LEAD;
+  }
   const score = game.userResult === 'win' ? 1 : game.userResult === 'draw' ? 0.5 : 0;
   return { gameId: game.id, timestamp: game.timestamp, score, habits };
 }

@@ -54,34 +54,75 @@ interface PracticeClockProps {
   onReset?: () => void;
   /** The pace of the opponents in the student's games; shown after the student's moves it names. */
   pace?: PaceTargets;
+  /** Where the clock keeps its state; give one that outlives the component to keep the clock across tabs. */
+  store?: ClockStore;
   now?: () => number;
 }
 
-export const PracticeClock: React.FC<PracticeClockProps> = ({ turn, ply, resetKey, student, live, onFlag, onReset, pace, now = Date.now }) => {
-  const [key, setKey] = useState('off');
+/**
+ * The clock's state, kept by the caller so it survives the component leaving the screen (another tab
+ * and back): without it the clock would start again and a flagged game would be playable again.
+ */
+export interface ClockStore {
+  key: string;
+  /** The resetKey and the control the clocks were last set for (null before the first). */
+  resetKey: number | string | null;
+  setFor: string | null;
+  left: Clocks;
+  stack: Clocks[];
+  basePly: number;
+  prevPly: number;
+  turnStart: number;
+  flagged: boolean;
+  longThinks: number;
+  paceNote: { move: number; left: number; target: number } | null;
+}
+
+export const newClockStore = (): ClockStore => ({
+  key: 'off',
+  resetKey: null,
+  setFor: null,
+  left: { w: 0, b: 0 },
+  stack: [],
+  basePly: 0,
+  prevPly: 0,
+  turnStart: 0,
+  flagged: false,
+  longThinks: 0,
+  paceNote: null,
+});
+
+export const PracticeClock: React.FC<PracticeClockProps> = ({ turn, ply, resetKey, student, live, onFlag, onReset, pace, store: given, now = Date.now }) => {
+  const own = useRef<ClockStore>(newClockStore());
+  const st = given ?? own.current;
+  const [key, setKeyState] = useState(st.key);
+  const setKey = (k: string) => {
+    st.key = k;
+    setKeyState(k);
+  };
   const control = CLOCK_CONTROLS.find((c) => c.key === key)!.control;
-  const leftRef = useRef<Clocks>({ w: 0, b: 0 });
-  const stackRef = useRef<Clocks[]>([]);
-  const basePlyRef = useRef(ply);
-  const prevPlyRef = useRef(ply);
-  const turnStartRef = useRef(now());
-  const flaggedRef = useRef(false);
-  const [longThinks, setLongThinks] = useState(0);
-  const [paceNote, setPaceNote] = useState<{ move: number; left: number; target: number } | null>(null);
   const [, setTick] = useState(0);
   const mine = (side: Side) => student === 'both' || side === student;
+  const longThinks = st.longThinks;
+  const paceNote = st.paceNote;
 
-  // A new game, a loaded position or another control: full clocks
+  // A new game, a loaded position or another control: full clocks. Coming back to the same game keeps them.
   useEffect(() => {
+    if (st.resetKey === resetKey && st.setFor === key) {
+      setTick((t) => t + 1);
+      return;
+    }
     const full = control ? control.base * 1000 : 0;
-    leftRef.current = { w: full, b: full };
-    stackRef.current = [{ ...leftRef.current }];
-    basePlyRef.current = ply;
-    prevPlyRef.current = ply;
-    turnStartRef.current = now();
-    flaggedRef.current = false;
-    setLongThinks(0);
-    setPaceNote(null);
+    st.resetKey = resetKey;
+    st.setFor = key;
+    st.left = { w: full, b: full };
+    st.stack = [{ ...st.left }];
+    st.basePly = ply;
+    st.prevPly = ply;
+    st.turnStart = now();
+    st.flagged = false;
+    st.longThinks = 0;
+    st.paceNote = null;
     onReset?.();
     setTick((t) => t + 1);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -89,48 +130,57 @@ export const PracticeClock: React.FC<PracticeClockProps> = ({ turn, ply, resetKe
 
   // A move: the mover's clock loses the time it took and gains the increment; a takeback goes back
   useEffect(() => {
-    if (ply === prevPlyRef.current) return;
+    if (ply === st.prevPly) return;
     const t = now();
-    if (control && !flaggedRef.current) {
-      if (ply > prevPlyRef.current) {
+    if (control && !st.flagged) {
+      if (ply > st.prevPly) {
         const mover: Side = turn === 'w' ? 'b' : 'w';
-        const spent = t - turnStartRef.current;
-        if (mine(mover) && spent > THINK_CAP_MS) setLongThinks((n) => n + 1);
-        leftRef.current = { ...leftRef.current, [mover]: Math.max(0, leftRef.current[mover] - spent) + control.inc * 1000 };
-        stackRef.current[ply - basePlyRef.current] = { ...leftRef.current };
-        // After the student's move N (counted from the start), the clock against the opponents' pace
-        const moveNo = Math.floor((ply - 1) / 2) + 1;
-        const target = pace && pace.control === key && student !== 'both' && mover === student ? pace.targets[moveNo] : undefined;
-        if (target !== undefined) setPaceNote({ move: moveNo, left: leftRef.current[mover] / 1000, target });
+        const spent = t - st.turnStart;
+        if (mine(mover) && spent > THINK_CAP_MS) st.longThinks += 1;
+        const remaining = st.left[mover] - spent;
+        if (remaining <= 0) {
+          // The move came after the clock had run out: the flag stands, and there is no increment
+          st.flagged = true;
+          st.left = { ...st.left, [mover]: 0 };
+          onFlag(mover);
+        } else {
+          st.left = { ...st.left, [mover]: remaining + control.inc * 1000 };
+          st.stack[ply - st.basePly] = { ...st.left };
+          // After the student's move N (counted from the start), the clock against the opponents' pace
+          const moveNo = Math.floor((ply - 1) / 2) + 1;
+          const target = pace && pace.control === key && student !== 'both' && mover === student ? pace.targets[moveNo] : undefined;
+          if (target !== undefined) st.paceNote = { move: moveNo, left: st.left[mover] / 1000, target };
+        }
       } else {
-        leftRef.current = { ...(stackRef.current[ply - basePlyRef.current] ?? leftRef.current) };
+        st.left = { ...(st.stack[ply - st.basePly] ?? st.left) };
       }
-      stackRef.current.length = Math.max(1, ply - basePlyRef.current + 1);
+      if (!st.flagged) st.stack.length = Math.max(1, ply - st.basePly + 1);
     }
-    turnStartRef.current = t;
-    prevPlyRef.current = ply;
+    st.turnStart = t;
+    st.prevPly = ply;
     setTick((k) => k + 1);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ply]);
 
   // The running clock, and the flag
   useEffect(() => {
-    if (!control || !live || flaggedRef.current) return;
+    if (!control || !live || st.flagged) return;
     const id = setInterval(() => {
-      if (leftRef.current[turn] - (now() - turnStartRef.current) <= 0 && !flaggedRef.current) {
-        flaggedRef.current = true;
+      if (st.left[turn] - (now() - st.turnStart) <= 0 && !st.flagged) {
+        st.flagged = true;
         // The stopped clock shows the zero it ran down to
-        leftRef.current = { ...leftRef.current, [turn]: 0 };
+        st.left = { ...st.left, [turn]: 0 };
         onFlag(turn);
       }
       setTick((k) => k + 1);
     }, 200);
     return () => clearInterval(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [control, live, turn, onFlag, now]);
 
-  const running = Boolean(control) && live && !flaggedRef.current;
-  const elapsed = running ? now() - turnStartRef.current : 0;
-  const shown = (side: Side) => Math.max(0, leftRef.current[side] - (side === turn ? elapsed : 0));
+  const running = Boolean(control) && live && !st.flagged;
+  const elapsed = running ? now() - st.turnStart : 0;
+  const shown = (side: Side) => Math.max(0, st.left[side] - (side === turn ? elapsed : 0));
   const cue = running && mine(turn) && elapsed > THINK_CAP_MS;
   const label = (side: Side) => (student === 'both' ? (side === 'w' ? 'White' : 'Black') : mine(side) ? 'You' : 'Maia');
 

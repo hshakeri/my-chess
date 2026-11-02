@@ -33,4 +33,28 @@ describe("Today's routine", () => {
     });
     expect(done.every((s) => s.done)).toBe(true);
   });
+
+  it('ticks the cards once today\'s session is finished, though new cards still wait; tactics after ten positions today', () => {
+    const today = startOfDay(NOW);
+    const steps = todayRoutine({
+      now: NOW,
+      cct: [],
+      tacticSessions: [
+        { at: today + 1, good: 3, hard: 1, again: 0, ms: 1 },
+        { at: today + 2, good: 4, hard: 0, again: 1, ms: 1 },
+      ],
+      dueCards: 8,
+      plansDue: 2,
+      sessionDoneAt: today + 3,
+    });
+    expect(steps.map((s) => [s.key, s.done, s.left])).toEqual([
+      ['warmup', false, undefined],
+      ['cards', true, undefined],
+      ['tactics', false, undefined],
+      ['plans', false, 2],
+    ]);
+    // A session finished yesterday does not tick today; two more positions make ten
+    const later = todayRoutine({ now: NOW, cct: [], tacticSessions: [{ at: today + 1, good: 10, hard: 0, again: 0, ms: 1 }], dueCards: 8, plansDue: 0, sessionDoneAt: today - 1 });
+    expect(later.map((s) => s.done)).toEqual([false, false, true, true]);
+  });
 });

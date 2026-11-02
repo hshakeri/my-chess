@@ -125,6 +125,8 @@ describe('Tactics deck (DC-2)', () => {
     play(free.fen, 'Rxd8+');
     fireEvent.click(view.container.querySelector('[data-action="tactics-spar"]')!);
     expect(requests).toEqual([expect.objectContaining({ lessonId: 'review:tactic-free', initialFen: free.fen, movesSan: ['Rxd8+'], studentColor: 'w' })]);
+    // Leaving for the spar keeps the session so far
+    expect(readTacticSessions()).toMatchObject([{ good: 1, hard: 0, again: 0 }]);
     // The mate in one: nothing to play out
     fireEvent.click(view.container.querySelector('[data-action="tactics-next"]')!);
     play(tactic('m', 'mate-in-one').fen, 'Rd8#');

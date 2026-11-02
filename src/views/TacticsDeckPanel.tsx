@@ -57,6 +57,17 @@ export const TacticsDeckPanel: React.FC<{ onClose: () => void; deck?: TacticPosi
   const [sessions, setSessions] = useState<TacticSession[]>(() => readTacticSessions());
   const [now, setNow] = useState(Date.now());
   const rulesRef = useRef(new RulesEngine());
+  // The session is kept once, when it is finished, left for a spar, closed or the panel goes away
+  const resultsRef = useRef<Result[]>([]);
+  const loggedRef = useRef(true);
+  const logSession = () => {
+    const all = resultsRef.current;
+    if (loggedRef.current || !all.length) return;
+    loggedRef.current = true;
+    const count = (g: TacticGrade) => all.filter((r) => r.grade === g).length;
+    setSessions(logTacticSession({ at: Date.now(), good: count('good'), hard: count('hard'), again: count('again'), ms: all.reduce((a, r) => a + r.ms, 0) }));
+  };
+  useEffect(() => () => logSession(), []);
   const startRef = useRef(0);
   const [, setTick] = useState(0);
 
@@ -77,6 +88,8 @@ export const TacticsDeckPanel: React.FC<{ onClose: () => void; deck?: TacticPosi
     setSession(next);
     setIndex(0);
     setResults([]);
+    resultsRef.current = [];
+    loggedRef.current = false;
     show(next[0]);
   };
 
@@ -99,6 +112,7 @@ export const TacticsDeckPanel: React.FC<{ onClose: () => void; deck?: TacticPosi
     setStates(recordSolve(states, current.id, correct, ms));
     setResult(r);
     setResults((all) => [...all, r]);
+    resultsRef.current = [...resultsRef.current, r];
     // The board shows the right move either way
     rulesRef.current.makeMove(correct ? san : current.solution);
     setPhase('answered');
@@ -106,8 +120,7 @@ export const TacticsDeckPanel: React.FC<{ onClose: () => void; deck?: TacticPosi
 
   const next = () => {
     if (index + 1 >= session.length) {
-      const count = (g: TacticGrade) => results.filter((r) => r.grade === g).length;
-      setSessions(logTacticSession({ at: Date.now(), good: count('good'), hard: count('hard'), again: count('again'), ms: results.reduce((a, r) => a + r.ms, 0) }));
+      logSession();
       setPhase('done');
       return;
     }
@@ -139,7 +152,15 @@ export const TacticsDeckPanel: React.FC<{ onClose: () => void; deck?: TacticPosi
               a row: {retired} retired so far.
             </p>
           </div>
-          <button type="button" data-action="tactics-close" onClick={onClose} className="text-slate-400 hover:text-white text-sm underline">
+          <button
+            type="button"
+            data-action="tactics-close"
+            onClick={() => {
+              logSession();
+              onClose();
+            }}
+            className="text-slate-400 hover:text-white text-sm underline"
+          >
             Close
           </button>
         </div>
@@ -239,7 +260,8 @@ export const TacticsDeckPanel: React.FC<{ onClose: () => void; deck?: TacticPosi
                         <button
                           type="button"
                           data-action="tactics-spar"
-                          onClick={() =>
+                          onClick={() => {
+                            logSession();
                             onSpar({
                               lessonId: `review:tactic-${current.id}`,
                               title: `Your game of ${current.date}: win it from here`,
@@ -248,8 +270,8 @@ export const TacticsDeckPanel: React.FC<{ onClose: () => void; deck?: TacticPosi
                               studentColor: current.fen.split(' ')[1] === 'b' ? 'b' : 'w',
                               elo: 1100,
                               milestones: [],
-                            })
-                          }
+                            });
+                          }}
                           className="px-3 py-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-white font-medium"
                           title="Play the won position on against Maia: keep the lead and finish the game"
                         >

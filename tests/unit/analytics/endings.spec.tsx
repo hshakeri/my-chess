@@ -43,6 +43,9 @@ describe('How the games end (DC-3, DC-8)', () => {
     expect(g('Game drawn by timeout vs insufficient material', 'draw')).toEqual({ result: 'draw', kind: 'insufficient' });
     expect(g('Game drawn by repetition', 'draw')).toEqual({ result: 'draw', kind: 'repetition' });
     expect(g('Game drawn by agreement', 'draw')).toEqual({ result: 'draw', kind: 'agreement' });
+    // The winner's name does not count: only the way the game ended
+    expect(g('resign4life won on time', 'loss')).toEqual({ result: 'loss', kind: 'time' });
+    expect(g('CheckmateKid won by resignation', 'loss')).toEqual({ result: 'loss', kind: 'resignation' });
     // Lichess writes "Normal" for a resignation and a mate alike
     expect(g('Normal', 'loss')).toEqual({ result: 'loss', kind: 'resignation' });
     expect(g('Normal', 'loss', ['f3', 'e5', 'g4', 'Qh4#'])).toEqual({ result: 'loss', kind: 'checkmate' });

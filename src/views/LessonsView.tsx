@@ -35,7 +35,7 @@ import { canonicalFenKey } from '../services/fenKey';
 import { buildQueue, isGameCard, LearningSteps } from '../services/sessionQueue';
 import { questionBeforeDecision, type MicroQuestion } from '../services/microQuestions';
 import { logCct, readCctLog, readGateEnabled, writeGateEnabled } from '../services/cctLog';
-import { todayRoutine, type TodayKey } from '../services/today';
+import { readSessionDoneAt, startOfDay, todayRoutine, writeSessionDoneAt, type TodayKey } from '../services/today';
 import { BoardQuestion, isRight, questionSquareStyles, type QuestionAnswer, type QuestionStatus } from '../components/BoardQuestion';
 import { WarmupPanel } from './WarmupPanel';
 import { SpeedRunPanel, SPEED_MIN_MOVES, speedMoves } from './SpeedRunPanel';
@@ -1091,14 +1091,25 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
   const sessionFinished = !!session && session.current === null && session.index >= session.cards.length;
   // Read again whenever one of the trainers closes or the due counts change
   // Today's share of the due cards is one session: at most the queue's reviews and new cards, not every card due
+  // The day the routine is for: it rolls over at local midnight even with the page left open
+  const [day, setDay] = useState(() => startOfDay(Date.now()));
+  useEffect(() => {
+    const id = window.setInterval(() => setDay(startOfDay(Date.now())), 60_000);
+    return () => window.clearInterval(id);
+  }, []);
+  // A finished session ticks today's cards (new cards always wait, so the queue never empties)
+  useEffect(() => {
+    if (sessionFinished) writeSessionDoneAt(Date.now());
+  }, [sessionFinished]);
   const sessionSize = useMemo(() => {
     const now = Date.now();
     return buildQueue(dueCards, { now, retrievability: (c) => CardService.retrievability(c, now) }).length;
   }, [dueCards]);
   const today = useMemo(
-    () => todayRoutine({ now: Date.now(), cct: readCctLog(), tacticSessions: readTacticSessions(), dueCards: sessionSize, plansDue }),
+    () =>
+      todayRoutine({ now: Date.now(), cct: readCctLog(), tacticSessions: readTacticSessions(), dueCards: sessionSize, plansDue, sessionDoneAt: readSessionDoneAt() }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [warmupOpen, tacticsOpen, plansOpen, sessionSize, plansDue]
+    [warmupOpen, tacticsOpen, plansOpen, sessionSize, plansDue, day, sessionFinished]
   );
   const openStep = (key: TodayKey) => {
     if (key === 'warmup') setWarmupOpen(true);

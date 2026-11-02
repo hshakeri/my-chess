@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { db } from '../db/database';
 import { reviewGame, type ReviewInput } from '../analytics/review';
 import { summarizeReviews, type MistakeSummary, type RateRow } from '../analytics/mistakePatterns';
-import { summarizeHabits, type HabitRow } from '../analytics/habits';
+import { habitsOfGame, habitsReady, summarizeHabits, type HabitRow } from '../analytics/habits';
 import type { ReviewProgress } from '../engine/worker/engineClient';
 import { useEngineClient } from '../engine/EngineContext';
 import type { StoredGame } from '../types/db';
@@ -197,7 +197,29 @@ export const MistakePatternsPanel: React.FC<{ games: StoredGame[] }> = ({ games 
   }, [load]);
 
   const summary = useMemo(() => (reviews ? summarizeReviews(reviews, games) : null), [reviews, games]);
-  const habits = useMemo(() => summarizeHabits(games, reviews ?? []), [games, reviews]);
+  // The scorecard reads every game's moves: in slices between frames, so a big archive does not freeze the page
+  const [habits, setHabits] = useState<HabitRow[] | null>(null);
+  const [habitsRead, setHabitsRead] = useState(0);
+  useEffect(() => {
+    let cancelled = false;
+    let i = 0;
+    const step = () => {
+      if (cancelled) return;
+      const t0 = performance.now();
+      while (i < games.length && performance.now() - t0 < 25) habitsOfGame(games[i++]);
+      if (i < games.length) {
+        setHabitsRead(i);
+        setTimeout(step, 0);
+      } else {
+        setHabits(summarizeHabits(games, reviews ?? []));
+      }
+    };
+    setHabits(games.every(habitsReady) ? summarizeHabits(games, reviews ?? []) : null);
+    step();
+    return () => {
+      cancelled = true;
+    };
+  }, [games, reviews]);
   const reviewedIds = useMemo(() => new Set((reviews ?? []).map((r) => r.gameId)), [reviews]);
   const waiting = useMemo(() => batchQueue(games, reviewedIds, Number.MAX_SAFE_INTEGER).length, [games, reviewedIds]);
 
@@ -297,7 +319,13 @@ export const MistakePatternsPanel: React.FC<{ games: StoredGame[] }> = ({ games 
         </span>
       </div>
 
-      <HabitScorecard rows={habits} />
+      {habits ? (
+        <HabitScorecard rows={habits} />
+      ) : (
+        <p className="text-sm text-slate-400" data-section="habits-reading">
+          Reading the habits of your games: {habitsRead} of {games.length}…
+        </p>
+      )}
 
       {!summary && <p className="text-sm text-slate-400">Reading the reviews…</p>}
       {summary && summary.games === 0 && (

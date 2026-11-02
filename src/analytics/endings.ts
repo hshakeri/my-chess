@@ -1,5 +1,6 @@
 import { Chess } from 'chess.js';
 import { finalLead } from './clock';
+import { finalFen } from './finalPosition';
 import type { StoredGame } from '../types/db';
 
 /**
@@ -36,22 +37,42 @@ export const ROOK_POINTS = 5;
  * Whether mate in one is coming in the game's final position: the opponent, to move, has a mate in
  * one, or hoot65, to move, has no move that stops one. Resigning there is not resigning too soon.
  */
+const mateCache = new Map<string, boolean>();
+
 export function mateInOneComing(game: StoredGame): boolean {
-  const chess = new Chess();
+  const key = `${game.id}:${game.movesSan.length}`;
+  const hit = mateCache.get(key);
+  if (hit !== undefined) return hit;
+  const coming = mateInOneComingAt(game);
+  mateCache.set(key, coming);
+  return coming;
+}
+
+function mateInOneComingAt(game: StoredGame): boolean {
+  const fen = finalFen(game);
+  if (!fen) return false;
+  let chess: Chess;
   try {
-    for (const san of game.movesSan) chess.move(san);
+    chess = new Chess(fen);
   } catch {
     return false;
   }
   const mine = game.userColor === 'black' ? 'b' : 'w';
-  const opponentMates = (c: Chess) =>
-    c.moves().some((san) => {
-      c.move(san);
-      const mate = c.isCheckmate();
-      c.undo();
-      return mate;
-    });
+  // chess.js writes a mating move's SAN with "#"
+  const opponentMates = (c: Chess) => c.moves().some((san) => san.endsWith('#'));
   if (chess.turn() !== mine) return opponentMates(chess);
+  // hoot65 to move: with no mate in one threatened (the opponent mates nothing if hoot65 could pass),
+  // some move stops it, so the two-ply search is only for the positions with a threat
+  if (!chess.inCheck()) {
+    const parts = fen.split(' ');
+    parts[1] = parts[1] === 'w' ? 'b' : 'w';
+    parts[3] = '-';
+    try {
+      if (!opponentMates(new Chess(parts.join(' ')))) return false;
+    } catch {
+      // an illegal position after the pass: fall through to the full search
+    }
+  }
   return chess.moves().every((san) => {
     chess.move(san);
     const mate = opponentMates(chess);
@@ -68,7 +89,10 @@ export interface GameEnd {
 export function endOf(game: StoredGame): GameEnd | null {
   if (!game.userResult || game.userResult === '*') return null;
   const result = game.userResult;
-  const term = (/\[Termination "([^"]+)"\]/.exec(game.pgn ?? '')?.[1] ?? '').toLowerCase();
+  const header = (/\[Termination "([^"]+)"\]/.exec(game.pgn ?? '')?.[1] ?? '').toLowerCase();
+  // Chess.com writes "<winner> won by resignation" or "Game drawn by repetition": read only the way it
+  // ended, so a player named "resign4life" or "CheckmateKid" does not count
+  const term = /\bwon (.*)$/.exec(header)?.[1] ?? /\bdrawn (.*)$/.exec(header)?.[1] ?? header;
   const kinds: Array<[RegExp, EndKind]> = [
     [/checkmate/, 'checkmate'],
     [/resign/, 'resignation'],
@@ -82,9 +106,11 @@ export function endOf(game: StoredGame): GameEnd | null {
   ];
   for (const [re, kind] of kinds) if (re.test(term)) return { result, kind };
   // No telling header: read the final position
-  const chess = new Chess();
+  const fen = finalFen(game);
+  let chess: Chess;
   try {
-    for (const san of game.movesSan) chess.move(san);
+    chess = new Chess(fen ?? undefined);
+    if (!fen) return { result, kind: 'other' };
   } catch {
     return { result, kind: 'other' };
   }
@@ -92,7 +118,7 @@ export function endOf(game: StoredGame): GameEnd | null {
   if (chess.isStalemate()) return { result, kind: 'stalemate' };
   if (result !== 'draw') return { result, kind: 'resignation' };
   if (chess.isInsufficientMaterial()) return { result, kind: 'insufficient' };
-  if (chess.isThreefoldRepetition()) return { result, kind: 'repetition' };
+  // A repetition needs the moves before: from the final position alone it is not seen
   return { result, kind: 'other' };
 }
 
