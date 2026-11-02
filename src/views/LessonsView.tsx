@@ -44,7 +44,7 @@ import { PlanReviewPanel } from './PlanReviewPanel';
 import { TacticsDeckPanel } from './TacticsDeckPanel';
 import { practiceDeck, readTacticSessions, readTacticStates, toRedo } from '../services/tacticsDeck';
 import { dueIdeas } from '../services/ideaCards';
-import { exerciseCode, exercisesToPractise, isLessonMastered, lessonCode } from '../curriculum/itemCodes';
+import { exerciseCode, exercisesToPractise, isCardMastered, isLessonMastered, lessonCode, liveLessonIds } from '../curriculum/itemCodes';
 import type { SparRequest } from '../services/sparLog';
 import type { HumanElo } from '../types/engine';
 
@@ -333,10 +333,9 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
   );
   const isActiveCard = useCallback(
     // A card counts once studied, when a core lesson owns it, or when it comes from a game review (CL-3),
-    // unless every lesson it belongs to is mastered
+    // unless every lesson it belongs to is mastered; a mastered lesson owns no card
     (card: StoredCard) =>
-      !(card.lessonIds.length > 0 && card.lessonIds.every(isLessonMastered)) &&
-      (card.reps > 0 || card.lessonIds.some((id) => coreLessonIds.has(id)) || isGameCard(card)),
+      !isCardMastered(card) && (card.reps > 0 || liveLessonIds(card.lessonIds).some((id) => coreLessonIds.has(id)) || isGameCard(card)),
     [coreLessonIds]
   );
 
@@ -923,8 +922,10 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
 
   const lessonForCard = useCallback(
     (card: StoredCard): { lesson: CurriculumLesson; sourceTitle: string | null; sourceLessonId: string | null } => {
-      // Prefer a core lesson as the source of context and teaching; the card keeps every accepted answer
-      const candidates = allCurriculumLessons.filter((l) => card.lessonIds.includes(l.id));
+      // Prefer a core lesson as the source of context and teaching, and one not mastered; the card keeps every accepted answer
+      const owners = allCurriculumLessons.filter((l) => card.lessonIds.includes(l.id));
+      const live = owners.filter((l) => !isLessonMastered(l.id));
+      const candidates = live.length ? live : owners;
       const source = candidates.find((l) => l.relevance !== 'outside-repertoire') ?? candidates[0];
       const spec = source ? allSpecs[source.id]?.find((d) => canonicalFenKey(d.fen) === card.id) : undefined;
       const main = spec?.acceptedSan[0] ?? card.accepted[0];
@@ -1072,9 +1073,10 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
   }, [filteredLessons]);
 
   // A drill position knows its set, so a finished position can offer the next one
-  const currentDrillSet = drillSetOf(currentLesson.id);
+  // The set's positions not mastered (and this one, should it be): "Position n of m" counts these, as the tiles do
+  const currentDrillSet = drillSetOf(currentLesson.id)?.filter((l) => l.id === currentLesson.id || !isLessonMastered(l.id));
   const drillIndex = currentDrillSet ? currentDrillSet.findIndex((l) => l.id === currentLesson.id) : -1;
-  const nextDrill = currentDrillSet ? currentDrillSet.slice(drillIndex + 1).find((l) => !isLessonMastered(l.id)) : undefined;
+  const nextDrill = currentDrillSet ? currentDrillSet[drillIndex + 1] : undefined;
 
   // Keep the active lesson visible: a review-queue or hand-off lesson that lives outside the
   // current list switches the filter to where it is listed.
@@ -1110,7 +1112,8 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
 
   const coreCount = allCurriculumLessons.length - patternLibrary.length - masteredLessons.length;
   const dueCount = dueCards.length;
-  const lessonDueCount = Array.from(lessonCards.values()).filter((c) => c.due <= Date.now()).length;
+  // As "Due today" counts them: a mastered lesson's cards are not due
+  const lessonDueCount = Array.from(lessonCards.values()).filter((c) => c.due <= Date.now() && isActiveCard(c)).length;
   const sessionFinished = !!session && session.current === null && session.index >= session.cards.length;
   // Read again whenever one of the trainers closes or the due counts change
   // Today's share of the due cards is one session: at most the queue's reviews and new cards, not every card due

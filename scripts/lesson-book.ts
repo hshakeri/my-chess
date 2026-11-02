@@ -25,10 +25,10 @@ import { allCurriculumLessons, curriculumCourses } from '../src/curriculum';
 import { PatternGroup, patternGroupOf, patternPath, inPatternOrder } from '../src/curriculum/patternPath';
 import { plyLabel, replyOptions } from '../src/curriculum/builder';
 import { drillSetOf, gameDrillData } from '../src/curriculum/gameDrills';
-import { MOTIF_LABEL, isControl, numberLine, tacticsDeck, type TacticPosition } from '../src/services/tacticsDeck';
+import { MOTIF_LABEL, isControl, numberLine, practiceDeck, type TacticPosition } from '../src/services/tacticsDeck';
 import { lessonUrl } from '../src/router';
 import { boardCardRows } from '../src/views/PointsCard';
-import { exerciseCode, exercisesToPractise, isLessonMastered, isTacticMastered, lessonCode, masteredCodes, tacticCode } from '../src/curriculum/itemCodes';
+import { exerciseCode, exercisesToPractise, isLessonMastered, lessonCode, masteredCodes, tacticCode } from '../src/curriculum/itemCodes';
 import { getRecommendedWhiteRepertoire, getRecommendedBlackRepertoire } from '../src/analytics/repertoire';
 import { CurriculumLesson, CurriculumMove } from '../src/types/curriculum';
 import { RepertoirePlan } from '../src/types/diagnostics';
@@ -372,16 +372,16 @@ function renderDrillSet(lessons: CurriculumLesson[], n: number, group: PatternGr
 const BOOK_TACTICS = 24;
 
 /** A sheet of the tactics deck: each position just after a mistake in one of hoot65's games, from the side to move; the back holds the answers. */
-function renderTacticsSheet(positions: TacticPosition[], n: number, sheetNo: number, sheets: number, ahead = false): string {
+function renderTacticsSheet(positions: TacticPosition[], n: number, sheetNo: number, sheets: number, ahead = false, before = ''): string {
   const name = ahead ? 'Two moves ahead' : `Tactics from your games${sheets > 1 ? `, sheet ${sheetNo} of ${sheets}` : ''}`;
   const chapter = `${n}. ${name}`;
   toc.push({ heading: chapter, id: `ch-${n}`, no: `${n}.`, title: `${name} (${positions.length} positions)` });
   const intro = ahead
     ? `<p>The same kind of positions, two moves earlier: each diagram is drawn two moves before the tactic, with the two moves that were played under it. Play them in your head, without moving anything, and find the winning move in the position they reach. The answers are on the back.</p>`
     : sheetNo === 1
-      ? `<p>Positions from your games, each just after a mistake, yours or your opponent's: in most of them one move wins clearly, and in a few nothing does and a solid move is right (checked with Stockfish 19). Each diagram is drawn from the side to move, with the move that had just been played. Aim for under a minute each. The answers are on the back. The app's Tactics deck holds ${tacticsDeck.length} of them and brings back the ones you miss.</p>`
+      ? `<p>Positions from your games, each just after a mistake, yours or your opponent's: in most of them one move wins clearly, and in a few nothing does and a solid move is right (checked with Stockfish 19). Each diagram is drawn from the side to move, with the move that had just been played. Aim for under a minute each. The answers are on the back. The app's Tactics deck holds ${practiceDeck.length} of them and brings back the ones you miss.</p>`
       : '';
-  let front = `<section class="sheet sheet-front drill-set" id="ch-${n}">${chapterHead(chapter, undefined, intro)}<div class="drills">`;
+  let front = `<section class="sheet sheet-front drill-set" id="ch-${n}">${before}${chapterHead(chapter, undefined, intro)}<div class="drills">`;
   let answers = '';
   positions.forEach((t, k) => {
     const side: 'w' | 'b' = t.fen.split(' ')[1] === 'b' ? 'b' : 'w';
@@ -517,13 +517,18 @@ for (const lesson of openingLessons) {
   previousLessonId = lesson.id;
 }
 // The tactics deck closes Part I, two sheets of twelve
-const deck = tacticsDeck.filter((t) => !isTacticMastered(t.id));
+// The deck less the mastered tactics, as the app has it
+const deck = practiceDeck;
 const bookTactics = deck.slice(0, BOOK_TACTICS);
 const tacticSheets = Math.ceil(bookTactics.length / SHEET_DRILLS);
-for (let k = 0; k < tacticSheets; k++) chapters.push(renderTacticsSheet(bookTactics.slice(k * SHEET_DRILLS, (k + 1) * SHEET_DRILLS), ++n, k + 1, tacticSheets));
 // Then a visualization sheet: the next twelve tactics (quiet positions left out), each two moves before it
 const aheadTactics = deck.filter((t) => t.before && !isControl(t) && !bookTactics.includes(t)).slice(0, SHEET_DRILLS);
-if (aheadTactics.length) chapters.push(renderTacticsSheet(aheadTactics, ++n, 1, 1, true));
+// With every lesson and position of Part I mastered, the first tactics sheet carries the part heading
+const partOneFirst = () => (chapters.length === 0 ? partOne() : '');
+for (let k = 0; k < tacticSheets; k++) {
+  chapters.push(renderTacticsSheet(bookTactics.slice(k * SHEET_DRILLS, (k + 1) * SHEET_DRILLS), ++n, k + 1, tacticSheets, false, partOneFirst()));
+}
+if (aheadTactics.length) chapters.push(renderTacticsSheet(aheadTactics, ++n, 1, 1, true, partOneFirst()));
 chapters.push(
   partHead(
     'Part II · The repertoire plans',

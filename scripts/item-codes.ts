@@ -10,7 +10,7 @@
  * New codes follow on from the highest of their kind. No code is renumbered or given to another item:
  * an item that leaves the curriculum keeps its code in src/data/item_codes.json.
  */
-import { readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { allCurriculumLessons } from '../src/curriculum';
 import { inPatternOrder } from '../src/curriculum/patternPath';
@@ -49,16 +49,19 @@ function items(): Item[] {
   return out;
 }
 
+/** A missing file starts empty; a file that is there but not valid JSON (a merge conflict, a stray comma) stops the script, which would otherwise give every code again. */
 const readJson = <T>(file: string, empty: T): T => {
+  if (!existsSync(file)) return empty;
   try {
     return JSON.parse(readFileSync(file, 'utf8')) as T;
-  } catch {
-    return empty;
+  } catch (err) {
+    throw new Error(`${file} is not valid JSON (${(err as Error).message}). Fix it first: nothing was written.`);
   }
 };
 const order = (a: string, b: string) => KINDS.findIndex((k) => CODE_PREFIX[k] === a[0]) - KINDS.findIndex((k) => CODE_PREFIX[k] === b[0]) || Number(a.slice(1)) - Number(b.slice(1));
 
 const registry = readJson<CodeRegistry>(CODES_FILE, { lesson: {}, exercise: {}, game: {}, tactic: {}, worksheet: {} });
+for (const kind of KINDS) registry[kind] ??= {};
 const mastered = readJson<Record<string, string>>(MASTERED_FILE, {});
 const all = items();
 const nameOf = new Map<string, string>();

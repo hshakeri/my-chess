@@ -39,6 +39,12 @@ export const isExerciseMastered = (exerciseId: string): boolean => isMastered(ex
 export const isTacticMastered = (tacticId: string): boolean => isMastered(tacticCode(tacticId));
 export const isWorksheetMastered = (worksheetId: string | undefined): boolean => isMastered(worksheetCode(worksheetId));
 
+/** The lessons a card still belongs to once the mastered ones are left out. */
+export const liveLessonIds = (lessonIds: string[]): string[] => lessonIds.filter((id) => !isLessonMastered(id));
+
+/** A card every lesson of which is mastered: it leaves the sessions (a card of no lesson, from a game review, stays). */
+export const isCardMastered = (card: { lessonIds: string[] }): boolean => card.lessonIds.length > 0 && card.lessonIds.every(isLessonMastered);
+
 /** A lesson's exercises less the mastered ones (the same array when none is). */
 export function exercisesToPractise(lesson: CurriculumLesson): CurriculumExercise[] {
   const left = lesson.exercises.filter((ex) => !isExerciseMastered(ex.id));

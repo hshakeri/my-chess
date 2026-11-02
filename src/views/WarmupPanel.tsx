@@ -9,6 +9,7 @@ import { gamesRepo } from '../db/gamesRepo';
 import { RulesEngine } from '../engine/rules';
 import { labelAt, moveLabel } from '../analytics/review';
 import { gameDrillData, type GameDrill } from '../curriculum/gameDrills';
+import { isLessonMastered } from '../curriculum/itemCodes';
 import type { Square } from '../types/chess';
 import type { StoredGame } from '../types/db';
 import seedGamesRaw from '../data/seed_hoot65_games.json';
@@ -57,7 +58,7 @@ const PIECE: Record<string, string> = { p: 'pawn', n: 'knight', b: 'bishop', r: 
  * built. Half of the "Was it safe?" questions come from these: most moves played are safe, so on
  * random positions alone "Yes" would nearly always be right.
  */
-export const UNSAFE_DRILLS: GameDrill[] = [...gameDrillData.threat, ...(gameDrillData.mate ?? [])];
+export const UNSAFE_DRILLS: GameDrill[] = [...gameDrillData.threat, ...(gameDrillData.mate ?? [])].filter((d) => !isLessonMastered(`lesson-game-${d.id}`));
 
 /** A "Was it safe?" question on one of UNSAFE_DRILLS, the answer No, with the reply that punishes the move. */
 export function unsafeItem(random: () => number): WarmupItem | null {

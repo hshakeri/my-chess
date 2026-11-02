@@ -159,7 +159,7 @@ Compromised Defence plays 9.Bg5; the Konikowski 9.Bf4 and the Elephant 7.Nxf6+ a
   start on a back (rendering again after each), fills in the page numbers (contents and each chapter's pointer to its
   practice), renders the book, and fails if any sheet is not a front page followed by its answers.
   92 US Letter pages, 27 sheets (the four drill sheets, three tactics sheets at the end of Part I,
-  twenty practice sheets), 514 answers. Diagrams are SVG drawings with the app's
+  twenty practice sheets), 517 answers. Diagrams are SVG drawings with the app's
   piece set (`public/pieces`); the fonts are Times New Roman and Arial, whose metric twins Liberation
   Serif and Sans the Linux runner has, so pages break the same way there. All text is black and dark
   squares are a light grey.

@@ -1,5 +1,6 @@
 import React from 'react';
 import { patternPath } from '../curriculum/patternPath';
+import { isLessonMastered } from '../curriculum/itemCodes';
 
 /**
  * Where hoot65's points go, from the archive analysis (`docs/game-analysis.md`: all 4,101 Chess.com
@@ -101,7 +102,8 @@ export const PointsCard: React.FC<{ onOpenClock?: () => void; onPlayWithChecks?:
     </div>
     <ol className="space-y-1.5 text-sm">
       {POINTS_ROWS.map((row, k) => {
-        const lesson = row.group ? patternPath.find((g) => g.id === row.group)?.lessonIds[0] : undefined;
+        // The group's first position not yet mastered
+        const lesson = row.group ? patternPath.find((g) => g.id === row.group)?.lessonIds.find((id) => !isLessonMastered(id)) : undefined;
         return (
           <li key={row.key} data-points-row={row.key} className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
             <span className="font-mono text-emerald-300 w-24 shrink-0 whitespace-nowrap">{row.points}</span>

@@ -7,6 +7,7 @@ import { allCurriculumLessons } from '../curriculum';
 import { practiceDeck, readTacticSessions, readTacticStates, tacticsProgress, type TacticsProgress } from '../services/tacticsDeck';
 import { cctBySource, readCctLog, type CctSourceStats } from '../services/cctLog';
 import type { StoredCard, StoredRevlog } from '../types/db';
+import { isCardMastered } from '../curriculum/itemCodes';
 
 const pct = (x: number) => `${Math.round(x * 100)}%`;
 
@@ -165,7 +166,8 @@ export const ProgressPanel: React.FC<ProgressPanelProps> = ({ onClose, onOpenLes
     };
   }, []);
 
-  const summary = useMemo(() => (data ? summarizeProgress(data.cards, data.revlog) : null), [data]);
+  // A mastered lesson's cards leave the forecast and the riskiest positions, as they leave the sessions
+  const summary = useMemo(() => (data ? summarizeProgress(data.cards.filter((c) => !isCardMastered(c)), data.revlog) : null), [data]);
   // The deck less the mastered positions, as the tactics sessions see it
   const tactics = useMemo(() => tacticsProgress(practiceDeck, readTacticStates(), readTacticSessions()), []);
   const questions = useMemo(() => cctBySource(readCctLog()), []);
