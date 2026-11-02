@@ -130,9 +130,9 @@ export const scotchGambitBreakthrough: CurriculumLesson = buildVerifiedLesson({
       fen: 'r1bqk1nr/ppppbppp/2n5/8/2B1P3/2p2N2/PP3PPP/RNBQK2R w KQkq - 0 6',
       turn: 'w',
       difficultyRating: 2,
-      prompt: 'White to play. Black just played 5...dxc3, taking a second pawn. Find White\'s move that threatens mate in one.',
+      prompt: 'White to play. Black just played 5...dxc3, taking a second pawn. Find the queen move into the centre that threatens mate in one.',
       solutionSan: ['Qd5', 'Nh6', 'Bxh6'],
-      explanation: '6.Qd5! immediately threatens Qxf7# with battery coordination from the c4-bishop. After 6...Nh6, White removes the defender with 7.Bxh6!',
+      explanation: '6.Qd5! threatens Qxf7#, the c4 bishop backing the queen (6.Qb3 threatens the same mate). Against the best defence Stockfish prefers 6.Nxc3, but here 6...Nh6 is the only move that holds, and Maia expects about four in ten players at your level to miss it. After 6...Nh6, White removes the defender with 7.Bxh6!',
       sourceGame: {
         white: 'Sanchez Jimenez',
         black: 'Tofe Mata',
