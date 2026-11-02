@@ -38,6 +38,7 @@ import { logCct, readGateEnabled, writeGateEnabled } from '../services/cctLog';
 import { BoardQuestion, isRight, questionSquareStyles, type QuestionAnswer, type QuestionStatus } from '../components/BoardQuestion';
 import { WarmupPanel } from './WarmupPanel';
 import { SpeedRunPanel, SPEED_MIN_MOVES, speedMoves } from './SpeedRunPanel';
+import { ProgressPanel } from './ProgressPanel';
 import type { SparRequest } from '../services/sparLog';
 import type { HumanElo } from '../types/engine';
 
@@ -251,6 +252,7 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
   const [decisionTick, setDecisionTick] = useState(0);
   const [warmupOpen, setWarmupOpen] = useState(false);
   const [speedOpen, setSpeedOpen] = useState(false);
+  const [progressOpen, setProgressOpen] = useState(false);
 
   useEffect(() => {
     onLessonChange?.(currentLesson.id);
@@ -1083,6 +1085,15 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
     <div className="lessons-view w-full max-w-7xl mx-auto flex flex-col gap-6" data-view="lessons">
       {warmupOpen && <WarmupPanel onClose={() => setWarmupOpen(false)} />}
       {speedOpen && <SpeedRunPanel lesson={currentLesson} onClose={() => setSpeedOpen(false)} />}
+      {progressOpen && (
+        <ProgressPanel
+          onClose={() => setProgressOpen(false)}
+          onOpenLesson={(id) => {
+            const lesson = allCurriculumLessons.find((l) => l.id === id);
+            if (lesson) handleSelectLesson(lesson);
+          }}
+        />
+      )}
       {/* Header Banner */}
       <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-lg flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
@@ -1124,6 +1135,16 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
             title="Play this lesson's main line against the clock, the opponent's replies at once"
           >
             Speed run
+          </button>
+
+          <button
+            type="button"
+            data-action="progress"
+            onClick={() => setProgressOpen(true)}
+            className="bg-slate-950/80 border border-violet-500/40 rounded-lg px-3 py-2 text-xs font-semibold text-violet-300 hover:bg-violet-950/40"
+            title="Your review cards: how much you would recall today, the positions most likely to cost a game, the moves you mix up"
+          >
+            Progress
           </button>
 
           <label className="flex items-center gap-1.5 text-xs text-slate-300" title="Before each move of a line, answer one question about the position: what the last move attacks, what is undefended, or how many checks the opponent has">

@@ -336,6 +336,21 @@ test.describe('05. Interactive Lessons, Feedback Loops & Spaced Repetition (F16 
     await expect(modal).toHaveCount(0);
   });
 
+  test('Progress: a decision played is a reviewed card, with the reviews due over two weeks (DC-8)', async ({ page }) => {
+    await page.locator('[data-lesson-id="lesson-scandinavian-refutation-drill"]').click();
+    await expect(page.locator('[data-square="e4"] img[alt="White p"]')).toBeVisible();
+    await page.locator('[data-square="e4"]').click();
+    await page.locator('[data-square="d5"]').click();
+    await expect(page.locator('.correct-feedback')).toBeVisible();
+    await page.locator('button[data-action="progress"]').click();
+    const summary = page.locator('[data-modal="progress"] [data-section="progress-summary"]');
+    await expect(summary).toBeVisible();
+    await expect(summary).toHaveAttribute('data-reviewed', '1');
+    await expect(summary.locator('[data-due-day]')).toHaveCount(14);
+    await page.locator('[data-action="progress-close"]').click();
+    await expect(page.locator('[data-modal="progress"]')).toHaveCount(0);
+  });
+
   test('Spar: the finished Scandinavian line is played on against Maia, with the plan goals and a review (CL-6)', async ({ page }) => {
     test.setTimeout(150_000);
     await page.locator('[data-lesson-id="lesson-scandinavian-refutation-drill"]').click();
