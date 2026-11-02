@@ -31,7 +31,8 @@
     "lesson-refuting-latvian-gambit": "L29",
     "lesson-siberian-trap": "L30",
     "lesson-noahs-ark-trap": "L31",
-    "lesson-elephant-trap-qgd": "L32"
+    "lesson-elephant-trap-qgd": "L32",
+    "lesson-black-caro-vs-e5-d3": "L33"
   },
   "exercise": {
     "ex-scandi-drill-1": "E1",
@@ -76,7 +77,8 @@
     "ex-siberian-1": "E40",
     "ex-noahs-ark-1": "E41",
     "ex-elephant-trap-1": "E42",
-    "ex-italian-d6-two-on-f3": "E43"
+    "ex-italian-d6-two-on-f3": "E43",
+    "ex-black-caro-e5-qa5": "E44"
   },
   "game": {
     "lesson-game-threat-186294577658-12": "G1",

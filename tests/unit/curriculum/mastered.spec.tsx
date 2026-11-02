@@ -13,6 +13,8 @@ vi.mock('../../../src/data/mastered.json', () => ({
 import { scandinavianRefutationDrill } from '../../../src/curriculum/drills';
 import { exerciseCode, exercisesToPractise, isLessonMastered, masteredCodes } from '../../../src/curriculum/itemCodes';
 import { practiceDeck, tacticsDeck } from '../../../src/services/tacticsDeck';
+import { dueIdeas, ideaLessons } from '../../../src/services/ideaCards';
+import { allCurriculumLessons } from '../../../src/curriculum';
 import { CardService } from '../../../src/services/cards';
 import { LessonsView } from '../../../src/views/LessonsView';
 import { TacticsSheet } from '../../../src/views/TacticsSheet';
@@ -38,6 +40,11 @@ describe('What is on the mastered list is left out of the app', () => {
     expect(left.map((ex) => exerciseCode(ex.id))).toEqual(['E2', 'E3']);
     expect(practiceDeck.length).toBe(tacticsDeck.length - 1);
     expect(practiceDeck[0].id).toBe(tacticsDeck[1].id);
+    // A mastered lesson's plan card does not come due
+    const plans = dueIdeas(allCurriculumLessons).map((l) => l.id);
+    expect(ideaLessons(allCurriculumLessons).map((l) => l.id)).toContain(EVANS);
+    expect(plans.length).toBeGreaterThan(0);
+    expect(plans).not.toContain(EVANS);
   });
 
   it('the study path drops a mastered lesson and position; the Mastered list keeps them, and every card shows its code', async () => {

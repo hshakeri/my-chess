@@ -1414,6 +1414,142 @@ export const wallVsFlankLesson: CurriculumLesson = buildVerifiedLesson({
   ],
 });
 
+// Stockfish 19 at depth 20-22: after 2.e5, 2...d6 +0.01, 2...d5 -0.44, 2...f6 -0.58; after 2...d6, 3.exd6 +0.04
+// (exd6 -0.04, Qxd6 -0.16; 4.d4 d5 0.0), 3.d4? dxe5 4.dxe5 Qa5+! +0.69 (4...Qxd1+ 0.0); after 2...f6 3.d4,
+// 3...fxe5 -0.21 and 3...Qa5+? -2.04. After 2.d3 d5 3.Nc3: 3...d4 +0.08, 3...e5 +0.04, 3...dxe4 -0.21; after
+// 3.exd5, 3...cxd5 +0.11 and 3...Qxd5 -0.46.
+export const caroKannE5D3Lesson: CurriculumLesson = buildVerifiedLesson({
+  ...SOURCE,
+  id: 'lesson-black-caro-vs-e5-d3',
+  title: 'Caro-Kann vs 2.e5 and 2.d3',
+  subtitle: 'When White pushes the e-pawn early, or starts slowly',
+  category: 'opening',
+  eco: 'B10',
+  targetColor: 'black',
+  targetRatingBand: 'intermediate',
+  relevance: 'core',
+  description:
+    '2.e5 and 2.d3 came up in 3 of your Caro-Kann games each, and you scored 1 point against each. Against 2.e5 the pawn has nothing behind it yet: hit it with ...d6, and keep the f-pawn home, since ...f6 opens the diagonal from h5 to your king. Against 2.d3 strike with ...d5, and after 3.Nc3 take the centre with ...e5.',
+  thematicObjective: 'Against 2.e5: 2...d6; after 3.exd6 exd6 4.d4 d5 the game is level, and after 3.d4? dxe5 4.dxe5, 4...Qa5+ and 5...Qxe5+. Against 2.d3: 2...d5, and after 3.Nc3, 3...e5.',
+  keyTacticalMotif: 'A queen check that also hits a loose pawn; after ...f6 the queen checks on h5',
+  moves: [
+    { san: 'e4', isUserMove: false },
+    { san: 'c6', isUserMove: true, wrongMoveFeedback: AGAINST_E4 },
+    // After 1.e4 c6: 2.d4 25, 2.Nf3 20, 2.Bc4 8, 2.Nc3 4, 2.e5 3, 2.d3 3, 2.f4 2.
+    {
+      san: 'e5',
+      isUserMove: false,
+      frequency: 3,
+      annotation: 'White pushes the e-pawn before d4 can support it.',
+      alternatives: {
+        d3: [
+          {
+            san: 'd5',
+            isUserMove: true,
+            frequency: 3,
+            annotation: 'Strike at the centre, as against every second move.',
+            hintTheme: 'Strike at the centre',
+          },
+          {
+            san: 'Nc3',
+            isUserMove: false,
+            // After 2.d3 d5: 3.Nc3 2, 3.exd5 1.
+            frequency: 2,
+            alternatives: {
+              exd5: [
+                {
+                  san: 'cxd5',
+                  isUserMove: true,
+                  frequency: 1,
+                  annotation: 'Take back with the pawn, as you did, and keep a pawn on d5.',
+                  wrongMoveFeedback: {
+                    Qxd5: '3...Qxd5 puts the queen where Nc3 will hit it; Stockfish rates it more than half a pawn below 3...cxd5.',
+                  },
+                },
+                { san: 'Nf3', isUserMove: false },
+                { san: 'Nc6', isUserMove: true, annotation: 'Develop.', accept: { san: ['Bg4', 'Nf6'] } },
+              ],
+            },
+          },
+          {
+            san: 'e5',
+            isUserMove: true,
+            annotation: 'Take the centre with a second pawn, as in your win.',
+            hintTheme: 'Take the centre',
+            wrongMoveFeedback: {
+              dxe4: '3...dxe4, your move in the other game, trades off your only centre pawn; Stockfish rates 3...e5 a quarter of a pawn higher.',
+              d4: '3...d4 is as good (Stockfish), and gains space with tempo on the knight. This lesson takes the centre with 3...e5, as in your win.',
+            },
+          },
+          { san: 'exd5', isUserMove: false },
+          { san: 'cxd5', isUserMove: true, annotation: 'Take back: your pawns on d5 and e5 hold the centre.' },
+        ],
+      },
+    },
+    {
+      san: 'd6',
+      isUserMove: true,
+      annotation: 'Hit the pawn at once: nothing defends it.',
+      hintTheme: 'Attack the advanced pawn',
+      wrongMoveFeedback: {
+        f6: '2...f6?! was your move in two of these games (1 point): it opens the diagonal from h5 to your king, as in the Damiano. After 3.d4 fxe5 4.Qh5+ g6 5.Qxe5 White has the pawn back and the queen hits your h8 rook, and in one game 3...Qa5+? 4.Nc3 d5 5.Bd3 fxe5 6.Qh5+ walked your king out. Stockfish rates 2...d6 more than half a pawn higher.',
+        d5: '2...d5 is playable: after 3.d4 it is the Advance, which has its own lesson. Stockfish rates 2...d6 almost half a pawn higher.',
+      },
+    },
+    {
+      san: 'exd6',
+      isUserMove: false,
+      annotation: 'White trades the pawn.',
+      alternatives: {
+        d4: [
+          { san: 'dxe5', isUserMove: true, annotation: 'Take the pawn.' },
+          { san: 'dxe5', isUserMove: false },
+          {
+            san: 'Qa5+',
+            isUserMove: true,
+            annotation: 'Check along the a5-e1 diagonal, and the queen also hits the e5 pawn, which has nothing behind it now.',
+            hintTheme: 'A check that hits a loose pawn',
+            wrongMoveFeedback: {
+              'Qxd1+': '4...Qxd1+ trades queens, and the game is level; 4...Qa5+ wins a pawn (Stockfish +0.7 against 0.0).',
+            },
+          },
+          { san: 'Nc3', isUserMove: false, annotation: 'Whatever White plays, 5...Qxe5+ takes the pawn with check.' },
+          { san: 'Qxe5+', isUserMove: true, annotation: 'A pawn up, with check.' },
+        ],
+      },
+    },
+    {
+      san: 'exd6',
+      isUserMove: true,
+      annotation: 'Take back with the e-pawn: the f8 bishop and the queen now have e7.',
+      wrongMoveFeedback: {
+        Qxd6: '3...Qxd6 is playable; Stockfish rates 3...exd6 a little higher.',
+      },
+    },
+    { san: 'd4', isUserMove: false },
+    {
+      san: 'd5',
+      isUserMove: true,
+      annotation: 'Each side has a pawn in the centre, and the game is level (Stockfish 0.0): develop with ...Bd6, ...Nf6 or ...Ne7, and castle.',
+      accept: { san: ['Nf6'] },
+    },
+  ],
+  exercises: [
+    {
+      id: 'ex-black-caro-e5-qa5',
+      title: 'The Pawn With Nothing Behind It',
+      // 1.e4 c6 2.e5 d6 3.d4 dxe5 4.dxe5
+      fen: 'rnbqkbnr/pp2pppp/2p5/4P3/8/8/PPP2PPP/RNBQKBNR b KQkq - 0 4',
+      turn: 'b',
+      difficultyRating: 2,
+      prompt: 'Black to play. After 3.d4 dxe5 4.dxe5, find the move that wins a pawn.',
+      solutionSan: ['Qa5+', 'Nc3', 'Qxe5+'],
+      explanation:
+        '4...Qa5+! checks along the a5-e1 diagonal and hits the e5 pawn: whatever White plays, 5...Qxe5+ takes it with check (Stockfish +0.7). 4...Qxd1+ only trades queens.',
+    },
+  ],
+});
+
 export const blackRepertoireLessons: CurriculumLesson[] = [
   londonWallLesson,
   slavWallLesson,
@@ -1424,5 +1560,6 @@ export const blackRepertoireLessons: CurriculumLesson[] = [
   caroKannBc4Lesson,
   caroKannExchangeLesson,
   caroKannF4Lesson,
+  caroKannE5D3Lesson,
   caroKannClassicalLesson,
 ];

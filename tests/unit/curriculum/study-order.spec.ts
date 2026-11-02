@@ -425,13 +425,14 @@ describe('Opening study order: lessons, courses and the repertoire plan agree', 
   it('groups the Black lessons in their own course, each starting with the opponent\'s first move', () => {
     const course = curriculumCourses.find((c) => c.id === 'course-black-repertoire')!;
     expect(course.category).toBe('black_repertoire');
-    // The 2.Bc4 and Exchange lessons (2026-11-02) cover replies to the Caro-Kann the seed games met without a lesson
+    // The 2.Bc4, Exchange and 2.e5/2.d3 lessons (2026-11-02) cover replies to the Caro-Kann the seed games met without a lesson
     expect(course.lessons.map((l) => l.id).sort()).toEqual([
       'lesson-black-caro-bg4-timing',
       'lesson-black-caro-exchange',
       'lesson-black-caro-kann-advance',
       'lesson-black-caro-kann-classical',
       'lesson-black-caro-vs-bc4',
+      'lesson-black-caro-vs-e5-d3',
       'lesson-black-caro-vs-f4',
       'lesson-black-slav-wall',
       'lesson-black-wall-vs-flank',

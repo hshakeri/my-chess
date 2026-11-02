@@ -97,7 +97,7 @@ describe('Curriculum Move Legality & Verification (chess.js)', () => {
     // ending has the other way to give way, 1...Kc8 (an ending, so unweighted too). The Caro-Kann
     // lesson against 2.Bc4 (2026-11-02) branches on White's fourth and fifth moves, and the Exchange lesson on
     // White's fourth and fifth, the Two Knights lesson with 4.d4 on Black's fifth, and White's lesson against
-    // the Caro-Kann on Black's third and fourth, weighted from the seed.
+    // the Caro-Kann on Black's third and fourth, weighted from the seed; the Caro-Kann lesson against 2.e5 and 2.d3 branches on White's second and third moves.
     expect([...lessonsWithBranches].sort()).toEqual([
       'lesson-alapin-sicilian-centre',
       'lesson-black-caro-bg4-timing',
@@ -105,6 +105,7 @@ describe('Curriculum Move Legality & Verification (chess.js)', () => {
       'lesson-black-caro-kann-advance',
       'lesson-black-caro-kann-classical',
       'lesson-black-caro-vs-bc4',
+      'lesson-black-caro-vs-e5-d3',
       'lesson-black-caro-vs-f4',
       'lesson-black-slav-wall',
       'lesson-black-wall-vs-flank',

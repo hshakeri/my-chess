@@ -2,6 +2,7 @@ import { createEmptyCard, fsrs, Rating, type Card, type Grade } from 'ts-fsrs';
 import { Chess } from 'chess.js';
 import { CARD_PARAMETERS } from './cards';
 import type { CurriculumLesson } from '../types/curriculum';
+import { isLessonMastered } from '../curriculum/itemCodes';
 
 /**
  * Idea cards (CL-7): one card per opening lesson that rehearses the plan rather than a move. The card
@@ -101,10 +102,11 @@ const fromCard = (c: Card): StoredIdea => ({
   last_review: c.last_review ? c.last_review.getTime() : undefined,
 });
 
-/** The idea cards due now, oldest due first; a lesson never seen counts as due (a new card). */
+/** The idea cards due now, oldest due first; a lesson never seen counts as due (a new card). A mastered lesson's card is not. */
 export function dueIdeas(lessons: CurriculumLesson[], now = Date.now()): CurriculumLesson[] {
   const all = readAll();
   return ideaLessons(lessons)
+    .filter((l) => !isLessonMastered(l.id))
     .filter((l) => !all[l.id] || all[l.id].due <= now)
     .sort((a, b) => (all[a.id]?.due ?? 0) - (all[b.id]?.due ?? 0));
 }

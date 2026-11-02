@@ -501,6 +501,32 @@ test.describe('05. Interactive Lessons, Feedback Loops & Spaced Repetition (F16 
     await expect(page.locator('.correct-feedback').first()).toContainText('4.Qh5+ Ke7 5.Qxe5+', { timeout: 10000 });
   });
 
+  test('Caro-Kann vs 2.e5: hit the pawn at once, and the queen check that wins it after 3.d4', async ({ page }) => {
+    await page.goto('/#/lesson/lesson-black-caro-vs-e5-d3');
+    const move = async (from: string, to: string) => {
+      await page.locator(`[data-square="${from}"]`).click();
+      await page.locator(`[data-square="${to}"]`).click();
+    };
+    const yourTurn = page.getByText(/Your turn: find Black/);
+    for (const [check, from, to] of [
+      ['e4', 'c7', 'c6'],
+      ['e5', 'd7', 'd6'],
+      ['d6', 'e7', 'd6'],
+      ['d4', 'd6', 'd5'],
+    ] as const) {
+      await expect(page.locator(`[data-square="${check}"] img[alt^="White"]`)).toBeVisible({ timeout: 5000 });
+      await expect(yourTurn).toBeVisible({ timeout: 5000 });
+      await move(from, to);
+    }
+    // The exercise: after 3.d4 dxe5 4.dxe5, the check that wins the e5 pawn
+    await expect(page.locator('[data-square="d5"] img')).toHaveCount(0, { timeout: 10000 });
+    await expect(page.locator('[data-square="e5"] img[alt="White p"]')).toBeVisible();
+    await move('d8', 'a5');
+    await expect(page.locator('[data-square="c3"] img[alt="White n"]')).toBeVisible({ timeout: 5000 });
+    await move('a5', 'e5');
+    await expect(page.locator('.correct-feedback').first()).toContainText('5...Qxe5+ takes it with check', { timeout: 10000 });
+  });
+
   test('Black-perspective lessons play the opponent\'s first move for the student', async ({ page }) => {
     await page.locator('[data-course="pattern-library"]').click();
     await page.locator('[data-lesson-id="lesson-siberian-trap"]').click();

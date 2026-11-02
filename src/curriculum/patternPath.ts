@@ -82,13 +82,14 @@ export const patternPath: PatternGroup[] = [
     id: 'pattern-king-in-the-centre',
     title: 'The king in the centre',
     idea:
-      'A king that has not castled can be mated by a knight check. In Legal\'s mate nothing can take the knight on d5; against Nd6# and Nf3# the only piece that could take it is pinned. In the Evans, White castles before taking back on d4, in the Two Knights with 4.d4 the rook on e1 pins a knight on e4 to the king, against 1...Nc6 a knight on b5 eyes a check on c7 that forks king and rook, and against 2...f6 the queen checks on h5 along the diagonal the f-pawn opened.',
+      'A king that has not castled can be mated by a knight check. In Legal\'s mate nothing can take the knight on d5; against Nd6# and Nf3# the only piece that could take it is pinned. In the Evans, White castles before taking back on d4, in the Two Knights with 4.d4 the rook on e1 pins a knight on e4 to the king, against 1...Nc6 a knight on b5 eyes a check on c7 that forks king and rook, and against 2...f6 the queen checks on h5 along the diagonal the f-pawn opened, which is why, as Black against 2.e5 in the Caro-Kann, the f-pawn stays home; there the queen checks on a5 instead and takes the loose e5 pawn.',
     check: 'With a king still on e1 or e8: which knight checks are possible, and can each checking knight be taken?',
     lessonIds: [
       'lesson-evans-gambit-destruction',
       'lesson-two-knights-d4',
       'lesson-white-vs-nimzowitsch',
       'lesson-white-vs-damiano',
+      'lesson-black-caro-vs-e5-d3',
       'lesson-legals-mate',
       'lesson-black-wall-vs-nc3-bg5',
       'lesson-blackburne-shilling-drill',

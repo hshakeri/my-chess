@@ -158,8 +158,8 @@ Compromised Defence plays 9.Bg5; the Konikowski 9.Bf4 and the Elephant 7.Nxf6+ a
   a draft, reads from its bookmarks where each heading landed, puts a notes page wherever a sheet would
   start on a back (rendering again after each), fills in the page numbers (contents and each chapter's pointer to its
   practice), renders the book, and fails if any sheet is not a front page followed by its answers.
-  88 US Letter pages, 26 sheets (the four drill sheets, three tactics sheets at the end of Part I,
-  nineteen practice sheets), 501 answers. Diagrams are SVG drawings with the app's
+  92 US Letter pages, 27 sheets (the four drill sheets, three tactics sheets at the end of Part I,
+  twenty practice sheets), 514 answers. Diagrams are SVG drawings with the app's
   piece set (`public/pieces`); the fonts are Times New Roman and Arial, whose metric twins Liberation
   Serif and Sans the Linux runner has, so pages break the same way there. All text is black and dark
   squares are a light grey.
@@ -279,12 +279,16 @@ Next: the roadmap below.
   the last year's 475 games), in the group on the Caro-Kann bishop, and "Caro-Kann vs 2.f4"
   (`lesson-black-caro-vs-f4`; hoot65 lost all six archive games against it), in the same group, and
   "Against 1...Nc6 as White" (`lesson-white-vs-nimzowitsch`) and "Against 2...f6 as White"
-  (`lesson-white-vs-damiano`), in the group on the king in the centre. Every
+  (`lesson-white-vs-damiano`), in the group on the king in the centre, with "Caro-Kann vs 2.e5 and 2.d3"
+  (`lesson-black-caro-vs-e5-d3`) after it: against 2.e5 the f-pawn stays home (the same Qh5+ pattern). Every
   stated fact is replayed in `tests/unit/curriculum/caro-*.spec.ts`, `two-knights-d4.spec.ts` and
   `white-vs-caro.spec.ts`.
   Other gaps that analysis showed, by seed games: 1.e4 e6 (10), 1.e4 g6 (7), 1.e4 Nc6 (5) as White
   (the French needs a choice of system first: hoot65's own second moves vary; against 1...g6 hoot65
-  already scores 5 of 7), and 2.d3 (3) as Black. Against the Two Knights (3...Nf6) the lessons teach
+  already scores 5 of 7); 2.d3 and 2.e5 (3 each) as Black now have a lesson. For the French, Stockfish 19 at depth 22: 2.d4 +0.36
+  and 2.Nc3 +0.39; after 2.d4 d5, 3.Nc3 +0.33 and 3.e5 (the Advance) +0.31; after 2.Nc3 d5, 3.d4 +0.39
+  (back into the main lines), 3.Nf3 +0.01 and 3.e5?! -0.48. The Italian against 3...d6 (4 games) is now
+  a branch of the Evans lesson. Against the Two Knights (3...Nf6) the lessons teach
   4.d3 (a branch of the Evans lesson), and hoot65 played 4.d4 in 10 of 12 seed games (5 points); the
   4.d4 lesson above now covers 4...exd4 5.O-O, but not 4...Bb4+, 4...d5 or 4...Bd6 (one game each). Many
   exits are hoot65 leaving the plan themselves at move 1 as Black: 1...d6 in 41 of 108 games against
