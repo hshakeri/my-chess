@@ -75,6 +75,11 @@ export const TacticsDeckPanel: React.FC<{ onClose: () => void; deck?: TacticPosi
   const [, setTick] = useState(0);
 
   const retired = useMemo(() => deck.filter((t) => isRetired(states[t.id])).length, [deck, states]);
+  // The codes of the retired positions, as the book prints them: the ones to ask to have taken off the printed sheets
+  const retiredCodes = useMemo(
+    () => deck.filter((t) => isRetired(states[t.id])).map((t) => tacticCode(t.id)).filter((c): c is string => !!c),
+    [deck, states]
+  );
   const yours = useMemo(() => deck.filter((t) => t.ownSide && !isControl(t)), [deck]);
   const missed = useMemo(() => yours.filter(missedInGame).length, [yours]);
   const current = session[index];
@@ -156,6 +161,12 @@ export const TacticsDeckPanel: React.FC<{ onClose: () => void; deck?: TacticPosi
               {GOOD_MS / 1000} seconds is Good, up to {HARD_MS / 1000} Hard, slower or wrong Again. A position retires after {RETIRE_STREAK} Good solves in
               a row: {retired} retired so far.
             </p>
+            {retiredCodes.length > 0 && (
+              <p className="text-xs text-slate-400 mt-1" data-retired-codes={retiredCodes.join(' ')}>
+                Retired here: {retiredCodes.join(', ')}. These are the codes printed beside them in the book; ask for them to be taken off the
+                printed sheets once they stay easy.
+              </p>
+            )}
           </div>
           <button
             type="button"

@@ -174,6 +174,15 @@ describe('Tactics deck (DC-2)', () => {
     expect(requests).toHaveLength(1);
   });
 
+  it('lists the codes of the retired positions, to have them taken off the printed sheets', () => {
+    window.localStorage.setItem(
+      TACTICS_STORAGE_KEY,
+      JSON.stringify({ [tacticsDeck[0].id]: { tries: 3, streak: 3, grade: 'good', at: Date.now() }, [tacticsDeck[1].id]: { tries: 1, streak: 1, grade: 'good', at: Date.now() } })
+    );
+    const view = render(<TacticsDeckPanel onClose={() => undefined} />);
+    expect(view.container.querySelector('[data-retired-codes]')?.getAttribute('data-retired-codes')).toBe('T1');
+  });
+
   it('sums up the deck for the Progress panel: seen, retired, to redo, and the solve time then and now', () => {
     const deck = [tactic('a', 'fork'), tactic('b', 'fork'), tactic('c', 'mate')];
     const states = { a: { tries: 3, streak: 3, grade: 'good' as const, at: 3 }, b: { tries: 1, streak: 0, grade: 'again' as const, at: 2 } };
