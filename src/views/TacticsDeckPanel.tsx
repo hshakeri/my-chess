@@ -8,8 +8,10 @@ import {
   RETIRE_STREAK,
   SESSION_SIZE,
   gradeSolve,
+  isControl,
   isRetired,
   logTacticSession,
+  missedInGame,
   numberLine,
   pickSession,
   readTacticSessions,
@@ -72,6 +74,8 @@ export const TacticsDeckPanel: React.FC<{ onClose: () => void; deck?: TacticPosi
   const [, setTick] = useState(0);
 
   const retired = useMemo(() => deck.filter((t) => isRetired(states[t.id])).length, [deck, states]);
+  const yours = useMemo(() => deck.filter((t) => t.ownSide && !isControl(t)), [deck]);
+  const missed = useMemo(() => yours.filter(missedInGame).length, [yours]);
   const current = session[index];
 
   const show = (t: TacticPosition) => {
@@ -167,6 +171,12 @@ export const TacticsDeckPanel: React.FC<{ onClose: () => void; deck?: TacticPosi
 
         {phase === 'ready' || phase === 'done' ? (
           <div className="space-y-3 text-sm text-slate-300">
+            {yours.length > 0 && (
+              <p className="text-xs text-slate-400" data-tactics-missed={missed}>
+                In {yours.length} of the positions you were the one to move: you found the win in your game {yours.length - missed} times and missed it{' '}
+                {missed} times. The ones you missed come first.
+              </p>
+            )}
             {phase === 'done' && (
               <div className="space-y-1" data-section="tactics-summary">
                 <p className="text-white">

@@ -140,6 +140,9 @@ export function logTacticSession(session: TacticSession): TacticSession[] {
 /** Positions where several moves are right and the game move gave something away: no single winning move to find. */
 export const isControl = (t: TacticPosition) => t.motif === 'quiet' || t.motif === 'lead';
 
+/** A win with hoot65 to move that hoot65 did not play in the game. */
+export const missedInGame = (t: TacticPosition) => t.ownSide && !isControl(t) && t.played !== t.solution && !t.accepted.includes(t.played);
+
 /** Positions last graded Again or Hard, and not retired: the ones a session takes first. */
 export function toRedo(deck: TacticPosition[], states: Record<string, TacticState>): number {
   return deck.filter((t) => states[t.id] && states[t.id].grade !== 'good').length;

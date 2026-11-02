@@ -96,6 +96,9 @@ app build. The results and what they mean are in `docs/game-analysis.md`.
    worse, two or more moves keeping the win), merged into the last tier with `tactics-merge.mjs ...
    mate,promotion,other`; `node tactics-complete.mjs <deck.json>` then scores every legal move of each
    control position so every right move is accepted, and drops those left with a single one.
+   `node tactics-order.mjs <deck.json> <quiet.json> <lead.json>` sets the order new positions come up
+   in (the study-path tiers, and within each the wins hoot65 missed in the game first, then the
+   easiest), taking the control positions out for `tactics-merge.mjs` to put back.
 12. **Opening book** (`opening-book.mjs`): `node opening-book.mjs games.jsonl
    ../../src/data/openingBook.json [min] [plies]` rebuilds the book Maia plays from on the Play tab
    out of the archive: every position of the first 16 plies where the opponent was to move and that

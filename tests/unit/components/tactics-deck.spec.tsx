@@ -15,6 +15,7 @@ import {
   readTacticSessions,
   readTacticStates,
   recordSolve,
+  missedInGame,
   tacticsDeck,
   tacticsProgress,
   toRedo,
@@ -202,6 +203,20 @@ describe('Tactics deck (DC-2)', () => {
     const aheadSheet = ahead.container.querySelector('[data-section="tactics-sheet"]')!;
     expect(aheadSheet.getAttribute('data-items')).toBe('1');
     expect(aheadSheet.querySelector('[data-tactics-item="1"]')?.textContent).toContain('After 29.Kg1 Kh8, White to play and win.');
+  });
+
+  it('orders the deck along the study path, the wins missed in the games first within each tier', () => {
+    const tier = (m: string) => (['free-piece', 'mate-in-one'].includes(m) ? 0 : ['fork', 'check', 'quiet'].includes(m) ? 1 : 2);
+    const tiers = tacticsDeck.map((t) => tier(t.motif));
+    expect([...tiers].sort((a, b) => a - b)).toEqual(tiers);
+    for (const k of [0, 1, 2]) {
+      const inTier = tacticsDeck.filter((t) => tier(t.motif) === k && t.motif !== 'quiet' && t.motif !== 'lead');
+      const firstHit = inTier.findIndex((t) => !missedInGame(t));
+      expect(inTier.slice(firstHit).some(missedInGame), `tier ${k}`).toBe(false);
+    }
+    const view = render(<TacticsDeckPanel onClose={() => undefined} />);
+    const mine = tacticsDeck.filter((t) => t.ownSide && t.motif !== 'quiet' && t.motif !== 'lead');
+    expect(view.container.querySelector('[data-tactics-missed]')?.getAttribute('data-tactics-missed')).toBe(String(mine.filter(missedInGame).length));
   });
 
   it('every deck position replays with chess.js: the answer, the line, the last move and the motif', () => {
