@@ -1,4 +1,8 @@
 import { test, expect } from '@playwright/test';
+import { readFileSync } from 'node:fs';
+
+// The opening book is the archive opponents' own moves, drawn by frequency (DC-6)
+const book = JSON.parse(readFileSync('src/data/openingBook.json', 'utf8')) as Record<string, Array<{ san: string }>>;
 
 test.describe('02. Human-Like Maia Engine Opponent (F05 - F06)', () => {
   test.beforeEach(async ({ page }) => {
@@ -40,9 +44,10 @@ test.describe('02. Human-Like Maia Engine Opponent (F05 - F06)', () => {
     const blackMove = page.locator('button[data-ply="2"]').first();
     await expect(blackMove).toBeVisible({ timeout: 15000 });
 
-    const moveText = await blackMove.textContent();
-    // Common human responses to 1.e4: e5, c5, c6, e6, d5, d6, Nf6
-    expect(moveText?.trim()).toMatch(/^(e5|c5|c6|e6|d5|d6|Nf6)/);
+    const moveText = (await blackMove.textContent())?.trim() ?? '';
+    // A reply hoot65's opponents chose after 1.e4 (the book has 1...g6 and 1...Nc6 too), or Nf6
+    const replies = [...book['rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1'].map((m) => m.san), 'Nf6'];
+    expect(replies).toContain(moveText.replace(/^\d+\.+\s*/, ''));
   });
 
   test('Engine plays first move when configured to play as White', async ({ page }) => {
