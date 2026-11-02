@@ -75,7 +75,7 @@ app build. The results and what they mean are in `docs/game-analysis.md`.
    fastest, Black slowest); everything not proved won is a draw. It runs in under a second and is
    used to check the archive's king-and-pawn endings and any lesson position of that ending.
 11. **Tactics deck** (`tactics.mjs`, `tactics-pick.mjs`): `node tactics.mjs scan <out.json> [max]
-   [depth]` takes every position right after a move that cost its player 0.3 or more of Maia's
+   [depth] [skip]` (skip resumes a scan) takes every position right after a move that cost its player 0.3 or more of Maia's
    expected score (either player, the other one not already clearly winning before it), newest game
    first, and keeps those where Stockfish's best move wins at least 2.5 pawns (or mates in three or
    fewer) and the second best is at least 2 pawns worse; it tags each by motif (a piece to take, a

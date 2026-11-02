@@ -14,7 +14,7 @@ import { Chess } from 'chess.js';
 import { Stockfish, MATE } from './stockfish.mjs';
 
 const [candFile, outFile, depthArg = '18'] = process.argv.slice(2);
-const CAP = { 'mate-in-one': 40, mate: 35, 'free-piece': 80, fork: 45, check: 30, promotion: 10, other: 40 };
+const CAP = { 'mate-in-one': 50, mate: 35, 'free-piece': 90, fork: 45, check: 30, promotion: 10, other: 40 };
 const cands = JSON.parse(fs.readFileSync(candFile, 'utf8'));
 const games = new Map(fs.readFileSync('games.jsonl', 'utf8').trim().split('\n').map((l) => { const g = JSON.parse(l); return [g.url.split('/').pop(), g]; }));
 
@@ -38,7 +38,7 @@ const sf = await Stockfish.start({ engine: 'full', threads: 6, hash: 256 });
 const deck = [];
 const san = (fen, u) => new Chess(fen).move({ from: u.slice(0, 2), to: u.slice(2, 4), promotion: u[4] }).san;
 for (const [k, c] of picked.entries()) {
-  const r = await sf.analyse(c.fen, { depth: Number(depthArg), multipv: Math.min(3, new Chess(c.fen).moves().length) });
+  const r = await sf.analyse(c.fen, { depth: Number(depthArg), maxMs: 8000, multipv: Math.min(3, new Chess(c.fen).moves().length) });
   const lines = r.lines;
   const best = lines[0].score;
   const mateIn = best > MATE - 1000 ? MATE - best : null;

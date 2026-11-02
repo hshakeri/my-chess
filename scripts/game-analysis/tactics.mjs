@@ -13,7 +13,8 @@ import { Chess } from 'chess.js';
 import { Stockfish, MATE } from './stockfish.mjs';
 
 const V = { p: 1, n: 3, b: 3, r: 5, q: 9, k: 0 };
-const [mode, outFile = 'tactics-cands.json', maxArg = '3000', depthArg = '14'] = process.argv.slice(2);
+const [mode, outFile = 'tactics-cands.json', maxArg = '3000', depthArg = '14', skipArg = '0'] = process.argv.slice(2);
+// `skip` resumes a scan: the first `skip` candidates are taken as scored, and the kept ones are read back from `out`
 if (mode !== 'scan') throw new Error('usage: node tactics.mjs scan <out.json> [max] [depth]');
 
 const games = fs.readFileSync('games.jsonl', 'utf8').trim().split('\n').map((l) => JSON.parse(l));
@@ -72,14 +73,16 @@ function motif(fen, uci, mateIn) {
 }
 
 const sf = await Stockfish.start({ engine: 'full', threads: 6, hash: 256 });
-const out = [];
+const SKIP = Number(skipArg);
+const out = SKIP ? JSON.parse(fs.readFileSync(outFile, 'utf8')) : [];
 let done = 0;
 const t0 = Date.now();
 for (const cand of cands) {
   done++;
+  if (done <= SKIP) continue;
   const c = new Chess(cand.fen);
   if (c.isGameOver()) continue;
-  const r = await sf.analyse(cand.fen, { depth: Number(depthArg), multipv: Math.min(3, c.moves().length) });
+  const r = await sf.analyse(cand.fen, { depth: Number(depthArg), maxMs: 5000, multipv: Math.min(3, c.moves().length) });
   const lines = r.lines;
   if (!lines?.length) continue;
   const best = lines[0].score;
@@ -121,7 +124,7 @@ for (const cand of cands) {
       ply: cand.ply,
     });
   }
-  if (done % 100 === 0) {
+  if (done % 50 === 0) {
     console.error(`${done}/${cands.length} scored, ${out.length} kept, ${((Date.now() - t0) / 1000).toFixed(0)} s`);
     fs.writeFileSync(outFile, JSON.stringify(out, null, 1));
   }
