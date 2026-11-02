@@ -248,6 +248,32 @@ test.describe('01. 2D Chessboard & Rules Engine (F01 - F04)', () => {
   });
 });
 
+test.describe('01d. The board question in games (CL-5)', () => {
+  test('switched on, each of your moves waits for the question about Maia\'s last move', async ({ page }) => {
+    await page.goto('/');
+    await page.locator('[data-tab="play"]').click();
+    await page.locator('input[data-toggle="play-gate"]').check();
+    // White's first move has no engine move before it: no question
+    await page.locator('[data-square="e2"]').click();
+    await page.locator('[data-square="e4"]').click();
+    await expect(page.locator('button[data-ply="2"]').first()).toBeVisible({ timeout: 15000 });
+    const question = page.locator('[data-section="board-question"]');
+    await expect(question).toHaveAttribute('data-question-status', 'asking');
+    // The board waits: a move tried now is not made
+    await page.locator('[data-square="d2"]').click();
+    await page.locator('[data-square="d4"]').click();
+    await expect(page.locator('[data-square="d2"] img[alt="White p"]')).toBeVisible();
+    // Answer, then move
+    await question.locator('button[data-action="question-none"]').click();
+    await expect(question).toHaveAttribute('data-question-status', /right|wrong/);
+    await page.locator('[data-square="g1"]').click();
+    await page.locator('[data-square="f3"]').click();
+    await expect(page.locator('[data-square="f3"] img[alt="White n"]')).toBeVisible();
+    // Switched on across visits
+    expect(await page.evaluate(() => window.localStorage.getItem('my_chess_play_gate'))).toBe('on');
+  });
+});
+
 test.describe('01c. Practice clock (DC-3)', () => {
   test('10+0: the clock of the side to move runs, a move stops it, and a flag ends the game', async ({ page }) => {
     await page.clock.install();

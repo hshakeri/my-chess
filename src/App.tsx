@@ -15,6 +15,12 @@ import { Chessboard } from './components/Chessboard';
 import { BoardControls } from './components/BoardControls';
 import { PracticeClock, newClockStore, type PaceTargets } from './components/PracticeClock';
 import { cannotMate } from './analytics/finalPosition';
+import { BoardQuestion, isRight, questionSquareStyles, type QuestionAnswer, type QuestionStatus } from './components/BoardQuestion';
+import { questionBeforeDecision, type MicroQuestion } from './services/microQuestions';
+import { logCct } from './services/cctLog';
+
+/** The Play tab's board question before each of the student's moves (CL-5 in real games); off unless switched on. */
+const PLAY_GATE_KEY = 'my_chess_play_gate';
 import { summarizeClock } from './analytics/clock';
 import { MoveList } from './components/MoveList';
 import { PositionSetupModal } from './components/PositionSetupModal';
@@ -197,6 +203,15 @@ export const App: React.FC = () => {
   const onClockReset = useCallback(() => setFlagged(null), []);
   // The clock's state outlives the Play tab, so another tab and back neither restarts it nor revives a flagged game
   const clockStore = useRef(newClockStore());
+  // CL-5 in games: before each of the student's moves, what does the engine's last move attack?
+  const [playGateOn, setPlayGateOn] = useState<boolean>(() => {
+    try {
+      return window.localStorage.getItem(PLAY_GATE_KEY) === 'on';
+    } catch {
+      return false;
+    }
+  });
+  const [playGate, setPlayGate] = useState<{ question: MicroQuestion; fen: string; picked: string[]; status: QuestionStatus; askedAt: number; ply: number } | null>(null);
   const [tierUsed, setTierUsed] = useState<'human_opening_book' | 'maia_neural' | 'heuristic_fallback' | undefined>(undefined);
   const [centipawns, setCentipawns] = useState<number | undefined>(undefined);
   const [modelLoaded, setModelLoaded] = useState<boolean>(false);
@@ -304,6 +319,45 @@ export const App: React.FC = () => {
     if (!summary) return undefined;
     return { control: `${summary.base}+${summary.increment}`, targets: Object.fromEntries(summary.pace.map((p) => [p.move, p.theirs])) };
   }, [dbGames]);
+
+  // The Play tab's board question: asked once per position where the student is to move after the engine's move
+  useEffect(() => {
+    if (!playGateOn || activeTab !== 'play' || engineColor === 'none' || flagged) return;
+    if (currentPly !== history.length || history.length === 0) return;
+    const game = rulesRef.current;
+    if (game.isGameOver() || game.getTurn() === engineColor) return;
+    if (playGate && playGate.ply === history.length) return;
+    const last = history[history.length - 1];
+    const fenBefore = history.length >= 2 ? history[history.length - 2].fenAfter : game.getInitialFen();
+    try {
+      setPlayGate({ question: questionBeforeDecision(game.getFen(), { fenBefore, san: last.san }), fen: game.getFen(), picked: [], status: 'asking', askedAt: Date.now(), ply: history.length });
+    } catch (err) {
+      console.warn('No board question for this position:', err);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [playGateOn, activeTab, engineColor, flagged, currentPly, history.length]);
+
+  const playGateHere = playGate && playGate.ply === history.length ? playGate : null;
+  const playGateAsking = !!playGateHere && playGateHere.status === 'asking';
+  const pickPlayGateSquare = useCallback((square: Square) => {
+    setPlayGate((g) => (g && g.status === 'asking' ? { ...g, picked: g.picked.includes(square) ? g.picked.filter((x) => x !== square) : [...g.picked, square] } : g));
+  }, []);
+  const submitPlayGate = (answer: QuestionAnswer) => {
+    if (!playGate || playGate.status !== 'asking') return;
+    const right = isRight(playGate.question, answer);
+    const now = Date.now();
+    logCct({ at: now, kind: playGate.question.kind, correct: right, ms: now - playGate.askedAt, source: 'play', fen: playGate.fen });
+    setPlayGate({ ...playGate, picked: Array.isArray(answer) ? answer : playGate.picked, status: right ? 'right' : 'wrong' });
+  };
+  const togglePlayGate = (on: boolean) => {
+    setPlayGateOn(on);
+    try {
+      window.localStorage.setItem(PLAY_GATE_KEY, on ? 'on' : 'off');
+    } catch {
+      // the switch still works for this visit
+    }
+    if (!on) setPlayGate(null);
+  };
 
   // Trigger engine move when it's engine's turn and at the live position
   useEffect(() => {
@@ -736,12 +790,23 @@ export const App: React.FC = () => {
                 store={clockStore.current}
                 pace={rulesRef.current.getInitialFen() === START_POSITION ? pace : undefined}
               />
+              <label className="w-full max-w-[560px] flex items-center gap-1.5 text-xs text-slate-300" title="Before each of your moves: which of your pieces does the engine's last move attack?">
+                <input type="checkbox" data-toggle="play-gate" checked={playGateOn} onChange={(e) => togglePlayGate(e.target.checked)} className="accent-sky-500" />
+                Board question before each of your moves
+              </label>
+              {playGateHere && (
+                <div className="w-full max-w-[560px]">
+                  <BoardQuestion question={playGateHere.question} fen={playGateHere.fen} picked={playGateHere.picked} status={playGateHere.status} onSubmit={submitPlayGate} />
+                </div>
+              )}
               <Chessboard
                 board={displayBoard}
                 position={displayPosition}
                 orientation={orientation}
                 lastMove={lastMove}
-                interactive={currentPly === history.length && !isThinking && !flagged}
+                interactive={currentPly === history.length && !isThinking && !flagged && !playGateAsking}
+                onSquarePick={playGateAsking && playGateHere && playGateHere.question.kind !== 'checks' && playGateHere.question.kind !== 'safe' ? pickPlayGateSquare : undefined}
+                customSquareStyles={playGateHere ? questionSquareStyles(playGateHere.question, playGateHere.picked, playGateHere.status) : undefined}
                 onMove={handleBoardMove}
                 getLegalMovesForSquare={(sq) => displayEngine.getLegalMovesForSquare(sq)}
               />

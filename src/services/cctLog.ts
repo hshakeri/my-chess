@@ -1,7 +1,8 @@
 import type { QuestionKind } from './microQuestions';
 
 /**
- * The record of board questions answered (CL-5): every answer from the lesson gate and the warm-up,
+ * The record of board questions answered (CL-5): every answer from the lesson gate, the warm-up and the
+ * Play tab's question,
  * kept in this browser (localStorage, the newest 1000), for the warm-up's choice of what to ask next
  * and for a later progress panel. Reading or writing never throws: without storage nothing is kept.
  */
@@ -11,7 +12,7 @@ export interface CctEvent {
   correct: boolean;
   /** Time from the question appearing to the answer. */
   ms: number;
-  source: 'lesson' | 'warmup';
+  source: 'lesson' | 'warmup' | 'play';
   fen: string;
   lessonId?: string;
 }

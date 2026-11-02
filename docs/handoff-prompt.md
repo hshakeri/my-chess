@@ -18,7 +18,7 @@ also runs on every push to another branch).
   for scheduling; maia3-js + onnxruntime-web in a Web Worker for the human-like engine.
 - Tests: Vitest (`npm test`, 448 tests: SSR `renderToString` specs, jsdom interaction specs under
   `tests/unit/curriculum/lessons-view-interactions.spec.tsx`, fake-indexeddb for the database) and
-  Playwright (`npm run test:e2e`, 99 tests incl. iPhone-viewport tests). Keep both green or update
+  Playwright (`npm run test:e2e`, 100 tests incl. iPhone-viewport tests). Keep both green or update
   tests deliberately and say why. The board question before each lesson move (CL-5) is on by default:
   a test that plays lesson moves either answers it or sets localStorage `my_chess_cct_gate` to `off`
   first (`page.addInitScript` in e2e, the jsdom spec's beforeEach). No `if (await ...isVisible())` guards in specs: a missing control
@@ -40,7 +40,8 @@ also runs on every push to another branch).
 - **Play vs Maia** (worker engine with opening book, Maia neural net, heuristic fallback; a
   main-thread fallback answers within 4 s if the worker is slow). Phone layout has an engine strip
   above the board. The opening book is the archive opponents' moves; a practice clock (off by
-  default) runs 10+0, 5+0 or 3+2 with a cue after 30 seconds on one move.
+  default) runs 10+0, 5+0 or 3+2 with a cue after 30 seconds on one move and the pace against the
+  opponents; a switch asks the board question (what the engine's last move attacks) before each move.
 - **Game Database**: Chess.com sync, PGN upload, replay, JSON export/import (schema v2 with FSRS
   cards and review log).
 - **Opening Diagnostics** (`src/analytics/diagnostics.ts`, `repertoire.ts`): measured habit
