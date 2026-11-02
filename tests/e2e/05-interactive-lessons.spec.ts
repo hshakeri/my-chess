@@ -322,6 +322,26 @@ test.describe('05. Interactive Lessons, Feedback Loops & Spaced Repetition (F16 
     await expect(modal).toHaveCount(0);
   });
 
+  test('King and pawn: the king takes the opposition, the pawn runs, and it promotes (Finish the game)', async ({ page }) => {
+    await page.locator('[data-lesson-id="lesson-king-pawn-opposition"]').click();
+    await expect(page.locator('[data-square="e6"] img[alt="White p"]')).toBeVisible();
+    const play = async (from: string, to: string) => {
+      await page.locator(`[data-square="${from}"]`).click();
+      await page.locator(`[data-square="${to}"]`).click();
+    };
+    await play('d5', 'd6');
+    await expect(page.locator('.correct-feedback')).toBeVisible();
+    await expect(page.locator('[data-square="e8"] img[alt="Black k"]')).toBeVisible();
+    await play('e6', 'e7');
+    await expect(page.locator('[data-square="f7"] img[alt="Black k"]')).toBeVisible();
+    await play('d6', 'd7');
+    await expect(page.locator('[data-square="f6"] img[alt="Black k"]')).toBeVisible();
+    await play('e7', 'e8');
+    await page.getByRole('button', { name: 'White q Queen' }).click();
+    await expect(page.locator('[data-square="e8"] img[alt="White q"]')).toBeVisible();
+    await expect(page.locator('.correct-feedback')).toBeVisible();
+  });
+
   test('Speed run: the lesson\'s line against the clock, the replies at once', async ({ page }) => {
     await page.locator('[data-lesson-id="lesson-scandinavian-refutation-drill"]').click();
     await page.locator('button[data-action="speed-run"]').click();

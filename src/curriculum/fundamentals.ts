@@ -348,8 +348,145 @@ export const rookBackRankMate: CurriculumLesson = buildVerifiedLesson({
   ],
 });
 
+export const kingPawnOpposition: CurriculumLesson = buildVerifiedLesson({
+  id: 'lesson-king-pawn-opposition',
+  title: 'King and Pawn: Lead with the King',
+  subtitle: 'Take the opposition, then let the pawn go while your king guards its path',
+  category: 'fundamentals',
+  sourceBook: 'Chess Fundamentals',
+  author: 'José Raúl Capablanca',
+  publicationYear: 1921,
+  pagesRef: 'Pawn promotion',
+  eco: 'KPK',
+  relevance: 'core',
+  // Every White move is the only one that wins, by an exact solution of the ending (scripts/game-analysis/kpk-solve.mjs);
+  // each Black move is the longest defence
+  initialFen: '3k4/8/4P3/3K4/8/8/8/8 w - - 0 1',
+  targetColor: 'white',
+  targetRatingBand: 'beginner',
+  description:
+    'King and pawn against a lone king: a won ending that is easy to draw. The king goes first. When the two kings stand face to face with one square between them, the side that has to move must give way; with your king beside or in front of your pawn and the other king to move, your king gets through, and only then does the pawn advance, with your king guarding the squares in front of it.',
+  thematicObjective:
+    'King first: take the opposition, push the pawn when the defending king has had to step aside, guard the queening square with your king, and promote without stalemate.',
+  keyTacticalMotif: 'Opposition, king in front of the pawn, the square of the pawn, stalemate check',
+  moves: [
+    {
+      san: 'Kd6',
+      isUserMove: true,
+      annotation:
+        'The kings stand face to face on the d-file with one square between them, and Black is to move: the black king has to give way. 1.Ke5? Ke7 lets the black king stand in front of the pawn with you to move, and 1.e7+? Kxe7 loses the pawn: both are draws.',
+      hintPiece: 'King',
+      hintSquare: 'd6',
+      hintTheme: 'Take the opposition',
+      wrongMoveFeedback: {
+        Ke5: '1.Ke5? Ke7: the black king stands in front of the pawn, face to face with yours, and you are to move. It is a draw.',
+        'e7+': '1.e7+? Kxe7: nothing defends the pawn, and king against king is a draw. The king goes first.',
+      },
+    },
+    {
+      san: 'Ke8',
+      isUserMove: false,
+      alternatives: {
+        Kc8: [
+          {
+            san: 'e7',
+            isUserMove: true,
+            annotation: 'The black king has gone to the side your king covers: d7 is yours, so nothing stops the pawn, and 3.e8=Q comes next.',
+            hintPiece: 'Pawn',
+            hintSquare: 'e7',
+            hintTheme: 'Now the pawn runs',
+            accept: { san: ['Kc5', 'Kc6', 'Kd5', 'Ke5', 'Ke7'] },
+          },
+        ],
+      },
+    },
+    {
+      san: 'e7',
+      isUserMove: true,
+      annotation: 'Now the pawn goes, guarded by your king: the black king cannot take it, and its only move is to f7.',
+      hintPiece: 'Pawn',
+      hintSquare: 'e7',
+      hintTheme: 'Push the pawn your king guards',
+      wrongMoveFeedback: {
+        Kc7: '2.Kc7? Ke7: the black king reaches the pawn first. It is a draw.',
+        Ke5: '2.Ke5? Ke7: the black king stands in front of the pawn again. It is a draw.',
+      },
+    },
+    { san: 'Kf7', isUserMove: false },
+    {
+      san: 'Kd7',
+      isUserMove: true,
+      annotation: 'Your king guards the queening square e8 and keeps guarding the pawn on e7: the pawn promotes next move.',
+      hintPiece: 'King',
+      hintSquare: 'd7',
+      hintTheme: 'Guard the queening square',
+      wrongMoveFeedback: {
+        'e8=Q+': '3.e8=Q+?? Kxe8: nothing defends the new queen, and king against king is a draw. Guard e8 with your king first.',
+      },
+    },
+    { san: 'Kf6', isUserMove: false },
+    {
+      san: 'e8=Q',
+      isUserMove: true,
+      annotation: 'The pawn promotes, and the queen mate from the first lesson of this group finishes the game.',
+      hintPiece: 'Pawn',
+      hintSquare: 'e8',
+      hintTheme: 'Promote',
+      accept: { san: ['e8=R', 'Kd6', 'Kd8', 'Ke8'] },
+    },
+  ],
+  exercises: [
+    {
+      id: 'ex-king-pawn-opposition',
+      title: 'Step in Front',
+      fen: '8/8/4k3/8/5K2/4P3/8/8 w - - 0 1',
+      turn: 'w',
+      difficultyRating: 2,
+      prompt: 'White to play. Only one move wins: where does your king go?',
+      solutionSan: ['Ke4'],
+      explanation:
+        '1.Ke4: your king stands in front of its pawn, face to face with the black king, and Black is to move. Every other move draws; 1.e4? Kf6 lets the black king take the opposition.',
+    },
+    {
+      id: 'ex-king-pawn-square',
+      title: 'The Square of the Pawn',
+      fen: '1K6/8/8/8/8/8/4P2k/8 w - - 0 1',
+      turn: 'w',
+      difficultyRating: 2,
+      prompt: 'White to play. Your king is far away. Can the pawn win the race on its own?',
+      solutionSan: ['e4'],
+      explanation:
+        '1.e4: draw the square from e4 to e8 and across to the h-file; after the double step the black king on h2 cannot step into it, so the pawn promotes. 1.e3? Kg3 brings the king into the square of the pawn on e3 in time, and it is a draw.',
+    },
+    {
+      id: 'ex-king-pawn-stalemate',
+      title: 'Promote, Not Stalemate',
+      fen: '4k3/4P3/8/3K4/8/8/8/8 w - - 0 1',
+      turn: 'w',
+      difficultyRating: 2,
+      prompt: 'White to play and win. Careful: one natural king move leaves Black no legal move at all.',
+      solutionSan: ['Kd6', 'Kf7', 'Kd7'],
+      explanation:
+        '1.Kd6 Kf7 2.Kd7 guards e8 and the pawn promotes. 1.Ke6?? is stalemate: the black king on e8 is not in check, d7 and f7 are covered by your king, and d8 and f8 by the pawn.',
+    },
+  ],
+  mistakesAndTraps: [
+    {
+      // The position after 2...Kf7 (kings d6 and f7, pawn e7)
+      plyIndex: 4,
+      attemptedSan: 'e8=Q+',
+      isTrap: true,
+      severity: 'blunder',
+      explanatoryFeedback: '3.e8=Q+?? Kxe8: the new queen stands where nothing defends it, and the black king takes it. 3.Kd7 guards e8 first, and the pawn promotes next move.',
+      refutationSanList: ['Kxe8'],
+      punishmentSummary: 'A won ending drawn: king against king.',
+    },
+  ],
+});
+
 export const fundamentalsLessons: CurriculumLesson[] = [
   queenCageBoxMate,
   rookBackRankMate,
+  kingPawnOpposition,
   stalemateCatastrophes,
 ];

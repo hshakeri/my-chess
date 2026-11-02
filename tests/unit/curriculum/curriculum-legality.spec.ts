@@ -93,7 +93,8 @@ describe('Curriculum Move Legality & Verification (chess.js)', () => {
     expect(branchMovesVerified).toBeGreaterThanOrEqual(50);
     // The opening study order (docs/handoff-prompt.md) added the Blackburne-Shilling drill, the Alapin
     // and the seven Black repertoire lessons, all with archive-weighted branches. The Stockfish pass gave
-    // the Konikowski lesson a 9...Bd7 branch (unobserved in the archive, so unweighted).
+    // the Konikowski lesson a 9...Bd7 branch (unobserved in the archive, so unweighted). The king and pawn
+    // ending has the other way to give way, 1...Kc8 (an ending, so unweighted too).
     expect([...lessonsWithBranches].sort()).toEqual([
       'lesson-alapin-sicilian-centre',
       'lesson-black-caro-bg4-timing',
@@ -106,6 +107,7 @@ describe('Curriculum Move Legality & Verification (chess.js)', () => {
       'lesson-blackburne-shilling-drill',
       'lesson-caro-kann-discipline-drill',
       'lesson-evans-gambit-destruction',
+      'lesson-king-pawn-opposition',
       'lesson-refuting-konikowski-gambit',
       'lesson-scandinavian-refutation-drill',
     ]);

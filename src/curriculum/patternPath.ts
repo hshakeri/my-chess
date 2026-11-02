@@ -102,9 +102,9 @@ export const patternPath: PatternGroup[] = [
   {
     id: 'pattern-finish-the-game',
     title: 'Finish the game',
-    idea: 'With a queen or a rook against a lone king, keep it in a box on the edge, bring your king up, and give mate rather than stalemate.',
-    check: 'Before a quiet queen or rook move near the enemy king: does the king still have a legal move?',
-    lessonIds: ['lesson-queen-cage-box-mate', 'lesson-rook-back-rank-mate', 'lesson-stalemate-catastrophes'],
+    idea: 'With a queen or a rook against a lone king, keep it in a box on the edge, bring your king up, and give mate rather than stalemate. With a lone pawn, your king goes first and takes the opposition, and the pawn advances when your king guards its path.',
+    check: 'Before a quiet move near the enemy king: does the king still have a legal move?',
+    lessonIds: ['lesson-queen-cage-box-mate', 'lesson-rook-back-rank-mate', 'lesson-king-pawn-opposition', 'lesson-stalemate-catastrophes'],
   },
 ];
 
