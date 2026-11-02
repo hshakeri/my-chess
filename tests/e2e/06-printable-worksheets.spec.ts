@@ -123,4 +123,14 @@ test.describe('06. Printable Physical-Board Worksheets & @media print (F19 - F20
     await expect(sheet.locator('[data-tactics-item]')).toHaveCount(12);
     await expect(sheet.locator('[data-tactics-item="1"]')).toContainText('to play and win');
   });
+
+  test('The card of the checks prints on its own, in the order they come up at the board', async ({ page }) => {
+    await page.locator('button[data-action="board-card"]').click();
+    const card = page.locator('[data-section="board-card"]');
+    await expect(card.locator('[data-card-row]')).toHaveCount(6);
+    await expect(card.locator('[data-card-row]').first()).toContainText('what it attacks');
+    await expect(card.locator('[data-card-row="hang"]')).toContainText('5.7');
+    await page.locator('button[data-action="board-card"]').click();
+    await expect(card).toHaveCount(0);
+  });
 });

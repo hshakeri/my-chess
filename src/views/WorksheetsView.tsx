@@ -16,6 +16,7 @@ import { PieceSymbol, PieceColor } from '../types/chess';
 import { ChessPiece } from '../components/ChessPiece';
 import { MistakeSheet } from './MistakeSheet';
 import { TacticsSheet } from './TacticsSheet';
+import { BoardCardSheet } from './PointsCard';
 
 const FILES = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'] as const;
 const RANKS = ['8', '7', '6', '5', '4', '3', '2', '1'] as const;
@@ -136,7 +137,7 @@ export const WorksheetsView: React.FC<{ initialWorksheetId?: string }> = ({ init
   const [filterType, setFilterType] = useState<'all' | 'curriculum_lesson' | 'hoot65_drill'>('all');
   // The sheet of the student's own reviewed mistakes (DC-4) instead of a worksheet
   // A sheet built from the student's own games instead of a lesson worksheet
-  const [ownSheet, setOwnSheet] = useState<'none' | 'mistakes' | 'tactics' | 'ahead'>('none');
+  const [ownSheet, setOwnSheet] = useState<'none' | 'mistakes' | 'tactics' | 'ahead' | 'card'>('none');
   const showMistakes = ownSheet === 'mistakes';
 
   const filteredWorksheets = allWorksheets.filter((ws) => {
@@ -234,6 +235,16 @@ export const WorksheetsView: React.FC<{ initialWorksheetId?: string }> = ({ init
           >
             {ownSheet === 'ahead' ? 'Back to the worksheets' : 'Two moves ahead (visualization)'}
           </button>
+          <button
+            type="button"
+            data-action="board-card"
+            onClick={() => setOwnSheet((v) => (v === 'card' ? 'none' : 'card'))}
+            className={`text-left px-3 py-2 rounded-lg border text-sm font-semibold ${
+              ownSheet === 'card' ? 'bg-rose-950/40 border-rose-500/50 text-rose-200' : 'bg-slate-900 border-slate-800 text-slate-200 hover:border-slate-600'
+            }`}
+          >
+            {ownSheet === 'card' ? 'Back to the worksheets' : 'The checks in order: a card for the board'}
+          </button>
 
           {/* Filter tabs */}
           <div className="flex items-center gap-1 bg-slate-900 p-1 rounded-lg border border-slate-800 text-xs">
@@ -330,7 +341,7 @@ export const WorksheetsView: React.FC<{ initialWorksheetId?: string }> = ({ init
 
         {/* Right Column: Printable Paper Sheet Container */}
         <div className="lg:col-span-8 flex flex-col gap-4">
-          {ownSheet === 'mistakes' ? <MistakeSheet /> : ownSheet === 'tactics' ? <TacticsSheet /> : ownSheet === 'ahead' ? <TacticsSheet ahead /> : (
+          {ownSheet === 'mistakes' ? <MistakeSheet /> : ownSheet === 'tactics' ? <TacticsSheet /> : ownSheet === 'ahead' ? <TacticsSheet ahead /> : ownSheet === 'card' ? <BoardCardSheet /> : (
           <div
             className="printable-sheet bg-white text-slate-900 p-8 sm:p-10 rounded-2xl shadow-xl border border-slate-200 print:shadow-none print:border-none print:p-0 print:max-w-none print:rounded-none w-full"
             data-printable="sheet"

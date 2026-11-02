@@ -43,6 +43,48 @@ export const POINTS_ROWS: PointsRow[] = [
   { key: 'mate', habit: 'Before every move, check whether the opponent has a mate in one', points: '1.3 to 1.8', group: 'pattern-does-your-move-allow-mate' },
 ];
 
+/**
+ * The same habits in the order a player meets them at the board: the opponent's move, then one's own,
+ * then the clock and the result. The card to keep by the board (the Worksheets tab and the book).
+ */
+export const BOARD_ORDER = ['threat', 'hang', 'mate', 'free', 'clock', 'resign'] as const;
+export const boardCardRows = (): PointsRow[] => BOARD_ORDER.map((key) => POINTS_ROWS.find((r) => r.key === key)!);
+
+/** The card itself, as a printable sheet. */
+export const BoardCardSheet: React.FC = () => (
+  <div
+    className="printable-sheet bg-white text-slate-900 p-8 sm:p-10 rounded-2xl shadow-xl border border-slate-200 print:shadow-none print:border-none print:p-0 print:max-w-none print:rounded-none w-full"
+    data-printable="sheet"
+    data-section="board-card"
+  >
+    <div className="border-2 border-dashed border-slate-900 p-4 max-w-xl">
+      <table className="w-full text-sm border-collapse">
+        <thead>
+          <tr>
+            <th colSpan={2} className="text-left font-bold pb-1 border-b border-slate-900">
+              At the board, every move: the checks in order
+            </th>
+            <th className="text-right font-bold pb-1 border-b border-slate-900">Points</th>
+          </tr>
+        </thead>
+        <tbody>
+          {boardCardRows().map((row, k) => (
+            <tr key={row.key} data-card-row={row.key} className="border-b border-slate-300 align-top">
+              <td className="py-1.5 pr-2 w-6">{k + 1}.</td>
+              <td className="py-1.5">{row.habit}</td>
+              <td className="py-1.5 pl-3 text-right whitespace-nowrap">{row.points}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <p className="text-[11px] text-slate-600 mt-2">
+        From your 4,101 Chess.com games: the points per 100 games each habit would have won if kept every time (near a 50% score, one point per 100 games is about 7 rating
+        points). Cut along the dashed line and keep it by the board.
+      </p>
+    </div>
+  </div>
+);
+
 export const PointsCard: React.FC<{ onOpenClock?: () => void }> = ({ onOpenClock }) => (
   <section className="bg-slate-900 border border-emerald-500/30 rounded-2xl p-5 space-y-3" data-section="points">
     <div>

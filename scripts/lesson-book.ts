@@ -27,7 +27,7 @@ import { plyLabel, replyOptions } from '../src/curriculum/builder';
 import { drillSetOf, gameDrillData } from '../src/curriculum/gameDrills';
 import { MOTIF_LABEL, isControl, numberLine, tacticsDeck, type TacticPosition } from '../src/services/tacticsDeck';
 import { lessonUrl } from '../src/router';
-import { POINTS_ROWS } from '../src/views/PointsCard';
+import { boardCardRows } from '../src/views/PointsCard';
 import { getRecommendedWhiteRepertoire, getRecommendedBlackRepertoire } from '../src/analytics/repertoire';
 import { CurriculumLesson, CurriculumMove } from '../src/types/curriculum';
 import { RepertoirePlan } from '../src/types/diagnostics';
@@ -437,9 +437,8 @@ const printing =
   'Print the book double-sided, flipping on the long edge. Every page with questions, the seven pages of positions from your games (four drill sheets and three tactics sheets) and each practice sheet, is the front of a sheet with its answers on the back, so each sheet can be taken to the board on its own. Where a practice sheet would otherwise start on the back of a page, a page for notes comes first.';
 
 // The habits the archive ranks (the app's "Where your points go"), in the order a player meets them at
-// the board: the opponent's move, then one's own, then the clock and the result. A card to cut out
-const BOARD_ORDER = ['threat', 'hang', 'mate', 'free', 'clock', 'resign'];
-const boardCard = `<div class="card"><table><thead><tr><th colspan="2">At the board, every move: the checks in order</th><th class="pts">Points</th></tr></thead><tbody>${BOARD_ORDER.map((key) => POINTS_ROWS.find((r) => r.key === key)!)
+// the board (the app's own card, `boardCardRows`): a card to cut out
+const boardCard = `<div class="card"><table><thead><tr><th colspan="2">At the board, every move: the checks in order</th><th class="pts">Points</th></tr></thead><tbody>${boardCardRows()
   .map((r, k) => `<tr><td class="n">${k + 1}.</td><td>${esc(r.habit)}</td><td class="pts">${esc(r.points)}</td></tr>`)
   .join('')}</tbody></table><p class="card-note">From your 4,101 Chess.com games: the points per 100 games each habit would have won if kept every time (near a 50% score, one point per 100 games is about 7 rating points). Cut along the dashed line and keep it by the board.</p></div>`;
 

@@ -2,7 +2,7 @@
 import { describe, it, expect, afterEach } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { render, fireEvent, cleanup } from '@testing-library/react';
-import { PointsCard, POINTS_ROWS } from '../../../src/views/PointsCard';
+import { BoardCardSheet, BOARD_ORDER, PointsCard, POINTS_ROWS } from '../../../src/views/PointsCard';
 import { patternPath } from '../../../src/curriculum/patternPath';
 
 describe('Where your points go (Diagnostics)', () => {
@@ -33,5 +33,17 @@ describe('Where your points go (Diagnostics)', () => {
     fireEvent.click(view.container.querySelector('[data-points-clock="clock"]')!);
     fireEvent.click(view.container.querySelector('[data-points-clock="resign"]')!);
     expect(opened).toBe(2);
+  });
+
+  it('prints the same habits as a card for the board, in the order they come up at the board', () => {
+    expect([...BOARD_ORDER].sort()).toEqual(POINTS_ROWS.map((r) => r.key).sort());
+    const view = render(<BoardCardSheet />);
+    const rows = Array.from(view.container.querySelectorAll('[data-card-row]'));
+    expect(rows.map((r) => r.getAttribute('data-card-row'))).toEqual([...BOARD_ORDER]);
+    rows.forEach((r) => {
+      const row = POINTS_ROWS.find((p) => p.key === r.getAttribute('data-card-row'))!;
+      expect(r.textContent).toContain(row.habit);
+      expect(r.textContent).toContain(row.points);
+    });
   });
 });
