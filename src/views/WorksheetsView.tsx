@@ -14,6 +14,7 @@ import { worksheetSetupMoves, numberedLine, fenSideToMove, samePosition } from '
 import { PrintableWorksheetData } from '../types/curriculum';
 import { PieceSymbol, PieceColor } from '../types/chess';
 import { ChessPiece } from '../components/ChessPiece';
+import { MistakeSheet } from './MistakeSheet';
 
 const FILES = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'] as const;
 const RANKS = ['8', '7', '6', '5', '4', '3', '2', '1'] as const;
@@ -47,7 +48,7 @@ function parseFenToBoard(fen: string): Array<Array<{ type: PieceSymbol; color: P
  * A printable diagram drawn from the student's side: on a Black sheet rank 1 is at the top and the
  * h-file on the left, so the paper matches a wooden board set up with Black nearest the student.
  */
-const WorksheetBoard: React.FC<{
+export const WorksheetBoard: React.FC<{
   fen: string;
   flipped: boolean;
   size: 'lg' | 'sm';
@@ -132,6 +133,8 @@ export const WorksheetsView: React.FC<{ initialWorksheetId?: string }> = ({ init
   });
 
   const [filterType, setFilterType] = useState<'all' | 'curriculum_lesson' | 'hoot65_drill'>('all');
+  // The sheet of the student's own reviewed mistakes (DC-4) instead of a worksheet
+  const [showMistakes, setShowMistakes] = useState(false);
 
   const filteredWorksheets = allWorksheets.filter((ws) => {
     if (filterType === 'all') return true;
@@ -198,6 +201,16 @@ export const WorksheetsView: React.FC<{ initialWorksheetId?: string }> = ({ init
               {filteredWorksheets.length} Available
             </span>
           </div>
+          <button
+            type="button"
+            data-action="mistake-sheet"
+            onClick={() => setShowMistakes((v) => !v)}
+            className={`text-left px-3 py-2 rounded-lg border text-sm font-semibold ${
+              showMistakes ? 'bg-rose-950/40 border-rose-500/50 text-rose-200' : 'bg-slate-900 border-slate-800 text-slate-200 hover:border-slate-600'
+            }`}
+          >
+            {showMistakes ? 'Back to the worksheets' : 'Mistakes from your reviewed games'}
+          </button>
 
           {/* Filter tabs */}
           <div className="flex items-center gap-1 bg-slate-900 p-1 rounded-lg border border-slate-800 text-xs">
@@ -294,6 +307,7 @@ export const WorksheetsView: React.FC<{ initialWorksheetId?: string }> = ({ init
 
         {/* Right Column: Printable Paper Sheet Container */}
         <div className="lg:col-span-8 flex flex-col gap-4">
+          {showMistakes ? <MistakeSheet /> : (
           <div
             className="printable-sheet bg-white text-slate-900 p-8 sm:p-10 rounded-2xl shadow-xl border border-slate-200 print:shadow-none print:border-none print:p-0 print:max-w-none print:rounded-none w-full"
             data-printable="sheet"
@@ -578,6 +592,7 @@ export const WorksheetsView: React.FC<{ initialWorksheetId?: string }> = ({ init
               </div>
             </div>
           </div>
+          )}
         </div>
       </div>
     </div>

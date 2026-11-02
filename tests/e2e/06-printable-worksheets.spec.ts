@@ -98,4 +98,13 @@ test.describe('06. Printable Physical-Board Worksheets & @media print (F19 - F20
     // Reset media
     await page.emulateMedia({ media: null });
   });
+  test('The sheet of your own reviewed mistakes waits for a review, and the worksheets come back (DC-4)', async ({ page }) => {
+    await page.locator('button[data-action="mistake-sheet"]').click();
+    const sheet = page.locator('[data-section="mistake-sheet"]');
+    await expect(sheet).toHaveAttribute('data-items', '0');
+    await expect(sheet).toContainText('No reviewed game has a mistake');
+    await page.locator('button[data-action="mistake-sheet"]').click();
+    await expect(page.locator('[data-printable="sheet"]').first()).toBeVisible();
+    await expect(sheet).toHaveCount(0);
+  });
 });
