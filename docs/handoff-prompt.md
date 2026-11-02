@@ -287,8 +287,8 @@ Next: the roadmap below.
   (the French needs a choice of system first: hoot65's own second moves vary; against 1...g6 hoot65
   already scores 5 of 7); 2.d3 and 2.e5 (3 each) as Black now have a lesson. For the French, Stockfish 19 at depth 22: 2.d4 +0.36
   and 2.Nc3 +0.39; after 2.d4 d5, 3.Nc3 +0.33 and 3.e5 (the Advance) +0.31; after 2.Nc3 d5, 3.d4 +0.39
-  (back into the main lines), 3.Nf3 +0.01 and 3.e5?! -0.48. The Italian against 3...d6 (4 games) is now
-  a branch of the Evans lesson. Against the Two Knights (3...Nf6) the lessons teach
+  (back into the main lines), 3.Nf3 +0.01 and 3.e5?! -0.48. The Italian against 3...d6 (4 games) and 3...f5
+  (3 games) are now branches of the Evans lesson. Against the Two Knights (3...Nf6) the lessons teach
   4.d3 (a branch of the Evans lesson), and hoot65 played 4.d4 in 10 of 12 seed games (5 points); the
   4.d4 lesson above now covers 4...exd4 5.O-O, but not 4...Bb4+, 4...d5 or 4...Bd6 (one game each). Many
   exits are hoot65 leaving the plan themselves at move 1 as Black: 1...d6 in 41 of 108 games against

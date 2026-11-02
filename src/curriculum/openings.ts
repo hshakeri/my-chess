@@ -424,6 +424,47 @@ export const evansGambitDestruction: CurriculumLesson = buildVerifiedLesson({
             accept: { san: ['Nc3'] },
           },
         ],
+        // Stockfish 19 at depth 20-22: 4.d4 +1.47, 4.d3 +1.11, 4.exf5 -0.07 (after 4...e4 only 5.Nd4, -0.07;
+        // 5.Ng1 -0.52, 5.Qe2 -1.52), 4.Nc3?? -2.18, 4.O-O?? -2.68; after 4.d3 Nf6, 5.O-O +1.32 (5.Nc3 +0.31);
+        // after 4.d3 fxe4, 5.dxe4 +1.90 (5.Ng5? -2.19)
+        f5: [
+          {
+            san: 'd3',
+            isUserMove: true,
+            frequency: 3,
+            annotation:
+              '3...f5 hits the e4 pawn, which nothing defends: hold it with a pawn. The c4 bishop keeps the diagonal that ...f5 opened to g8.',
+            hintTheme: 'Hold the attacked pawn',
+            wrongMoveFeedback: {
+              exf5: '4.exf5, your move in all three of these games, gives the advantage away: after 4...e4, which hits the f3 knight, only 5.Nd4 keeps the balance, and your 5.Qe2 and 5.Ng1 both lost. 4.d3 keeps e4 and White clearly better (Stockfish +1.1 against 0.0).',
+              d4: '4.d4 is even stronger (Stockfish +1.5), but sharper. This lesson holds e4 with 4.d3 (+1.1).',
+              'O-O': '4.O-O?? fxe4 hits the f3 knight, and every way out costs: 5.Ng5 Qxg5 and 5.Nxe5? Nxe5 lose the knight, and after 5.Ne1 d5 Black\'s pawns take the centre (Stockfish -2.6 or worse).',
+              Nc3: '4.Nc3?? fxe4 hits the f3 knight, as after 4.O-O (Stockfish -2.2). Hold e4 first with 4.d3.',
+            },
+          },
+          {
+            san: 'Nf6',
+            isUserMove: false,
+            annotation: 'Black develops the knight.',
+            alternatives: {
+              fxe4: [
+                {
+                  san: 'dxe4',
+                  isUserMove: true,
+                  annotation: 'Take back with the pawn (Stockfish +1.9).',
+                  wrongMoveFeedback: {
+                    Ng5: '5.Ng5? d5 hits the c4 bishop, and Black keeps the e4 pawn (Stockfish -2.2).',
+                  },
+                },
+              ],
+            },
+          },
+          {
+            san: 'O-O',
+            isUserMove: true,
+            annotation: 'Castle: Stockfish rates 5.O-O a full pawn above 5.Nc3 or 5.Ng5.',
+          },
+        ],
       },
     },
     {

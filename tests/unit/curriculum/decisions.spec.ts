@@ -73,8 +73,9 @@ describe('enumerateDecisions', () => {
     // and the five decisions of the 5...Ba5 branch. The Stockfish pass rebuilt the Blackburne-Shilling
     // branch after 4...exd4 around 5.O-O: four decisions (5.c3, 6.Nxc3, 6.cxd4, 7.O-O) became eight
     // (5.O-O, 6.Bxf7+, 7.Qh5+, 8.Qxc5; 6.c3 against ...d6, 6.Re1 against ...Nf6, 7.Bb3 and 8.Qxc5+ against ...Kf8).
-    // The 3...d6 branch added six: 4.O-O, 5.h3 and 6.c3, 6.Qxf3 against ...Bxf3, and 5.Bxe6 and 6.d4 against ...Be6
-    expect(branch.length).toBe(34);
+    // The 3...d6 branch added six: 4.O-O, 5.h3 and 6.c3, 6.Qxf3 against ...Bxf3, and 5.Bxe6 and 6.d4 against ...Be6;
+    // the 3...f5 branch three: 4.d3 and 5.O-O, and 5.dxe4 against ...fxe4
+    expect(branch.length).toBe(37);
     expect(decisions.every((d) => d.tags.includes('opening:evans-gambit-destruction'))).toBe(true);
     expect(decisions.every((d) => d.tags.includes('family:opening'))).toBe(true);
     expect(decisions.every((d) => d.color === 'w')).toBe(true);
@@ -85,34 +86,35 @@ describe('enumerateDecisions', () => {
     const after = (path: string) => decisions.find((d) => d.path.join(' ') === path)!;
     const italian = 'e4 e5 Nf3 Nc6 Bc4';
 
-    // After 3.Bc4 the archive replies are Bc5 11, Nf6 12, Nd4 5, h6 16, d6 4 (48 in total)
+    // After 3.Bc4 the archive replies are Bc5 11, Nf6 12, Nd4 5, h6 16, d6 4, f5 3 (51 in total)
     const nf6 = after(`${italian} Nf6`);
     const nd4 = after(`${italian} Nd4`);
     const h6 = after(`${italian} h6`);
     const d6 = after(`${italian} d6`);
-    expect(nf6.reachProb).toBeCloseTo(12 / 48, 6);
-    expect(nd4.reachProb).toBeCloseTo(5 / 48, 6);
-    expect(h6.reachProb).toBeCloseTo(16 / 48, 6);
-    expect(d6.reachProb).toBeCloseTo(4 / 48, 6);
+    expect(nf6.reachProb).toBeCloseTo(12 / 51, 6);
+    expect(nd4.reachProb).toBeCloseTo(5 / 51, 6);
+    expect(h6.reachProb).toBeCloseTo(16 / 51, 6);
+    expect(d6.reachProb).toBeCloseTo(4 / 51, 6);
+    expect(after(`${italian} f5`).reachProb).toBeCloseTo(3 / 51, 6);
     const shares = replyOptions(evansGambitDestruction.moves[5]);
-    expect(shares.map((s) => s.san)).toEqual(['Bc5', 'Nf6', 'Nd4', 'h6', 'd6']);
+    expect(shares.map((s) => s.san)).toEqual(['Bc5', 'Nf6', 'Nd4', 'h6', 'd6', 'f5']);
     expect(shares.reduce((sum, s) => sum + s.share, 0)).toBeCloseTo(1, 9);
-    expect(shares[0].share).toBeCloseTo(11 / 48, 6);
+    expect(shares[0].share).toBeCloseTo(11 / 51, 6);
 
     // Decisions deeper in the same branch keep the branch's reach
-    expect(after(`${italian} Nf6 d3 Bc5`).reachProb).toBeCloseTo(12 / 48, 6);
-    expect(after(`${italian} Nf6 d3 Bc5 c3 d6`).reachProb).toBeCloseTo(12 / 48, 6);
+    expect(after(`${italian} Nf6 d3 Bc5`).reachProb).toBeCloseTo(12 / 51, 6);
+    expect(after(`${italian} Nf6 d3 Bc5 c3 d6`).reachProb).toBeCloseTo(12 / 51, 6);
 
     // Nested branch: after 4.Nxd4 exd4 5.O-O the scripted ...Bc5 keeps the branch's share, and the
     // unobserved ...d6 and ...Nf6 get a third of it each (weight 1 against 1 and 1)
-    expect(after(`${italian} Nd4 Nxd4 exd4 O-O Bc5`).reachProb).toBeCloseTo(5 / 48, 6);
-    expect(after(`${italian} Nd4 Nxd4 exd4 O-O d6`).reachProb).toBeCloseTo(5 / 48 / 3, 6);
+    expect(after(`${italian} Nd4 Nxd4 exd4 O-O Bc5`).reachProb).toBeCloseTo(5 / 51, 6);
+    expect(after(`${italian} Nd4 Nxd4 exd4 O-O d6`).reachProb).toBeCloseTo(5 / 51 / 3, 6);
     expect(after(`${italian} Nd4 Nxd4 exd4 O-O Nf6`).acceptedSan).toEqual(['Re1']);
     // 6.Bxf7+ is met by ...Kxf7 or ...Kf8, and 7.Qh5+ by ...g6 or ...Kf8: the alternative gets half
-    expect(after(`${italian} Nd4 Nxd4 exd4 O-O Bc5 Bxf7+ Kxf7`).reachProb).toBeCloseTo(5 / 48, 6);
-    expect(after(`${italian} Nd4 Nxd4 exd4 O-O Bc5 Bxf7+ Kf8`).reachProb).toBeCloseTo(5 / 48 / 2, 6);
+    expect(after(`${italian} Nd4 Nxd4 exd4 O-O Bc5 Bxf7+ Kxf7`).reachProb).toBeCloseTo(5 / 51, 6);
+    expect(after(`${italian} Nd4 Nxd4 exd4 O-O Bc5 Bxf7+ Kf8`).reachProb).toBeCloseTo(5 / 51 / 2, 6);
     expect(after(`${italian} Nd4 Nxd4 exd4 O-O Bc5 Bxf7+ Kxf7 Qh5+ Kf8`).acceptedSan).toEqual(['Qxc5+']);
-    expect(after(`${italian} Nd4 Nxd4 exd4 O-O Bc5 Bxf7+ Kxf7 Qh5+ Kf8`).reachProb).toBeCloseTo(5 / 48 / 2, 6);
+    expect(after(`${italian} Nd4 Nxd4 exd4 O-O Bc5 Bxf7+ Kxf7 Qh5+ Kf8`).reachProb).toBeCloseTo(5 / 51 / 2, 6);
 
     // 4...Bxb4 was played 7 of 7 times; the declined ...Bb6 is unobserved (weight 1)
     expect(after(`${italian} Bc5 b4 Bb6`).reachProb).toBeCloseTo(1 / 8, 6);
@@ -192,18 +194,20 @@ describe('chooseOpponentReply', () => {
   });
 
   it('is deterministic for a given rng value and walks the options in order', () => {
-    const node = evansGambitDestruction.moves[5]; // 3...Bc5 with Nf6, Nd4, h6, d6
+    const node = evansGambitDestruction.moves[5]; // 3...Bc5 with Nf6, Nd4, h6, d6, f5
     expect(chooseOpponentReply(node, () => 0).san).toBe('Bc5');
-    expect(chooseOpponentReply(node, () => 11 / 48 - 1e-9).san).toBe('Bc5');
-    expect(chooseOpponentReply(node, () => 11 / 48 + 1e-9).san).toBe('Nf6');
-    expect(chooseOpponentReply(node, () => 23 / 48 + 1e-9).san).toBe('Nd4');
-    expect(chooseOpponentReply(node, () => 44 / 48 - 1e-9).san).toBe('h6');
-    expect(chooseOpponentReply(node, () => 0.999).san).toBe('d6');
-    expect(chooseOpponentReply(node, () => 1).san).toBe('d6'); // clamped, never out of range
-    const h6 = chooseOpponentReply(node, () => 44 / 48 - 1e-9);
+    expect(chooseOpponentReply(node, () => 11 / 51 - 1e-9).san).toBe('Bc5');
+    expect(chooseOpponentReply(node, () => 11 / 51 + 1e-9).san).toBe('Nf6');
+    expect(chooseOpponentReply(node, () => 23 / 51 + 1e-9).san).toBe('Nd4');
+    expect(chooseOpponentReply(node, () => 44 / 51 - 1e-9).san).toBe('h6');
+    expect(chooseOpponentReply(node, () => 48 / 51 - 1e-9).san).toBe('d6');
+    expect(chooseOpponentReply(node, () => 0.999).san).toBe('f5');
+    expect(chooseOpponentReply(node, () => 1).san).toBe('f5'); // clamped, never out of range
+    const h6 = chooseOpponentReply(node, () => 44 / 51 - 1e-9);
     expect(h6.continuation?.[0].san).toBe('d4');
     expect(h6.continuation?.[0].isUserMove).toBe(true);
-    expect(chooseOpponentReply(node, () => 0.999).continuation?.[0].san).toBe('O-O');
+    expect(chooseOpponentReply(node, () => 48 / 51 - 1e-9).continuation?.[0].san).toBe('O-O');
+    expect(chooseOpponentReply(node, () => 0.999).continuation?.[0].san).toBe('d3');
   });
 
   it('respects the weights over many seeded draws', () => {
@@ -215,11 +219,12 @@ describe('chooseOpponentReply', () => {
       const r = chooseOpponentReply(node, rng);
       counts[r.san] = (counts[r.san] || 0) + 1;
     }
-    expect(counts.Bc5 / n).toBeCloseTo(11 / 48, 1);
-    expect(counts.Nf6 / n).toBeCloseTo(12 / 48, 1);
-    expect(counts.Nd4 / n).toBeCloseTo(5 / 48, 1);
-    expect(counts.h6 / n).toBeCloseTo(16 / 48, 1);
-    expect(counts.d6 / n).toBeCloseTo(4 / 48, 1);
+    expect(counts.Bc5 / n).toBeCloseTo(11 / 51, 1);
+    expect(counts.Nf6 / n).toBeCloseTo(12 / 51, 1);
+    expect(counts.Nd4 / n).toBeCloseTo(5 / 51, 1);
+    expect(counts.h6 / n).toBeCloseTo(16 / 51, 1);
+    expect(counts.d6 / n).toBeCloseTo(4 / 51, 1);
+    expect(counts.f5 / n).toBeCloseTo(3 / 51, 1);
     // The ordering of the shares is reproduced exactly
     expect(counts.h6).toBeGreaterThan(counts.Nf6);
     expect(counts.Nf6).toBeGreaterThan(counts.Bc5);
