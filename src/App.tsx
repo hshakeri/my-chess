@@ -530,6 +530,15 @@ export const App: React.FC = () => {
     setClockKey((k) => k + 1);
   };
 
+  /** Today's game: the Play tab against Maia with both checks on (a finished game makes way for a new one). */
+  const playWithChecks = () => {
+    togglePlayGate(true);
+    toggleSafety(true);
+    if (engineColor === 'none') setEngineColor(orientation === 'w' ? 'b' : 'w');
+    if (rulesRef.current.isGameOver() || flagged) handleNewGame();
+    setActiveTab('play');
+  };
+
   // Custom FEN / PGN Setup
   const handleLoadFen = (fen: string) => {
     const res = rulesRef.current.loadFen(fen);
@@ -1058,6 +1067,7 @@ export const App: React.FC = () => {
             initialLesson={pendingLesson?.lesson}
             onSpar={startSpar}
             onLessonChange={setShownLessonId}
+            onPlayWithChecks={playWithChecks}
           />
         )}
 

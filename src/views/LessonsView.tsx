@@ -64,6 +64,8 @@ interface LessonsViewProps {
   onSpar?: (request: SparRequest) => void;
   /** Told the id of the lesson on screen whenever it changes (the URL hash follows it, DC-5). */
   onLessonChange?: (lessonId: string) => void;
+  /** Today's game: the Play tab against Maia with the board question and the safety check on. */
+  onPlayWithChecks?: () => void;
 }
 
 /** One scheduled decision of the current run, for the review log under the board. */
@@ -204,7 +206,7 @@ function sideName(turn: 'w' | 'b'): string {
   return turn === 'w' ? 'White' : 'Black';
 }
 
-export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initialLesson, onSpar, onLessonChange }) => {
+export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initialLesson, onSpar, onLessonChange, onPlayWithChecks }) => {
   const resolveInitialLesson = (): CurriculumLesson => {
     if (initialLesson) return initialLesson;
     const requested = initialLessonId ? allCurriculumLessons.find((l) => l.id === initialLessonId) : undefined;
@@ -1115,6 +1117,7 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
     if (key === 'warmup') setWarmupOpen(true);
     else if (key === 'tactics') setTacticsOpen(true);
     else if (key === 'plans') setPlansOpen(true);
+    else if (key === 'game') onPlayWithChecks?.();
     else if (dueCount > 0 && !session) void handleStartSession();
   };
   const ratingSummary = (['again', 'hard', 'good', 'easy'] as CardRating[])

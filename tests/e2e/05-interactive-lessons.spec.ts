@@ -325,8 +325,8 @@ test.describe('05. Interactive Lessons, Feedback Loops & Spaced Repetition (F16 
   });
 
   test('Tactics deck: a position from your games, the winning move graded by time, and a wrong one shown the answer (DC-2)', async ({ page }) => {
-    // Today's routine on the Lessons tab: four steps, nothing done in a fresh profile; its third step opens the deck
-    await expect(page.locator('[data-section="today"] [data-today]')).toHaveCount(4);
+    // Today's routine on the Lessons tab: five steps, nothing done in a fresh profile; its third step opens the deck
+    await expect(page.locator('[data-section="today"] [data-today]')).toHaveCount(5);
     await expect(page.locator('[data-section="today"]')).toHaveAttribute('data-done', '0');
     await page.locator('[data-today="tactics"]').click();
     const modal = page.locator('[data-modal="tactics"]');
