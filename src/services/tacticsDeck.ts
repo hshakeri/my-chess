@@ -133,6 +133,30 @@ export function toRedo(deck: TacticPosition[], states: Record<string, TacticStat
   return deck.filter((t) => states[t.id] && states[t.id].grade !== 'good').length;
 }
 
+export interface TacticsProgress {
+  deck: number;
+  seen: number;
+  retired: number;
+  redo: number;
+  sessions: number;
+  /** Mean seconds a position in the first and in the last session (null before any). */
+  firstSeconds: number | null;
+  lastSeconds: number | null;
+}
+
+export function tacticsProgress(deck: TacticPosition[], states: Record<string, TacticState>, sessions: TacticSession[]): TacticsProgress {
+  const perPosition = (x: TacticSession) => x.ms / 1000 / Math.max(1, x.good + x.hard + x.again);
+  return {
+    deck: deck.length,
+    seen: deck.filter((t) => states[t.id]).length,
+    retired: deck.filter((t) => isRetired(states[t.id])).length,
+    redo: toRedo(deck, states),
+    sessions: sessions.length,
+    firstSeconds: sessions.length ? perPosition(sessions[0]) : null,
+    lastSeconds: sessions.length ? perPosition(sessions[sessions.length - 1]) : null,
+  };
+}
+
 /** The same positions with no two neighbours of one motif where that can be helped. */
 export function interleave(items: TacticPosition[]): TacticPosition[] {
   const left = [...items];

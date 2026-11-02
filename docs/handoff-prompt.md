@@ -16,7 +16,7 @@ also runs on every push to another branch).
 
 - React 18 + Vite 6 + TypeScript (strict) + Tailwind; chess.js 1.4; Dexie 4 (IndexedDB); ts-fsrs 5
   for scheduling; maia3-js + onnxruntime-web in a Web Worker for the human-like engine.
-- Tests: Vitest (`npm test`, 434 tests: SSR `renderToString` specs, jsdom interaction specs under
+- Tests: Vitest (`npm test`, 436 tests: SSR `renderToString` specs, jsdom interaction specs under
   `tests/unit/curriculum/lessons-view-interactions.spec.tsx`, fake-indexeddb for the database) and
   Playwright (`npm run test:e2e`, 97 tests incl. iPhone-viewport tests). Keep both green or update
   tests deliberately and say why. The board question before each lesson move (CL-5) is on by default:
@@ -226,7 +226,8 @@ Next: the roadmap below.
   either player, one clearly winning move by Stockfish 19 (`scripts/game-analysis/tactics.mjs`,
   `tactics-pick.mjs`, `src/data/tactics_deck.json`), Woodpecker-lite in the Lessons header
   (`src/views/TacticsDeckPanel.tsx`): graded by solve time, Again first, retired after three Good
-  solves in a row; a Worksheets sheet and two lesson-book sheets.
+  solves in a row; a Worksheets sheet and two lesson-book sheets. The Lessons header shows the
+  day's routine (warm-up, due cards, ten tactics, plans) with each step ticked when done.
 - DC-6 archive half done (2026-11-02): Maia's opening book is the archive opponents' moves
   (`scripts/game-analysis/opening-book.mjs`, 253 positions).
 - DC-8 habit done (2026-11-02): "Kept a lead of 3 points for the next 10 moves" replaces "traded

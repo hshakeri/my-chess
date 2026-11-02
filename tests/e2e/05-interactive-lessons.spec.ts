@@ -325,7 +325,10 @@ test.describe('05. Interactive Lessons, Feedback Loops & Spaced Repetition (F16 
   });
 
   test('Tactics deck: a position from your games, the winning move graded by time, and a wrong one shown the answer (DC-2)', async ({ page }) => {
-    await page.locator('button[data-action="tactics"]').click();
+    // Today's routine on the Lessons tab: four steps, nothing done in a fresh profile; its third step opens the deck
+    await expect(page.locator('[data-section="today"] [data-today]')).toHaveCount(4);
+    await expect(page.locator('[data-section="today"]')).toHaveAttribute('data-done', '0');
+    await page.locator('[data-today="tactics"]').click();
     const modal = page.locator('[data-modal="tactics"]');
     await expect(modal.locator('[data-tactics-deck]')).toHaveAttribute('data-tactics-deck', String(tacticsDeck.length));
     await modal.locator('button[data-action="tactics-start"]').click();
@@ -404,6 +407,8 @@ test.describe('05. Interactive Lessons, Feedback Loops & Spaced Repetition (F16 
     // Mastery by study-path group: one row per group, and a card played once is not mastered yet
     await expect(summary.locator('[data-mastery-group]')).toHaveCount(9);
     await expect(summary.locator('[data-mastery-group="pattern-queen-takes-on-g4"]')).toHaveAttribute('data-mastered', '0');
+    // The tactics deck in one line: nothing seen yet in a fresh profile
+    await expect(page.locator('[data-modal="progress"] [data-section="tactics-progress"]')).toHaveAttribute('data-seen', '0');
     await page.locator('[data-action="progress-close"]').click();
     await expect(page.locator('[data-modal="progress"]')).toHaveCount(0);
   });

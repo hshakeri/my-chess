@@ -34,14 +34,15 @@ import { CardService, CardRating } from '../services/cards';
 import { canonicalFenKey } from '../services/fenKey';
 import { buildQueue, isGameCard, LearningSteps } from '../services/sessionQueue';
 import { questionBeforeDecision, type MicroQuestion } from '../services/microQuestions';
-import { logCct, readGateEnabled, writeGateEnabled } from '../services/cctLog';
+import { logCct, readCctLog, readGateEnabled, writeGateEnabled } from '../services/cctLog';
+import { todayRoutine, type TodayKey } from '../services/today';
 import { BoardQuestion, isRight, questionSquareStyles, type QuestionAnswer, type QuestionStatus } from '../components/BoardQuestion';
 import { WarmupPanel } from './WarmupPanel';
 import { SpeedRunPanel, SPEED_MIN_MOVES, speedMoves } from './SpeedRunPanel';
 import { ProgressPanel } from './ProgressPanel';
 import { PlanReviewPanel } from './PlanReviewPanel';
 import { TacticsDeckPanel } from './TacticsDeckPanel';
-import { readTacticStates, tacticsDeck, toRedo } from '../services/tacticsDeck';
+import { readTacticSessions, readTacticStates, tacticsDeck, toRedo } from '../services/tacticsDeck';
 import { dueIdeas } from '../services/ideaCards';
 import type { SparRequest } from '../services/sparLog';
 import type { HumanElo } from '../types/engine';
@@ -1084,6 +1085,18 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
   const dueCount = dueCards.length;
   const lessonDueCount = Array.from(lessonCards.values()).filter((c) => c.due <= Date.now()).length;
   const sessionFinished = !!session && session.current === null && session.index >= session.cards.length;
+  // Read again whenever one of the trainers closes or the due counts change
+  const today = useMemo(
+    () => todayRoutine({ now: Date.now(), cct: readCctLog(), tacticSessions: readTacticSessions(), dueCards: dueCount, plansDue }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [warmupOpen, tacticsOpen, plansOpen, dueCount, plansDue]
+  );
+  const openStep = (key: TodayKey) => {
+    if (key === 'warmup') setWarmupOpen(true);
+    else if (key === 'tactics') setTacticsOpen(true);
+    else if (key === 'plans') setPlansOpen(true);
+    else if (dueCount > 0 && !session) void handleStartSession();
+  };
   const ratingSummary = (['again', 'hard', 'good', 'easy'] as CardRating[])
     .map((r) => ({ r, n: reviewLog.filter((e) => e.rating === r).length }))
     .filter((x) => x.n > 0)
@@ -1125,6 +1138,24 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
             Step-by-step lessons distilled from the local chess books, with specific feedback on mistakes, the refutation
             played out on the board, and review scheduling driven by how the drill actually went.
           </p>
+          <div className="mt-2 flex flex-wrap items-center gap-1.5 text-xs" data-section="today" data-done={today.filter((t) => t.done).length}>
+            <span className="text-slate-400 font-semibold">Today:</span>
+            {today.map((step, k) => (
+              <button
+                key={step.key}
+                type="button"
+                data-today={step.key}
+                data-done={step.done}
+                onClick={() => openStep(step.key)}
+                className={`px-2 py-1 rounded-md border ${
+                  step.done ? 'border-emerald-500/40 bg-emerald-950/40 text-emerald-300' : 'border-slate-700 bg-slate-950/60 text-slate-200 hover:border-slate-500'
+                }`}
+              >
+                {k + 1}. {step.label}
+                {step.done ? ' ✓' : step.left ? ` (${step.left})` : ''}
+              </button>
+            ))}
+          </div>
         </div>
 
         <div className="flex items-center gap-3 flex-wrap">
@@ -1769,6 +1800,20 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
                   >
                     Now ten tactics
                   </button>
+                  {plansDue > 0 && (
+                    <button
+                      type="button"
+                      data-action="session-plans"
+                      onClick={() => {
+                        handleEndSession();
+                        setPlansOpen(true);
+                      }}
+                      className="px-3 py-1.5 rounded-lg bg-teal-700 hover:bg-teal-600 text-white text-xs font-semibold"
+                      title="The plans of your openings that are due"
+                    >
+                      Then the plans ({plansDue} due)
+                    </button>
+                  )}
                 </div>
               </div>
             )}

@@ -4,6 +4,7 @@ import { CardService } from '../services/cards';
 import { summarizeProgress, type ProgressSummary } from '../analytics/progress';
 import { labelAt } from '../analytics/review';
 import { allCurriculumLessons } from '../curriculum';
+import { readTacticSessions, readTacticStates, tacticsDeck, tacticsProgress, type TacticsProgress } from '../services/tacticsDeck';
 import type { StoredCard, StoredRevlog } from '../types/db';
 
 const pct = (x: number) => `${Math.round(x * 100)}%`;
@@ -114,6 +115,16 @@ export const ProgressSummaryView: React.FC<{ summary: ProgressSummary; onOpenLes
   );
 };
 
+/** The tactics deck in one line: how much of it is seen and retired, and the solve time then and now. */
+export const TacticsProgressLine: React.FC<{ progress: TacticsProgress }> = ({ progress: p }) => (
+  <p className="text-sm text-slate-300" data-section="tactics-progress" data-seen={p.seen} data-retired={p.retired}>
+    Tactics deck: {p.seen} of {p.deck} positions seen, {p.retired} retired, {p.redo} to redo.
+    {p.sessions > 0 && p.lastSeconds !== null && p.firstSeconds !== null
+      ? ` ${p.sessions} session${p.sessions === 1 ? '' : 's'}: ${p.lastSeconds.toFixed(1)} s a position in the last${p.sessions > 1 ? `, ${p.firstSeconds.toFixed(1)} s in the first` : ''}.`
+      : ' No session yet: the Tactics button in the Lessons header starts one.'}
+  </p>
+);
+
 interface ProgressPanelProps {
   onClose: () => void;
   onOpenLesson?: (lessonId: string) => void;
@@ -134,6 +145,7 @@ export const ProgressPanel: React.FC<ProgressPanelProps> = ({ onClose, onOpenLes
   }, []);
 
   const summary = useMemo(() => (data ? summarizeProgress(data.cards, data.revlog) : null), [data]);
+  const tactics = useMemo(() => tacticsProgress(tacticsDeck, readTacticStates(), readTacticSessions()), []);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 md:p-6 bg-black/80 backdrop-blur-sm" data-modal="progress">
@@ -147,6 +159,7 @@ export const ProgressPanel: React.FC<ProgressPanelProps> = ({ onClose, onOpenLes
             Close
           </button>
         </div>
+        <TacticsProgressLine progress={tactics} />
         {!summary ? (
           <p className="text-sm text-slate-400">Reading your cards…</p>
         ) : (

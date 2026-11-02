@@ -4,6 +4,7 @@ import { render, fireEvent, cleanup } from '@testing-library/react';
 import { Chess } from 'chess.js';
 import { TacticsDeckPanel } from '../../../src/views/TacticsDeckPanel';
 import { TacticsSheet } from '../../../src/views/TacticsSheet';
+import { TacticsProgressLine } from '../../../src/views/ProgressPanel';
 import {
   TACTICS_STORAGE_KEY,
   gradeSolve,
@@ -15,6 +16,7 @@ import {
   readTacticStates,
   recordSolve,
   tacticsDeck,
+  tacticsProgress,
   toRedo,
   type TacticPosition,
 } from '../../../src/services/tacticsDeck';
@@ -110,6 +112,19 @@ describe('Tactics deck (DC-2)', () => {
     // The session is logged, and the last sessions show
     expect(readTacticSessions()).toMatchObject([{ good: 1, hard: 0, again: 1 }]);
     expect(view.container.querySelector('[data-section="tactics-sessions"]')?.textContent).toContain('1 Good, 0 Hard, 1 Again');
+  });
+
+  it('sums up the deck for the Progress panel: seen, retired, to redo, and the solve time then and now', () => {
+    const deck = [tactic('a', 'fork'), tactic('b', 'fork'), tactic('c', 'mate')];
+    const states = { a: { tries: 3, streak: 3, grade: 'good' as const, at: 3 }, b: { tries: 1, streak: 0, grade: 'again' as const, at: 2 } };
+    const sessions = [
+      { at: 1, good: 1, hard: 1, again: 0, ms: 20_000 },
+      { at: 2, good: 2, hard: 0, again: 0, ms: 8_000 },
+    ];
+    const p = tacticsProgress(deck, states, sessions);
+    expect(p).toEqual({ deck: 3, seen: 2, retired: 1, redo: 1, sessions: 2, firstSeconds: 10, lastSeconds: 4 });
+    const view = render(<TacticsProgressLine progress={p} />);
+    expect(view.container.textContent).toBe('Tactics deck: 2 of 3 positions seen, 1 retired, 1 to redo. 2 sessions: 4.0 s a position in the last, 10.0 s in the first.');
   });
 
   it('prints the next positions of a session on a sheet, the answers on the back', () => {

@@ -179,6 +179,8 @@ describe('LessonsView interactions (jsdom)', () => {
     expect(document.querySelector('[data-section="session-summary"]')?.textContent).toMatch(/1 card reviewed: 0 again, 0 hard, 1 good, 0 easy/);
     // The session ends with an offer of ten tactics from the student's games
     expect(document.querySelector('[data-section="session-summary"] button[data-action="session-tactics"]')?.textContent).toBe('Now ten tactics');
+    // And of the plans due (a fresh profile has every opening plan due)
+    expect(document.querySelector('[data-section="session-summary"] button[data-action="session-plans"]')?.textContent).toMatch(/^Then the plans \(\d+ due\)$/);
     expect(document.querySelector('[data-due-count]')?.getAttribute('data-due-count')).toBe('0');
     // No further "Next card" once the session is over: the count cannot be inflated
     expect(document.querySelector('button[data-action="next-card"]')).toBeNull();
