@@ -5,6 +5,7 @@ import { summarizeProgress, type ProgressSummary } from '../analytics/progress';
 import { labelAt } from '../analytics/review';
 import { allCurriculumLessons } from '../curriculum';
 import { readTacticSessions, readTacticStates, tacticsDeck, tacticsProgress, type TacticsProgress } from '../services/tacticsDeck';
+import { cctBySource, readCctLog, type CctSourceStats } from '../services/cctLog';
 import type { StoredCard, StoredRevlog } from '../types/db';
 
 const pct = (x: number) => `${Math.round(x * 100)}%`;
@@ -125,6 +126,21 @@ export const TacticsProgressLine: React.FC<{ progress: TacticsProgress }> = ({ p
   </p>
 );
 
+const SOURCE_LABEL: Record<CctSourceStats['source'], string> = { lesson: 'In lessons', play: 'In games', warmup: 'In the warm-up' };
+
+/** The board questions answered, by where, with the share right lately against before. */
+export const BoardQuestionLines: React.FC<{ rows: CctSourceStats[] }> = ({ rows }) =>
+  rows.length ? (
+    <ul className="text-sm text-slate-300 space-y-0.5" data-section="cct-progress">
+      {rows.map((r) => (
+        <li key={r.source} data-cct-source={r.source} data-cct-n={r.n}>
+          Board questions {SOURCE_LABEL[r.source].toLowerCase()}: {r.n} answered, {pct(r.correct / r.n)} right
+          {r.recent !== null && r.before !== null ? ` (the newest 20: ${pct(r.recent)}; the 20 before: ${pct(r.before)})` : ''}.
+        </li>
+      ))}
+    </ul>
+  ) : null;
+
 interface ProgressPanelProps {
   onClose: () => void;
   onOpenLesson?: (lessonId: string) => void;
@@ -146,6 +162,7 @@ export const ProgressPanel: React.FC<ProgressPanelProps> = ({ onClose, onOpenLes
 
   const summary = useMemo(() => (data ? summarizeProgress(data.cards, data.revlog) : null), [data]);
   const tactics = useMemo(() => tacticsProgress(tacticsDeck, readTacticStates(), readTacticSessions()), []);
+  const questions = useMemo(() => cctBySource(readCctLog()), []);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 md:p-6 bg-black/80 backdrop-blur-sm" data-modal="progress">
@@ -160,6 +177,7 @@ export const ProgressPanel: React.FC<ProgressPanelProps> = ({ onClose, onOpenLes
           </button>
         </div>
         <TacticsProgressLine progress={tactics} />
+        <BoardQuestionLines rows={questions} />
         {!summary ? (
           <p className="text-sm text-slate-400">Reading your cards…</p>
         ) : (

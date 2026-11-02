@@ -52,6 +52,32 @@ export function cctStats(events: CctEvent[]): Partial<Record<QuestionKind, { n: 
   return out;
 }
 
+export interface CctSourceStats {
+  source: CctEvent['source'];
+  n: number;
+  correct: number;
+  /** Share right over the newest 20 answers, and over the 20 before them (null when there are none). */
+  recent: number | null;
+  before: number | null;
+}
+
+/** The board questions answered, by where they were asked: the lessons, games, the warm-up. */
+export function cctBySource(events: CctEvent[]): CctSourceStats[] {
+  const share = (xs: CctEvent[]) => (xs.length ? xs.filter((e) => e.correct).length / xs.length : null);
+  return (['lesson', 'play', 'warmup'] as const)
+    .map((source) => {
+      const mine = events.filter((e) => e.source === source).sort((a, b) => a.at - b.at);
+      return {
+        source,
+        n: mine.length,
+        correct: mine.filter((e) => e.correct).length,
+        recent: share(mine.slice(-20)),
+        before: share(mine.slice(-40, -20)),
+      };
+    })
+    .filter((row) => row.n > 0);
+}
+
 /** Whether the lesson asks a board question before each decision (on unless switched off). */
 export function readGateEnabled(): boolean {
   try {
