@@ -425,10 +425,12 @@ describe('Opening study order: lessons, courses and the repertoire plan agree', 
   it('groups the Black lessons in their own course, each starting with the opponent\'s first move', () => {
     const course = curriculumCourses.find((c) => c.id === 'course-black-repertoire')!;
     expect(course.category).toBe('black_repertoire');
+    // The 2.Bc4 lesson (2026-11-02) covers the third most frequent reply to the Caro-Kann in the seed games
     expect(course.lessons.map((l) => l.id).sort()).toEqual([
       'lesson-black-caro-bg4-timing',
       'lesson-black-caro-kann-advance',
       'lesson-black-caro-kann-classical',
+      'lesson-black-caro-vs-bc4',
       'lesson-black-slav-wall',
       'lesson-black-wall-vs-flank',
       'lesson-black-wall-vs-london',

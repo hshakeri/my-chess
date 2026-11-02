@@ -16,7 +16,7 @@ also runs on every push to another branch).
 
 - React 18 + Vite 6 + TypeScript (strict) + Tailwind; chess.js 1.4; Dexie 4 (IndexedDB); ts-fsrs 5
   for scheduling; maia3-js + onnxruntime-web in a Web Worker for the human-like engine.
-- Tests: Vitest (`npm test`, 466 tests: SSR `renderToString` specs, jsdom interaction specs under
+- Tests: Vitest (`npm test`, 473 tests: SSR `renderToString` specs, jsdom interaction specs under
   `tests/unit/curriculum/lessons-view-interactions.spec.tsx`, fake-indexeddb for the database) and
   Playwright (`npm run test:e2e`, 103 tests incl. iPhone-viewport tests). Keep both green or update
   tests deliberately and say why. The board question before each lesson move (CL-5) is on by default:
@@ -158,8 +158,8 @@ Compromised Defence plays 9.Bg5; the Konikowski 9.Bf4 and the Elephant 7.Nxf6+ a
   a draft, reads from its bookmarks where each heading landed, puts a notes page wherever a sheet would
   start on a back (rendering again after each), fills in the page numbers (contents and each chapter's pointer to its
   practice), renders the book, and fails if any sheet is not a front page followed by its answers.
-  72 US Letter pages, 21 sheets (the four drill sheets, three tactics sheets at the end of Part I,
-  fourteen practice sheets), 413 answers. Diagrams are SVG drawings with the app's
+  74 US Letter pages, 22 sheets (the four drill sheets, three tactics sheets at the end of Part I,
+  fifteen practice sheets), 428 answers. Diagrams are SVG drawings with the app's
   piece set (`public/pieces`); the fonts are Times New Roman and Arial, whose metric twins Liberation
   Serif and Sans the Linux runner has, so pages break the same way there. All text is black and dark
   squares are a light grey.
@@ -255,6 +255,11 @@ Next: the roadmap below.
   when ahead", which the archive does not support; king activity in the endgame was measured too and
   is not kept (see `docs/pedagogy-audit.md`).
 - DC-1 re-scoped curriculum content for the lines above (this is where the opening order applies).
+  Added 2026-11-02 from where the seed games leave the lessons: "Caro-Kann vs 2.Bc4"
+  (`lesson-black-caro-vs-bc4`, 8 of the 67 Caro-Kann games), in the study-path group on loose
+  pieces on long lines, every stated fact replayed in `tests/unit/curriculum/caro-vs-bc4.spec.ts`.
+  Other gaps that analysis showed, by seed games: 1.e4 e6 (10), 1.e4 g6 (7), 1.e4 Nc6 (5) as White;
+  as Black, the Exchange Caro-Kann after 2.d4 d5 3.exd5 (4) and 2.d3 (3).
 
 ## How to verify before pushing
 

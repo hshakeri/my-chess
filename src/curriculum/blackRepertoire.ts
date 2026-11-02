@@ -752,6 +752,172 @@ export const caroKannBg4TimingLesson: CurriculumLesson = buildVerifiedLesson({
   ],
 });
 
+export const caroKannBc4Lesson: CurriculumLesson = buildVerifiedLesson({
+  ...SOURCE,
+  id: 'lesson-black-caro-vs-bc4',
+  title: 'Caro-Kann vs 2.Bc4: The Recapture on d5',
+  subtitle: 'The c4 bishop watches d5, and on b5 it can be loose',
+  category: 'opening',
+  eco: 'B10',
+  targetColor: 'black',
+  targetRatingBand: 'intermediate',
+  relevance: 'core',
+  description:
+    '2.Bc4 came up in 8 of your 67 Caro-Kann games (5.5 points). You met it with 2...d5 every time, and after 3.exd5 took back with 3...cxd5. Then the d5 pawn attacks the bishop again; in your games it went to b5 with check (5 games, 4.5 points) or back to b3 (3 games, 1 point). Two things to watch: the queen may not take on d5 while the bishop sees it, and a bishop on b5 that nothing defends can be hit together with the king.',
+  thematicObjective:
+    'Take back on d5 with the pawn, never the queen. Once White\'s d-pawn has left d2, with nothing on c3 or b4, ...Qa5+ checks and attacks a loose bishop on b5 at once.',
+  keyTacticalMotif: 'A queen check from a5 that also attacks an undefended bishop on b5',
+  moves: [
+    { san: 'e4', isUserMove: false },
+    { san: 'c6', isUserMove: true },
+    // After 1.e4 c6: 2.d4 25, 2.Nf3 20, 2.Bc4 8, 2.Nc3 4.
+    { san: 'Bc4', isUserMove: false, frequency: 8 },
+    {
+      san: 'd5',
+      isUserMove: true,
+      annotation: 'Strike at once: the d5 pawn attacks the bishop and the e4 pawn, and it closes the bishop\'s line to f7.',
+      hintTheme: 'Hit the centre and the bishop',
+    },
+    { san: 'exd5', isUserMove: false, frequency: 8 },
+    {
+      san: 'cxd5',
+      isUserMove: true,
+      annotation: 'Take back with the pawn, which attacks the bishop on c4 again.',
+      hintTheme: "Mind the bishop's diagonal",
+      wrongMoveFeedback: {
+        Qxd5: '3...Qxd5?? 4.Bxd5: the bishop on c4 looks straight down the diagonal to d5 and takes the queen.',
+      },
+    },
+    {
+      san: 'Bb5+',
+      isUserMove: false,
+      // After 3...cxd5: 4.Bb5+ 5, 4.Bb3 3.
+      frequency: 5,
+      alternatives: {
+        Bb3: [
+          {
+            san: 'Nf6',
+            isUserMove: true,
+            frequency: 3,
+            annotation: 'Develop. The b3 bishop attacks d5, which the queen and the f6 knight defend.',
+            wrongMoveFeedback: {
+              Bf5: '4...Bf5 is a good move too (you played it twice here). This lesson develops the knight first: it defends d5 and keeps the bishop\'s choice open.',
+              Nc6: '4...Nc6 is a good move too. This lesson develops the king\'s knight first: it defends d5.',
+            },
+          },
+          // After 4.Bb3 Nf6: 5.d4 1.
+          { san: 'd4', isUserMove: false, frequency: 1 },
+          {
+            san: 'Bg4',
+            isUserMove: true,
+            annotation: 'Develop with an attack on the queen. With e2 and f3 empty the queen sees g4, but the f6 knight defends the bishop: 6.Qxg4 Nxg4.',
+            accept: { san: ['Nc6'] },
+          },
+        ],
+      },
+    },
+    {
+      san: 'Nc6',
+      isUserMove: true,
+      annotation: 'Block with the knight, as you did in all five games; 4...Bd7 is just as good.',
+      wrongMoveFeedback: {
+        Bd7: '4...Bd7 is just as good. This lesson blocks with the knight, as you did in all five games.',
+      },
+    },
+    {
+      san: 'Nf3',
+      isUserMove: false,
+      // After 4...Nc6: 5.Nf3 2, 5.Bxc6+ 1, 5.d3 1, 5.Nc3 1.
+      frequency: 2,
+      alternatives: {
+        'Bxc6+': [
+          { san: 'bxc6', isUserMove: true, frequency: 1, annotation: 'Take toward the centre: the c6 pawn supports d5, and Black has the two bishops.' },
+          { san: 'd4', isUserMove: false, frequency: 1 },
+          {
+            san: 'Nf6',
+            isUserMove: true,
+            annotation: 'Develop. Not 6...Bg4??: with e2 and f3 empty the queen on d1 takes it, and nothing defends g4.',
+            accept: { san: ['Bf5', 'e6'] },
+            wrongMoveFeedback: {
+              Bg4: '6...Bg4?? 7.Qxg4: the queen on d1 sees g4 through e2 and f3, and nothing of Black\'s defends the bishop.',
+            },
+          },
+        ],
+        d3: [
+          {
+            san: 'Qa5+',
+            isUserMove: true,
+            frequency: 1,
+            annotation: 'Check and attack: 5.d3 opened the a5-e1 diagonal, and nothing defends the bishop on b5. In your game you played 5...a6.',
+            hintTheme: 'A check that also attacks the bishop',
+          },
+          {
+            san: 'Nc3',
+            isUserMove: false,
+            annotation: 'The best block: the knight guards b5.',
+          },
+          {
+            san: 'd4',
+            isUserMove: true,
+            annotation: 'The knight cannot move: it shields the king from the queen\'s check. 6...d4 attacks it.',
+            hintTheme: 'Attack the piece that cannot move',
+            wrongMoveFeedback: {
+              Qxb5: '6...Qxb5?? 7.Nxb5: the knight on c3 guards b5 and takes the queen.',
+            },
+          },
+        ],
+        Nc3: [
+          { san: 'Nf6', isUserMove: true, frequency: 1, annotation: 'Develop the king\'s knight.', accept: { san: ['e6', 'a6'] } },
+        ],
+      },
+    },
+    {
+      san: 'a6',
+      isUserMove: true,
+      annotation: 'Ask the bishop: take on c6 or retreat. 5...Bg4 is as good.',
+      wrongMoveFeedback: {
+        Bg4: '5...Bg4 is as good (you played it in one of these games). This lesson asks the bishop first with ...a6.',
+      },
+    },
+    // After 5...a6: 6.Bxc6+ 1.
+    { san: 'Bxc6+', isUserMove: false, frequency: 1 },
+    { san: 'bxc6', isUserMove: true, annotation: 'Take toward the centre: the c6 pawn supports d5, and Black has the two bishops.' },
+    // After 6...bxc6: 7.d4 1.
+    { san: 'd4', isUserMove: false, frequency: 1 },
+    {
+      san: 'e6',
+      isUserMove: true,
+      annotation: 'The pawns on c6, d5 and e6 hold the centre; the f8 bishop comes out next.',
+      accept: { san: ['Bg4'] },
+    },
+  ],
+  exercises: [
+    {
+      id: 'ex-caro-bc4-qa5-check',
+      title: 'The Bishop on b5',
+      // 1.e4 c6 2.Bc4 d5 3.exd5 cxd5 4.Bb5+ Nc6 5.d3 (your game of 2026-05-08, where you played 5...a6)
+      fen: 'r1bqkbnr/pp2pppp/2n5/1B1p4/8/3P4/PPP2PPP/RNBQK1NR b KQkq - 0 5',
+      turn: 'b',
+      difficultyRating: 2,
+      prompt: 'Black to play. White has just played 5.d3. What does Black play?',
+      solutionSan: ['Qa5+'],
+      explanation:
+        '5...Qa5+ checks along a5-e1, which 5.d3 opened, and attacks the bishop on b5, which nothing defends. After 6.c3, 6.Bd2 or 6.Nd2 the queen takes the bishop. After 6.Nc3 the knight guards b5, so 6...Qxb5?? 7.Nxb5 loses the queen; but the knight cannot move, and 6...d4 attacks it.',
+    },
+  ],
+  mistakesAndTraps: [
+    {
+      plyIndex: 5,
+      attemptedSan: 'Qxd5',
+      isTrap: false,
+      severity: 'blunder',
+      explanatoryFeedback: '3...Qxd5?? puts the queen on the bishop\'s diagonal: 4.Bxd5 takes it.',
+      refutationSanList: ['Bxd5'],
+      punishmentSummary: 'White wins the queen for a pawn.',
+    },
+  ],
+});
+
 export const caroKannClassicalLesson: CurriculumLesson = buildVerifiedLesson({
   ...SOURCE,
   id: 'lesson-black-caro-kann-classical',
@@ -1042,5 +1208,6 @@ export const blackRepertoireLessons: CurriculumLesson[] = [
   wallVsFlankLesson,
   caroKannAdvanceLesson,
   caroKannBg4TimingLesson,
+  caroKannBc4Lesson,
   caroKannClassicalLesson,
 ];
