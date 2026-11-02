@@ -102,8 +102,17 @@ describe('warm-up questions on positions from the student\'s games (CL-5)', () =
         expect(q.answer).toEqual(enPrise(chess, item.orientation).map((p) => p.square).sort());
       } else if (q.kind === 'safe') {
         expect(q.answer).toBe(isMoveSafe(item.fen, q.move).safe);
+      } else if (q.kind === 'checks') {
+        // The checks the opponent would have, counted on the position with the turn passed to them
+        expect(chess.inCheck()).toBe(false);
+        const parts = item.fen.split(' ');
+        parts[1] = parts[1] === 'w' ? 'b' : 'w';
+        parts[3] = '-';
+        const theirs = new Chess(parts.join(' ')).moves().filter((m) => /[+#]$/.test(m));
+        expect(q.checks.sort()).toEqual(theirs.sort());
+        expect(q.answer).toBe(theirs.length);
       }
     }
-    expect(kinds).toEqual(new Set(['knight', 'loose', 'safe']));
+    expect(kinds).toEqual(new Set(['knight', 'loose', 'safe', 'checks']));
   });
 });

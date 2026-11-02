@@ -3,7 +3,7 @@ import { Chess } from 'chess.js';
 import { Chessboard } from '../components/Chessboard';
 import { BoardQuestion, isRight, questionSquareStyles, type QuestionAnswer, type QuestionStatus } from '../components/BoardQuestion';
 import { enPrise } from '../analytics/errorTaxonomy';
-import { isMoveSafe, knightSquares, type MicroQuestion, type QuestionKind } from '../services/microQuestions';
+import { isMoveSafe, knightSquares, opponentChecks, type MicroQuestion, type QuestionKind } from '../services/microQuestions';
 import { cctStats, logCct, readCctLog } from '../services/cctLog';
 import { gamesRepo } from '../db/gamesRepo';
 import { RulesEngine } from '../engine/rules';
@@ -14,7 +14,7 @@ import seedGamesRaw from '../data/seed_hoot65_games.json';
 
 /** The warm-up's length; the question on the board when it runs out is finished first. */
 export const WARMUP_MS = 120_000;
-const WARMUP_KINDS: QuestionKind[] = ['knight', 'loose', 'safe'];
+const WARMUP_KINDS: QuestionKind[] = ['knight', 'loose', 'safe', 'checks'];
 /** Weight of a kind not answered yet: about a slow answer, so every kind comes up early. */
 const UNSEEN_MS = 8000;
 
@@ -76,6 +76,21 @@ export function makeWarmupItem(games: StoredGame[], random: () => number = Math.
         question: { kind: 'knight', prompt: `Click every square the knight on ${knight.square} attacks, then Done.`, answer: knightSquares(knight.square), focus: [knight.square] },
       };
     }
+    if (kind === 'checks') {
+      // Counting the opponent's checks is the habit behind "Does your move allow mate?"
+      if (chess.inCheck()) continue;
+      const checks = opponentChecks(fen);
+      return {
+        fen,
+        orientation: color,
+        question: {
+          kind: 'checks',
+          prompt: 'If it were your opponent\'s turn, how many checks would they have? Count every one, captures included.',
+          answer: checks.length,
+          checks,
+        },
+      };
+    }
     if (kind === 'loose') {
       return {
         fen,
@@ -105,7 +120,7 @@ interface WarmupPanelProps {
 
 /**
  * A two-minute board-vision warm-up (CL-5) on positions from the student's own games: knight squares,
- * pieces that can be won, and whether the move played was safe. Untimed per question; what the student
+ * pieces that can be won, whether the move played was safe, and how many checks the opponent has. Untimed per question; what the student
  * answers slowest comes up most, from the answer times kept outside the review schedule.
  */
 export const WarmupPanel: React.FC<WarmupPanelProps> = ({ onClose }) => {
@@ -185,7 +200,12 @@ export const WarmupPanel: React.FC<WarmupPanelProps> = ({ onClose }) => {
     }
     return out;
   }, [results]);
-  const kindName: Partial<Record<QuestionKind, string>> = { knight: 'Knight squares', loose: 'Pieces that can be won', safe: 'Was the move safe?' };
+  const kindName: Partial<Record<QuestionKind, string>> = {
+    knight: 'Knight squares',
+    loose: 'Pieces that can be won',
+    safe: 'Was the move safe?',
+    checks: 'Your opponent\'s checks',
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 md:p-6 bg-black/80 backdrop-blur-sm" data-modal="warmup">

@@ -306,8 +306,9 @@ test.describe('05. Interactive Lessons, Feedback Loops & Spaced Repetition (F16 
     await expect(question).toHaveAttribute('data-question-status', 'asking', { timeout: 10000 });
     // The kind of question is chosen at random: answer whichever it is
     const kind = await question.getAttribute('data-question-kind');
-    expect(['knight', 'loose', 'safe']).toContain(kind);
+    expect(['knight', 'loose', 'safe', 'checks']).toContain(kind);
     if (kind === 'safe') await question.locator('button[data-answer="yes"]').click();
+    else if (kind === 'checks') await question.locator('button[data-answer="0"]').click();
     else if (kind === 'loose') await question.locator('button[data-action="question-none"]').click();
     else {
       await modal.locator('[data-square="a1"]').click();
