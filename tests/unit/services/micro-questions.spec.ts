@@ -10,6 +10,7 @@ import {
   undefendedPieces,
 } from '../../../src/services/microQuestions';
 import { isRight } from '../../../src/components/BoardQuestion';
+import { withinNodes } from '../../../src/analytics/errorTaxonomy';
 
 const after = (...moves: string[]) => {
   const c = new Chess();
@@ -71,6 +72,13 @@ describe('microQuestions: board questions with answers from chess.js (CL-5)', ()
     expect(isMoveSafe(after('e4', 'e5', 'Nf3', 'Nc6', 'Bc4', 'h6', 'Nc3', 'd6'), 'Nxe5')).toEqual({ safe: false, reason: 'After Nxe5, the knight on e5 can be taken.', refutation: 'Nxe5' });
     // 2...Qh4?? hangs the queen to 3.Nxh4; 3.d3 misses it but loses nothing, so it is safe
     expect(isMoveSafe(after('e4', 'e5', 'Nf3', 'Qh4'), 'd3').safe).toBe(true);
+  });
+
+  it('a search past its node budget gives no answer, and the searches after it are whole again', () => {
+    const exchange = after('e4', 'e5', 'Nf3', 'Nc6', 'Bb5', 'a6');
+    expect(withinNodes(20, () => isMoveSafe(exchange, 'Bxc6'))).toBeUndefined();
+    expect(withinNodes(100_000, () => isMoveSafe(exchange, 'Bxc6'))).toEqual(isMoveSafe(exchange, 'Bxc6'));
+    expect(isMoveSafe(exchange, 'Bxc6').safe).toBe(true);
   });
 
   it('the question before a decision, and how answers are judged', () => {

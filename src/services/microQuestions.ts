@@ -117,7 +117,13 @@ export function knightSquares(square: string): string[] {
  * mover could keep. A trade is safe (4.Bxc6 dxc6 in the Exchange Ruy Lopez), and so is a move that
  * only leaves a capture untaken. With the opponent's reply that mates or wins the material.
  */
-export function isMoveSafe(fen: string, san: string): { safe: boolean; reason: string; refutation?: string } {
+export interface MoveSafety {
+  safe: boolean;
+  reason: string;
+  refutation?: string;
+}
+
+export function isMoveSafe(fen: string, san: string): MoveSafety {
   const after = new Chess(fen);
   const move = after.move(san);
   const mates = after.moves().filter((m) => m.endsWith('#'));

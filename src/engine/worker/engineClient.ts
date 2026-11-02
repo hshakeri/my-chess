@@ -2,7 +2,9 @@ import { EngineRequest, EngineResponse } from '../../types/engine';
 import { HybridEngine } from '../human/hybridEngine';
 import { reviewGame, type ReviewInput } from '../../analytics/review';
 import type { GameReview } from '../../types/review';
-import type { ReviewProgressMessage, ReviewResultMessage, ReviewStage } from './reviewProtocol';
+import type { ReviewProgressMessage, ReviewResultMessage, ReviewStage, SafetyResultMessage } from './reviewProtocol';
+import { isMoveSafe, type MoveSafety } from '../../services/microQuestions';
+import { withinNodes } from '../../analytics/errorTaxonomy';
 
 export interface ReviewProgress {
   stage: ReviewStage;
@@ -20,6 +22,7 @@ export class EngineClient {
   private worker: Worker | null = null;
   private pendingCallbacks = new Map<string, (res: EngineResponse) => void>();
   private pendingReviews = new Map<string, PendingReview>();
+  private pendingSafety = new Map<string, (verdict: MoveSafety | null) => void>();
   private directEngine: HybridEngine | null = null;
   private modelLoaded = false;
   private statusListeners: Array<(loaded: boolean, msg?: string) => void> = [];
@@ -33,9 +36,15 @@ export class EngineClient {
         );
 
         this.worker.onmessage = (event: MessageEvent<EngineResponse | { type: 'status'; modelLoaded: boolean; message?: string }>) => {
-          const data = event.data as EngineResponse | ReviewProgressMessage | ReviewResultMessage | { type: 'status'; modelLoaded: boolean; message?: string };
+          const data = event.data as EngineResponse | ReviewProgressMessage | ReviewResultMessage | SafetyResultMessage | { type: 'status'; modelLoaded: boolean; message?: string };
           if (data.type === 'review-progress' || data.type === 'review-result') {
             this.handleReviewMessage(data);
+            return;
+          }
+          if (data.type === 'safety-result') {
+            const done = this.pendingSafety.get(data.id);
+            this.pendingSafety.delete(data.id);
+            done?.(data.verdict);
             return;
           }
           if (data.type === 'status') {
@@ -168,6 +177,25 @@ export class EngineClient {
     return { result, cancel: () => this.worker?.postMessage({ type: 'cancel', id }) };
   }
 
+  /**
+   * Whether `san` from `fen` is safe (the Play tab's safety check), searched in the worker within
+   * `maxNodes` so the page never waits on a busy position; null past the budget. Without a worker it
+   * is searched here.
+   */
+  public checkMoveSafety(fen: string, san: string, maxNodes: number): Promise<MoveSafety | null> {
+    if (!this.worker) return Promise.resolve().then(() => withinNodes(maxNodes, () => isMoveSafe(fen, san)) ?? null);
+    const id = `safety_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+    const verdict = new Promise<MoveSafety | null>((resolve) => {
+      this.pendingSafety.set(id, resolve);
+      // A worker that died never answers: the check gives up rather than hold the move for ever
+      setTimeout(() => {
+        if (this.pendingSafety.delete(id)) resolve(null);
+      }, 15_000);
+    });
+    this.worker.postMessage({ type: 'safety', id, fen, san, maxNodes });
+    return verdict;
+  }
+
   public terminate(): void {
     if (this.worker) {
       this.worker.terminate();
@@ -176,5 +204,7 @@ export class EngineClient {
     this.pendingCallbacks.clear();
     for (const pending of this.pendingReviews.values()) pending.resolve(null);
     this.pendingReviews.clear();
+    for (const done of this.pendingSafety.values()) done(null);
+    this.pendingSafety.clear();
   }
 }

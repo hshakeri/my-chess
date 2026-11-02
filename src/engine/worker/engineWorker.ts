@@ -2,7 +2,9 @@ import { EngineRequest, EngineResponse } from '../../types/engine';
 import { HybridEngine } from '../human/hybridEngine';
 import { reviewGame, ReviewCancelled, type PositionScorer } from '../../analytics/review';
 import { thinkingDelayMs } from './thinkingDelay';
-import type { CancelMessage, ReviewProgressMessage, ReviewRequestMessage, ReviewResultMessage } from './reviewProtocol';
+import type { CancelMessage, ReviewProgressMessage, ReviewRequestMessage, ReviewResultMessage, SafetyRequestMessage, SafetyResultMessage } from './reviewProtocol';
+import { isMoveSafe } from '../../services/microQuestions';
+import { withinNodes } from '../../analytics/errorTaxonomy';
 
 const engine = new HybridEngine();
 
@@ -46,7 +48,7 @@ async function runReview(req: ReviewRequestMessage): Promise<void> {
   self.postMessage(result);
 }
 
-self.onmessage = async (event: MessageEvent<EngineRequest | ReviewRequestMessage | CancelMessage>) => {
+self.onmessage = async (event: MessageEvent<EngineRequest | ReviewRequestMessage | CancelMessage | SafetyRequestMessage>) => {
   const data = event.data;
   if (!data) return;
   if (data.type === 'cancel') {
@@ -55,6 +57,16 @@ self.onmessage = async (event: MessageEvent<EngineRequest | ReviewRequestMessage
   }
   if (data.type === 'review') {
     await runReview(data);
+    return;
+  }
+  if (data.type === 'safety') {
+    let verdict: SafetyResultMessage['verdict'] = null;
+    try {
+      verdict = withinNodes(data.maxNodes, () => isMoveSafe(data.fen, data.san)) ?? null;
+    } catch {
+      verdict = null;
+    }
+    self.postMessage({ type: 'safety-result', id: data.id, verdict } satisfies SafetyResultMessage);
     return;
   }
   const req = data;

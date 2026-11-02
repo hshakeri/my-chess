@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Chess } from 'chess.js';
 import { Chessboard } from '../components/Chessboard';
 import { BoardQuestion, isRight, questionSquareStyles, type QuestionAnswer, type QuestionStatus } from '../components/BoardQuestion';
-import { enPrise } from '../analytics/errorTaxonomy';
+import { enPrise, withinNodes } from '../analytics/errorTaxonomy';
 import { isMoveSafe, knightSquares, opponentChecks, type MicroQuestion, type QuestionKind } from '../services/microQuestions';
 import { cctStats, logCct, readCctLog } from '../services/cctLog';
 import { gamesRepo } from '../db/gamesRepo';
@@ -17,6 +17,8 @@ export const WARMUP_MS = 120_000;
 const WARMUP_KINDS: QuestionKind[] = ['knight', 'loose', 'safe', 'checks'];
 /** Weight of a kind not answered yet: about a slow answer, so every kind comes up early. */
 const UNSEEN_MS = 8000;
+/** Search nodes "Was it safe?" may take, about a fifth of a second: a position busier than that gets another question. */
+export const SAFE_NODES = 2000;
 
 interface WarmupItem {
   fen: string;
@@ -104,7 +106,9 @@ export function makeWarmupItem(games: StoredGame[], random: () => number = Math.
         },
       };
     }
-    const { safe, reason } = isMoveSafe(fen, played);
+    const verdict = withinNodes(SAFE_NODES, () => isMoveSafe(fen, played));
+    if (!verdict) continue;
+    const { safe, reason } = verdict;
     return {
       fen,
       orientation: color,

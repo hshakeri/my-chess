@@ -111,7 +111,34 @@ const byVictim = (chess: Chess, moves: string[]) =>
     .sort((a, b) => b[1] - a[1])
     .map(([m]) => m);
 
+/**
+ * A node budget for the searches below, set only by `withinNodes`: a busy position (many captures and
+ * checks) can take the search seconds, which a question asked on the page cannot wait for.
+ */
+let nodes = 0;
+let nodeLimit = Infinity;
+class NodeLimitReached extends Error {}
+const visit = () => {
+  if (nodeLimit !== Infinity && ++nodes > nodeLimit) throw new NodeLimitReached();
+};
+
+/** `run()` with at most `limit` search nodes, or undefined when it needs more. */
+export function withinNodes<T>(limit: number, run: () => T): T | undefined {
+  const saved = [nodes, nodeLimit] as const;
+  nodes = 0;
+  nodeLimit = limit;
+  try {
+    return run();
+  } catch (err) {
+    if (err instanceof NodeLimitReached) return undefined;
+    throw err;
+  } finally {
+    [nodes, nodeLimit] = saved;
+  }
+}
+
 function quiesce(chess: Chess, alpha: number, beta: number, qdepth: number): number {
+  visit();
   const moves = chess.moves();
   const inCheck = chess.inCheck();
   if (moves.length === 0) return inCheck ? -MATE : 0;
@@ -136,6 +163,7 @@ function quiesce(chess: Chess, alpha: number, beta: number, qdepth: number): num
 }
 
 function search(chess: Chess, depth: number, alpha: number, beta: number): number {
+  visit();
   const moves = chess.moves();
   if (moves.length === 0) return chess.inCheck() ? -MATE - depth : 0;
   if (depth === 0) return quiesce(chess, alpha, beta, QDEPTH);
