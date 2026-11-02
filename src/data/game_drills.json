@@ -114,9 +114,7 @@
       "accepted": [
         "Bh5",
         "Bxf3",
-        "Bc8",
-        "Bd7",
-        "Be6"
+        "Bc8"
       ],
       "target": "g4",
       "refutation": "hxg4",
@@ -193,8 +191,7 @@
         "Bd3",
         "Bf1",
         "Be2",
-        "Bd5",
-        "Bb3"
+        "Bd5"
       ],
       "target": "c4",
       "refutation": "Nxc4",
@@ -808,11 +805,7 @@
       "played": "Nd5",
       "accepted": [
         "Kf8",
-        "a2",
-        "Ra5",
-        "Ra6",
-        "Ra8",
-        "h6"
+        "a2"
       ],
       "target": "d5",
       "refutation": "Bxd5",

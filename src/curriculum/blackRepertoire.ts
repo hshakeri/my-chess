@@ -1063,7 +1063,7 @@ export const caroKannF4Lesson: CurriculumLesson = buildVerifiedLesson({
       isUserMove: false,
       // After 2...d5: 3.e5 1.
       frequency: 1,
-      annotation: 'The pawn chain e5-f4, as in the Advance.',
+      annotation: 'The pawn goes to e5 as in the Advance, but here the f4 pawn defends it, not a pawn on d4.',
       alternatives: {
         exd5: [
           { san: 'cxd5', isUserMove: true, annotation: 'Take back with the pawn: Black has the centre pawn.' },

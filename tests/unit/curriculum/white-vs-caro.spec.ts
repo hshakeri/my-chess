@@ -61,7 +61,7 @@ describe('Against the Caro-Kann as White: every fact the lesson states, replayed
   it('the counts and weights come from the seed games', () => {
     const white = seed.filter((g) => g.userColor === 'white' && g.movesSan[0] === 'e4' && g.movesSan[1] === 'c6');
     const count = (prefix: string[]) => white.filter((g) => prefix.every((m, k) => g.movesSan[k] === m)).length;
-    expect([white.length, count(['e4', 'c6', 'Nc3']), count(['e4', 'c6', 'Nf3'])]).toEqual([19, 10, 8]);
+    expect([white.length, count(['e4', 'c6', 'Nc3']), count(['e4', 'c6', 'Nf3']), count(['e4', 'c6', 'h3'])]).toEqual([19, 10, 8, 1]);
     const two = white.filter((g) => K.every((m, k) => g.movesSan[k] === m));
     expect(two.reduce((n, g) => n + (g.userResult === 'win' ? 1 : g.userResult === 'draw' ? 0.5 : 0), 0)).toBe(4);
     const m = caroKannForWhiteLesson.moves;

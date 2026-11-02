@@ -87,6 +87,10 @@ export const scotchGambitBreakthrough: CurriculumLesson = buildVerifiedLesson({
       hintSquare: 'd5',
       hintTheme: 'Mate threat on f7',
       arrows: [{ from: 'd5', to: 'f7', color: 'red' }, { from: 'c4', to: 'f7', color: 'red' }],
+      // Stockfish 19 at depth 22: 6.Nxc3 +1.13, 6.Qd5 +0.41; the lesson drills the mate threat
+      wrongMoveFeedback: {
+        Nxc3: "6.Nxc3 is Stockfish's choice and a good move: for the pawn, White has three pieces out to Black's two and the better game. This lesson plays 6.Qd5 instead, which threatens mate at once; play it here.",
+      },
     },
     {
       san: 'Nh6',
@@ -789,7 +793,7 @@ export const caroKannForWhiteLesson: CurriculumLesson = buildVerifiedLesson({
   relevance: 'core',
   startPly: 2,
   description:
-    '1...c6 came up in 19 of your White games. You answered 2.Nc3 (10 games) or 2.Nf3 (8), and after 2...d5 the second knight came out too. After 2.Nc3 d5 3.Nf3 Black played 3...Bg4 in 3 games and 3...dxe4 in 2, and you scored 4 points of 5. When the bishop pins the knight, ask it with h3; if it retreats to h5, take on d5 first and then chase it with g4.',
+    '1...c6 came up in 19 of your White games. You answered 2.Nc3 in 10 of them, 2.Nf3 in 8 and 2.h3 once. After 2.Nc3 d5 3.Nf3 Black played 3...Bg4 in 3 games and 3...dxe4 in 2, and you scored 4 points of 5. When the bishop pins the knight, ask it with h3; if it retreats to h5, take on d5 first and then chase it with g4.',
   thematicObjective:
     '2.Nc3 d5 3.Nf3 Bg4 4.h3: after 4...Bxf3 5.Qxf3 White has the two bishops; after 4...Bh5 5.exd5 cxd5 6.g4 Bg6 7.Ne5 the knight attacks the bishop on g6.',
   keyTacticalMotif: 'A bishop chased by h3 and g4, with 6...Bxg4?? 7.hxg4 losing it',
@@ -814,7 +818,7 @@ export const caroKannForWhiteLesson: CurriculumLesson = buildVerifiedLesson({
       annotation: 'The second knight.',
       hintTheme: 'The second knight',
       wrongMoveFeedback: {
-        h3: '3.h3?! spends a move before Black\'s bishop has come out; 3.Nf3 develops. You lost the game with 3.h3.',
+        h3: '3.h3?! spends a move before Black\'s bishop has come out; 3.Nf3 develops, and Stockfish rates it about a third of a pawn higher. You lost the game with 3.h3.',
         d4: '3.d4 is good too, and leads to the main lines. This lesson keeps the knights\' plan you play.',
       },
     },
@@ -1005,7 +1009,7 @@ export const nimzowitschForWhiteLesson: CurriculumLesson = buildVerifiedLesson({
       fen: 'r1b1kbnr/ppp1pppp/2n5/7q/8/2N2N2/PPPP1PPP/R1BQKB1R w KQkq - 2 5',
       turn: 'w',
       difficultyRating: 2,
-      prompt: 'White to play. The queen went back to h5. What does White play?',
+      prompt: 'White to play. The queen went to h5. What does White play?',
       solutionSan: ['Nb5'],
       explanation:
         '5.Nb5 attacks c7, which nothing defends: Nxc7+ would fork the king on e8 and the rook on a8, so Black has to meet the threat.',
@@ -1043,7 +1047,7 @@ export const damianoForWhiteLesson: CurriculumLesson = buildVerifiedLesson({
     {
       san: 'Nxe5',
       isUserMove: true,
-      annotation: 'Take: the pawn that would take back opens the king to a queen check.',
+      annotation: 'Take: if the f-pawn takes back, 4.Qh5+ wins the pawn back with check, along the diagonal to the king that 2...f6 opened.',
       hintTheme: 'Take the pawn',
       wrongMoveFeedback: {
         Bc4: '3.Bc4 was your move in both of these games, and you lost both. It is a good move (Stockfish +1.9), but 3.Nxe5! is stronger (+2.3).',
@@ -1086,7 +1090,18 @@ export const damianoForWhiteLesson: CurriculumLesson = buildVerifiedLesson({
       annotation: 'The queen takes the pawn with check.',
       alternatives: {
         d5: [
-          { san: 'd3', isUserMove: true, annotation: 'Hold e4 with a pawn and open the bishop\'s diagonal.', accept: { san: ['Be2', 'Nc3'] } },
+          {
+            san: 'd3',
+            isUserMove: true,
+            annotation: 'The queen on e7 pins the e4 pawn to your king, so it cannot take on d5: hold it with a pawn, which also opens the c1 bishop\'s diagonal.',
+            hintTheme: 'Hold the pinned pawn',
+            // Stockfish 19 at depth 22: 5.d3 +2.44, 5.Be2 +0.47, 5.Nc3 +0.06, 5.Qe2 -0.04
+            wrongMoveFeedback: {
+              Nc3: '5.Nc3? dxe4: the pinned pawn falls, and the pawn that takes it hits the f3 knight. Only 5.d3 keeps the extra pawn (Stockfish +2.4 against +0.1).',
+              Be2: '5.Be2? dxe4: the pinned pawn falls, and the pawn that takes it hits the f3 knight. Only 5.d3 keeps the extra pawn (Stockfish +2.4 against +0.5).',
+              Qe2: '5.Qe2? dxe4: the pawn falls anyway, and the pawn that takes it hits the f3 knight. Only 5.d3 keeps the extra pawn (Stockfish +2.4 against 0.0).',
+            },
+          },
         ],
       },
     },

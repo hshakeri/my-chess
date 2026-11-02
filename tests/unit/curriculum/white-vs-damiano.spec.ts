@@ -19,8 +19,17 @@ describe('Against 2...f6 as White: every fact the lesson states, replayed', () =
     const f6 = after(...D);
     expect(attacks(f6, 'e5', 'b')).toEqual(['f6']);
     for (const sq of ['f7', 'g6']) expect(f6.get(sq as Square)).toBeUndefined();
+    // Before 2...f6 the f7 pawn closed that diagonal
+    expect(after('e4', 'e5', 'Nf3').get('f7')).toMatchObject({ type: 'p', color: 'b' });
     const check = after(...D, 'Nxe5', 'fxe5', 'Qh5+');
     expect(check.inCheck()).toBe(true);
+    // "4.Qh5+ wins the pawn back with check": Black has two answers, and 5.Qxe5+ follows both
+    expect(check.moves().sort()).toEqual(['Ke7', 'g6']);
+    for (const reply of ['Ke7', 'g6']) {
+      const back = after(...D, 'Nxe5', 'fxe5', 'Qh5+', reply);
+      expect(back.move('Qxe5+').captured).toBe('p');
+      expect(back.inCheck()).toBe(true);
+    }
   });
 
   it('4.Qh5+ Ke7 5.Qxe5+ Kf7 6.Bc4+ keeps checking; after 4...g6 5.Qxe5+ checks and hits h8', () => {
@@ -50,6 +59,19 @@ describe('Against 2...f6 as White: every fact the lesson states, replayed', () =
     const d3 = after(...D, 'Nxe5', 'Qe7', 'Nf3', 'd5', 'd3');
     expect(attacks(d3, 'e4', 'w')).toContain('d3');
     expect(d3.get('d2')).toBeUndefined();
+    // The queen on e7 pins the e4 pawn: it can only go on up the file, not take on d5
+    const d5 = after(...D, 'Nxe5', 'Qe7', 'Nf3', 'd5');
+    expect(d5.moves({ square: 'e4' })).toEqual(['e5']);
+    expect(attacks(d5, 'e4', 'b')).toEqual(['d5', 'e7']);
+    // 5.d3 keeps the extra pawn; after any of the others ...dxe4 takes it back and hits the f3 knight
+    const material = (chess: Chess) =>
+      chess.board().flat().reduce((n, p) => n + (p ? (p.color === 'w' ? 1 : -1) * { p: 1, n: 3, b: 3, r: 5, q: 9, k: 0 }[p.type] : 0), 0);
+    expect(material(d3)).toBe(1);
+    for (const other of ['Nc3', 'Be2', 'Qe2']) {
+      const back = after(...D, 'Nxe5', 'Qe7', 'Nf3', 'd5', other, 'dxe4');
+      expect(material(back), other).toBe(0);
+      expect(attacks(back, 'f3', 'b'), other).toContain('e4');
+    }
   });
 
   it('the counts and weights come from the seed games', () => {

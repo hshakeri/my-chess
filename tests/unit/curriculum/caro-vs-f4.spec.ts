@@ -15,8 +15,9 @@ const attacks = (chess: Chess, square: string, color: 'w' | 'b') => chess.attack
 const F = ['e4', 'c6', 'f4', 'd5'];
 
 describe('Caro-Kann vs 2.f4: every fact the lesson states, replayed', () => {
-  it('3.e5 makes the chain e5-f4; ...Bf5 comes out before ...e6; ...c5 and ...Nc6 attack d4 twice', () => {
-    expect(attacks(after(...F, 'e5'), 'e5', 'w')).toContain('f4');
+  it('3.e5: the f4 pawn alone defends it, with no pawn on d4; ...Bf5 comes out before ...e6; ...c5 and ...Nc6 attack d4 twice', () => {
+    expect(attacks(after(...F, 'e5'), 'e5', 'w')).toEqual(['f4']);
+    expect(after(...F, 'e5').get('d4')).toBeUndefined();
     const nc6 = after(...F, 'e5', 'Bf5', 'd4', 'e6', 'Nf3', 'c5', 'c3', 'Nc6');
     expect(attacks(nc6, 'd4', 'b')).toEqual(['c5', 'c6']);
   });
