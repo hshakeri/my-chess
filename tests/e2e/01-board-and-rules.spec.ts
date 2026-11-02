@@ -248,6 +248,40 @@ test.describe('01. 2D Chessboard & Rules Engine (F01 - F04)', () => {
   });
 });
 
+test.describe('01c. Practice clock (DC-3)', () => {
+  test('10+0: the clock of the side to move runs, a move stops it, and a flag ends the game', async ({ page }) => {
+    await page.clock.install();
+    await page.goto('/');
+    await page.locator('[data-tab="play"]').click();
+    await page.locator('button[data-engine-color="none"]').click();
+    await page.locator('select[data-select="practice-clock"]').selectOption('600+0');
+    const white = page.locator('[data-clock-side="w"]');
+    const black = page.locator('[data-clock-side="b"]');
+    await expect(white).toHaveText('White 10:00');
+    await page.clock.runFor(12_000);
+    await expect(white).toHaveText('White 9:48');
+    await page.locator('[data-square="e2"]').click();
+    await page.locator('[data-square="e4"]').click();
+    await expect(page.locator('[data-square="e4"] img')).toBeVisible();
+    // Black's clock runs now, White's stands
+    await page.clock.runFor(31_000);
+    await expect(black).toHaveText('Black 9:29');
+    await expect(white).toHaveText('White 9:48');
+    await expect(page.locator('[data-think-cue]')).toBeVisible();
+    // Black runs out of time: the game ends, and no more moves are taken
+    await page.clock.runFor(570_000);
+    await expect(page.locator('.move-list-panel').getByText('Black lost on time')).toBeVisible();
+    await expect(page.locator('.move-list-panel').getByText('1-0').first()).toBeVisible();
+    await page.locator('[data-square="e7"]').click();
+    await page.locator('[data-square="e5"]').click();
+    await expect(page.locator('[data-square="e5"] img')).toHaveCount(0);
+    // A new game starts the clocks again
+    await page.locator('button[data-action="new-game"]').click();
+    await expect(white).toHaveText('White 10:00');
+    await expect(page.locator('.move-list-panel').getByText('Black lost on time')).toHaveCount(0);
+  });
+});
+
 test.describe('01b. Phone play (iPhone viewport)', () => {
   test.use({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
 

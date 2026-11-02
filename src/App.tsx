@@ -13,6 +13,7 @@ import { Square, PieceColor, ChessPosition, ChessMoveRecord } from './types/ches
 import { HumanElo } from './types/engine';
 import { Chessboard } from './components/Chessboard';
 import { BoardControls } from './components/BoardControls';
+import { PracticeClock } from './components/PracticeClock';
 import { MoveList } from './components/MoveList';
 import { PositionSetupModal } from './components/PositionSetupModal';
 import { EngineControls } from './components/EngineControls';
@@ -183,6 +184,11 @@ export const App: React.FC = () => {
   }, []);
   const [elo, setElo] = useState<HumanElo>(1500);
   const [isThinking, setIsThinking] = useState(false);
+  // The practice clock (DC-3): restarted with each game, and the side that ran out of time
+  const [clockKey, setClockKey] = useState(0);
+  const [flagged, setFlagged] = useState<'w' | 'b' | null>(null);
+  const onFlag = useCallback((side: 'w' | 'b') => setFlagged(side), []);
+  const onClockReset = useCallback(() => setFlagged(null), []);
   const [tierUsed, setTierUsed] = useState<'human_opening_book' | 'maia_neural' | 'heuristic_fallback' | undefined>(undefined);
   const [centipawns, setCentipawns] = useState<number | undefined>(undefined);
   const [modelLoaded, setModelLoaded] = useState<boolean>(false);
@@ -241,7 +247,7 @@ export const App: React.FC = () => {
 
   // Request engine move callback
   const requestEngineMove = useCallback(async () => {
-    if (!engineClientRef.current || isThinking) return;
+    if (!engineClientRef.current || isThinking || flagged) return;
     const game = rulesRef.current;
     if (game.isGameOver()) return;
 
@@ -282,12 +288,12 @@ export const App: React.FC = () => {
     } finally {
       setIsThinking(false);
     }
-  }, [elo, isThinking, spar]);
+  }, [elo, isThinking, spar, flagged]);
 
   // Trigger engine move when it's engine's turn and at the live position
   useEffect(() => {
     if (activeTab !== 'play') return;
-    if (engineColor === 'none') return;
+    if (engineColor === 'none' || flagged) return;
     if (currentPly !== history.length) return; // don't move while browsing history
 
     const currentTurn = rulesRef.current.getTurn();
@@ -300,10 +306,11 @@ export const App: React.FC = () => {
       }, 200);
       return () => clearTimeout(timer);
     }
-  }, [activeTab, engineColor, currentPly, history.length, isThinking, requestEngineMove]);
+  }, [activeTab, engineColor, currentPly, history.length, isThinking, requestEngineMove, flagged]);
 
   // Handle player move from the board
   const handleBoardMove = (move: { from: Square; to: Square; promotion?: 'q' | 'r' | 'b' | 'n' }) => {
+    if (flagged) return;
     // If reviewing history, snap to end before moving
     if (currentPly !== history.length) {
       setCurrentPly(history.length);
@@ -357,6 +364,7 @@ export const App: React.FC = () => {
     setPosition(rulesRef.current.getPosition());
     setTierUsed(undefined);
     setCentipawns(undefined);
+    setClockKey((k) => k + 1);
   };
 
   // Custom FEN / PGN Setup
@@ -367,6 +375,7 @@ export const App: React.FC = () => {
       setCurrentPly(0);
       setPosition(rulesRef.current.getPosition());
       setTierUsed(undefined);
+      setClockKey((k) => k + 1);
     }
     return res;
   };
@@ -415,6 +424,7 @@ export const App: React.FC = () => {
       setCurrentPly(newHist.length);
       setPosition(rulesRef.current.getPosition());
       setTierUsed(undefined);
+      setClockKey((k) => k + 1);
     }
     return res;
   };
@@ -462,6 +472,7 @@ export const App: React.FC = () => {
       setSpar({ request, startFen: rules.getFen(), startPly: hist.length });
       setSparReview(null);
       setSparProgress(null);
+      setClockKey((k) => k + 1);
       setActiveTab('play');
     },
     [setEngineColor]
@@ -689,12 +700,21 @@ export const App: React.FC = () => {
                   )}
                 </span>
               </div>
+              <PracticeClock
+                turn={position.turn}
+                ply={history.length}
+                resetKey={clockKey}
+                student={engineColor === 'none' ? 'both' : engineColor === 'w' ? 'b' : 'w'}
+                live={!rulesRef.current.isGameOver() && !flagged}
+                onFlag={onFlag}
+                onReset={onClockReset}
+              />
               <Chessboard
                 board={displayBoard}
                 position={displayPosition}
                 orientation={orientation}
                 lastMove={lastMove}
-                interactive={currentPly === history.length && !isThinking}
+                interactive={currentPly === history.length && !isThinking && !flagged}
                 onMove={handleBoardMove}
                 getLegalMovesForSquare={(sq) => displayEngine.getLegalMovesForSquare(sq)}
               />
@@ -710,7 +730,7 @@ export const App: React.FC = () => {
                   onNavigateNext={handleNavigateNext}
                   onNavigateEnd={handleNavigateEnd}
                   onTakeback={handleTakeback}
-                  canTakeback={history.length > 0}
+                  canTakeback={history.length > 0 && !flagged}
                   onNewGame={handleNewGame}
                   onOpenPositionSetup={() => setIsSetupOpen(true)}
                   onExportPgn={handleExportPgn}
@@ -756,8 +776,8 @@ export const App: React.FC = () => {
                 history={history}
                 currentPly={currentPly}
                 onSelectPly={setCurrentPly}
-                result={gameOverStatus.result || '*'}
-                gameOverReason={gameOverStatus.reason}
+                result={flagged ? (flagged === 'w' ? '0-1' : '1-0') : gameOverStatus.result || '*'}
+                gameOverReason={flagged ? `${flagged === 'w' ? 'White' : 'Black'} lost on time` : gameOverStatus.reason}
                 onCopyPgn={handleExportPgn}
               />
             </div>
