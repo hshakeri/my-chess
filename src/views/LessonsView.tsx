@@ -56,6 +56,8 @@ interface LessonsViewProps {
   initialLesson?: CurriculumLesson;
   /** Play the lesson's last position on against Maia on the Play tab (CL-6). */
   onSpar?: (request: SparRequest) => void;
+  /** Told the id of the lesson on screen whenever it changes (the URL hash follows it, DC-5). */
+  onLessonChange?: (lessonId: string) => void;
 }
 
 /** One scheduled decision of the current run, for the review log under the board. */
@@ -196,7 +198,7 @@ function sideName(turn: 'w' | 'b'): string {
   return turn === 'w' ? 'White' : 'Black';
 }
 
-export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initialLesson, onSpar }) => {
+export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initialLesson, onSpar, onLessonChange }) => {
   const resolveInitialLesson = (): CurriculumLesson => {
     if (initialLesson) return initialLesson;
     const requested = initialLessonId ? allCurriculumLessons.find((l) => l.id === initialLessonId) : undefined;
@@ -249,6 +251,10 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
   const [decisionTick, setDecisionTick] = useState(0);
   const [warmupOpen, setWarmupOpen] = useState(false);
   const [speedOpen, setSpeedOpen] = useState(false);
+
+  useEffect(() => {
+    onLessonChange?.(currentLesson.id);
+  }, [currentLesson.id, onLessonChange]);
   const lastOpponentMoveRef = useRef<{ fenBefore: string; san: string } | null>(null);
   const gatePenaltyRef = useRef(0);
 

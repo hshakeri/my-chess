@@ -32,6 +32,8 @@ import { EngineContext } from './engine/EngineContext';
 import { SparPanel, type SparReview } from './components/SparPanel';
 import { DEFAULT_MILESTONES, evaluateMilestones } from './analytics/planMilestones';
 import { logSpar, type SparRequest } from './services/sparLog';
+import { formatRoute, parseHash, type Route } from './router';
+import { allCurriculumLessons } from './curriculum';
 import type { ReviewProgress } from './engine/worker/engineClient';
 
 const seedGames = seedGamesRaw as unknown as StoredGame[];
@@ -50,13 +52,22 @@ function readAdoptedRepertoires(): string[] {
   }
 }
 
+/** The route the page was opened with (DC-5), read once before the first render. */
+const initialRoute: Route | null = typeof window === 'undefined' ? null : parseHash(window.location.hash);
+const isAuthoredLesson = (id: string) => allCurriculumLessons.some((l) => l.id === id);
+
 export const App: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<ActiveTab>('play');
+  const [activeTab, setActiveTab] = useState<ActiveTab>(() => initialRoute?.view ?? 'play');
 
   // Live game archive from IndexedDB (seeded on first run), shared with Diagnostics
   const [dbGames, setDbGames] = useState<StoredGame[] | null>(null);
   // A lesson handed over from Diagnostics: an authored one by id, or one built on the fly
-  const [pendingLesson, setPendingLesson] = useState<{ id?: string; lesson?: CurriculumLesson } | null>(null);
+  // `seq` tells two hand-offs of the same lesson apart, so a second link to it reopens it
+  const [pendingLesson, setPendingLesson] = useState<{ id?: string; lesson?: CurriculumLesson; seq?: number } | null>(() =>
+    initialRoute?.lessonId && isAuthoredLesson(initialRoute.lessonId) ? { id: initialRoute.lessonId } : null
+  );
+  // The lesson on screen in the Lessons tab, for the URL hash
+  const [shownLessonId, setShownLessonId] = useState<string | null>(null);
   const [adoptedRepertoireIds, setAdoptedRepertoireIds] = useState<string[]>(() =>
     typeof window === 'undefined' ? [] : readAdoptedRepertoires()
   );
@@ -356,6 +367,42 @@ export const App: React.FC = () => {
     }
     return res;
   };
+
+  // Deep links (DC-5): a route opened while the app runs moves to its tab and lesson; a position for
+  // the Play tab is set up with the engine on the other side
+  const loadFenRef = useRef(handleLoadFen);
+  loadFenRef.current = handleLoadFen;
+  const applyRoute = useCallback(
+    (route: Route | null) => {
+      if (!route) return;
+      if (route.view === 'lessons') {
+        setPendingLesson(route.lessonId && isAuthoredLesson(route.lessonId) ? { id: route.lessonId, seq: Date.now() } : null);
+      }
+      if (route.view === 'play' && route.fen && loadFenRef.current(route.fen).success && route.color) {
+        setEngineColor(route.color === 'w' ? 'b' : 'w');
+      }
+      setActiveTab(route.view);
+    },
+    [setEngineColor]
+  );
+  useEffect(() => {
+    // The tab and lesson of the opening route are already in the initial state; its position needs the board
+    if (initialRoute?.view === 'play' && initialRoute.fen) applyRoute(initialRoute);
+    const onHashChange = () => applyRoute(parseHash(window.location.hash));
+    window.addEventListener('hashchange', onHashChange);
+    return () => window.removeEventListener('hashchange', onHashChange);
+  }, [applyRoute]);
+
+  // The hash follows the screen (replaceState: a tab or lesson change adds no history entry)
+  useEffect(() => {
+    const route: Route =
+      activeTab === 'lessons' && shownLessonId && isAuthoredLesson(shownLessonId) ? { view: 'lessons', lessonId: shownLessonId } : { view: activeTab };
+    const next = formatRoute(route);
+    const current = parseHash(window.location.hash);
+    // A position link stays as it was opened while the Play tab shows it
+    if (current?.view === 'play' && current.fen && activeTab === 'play') return;
+    if (window.location.hash !== next) window.history.replaceState(null, '', `${window.location.pathname}${window.location.search}${next}`);
+  }, [activeTab, shownLessonId]);
 
   const handleLoadPgn = (pgn: string) => {
     const res = rulesRef.current.loadPgn(pgn);
@@ -731,7 +778,13 @@ export const App: React.FC = () => {
 
         {/* Tab 4: Interactive Lessons */}
         {activeTab === 'lessons' && (
-          <LessonsView initialLessonId={pendingLesson?.id} initialLesson={pendingLesson?.lesson} onSpar={startSpar} />
+          <LessonsView
+            key={`${pendingLesson?.id ?? (pendingLesson?.lesson ? 'built' : 'default')}:${pendingLesson?.seq ?? 0}`}
+            initialLessonId={pendingLesson?.id}
+            initialLesson={pendingLesson?.lesson}
+            onSpar={startSpar}
+            onLessonChange={setShownLessonId}
+          />
         )}
 
         {/* Tab 5: Printable Worksheets */}

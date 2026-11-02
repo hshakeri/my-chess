@@ -20,10 +20,12 @@
 import { mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { Chess } from 'chess.js';
+import QRCode from 'qrcode';
 import { allCurriculumLessons, curriculumCourses } from '../src/curriculum';
 import { PatternGroup, patternGroupOf, patternPath, inPatternOrder } from '../src/curriculum/patternPath';
 import { plyLabel, replyOptions } from '../src/curriculum/builder';
 import { drillSetOf, gameDrillData } from '../src/curriculum/gameDrills';
+import { lessonUrl } from '../src/router';
 import { getRecommendedWhiteRepertoire, getRecommendedBlackRepertoire } from '../src/analytics/repertoire';
 import { CurriculumLesson, CurriculumMove } from '../src/types/curriculum';
 import { RepertoirePlan } from '../src/types/diagnostics';
@@ -206,8 +208,22 @@ function practiceItem(chapter: string, body: string, answers: string, kind = '')
 const practiceHeading = (chapter: string) => `Practice · ${chapter}`;
 
 /** The heading block of a chapter, kept together and with what follows it. */
-function chapterHead(title: string, group: PatternGroup | undefined, extra = ''): string {
-  return `<header class="chapter-head">${group ? groupIntro(group) : ''}<h2>${esc(title)}</h2>${extra}</header>`;
+/** A QR code as an SVG drawn module by module (black squares on white, no margin). */
+function qrSvg(text: string): string {
+  const { size, data } = QRCode.create(text, { errorCorrectionLevel: 'M' }).modules;
+  let path = '';
+  for (let r = 0; r < size; r++) for (let c = 0; c < size; c++) if (data[r * size + c]) path += `M${c} ${r}h1v1h-1z`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="-1 -1 ${size + 2} ${size + 2}" shape-rendering="crispEdges"><rect x="-1" y="-1" width="${size + 2}" height="${size + 2}" fill="#fff"/><path d="${path}" fill="#000"/></svg>`;
+}
+
+/** A chapter's QR code: scanned with a phone, it opens the lesson in the app (DC-5 deep links). */
+function qrLink(lessonId: string): string {
+  const url = lessonUrl(lessonId);
+  return `<a class="qr" href="${esc(url)}" title="${esc(url)}">${qrSvg(url)}<span>Open in the app</span></a>`;
+}
+
+function chapterHead(title: string, group: PatternGroup | undefined, extra = '', lessonId?: string): string {
+  return `<header class="chapter-head">${group ? groupIntro(group) : ''}${lessonId ? qrLink(lessonId) : ''}<h2>${esc(title)}</h2>${extra}</header>`;
 }
 
 /** Practice items for a lesson, gathered at the end of the book: the line and each reply as blanks, then the exercises. */
@@ -273,7 +289,7 @@ function renderLesson(lesson: CurriculumLesson, n: number, group?: PatternGroup,
   toc.push({ heading: chapter, id: `ch-${n}`, no: `${n}.`, title: tocTitle });
 
   const meta = `<p class="meta">${lesson.eco ? `ECO ${esc(lesson.eco)} · ` : ''}You play ${sideName} · ${esc(lesson.sourceBook)}, ${esc(lesson.author)}${lesson.pagesRef ? ` (${esc(lesson.pagesRef)})` : ''}</p>`;
-  let html = `<section class="chapter${newPage ? ' new-page' : ''}" id="ch-${n}">${chapterHead(chapter, group, `${meta}${lesson.subtitle ? `<p class="lead">${esc(lesson.subtitle)}</p>` : ''}`)}`;
+  let html = `<section class="chapter${newPage ? ' new-page' : ''}" id="ch-${n}">${chapterHead(chapter, group, `${meta}${lesson.subtitle ? `<p class="lead">${esc(lesson.subtitle)}</p>` : ''}`, lesson.id)}`;
 
   html += `<h3>Why this position</h3>`;
   if (lesson.description) html += `<p>${esc(lesson.description)}</p>`;
@@ -320,7 +336,7 @@ function renderDrillSet(lessons: CurriculumLesson[], n: number, group: PatternGr
   const chapter = `${n}. ${name}`;
   toc.push({ heading: chapter, id: `ch-${n}`, no: `${n}.`, title: `${name} (${lessons.length} positions from your games)` });
   const intro = `<p>${lessons.length} positions from your games, newest first. Each diagram is drawn from your side just after your opponent's move, which is named under it. Find your move and write it down. The answers are on the back of this page: every move that is right, and what happened in the game.</p>`;
-  let front = `<section class="sheet sheet-front drill-set" id="ch-${n}">${before}${chapterHead(chapter, group, intro)}<div class="drills">`;
+  let front = `<section class="sheet sheet-front drill-set" id="ch-${n}">${before}${chapterHead(chapter, group, intro, lessons[0].id)}<div class="drills">`;
   let answers = '';
   lessons.forEach((lesson, k) => {
     const [opp, mine] = lesson.moves;
@@ -475,6 +491,8 @@ ol.toc .pg { flex: 0 0 auto; }
 .chapter-head { border-top: 1.5pt solid #000; padding-top: 4pt; break-inside: avoid; break-after: avoid; page-break-after: avoid; }
 .part + .chapter .chapter-head, .part + .chapter-head { border-top: none; padding-top: 0; }
 .meta { font: 8.5pt/1.3 ${SANS}; margin-bottom: 2pt; }
+.qr { float: right; width: 14mm; margin: 1pt 0 2pt 6pt; text-align: center; font: 6pt/1.1 ${SANS}; color: #000; text-decoration: none; }
+.qr svg { display: block; width: 14mm; height: 14mm; }
 .lead { font-style: italic; }
 .group { border-bottom: .5pt solid #000; padding: 0 0 3pt; margin: 0 0 5pt; }
 .group-title { font: bold 9pt/1.3 ${SANS}; margin-bottom: 1pt; }
