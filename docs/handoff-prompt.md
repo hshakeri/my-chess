@@ -16,7 +16,7 @@ also runs on every push to another branch).
 
 - React 18 + Vite 6 + TypeScript (strict) + Tailwind; chess.js 1.4; Dexie 4 (IndexedDB); ts-fsrs 5
   for scheduling; maia3-js + onnxruntime-web in a Web Worker for the human-like engine.
-- Tests: Vitest (`npm test`, 486 tests: SSR `renderToString` specs, jsdom interaction specs under
+- Tests: Vitest (`npm test`, 488 tests: SSR `renderToString` specs, jsdom interaction specs under
   `tests/unit/curriculum/lessons-view-interactions.spec.tsx`, fake-indexeddb for the database) and
   Playwright (`npm run test:e2e`, 107 tests incl. iPhone-viewport tests). Keep both green or update
   tests deliberately and say why. The board question before each lesson move (CL-5) is on by default:
@@ -199,7 +199,8 @@ Next: the roadmap below.
   switches (2026-11-02): the board question before each of the student's moves against Maia, and a
   safety check before each move is played ("is it safe?", judged by the review's material search,
   `losesMaterial` in `src/analytics/errorTaxonomy.ts`, in the engine worker within 20,000 nodes);
-  both belong to one position of one game. The warm-up's "Was it safe?" uses the same search within
+  both belong to one position of one game; a safe move that leaves a loose enemy piece to take is held
+  with the capture named (`missedCapture`). The warm-up's "Was it safe?" uses the same search within
   2,000 nodes and takes half its questions from 32 unsafe drill moves. Not built: the question about
   the opponent's likeliest reply after the student's move.
 - CL-6 done (2026-11-01): play a finished lesson line on against Maia 1100/1300 from the Play tab,

@@ -254,6 +254,23 @@ export function losesMaterial(fenBefore: string, played: string): { loses: boole
   return beaten ? { loses: true, refutation: bestReply(after.fen()) } : { loses: false };
 }
 
+/**
+ * A capture other than `played` of a loose enemy piece (undefended, or attacked by something cheaper:
+ * the habit "look for an enemy piece that nothing defends, and take it") that the search finds wins at
+ * least MIN_LOSS more than `played` keeps, or than the material on the board if `played` keeps less.
+ * The most valuable victim first; undefined when there is none.
+ */
+export function missedCapture(fenBefore: string, played: string): string | undefined {
+  const before = new Chess(fenBefore);
+  const loose = new Set(enPrise(before, other(before.turn())).map((p) => p.square));
+  if (!loose.size) return undefined;
+  const san = new Chess(fenBefore).move(played).san;
+  const captures = byVictim(before, before.moves().filter((m) => m.includes('x') && m !== san && loose.has(dest(m) ?? '')));
+  if (!captures.length) return undefined;
+  const bar = Math.max(material(before), scoreOf(fenBefore, san)) + MIN_LOSS;
+  return captures.find((m) => reaches(fenBefore, m, bar));
+}
+
 /** Every move in `fen` that gives mate at once. */
 export function matesInOne(fen: string): string[] {
   const chess = new Chess(fen);

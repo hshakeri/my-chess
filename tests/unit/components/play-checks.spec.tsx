@@ -8,7 +8,7 @@ const mocks = vi.hoisted(() => ({ replies: [] as string[], safetyDelay: 0, safet
 
 vi.mock('../../../src/engine/worker/engineClient', async () => {
   const { Chess } = await import('chess.js');
-  const { isMoveSafe } = await import('../../../src/services/microQuestions');
+  const { moveVerdict } = await import('../../../src/services/microQuestions');
   const { withinNodes } = await import('../../../src/analytics/errorTaxonomy');
   class EngineClient {
     onStatusChange() {
@@ -30,7 +30,7 @@ vi.mock('../../../src/engine/worker/engineClient', async () => {
     }
     checkMoveSafety(fen: string, san: string, maxNodes: number) {
       mocks.safetyCalls++;
-      return new Promise((resolve) => setTimeout(() => resolve(withinNodes(maxNodes, () => isMoveSafe(fen, san)) ?? null), mocks.safetyDelay));
+      return new Promise((resolve) => setTimeout(() => resolve(withinNodes(maxNodes, () => moveVerdict(fen, san)) ?? null), mocks.safetyDelay));
     }
     reviewGame() {
       return { result: Promise.resolve(null), cancel: () => undefined };
@@ -122,5 +122,25 @@ describe("The Play tab's checks stay with their position", () => {
     move(c, 'b4', 'e7');
     await waitFor(() => expect(questions(c)[0]?.textContent).toContain('Before Be7 is played'));
     expect(mocks.safetyCalls).toBe(searches + 1);
+  });
+
+  it('a safe move that leaves a free piece is not played at once: the check names the capture', async () => {
+    localStorage.setItem('my_chess_play_safety', 'on');
+    const { container: c } = render(<App />);
+    await waitFor(() => expect(piece(c, 'e2')).toBe('wp'));
+    // 1.e4 e5 2.Nf3 Qh4??, White to move: the queen on h4 can be taken
+    await act(async () => {
+      window.location.hash = `#/play?fen=${encodeURIComponent('rnb1kbnr/pppp1ppp/8/4p3/4P2q/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3')}&color=w`;
+      window.dispatchEvent(new HashChangeEvent('hashchange'));
+    });
+    await waitFor(() => expect(piece(c, 'h4')).toBe('bq'), { timeout: 5000 });
+    move(c, 'd2', 'd3');
+    await waitFor(() => expect(questions(c)).toHaveLength(1));
+    fireEvent.click(c.querySelector('[data-answer="yes"]')!);
+    await waitFor(() => expect(c.querySelector('[data-safety-missed]')?.getAttribute('data-safety-missed')).toBe('Nxh4'));
+    // Not played: the student can take instead
+    expect(piece(c, 'd2')).toBe('wp');
+    move(c, 'f3', 'h4');
+    await waitFor(() => expect(questions(c)[0]?.textContent).toContain('Before Nxh4 is played'));
   });
 });

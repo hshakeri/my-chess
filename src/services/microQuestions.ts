@@ -1,5 +1,5 @@
 import { Chess, type Square } from 'chess.js';
-import { losesMaterial } from '../analytics/errorTaxonomy';
+import { losesMaterial, missedCapture } from '../analytics/errorTaxonomy';
 
 /**
  * One-click board questions (CL-5): the checks a player makes before moving, asked with answers
@@ -121,6 +121,8 @@ export interface MoveSafety {
   safe: boolean;
   reason: string;
   refutation?: string;
+  /** For a safe move in a game: a capture that would have won material instead (the Play tab's check). */
+  missed?: string;
 }
 
 export function isMoveSafe(fen: string, san: string): MoveSafety {
@@ -145,6 +147,17 @@ export function isMoveSafe(fen: string, san: string): MoveSafety {
     };
   }
   return { safe: true, reason: `After ${move.san} nothing of yours can be won and there is no mate in one.` };
+}
+
+/**
+ * The Play tab's verdict on a move: whether it is safe, and if it is, whether a capture that wins
+ * material was left on the board (the archive's fourth habit: take what is free).
+ */
+export function moveVerdict(fen: string, san: string): MoveSafety {
+  const verdict = isMoveSafe(fen, san);
+  if (!verdict.safe) return verdict;
+  const missed = missedCapture(fen, san);
+  return missed ? { ...verdict, missed } : verdict;
 }
 
 /** The same squares, in any order. */

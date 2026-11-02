@@ -3,7 +3,7 @@ import { HybridEngine } from '../human/hybridEngine';
 import { reviewGame, ReviewCancelled, type PositionScorer } from '../../analytics/review';
 import { thinkingDelayMs } from './thinkingDelay';
 import type { CancelMessage, ReviewProgressMessage, ReviewRequestMessage, ReviewResultMessage, SafetyRequestMessage, SafetyResultMessage } from './reviewProtocol';
-import { isMoveSafe } from '../../services/microQuestions';
+import { moveVerdict } from '../../services/microQuestions';
 import { withinNodes } from '../../analytics/errorTaxonomy';
 
 const engine = new HybridEngine();
@@ -62,7 +62,7 @@ self.onmessage = async (event: MessageEvent<EngineRequest | ReviewRequestMessage
   if (data.type === 'safety') {
     let verdict: SafetyResultMessage['verdict'] = null;
     try {
-      verdict = withinNodes(data.maxNodes, () => isMoveSafe(data.fen, data.san)) ?? null;
+      verdict = withinNodes(data.maxNodes, () => moveVerdict(data.fen, data.san)) ?? null;
     } catch {
       verdict = null;
     }

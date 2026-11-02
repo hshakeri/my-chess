@@ -17,7 +17,7 @@ import { BoardControls } from './components/BoardControls';
 import { PracticeClock, newClockStore, type PaceTargets } from './components/PracticeClock';
 import { cannotMate } from './analytics/finalPosition';
 import { BoardQuestion, isRight, questionSquareStyles, type QuestionAnswer, type QuestionStatus } from './components/BoardQuestion';
-import { isMoveSafe, questionBeforeDecision, type MicroQuestion, type MoveSafety } from './services/microQuestions';
+import { moveVerdict, questionBeforeDecision, type MicroQuestion, type MoveSafety } from './services/microQuestions';
 import { withinNodes } from './analytics/errorTaxonomy';
 import { logCct } from './services/cctLog';
 
@@ -442,7 +442,7 @@ export const App: React.FC = () => {
         setSafety({ move, san, fen, ply: history.length, game: clockKey, token, askedAt: Date.now() });
         const verdict = engineClient
           ? engineClient.checkMoveSafety(fen, san, PLAY_SAFE_NODES)
-          : Promise.resolve().then(() => withinNodes(PLAY_SAFE_NODES, () => isMoveSafe(fen, san!)) ?? null);
+          : Promise.resolve().then(() => withinNodes(PLAY_SAFE_NODES, () => moveVerdict(fen, san!)) ?? null);
         verdict.then((v) => setSafety((s) => (s && s.token === token ? { ...s, verdict: v } : s)));
         return;
       }
@@ -464,7 +464,8 @@ export const App: React.FC = () => {
     if (!safetyHere || safetyHere.settled || safetyHere.answer === undefined || safetyHere.verdict === undefined) return;
     const { verdict, answer } = safetyHere;
     if (verdict) logCct({ at: Date.now(), kind: 'safe', correct: answer === verdict.safe, ms: safetyHere.answerMs ?? 0, source: 'play', fen: safetyHere.fen });
-    if (verdict && verdict.safe && answer) {
+    // A safe move called safe is played at once, unless it left something free to take
+    if (verdict && verdict.safe && answer && !verdict.missed) {
       setSafety(null);
       playMove(safetyHere.move);
       return;
@@ -480,6 +481,16 @@ export const App: React.FC = () => {
       after.move(safetyHere.san);
       const reply = after.move(v.refutation);
       return { from: reply.from, to: reply.to };
+    } catch {
+      return undefined;
+    }
+  }, [safetyHere?.token, safetyHere?.verdict]);
+  const safetyMissed = useMemo(() => {
+    const m = safetyHere?.verdict?.missed;
+    if (!safetyHere || !m) return undefined;
+    try {
+      const capture = new Chess(safetyHere.fen).move(m);
+      return { from: capture.from, to: capture.to };
     } catch {
       return undefined;
     }
@@ -934,6 +945,11 @@ export const App: React.FC = () => {
                       Too many captures and checks here for the quick check: look again yourself before you play {safetyHere.san}.
                     </p>
                   )}
+                  {safetyHere.settled && safetyHere.verdict?.safe && safetyHere.verdict.missed && (
+                    <p className="text-sm text-amber-200" data-safety-missed={safetyHere.verdict.missed}>
+                      But look first: {safetyHere.verdict.missed} wins material here.
+                    </p>
+                  )}
                   {!safetyHere.settled && safetyHere.answer !== undefined && (
                     <p className="text-xs text-slate-400" data-safety-checking>
                       Checking {safetyHere.san}…
@@ -976,6 +992,7 @@ export const App: React.FC = () => {
                     ? [
                         { from: safetyHere.move.from, to: safetyHere.move.to, color: 'blue' as const },
                         ...(safetyHere.settled && safetyRefutation ? [{ ...safetyRefutation, color: 'red' as const }] : []),
+                        ...(safetyHere.settled && safetyMissed ? [{ ...safetyMissed, color: 'green' as const }] : []),
                       ]
                     : undefined
                 }

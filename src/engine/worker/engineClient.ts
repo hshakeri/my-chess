@@ -3,7 +3,7 @@ import { HybridEngine } from '../human/hybridEngine';
 import { reviewGame, type ReviewInput } from '../../analytics/review';
 import type { GameReview } from '../../types/review';
 import type { ReviewProgressMessage, ReviewResultMessage, ReviewStage, SafetyResultMessage } from './reviewProtocol';
-import { isMoveSafe, type MoveSafety } from '../../services/microQuestions';
+import { moveVerdict, type MoveSafety } from '../../services/microQuestions';
 import { withinNodes } from '../../analytics/errorTaxonomy';
 
 export interface ReviewProgress {
@@ -183,7 +183,7 @@ export class EngineClient {
    * is searched here.
    */
   public checkMoveSafety(fen: string, san: string, maxNodes: number): Promise<MoveSafety | null> {
-    if (!this.worker) return Promise.resolve().then(() => withinNodes(maxNodes, () => isMoveSafe(fen, san)) ?? null);
+    if (!this.worker) return Promise.resolve().then(() => withinNodes(maxNodes, () => moveVerdict(fen, san)) ?? null);
     const id = `safety_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
     const verdict = new Promise<MoveSafety | null>((resolve) => {
       this.pendingSafety.set(id, resolve);

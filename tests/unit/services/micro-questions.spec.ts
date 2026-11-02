@@ -10,7 +10,8 @@ import {
   undefendedPieces,
 } from '../../../src/services/microQuestions';
 import { isRight } from '../../../src/components/BoardQuestion';
-import { withinNodes } from '../../../src/analytics/errorTaxonomy';
+import { missedCapture, withinNodes } from '../../../src/analytics/errorTaxonomy';
+import { moveVerdict } from '../../../src/services/microQuestions';
 
 const after = (...moves: string[]) => {
   const c = new Chess();
@@ -72,6 +73,19 @@ describe('microQuestions: board questions with answers from chess.js (CL-5)', ()
     expect(isMoveSafe(after('e4', 'e5', 'Nf3', 'Nc6', 'Bc4', 'h6', 'Nc3', 'd6'), 'Nxe5')).toEqual({ safe: false, reason: 'After Nxe5, the knight on e5 can be taken.', refutation: 'Nxe5' });
     // 2...Qh4?? hangs the queen to 3.Nxh4; 3.d3 misses it but loses nothing, so it is safe
     expect(isMoveSafe(after('e4', 'e5', 'Nf3', 'Qh4'), 'd3').safe).toBe(true);
+  });
+
+  it('a safe move that leaves a free capture on the board names it; a capture of equal value is no miss', () => {
+    // 2...Qh4?? hangs the queen: 3.d3 is safe but leaves 3.Nxh4 untaken
+    const hangs = after('e4', 'e5', 'Nf3', 'Qh4');
+    expect(missedCapture(hangs, 'd3')).toBe('Nxh4');
+    expect(missedCapture(hangs, 'Nxh4')).toBeUndefined();
+    expect(moveVerdict(hangs, 'd3')).toMatchObject({ safe: true, missed: 'Nxh4' });
+    // Unsafe moves are judged on their own
+    expect(moveVerdict(after('f3', 'e5'), 'g4')).toEqual(isMoveSafe(after('f3', 'e5'), 'g4'));
+    // A trade on offer is not a free piece
+    expect(missedCapture(after('e4', 'e5', 'Nf3', 'Nc6', 'Bb5', 'a6'), 'Ba4')).toBeUndefined();
+    expect(moveVerdict(after('e4', 'e5', 'Nf3', 'Nc6', 'Bb5', 'a6'), 'Ba4').missed).toBeUndefined();
   });
 
   it('a stalemate when ahead is not safe, and says so', () => {
