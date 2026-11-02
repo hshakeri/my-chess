@@ -98,6 +98,11 @@ As Black:
 6. 1.c4 / 1.Nf3 (13 games, 46%): answer ...c6 and ...d5, same wall; a short lesson later.
 
 Status (2026-11-01): White 1-5 and Black 1-4 and 6 are done (Black 5 needs no new content).
+Engine pass (2026-11-01): Stockfish 19 and Maia changed five lines (the reasons are in
+`docs/pedagogy-audit.md`): the Blackburne-Shilling continuation is now 4...exd4 5.O-O, with 6.Bxf7+
+and 7.Qh5+ against a bishop on c5; the Advance trades first, 7...cxd4 8.cxd4 Qb6; the Evans
+Compromised Defence plays 9.Bg5; the Konikowski 9.Bf4 and the Elephant 7.Nxf6+ and 8.d4.
+`npx tsx scripts/engine-audit.ts` re-checks every answer.
 - White 1-3: the Evans lesson has a 5...Ba5 branch (6.d4 exd4 7.O-O Nge7 8.cxd4 d5 9.exd5 Nxd5
   10.Ba3), four decisions each against 3...h6 and 3...Nf6 with an exercise each, and the
   Scandinavian drill has exercises for 3...Qd8 and 3...Qe6+.

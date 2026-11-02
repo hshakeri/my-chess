@@ -92,11 +92,27 @@ export const refutingKonikowskiGambit: CurriculumLesson = buildVerifiedLesson({
     },
     { san: 'dxe4', isUserMove: false },
     {
-      san: 'Re1',
+      san: 'Bf4',
       isUserMove: true,
-      annotation: 'Pin the e4 pawn to the queen along the open e-file. Material is level again (two bishops against bishop and knight), but the e4 pawn is pinned and White has the safer king and the more active pieces.',
-      hintPiece: 'Rook on f1',
-      hintSquare: 'e1',
+      annotation: 'Material is level again (two bishops against bishop and knight). Develop with a threat: the bishop attacks the c7 pawn, which nothing defends.',
+      hintPiece: 'Bishop on c1',
+      hintSquare: 'f4',
+      hintTheme: 'Develop with a threat',
+      wrongMoveFeedback: {
+        Re1: '9.Re1 pins the e4 pawn to the queen, but 9.Bf4 comes first: it attacks c7, which nothing defends, and Re1 can follow.',
+      },
+    },
+    {
+      san: 'Nf6',
+      isUserMove: false,
+      alternatives: {
+        Bd7: [{ san: 'Bxc7', isUserMove: true, annotation: 'The c7 pawn falls. White is a pawn up.' }],
+      },
+    },
+    {
+      san: 'Bxc7',
+      isUserMove: true,
+      annotation: 'White wins the c7 pawn and is a pawn up; Re1 against the e4 pawn comes next.',
     },
   ],
   exercises: [
@@ -140,7 +156,7 @@ export const refutingElephantGambit: CurriculumLesson = buildVerifiedLesson({
   relevance: 'outside-repertoire',
   description:
     'The Elephant Gambit (1.e4 e5 2.Nf3 d5?!) is a risky attempt by Black to take the initiative. After 3.exd5 e4, White pins the e-pawn with 4.Qe2 and wins it.',
-  thematicObjective: 'Pin Black’s overextended e4 pawn, develop the queen knight to c3, and emerge a solid pawn ahead.',
+  thematicObjective: 'Pin Black’s overextended e4 pawn, win it with the queen knight, trade on f6 and take the centre with d4; when Black\'s rook pins the queen on the e-file, block with the bishop.',
   keyTacticalMotif: 'Pinning on the e-file with Qe2, centralized knight',
   moves: [
     { san: 'e4', isUserMove: true },
@@ -182,19 +198,35 @@ export const refutingElephantGambit: CurriculumLesson = buildVerifiedLesson({
     },
     { san: 'O-O', isUserMove: false },
     {
-      san: 'd3',
+      san: 'Nxf6+',
       isUserMove: true,
-      annotation: 'Solidify the center and open the diagonal for the dark-squared bishop.',
-      hintPiece: 'd-Pawn',
-      hintSquare: 'd3',
+      annotation: 'Trade knights with check: the f6 knight was attacking the d5 pawn.',
+      hintPiece: 'Knight on e4',
+      hintSquare: 'f6',
+      wrongMoveFeedback: {
+        d3: '7.d3 is solid, but after 7...Nxd5 Black has a pawn back at once. Trade on f6 first, then d4.',
+      },
     },
-    { san: 'Nxd5', isUserMove: false },
+    { san: 'Bxf6', isUserMove: false },
     {
-      san: 'Bd2',
+      san: 'd4',
       isUserMove: true,
-      annotation: 'Develop the bishop. White is a pawn up.',
+      annotation: 'Take the centre. White is two pawns up for the moment.',
+      hintPiece: 'd-Pawn',
+      hintSquare: 'd4',
+    },
+    { san: 'Re8', isUserMove: false, annotation: 'The rook pins the queen to White\'s king along the open e-file.' },
+    {
+      san: 'Be3',
+      isUserMove: true,
+      annotation: 'Block the file with the bishop, which develops at the same time. White is still two pawns up.',
       hintPiece: 'Dark-squared Bishop',
-      hintSquare: 'd2',
+      hintSquare: 'e3',
+      hintTheme: 'Block the pin with a developing move',
+      wrongMoveFeedback: {
+        Ne5: '9.Ne5 blocks the file too, but there the knight is attacked by the f6 bishop and the e8 rook, and 9...c5 hits the d4 pawn that defends it.',
+        Bf4: '9.Bf4?? does not block the e-file: 9...Rxe2+ takes the queen.',
+      },
     },
   ],
   exercises: [

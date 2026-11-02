@@ -206,7 +206,7 @@ export function getRecommendedBlackRepertoire(): RepertoirePlan {
   // (5.c3 is the archive's most common fifth move, with 5.Bd3).
   const advanceMoves = [
     'e4', 'c6', 'd4', 'd5', 'e5', 'Bf5', 'Nf3', 'e6', 'c3', 'c5',
-    'Be2', 'Nc6', 'O-O', 'Qb6'
+    'Be2', 'Nc6', 'O-O', 'cxd4', 'cxd4', 'Qb6'
   ];
   const advanceAnnotations: Record<number, { commentary?: string; annotation?: string; tacticalMotif?: string; isKeyMove?: boolean }> = {
     2: { commentary: 'Caro-Kann Defense! A rock-solid defense preparing d5 with a protected pawn structure.', isKeyMove: true },
@@ -215,7 +215,8 @@ export function getRecommendedBlackRepertoire(): RepertoirePlan {
     8: { commentary: 'Now Black securely locks the center with ...e6, with the light-squared bishop safely active outside the pawn chain.', isKeyMove: true },
     10: { commentary: 'The thematic Caro-Kann counter-strike against White\'s pawn base at d4!', annotation: '!', tacticalMotif: 'Pawn Chain Undermining', isKeyMove: true },
     12: { commentary: 'Piling up heavy pressure on the d4 pawn.', isKeyMove: true },
-    14: { commentary: 'The queen hits b2 and lines up behind the c5 pawn against d4; ...Nge7-f5 can follow.', isKeyMove: true }
+    14: { commentary: 'Trade on d4 before the queen comes out: with the c-pawns gone White cannot answer ...Qb6 with dxc5.', isKeyMove: true },
+    16: { commentary: 'The queen hits b2 and d4 at once.', isKeyMove: true }
   };
 
   const advanceLine: RepertoireLine = {
@@ -231,7 +232,7 @@ export function getRecommendedBlackRepertoire(): RepertoirePlan {
       'Put relentless pressure on the d4 pawn base'
     ],
     moves: buildMoveChain(advanceMoves, initialFen, advanceAnnotations),
-    pgn: '1. e4 c6 2. d4 d5 3. e5 Bf5! 4. Nf3 e6 5. c3 c5 6. Be2 Nc6 7. O-O Qb6'
+    pgn: '1. e4 c6 2. d4 d5 3. e5 Bf5! 4. Nf3 e6 5. c3 c5 6. Be2 Nc6 7. O-O cxd4 8. cxd4 Qb6'
   };
 
   // Line 2: Caro-Kann Classical Variation (Capablanca 4...Bf5!)

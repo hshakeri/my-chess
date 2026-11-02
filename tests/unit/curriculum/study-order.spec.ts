@@ -119,10 +119,12 @@ describe('Opening study order: archive weights', () => {
     expect(repliesAfter('white', [...nd4, 'Nxd4', 'exd4'])).toEqual({ Qf3: 3 });
     const l = lesson('lesson-blackburne-shilling-drill');
     expect(l.startPly).toBe(6);
-    const c3 = l.moves[8];
-    expect(c3.san).toBe('c3');
-    expect(c3.isUserMove).toBe(true);
-    expect(Object.keys(c3.wrongMoveFeedback!)).toContain('Qf3');
+    // The move after 4...exd4 is 5.O-O since the Stockfish pass (it scores higher than 5.c3 against best
+    // play and against Maia's likely replies); 5.Qf3, the games' move, and 5.c3 get their own feedback
+    const castle = l.moves[8];
+    expect(castle.san).toBe('O-O');
+    expect(castle.isUserMove).toBe(true);
+    expect(Object.keys(castle.wrongMoveFeedback!)).toEqual(expect.arrayContaining(['Qf3', 'c3']));
     for (const id of ['169351731946', '184018513142', '169462171410', '173560422718', '185142463810']) {
       expect(l.description).toContain(id);
       expect(archive.some((g) => g.url?.endsWith(`/${id}`))).toBe(true);
@@ -222,6 +224,51 @@ describe('Opening study order: the facts the lessons state', () => {
     expect(c3.attackers('d4' as Square, 'b')).toEqual([]);
   });
 
+  it('Evans, Compromised Defence: 9.Bg5 attacks the queen, and after 10.Nxc3 Black is two pawns up with three pieces out to five', () => {
+    const line = 'e4 e5 Nf3 Nc6 Bc4 Bc5 b4 Bxb4 c3 Bc5 d4 exd4 O-O dxc3 Qb3 Qf6 Bg5';
+    expect(play(line).attackers('f6' as Square, 'w')).toEqual(['g5']);
+    const end = play(`${line} Qg6 Nxc3`);
+    const pawns = (color: 'w' | 'b') => end.board().flat().filter((p) => p && p.color === color && p.type === 'p').length;
+    expect(pawns('b') - pawns('w')).toBe(2);
+    const home: Record<string, string> = { b1: 'n', g1: 'n', c1: 'b', f1: 'b', d1: 'q', b8: 'n', g8: 'n', c8: 'b', f8: 'b', d8: 'q' };
+    const out = (color: 'w' | 'b') =>
+      end.board().flat().filter((p) => p && p.color === color && 'nbq'.includes(p.type) && home[p.square] !== p.type).length;
+    expect([out('w'), out('b')]).toEqual([5, 3]);
+    expect(end.fen().split(' ')[2]).toBe('kq');
+  });
+
+  it('after 5.O-O: the c5 bishop has no defender, 7.Qh5+ checks and hits it, and the branches state what is on the board', () => {
+    const base = 'e4 e5 Nf3 Nc6 Bc4 Nd4 Nxd4 exd4 O-O';
+    expect(play(base).attackers('d4' as Square, 'b')).toEqual([]);
+    const bc5 = play(`${base} Bc5`);
+    expect(bc5.attackers('c5' as Square, 'b')).toEqual([]);
+    // 6.Bxf7+: only the king can take, and it may step aside instead
+    const check = play(`${base} Bc5 Bxf7+`);
+    expect(check.moves().filter((m) => m.startsWith('K')).sort()).toEqual(['Ke7', 'Kf8', 'Kxf7']);
+    expect(check.moves().every((m) => m.startsWith('K'))).toBe(true);
+    // 7.Qh5+ gives check and attacks c5 along the fifth rank; 8.Qxc5 leaves White a pawn up
+    const qh5 = play(`${base} Bc5 Bxf7+ Kxf7 Qh5+`);
+    expect(qh5.inCheck()).toBe(true);
+    expect(qh5.attackers('c5' as Square, 'w')).toEqual(['h5']);
+    const end = play(`${base} Bc5 Bxf7+ Kxf7 Qh5+ g6 Qxc5`);
+    const count = (c: ReturnType<typeof play>, color: 'w' | 'b') =>
+      c.board().flat().filter((p) => p && p.color === color).reduce((n, p) => n + ({ p: 1, n: 3, b: 3, r: 5, q: 9, k: 0 } as const)[p!.type], 0);
+    expect(count(end, 'w') - count(end, 'b')).toBe(1);
+    expect(end.fen().split(' ')[2]).not.toMatch(/[kq]/);
+    expect(end.attackers('d4' as Square, 'w')).toEqual(['c5']);
+    expect(play(`${base} Bc5 Bxf7+ Kxf7 Qh5+ Kf8 Qxc5+`).inCheck()).toBe(true);
+    // ...Kf8 at once: 7.Bb3 keeps the extra pawn, and the king has lost castling
+    const kf8 = play(`${base} Bc5 Bxf7+ Kf8 Bb3`);
+    expect(count(kf8, 'w') - count(kf8, 'b')).toBe(1);
+    expect(kf8.fen().split(' ')[2]).not.toMatch(/[kq]/);
+    // 5...Nf6 hits e4, which nothing defends until 6.Re1; after 5...d6 6.c3 nothing defends d4
+    const nf6 = play(`${base} Nf6`);
+    expect(nf6.attackers('e4' as Square, 'b')).toEqual(['f6']);
+    expect(nf6.attackers('e4' as Square, 'w')).toEqual([]);
+    expect(play(`${base} Nf6 Re1`).attackers('e4' as Square, 'w')).toEqual(['e1']);
+    expect(play(`${base} d6 c3`).attackers('d4' as Square, 'b')).toEqual([]);
+  });
+
   it('the d4 pawn is what closes the fourth rank in the ...Bg4 lesson', () => {
     const open = play('e4 c6 Nf3 d5 exd5 cxd5 c3 Bg4 Qa4+');
     expect(open.isCheck()).toBe(true);
@@ -242,10 +289,19 @@ describe('Opening study order: the facts the lessons state', () => {
     expect(play('d4 d5 Bf4 c6 e3 Bf5 Nf3 e6 Bd3 Bxd3 Qxd3 Qb6').attackers('b2' as Square, 'w')).toEqual([]);
   });
 
-  it('in the Advance ...Qb6 stands behind the c5 pawn rather than attacking d4 itself', () => {
-    const c = play('e4 c6 d4 d5 e5 Bf5 Nf3 e6 c3 c5 Be2 Nc6 O-O Qb6');
-    expect(c.attackers('d4' as Square, 'b').sort()).toEqual(['c5', 'c6']);
-    expect(c.attackers('d4' as Square, 'w').sort()).toEqual(['c3', 'd1', 'f3']);
+  it('in the Advance the trade on d4 comes before ...Qb6, which then hits d4 and b2 (Stockfish: 7...Qb6 at once meets 8.dxc5 and 9.b4)', () => {
+    const c = play('e4 c6 d4 d5 e5 Bf5 Nf3 e6 c3 c5 Be2 Nc6 O-O cxd4 cxd4 Qb6');
+    expect(c.attackers('d4' as Square, 'b').sort()).toEqual(['b6', 'c6']);
+    expect(c.attackers('d4' as Square, 'w').sort()).toEqual(['d1', 'f3']);
+    expect(c.attackers('b2' as Square, 'b')).toEqual(['b6']);
+    expect(c.attackers('b2' as Square, 'w')).toEqual(['c1']);
+    expect([1, 2, 3, 4, 5, 6, 7, 8].some((r) => c.get(`c${r}` as Square)?.type === 'p')).toBe(false);
+    // The move it replaces: after 7...Qb6 8.dxc5 Bxc5 9.b4 the pawn hits the bishop, and b5 is free for it
+    const early = play('e4 c6 d4 d5 e5 Bf5 Nf3 e6 c3 c5 Be2 Nc6 O-O Qb6 dxc5 Bxc5 b4');
+    expect(early.attackers('c5' as Square, 'w')).toEqual(['b4']);
+    expect(early.get('b5' as Square)).toBeFalsy();
+    // After 9.Be3 nothing defends b2 (the second exercise)
+    expect(play('e4 c6 d4 d5 e5 Bf5 Nf3 e6 c3 c5 Be2 Nc6 O-O cxd4 cxd4 Qb6 Be3').attackers('b2' as Square, 'w')).toEqual([]);
   });
 
   it('the pinned-queen exercises pin what they say they pin', () => {

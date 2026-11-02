@@ -58,7 +58,13 @@ app build. The results and what they mean are in `docs/game-analysis.md`.
    `add` chooses. `verify-drills.mjs check` runs the same test on `src/data/game_drills.json`. The engine audit
    (`npx tsx scripts/engine-audit.ts [depth] [out.json] [lesson-id-prefix]` from the repository)
    scores every answer, alternative, warned-against move and exercise of the curriculum against
-   Stockfish's best move and lists the ones that give away too much.
+   Stockfish's best move and lists the ones that give away too much. Before a lesson move is changed,
+   `practical.mjs` scores each candidate twice: by Stockfish against the best reply, and against the
+   replies Maia expects from players of hoot65's rating (each reply weighted by Maia's share and
+   scored by Stockfish, as centipawns and as an expected score on the Lichess curve). A lesson move
+   is replaced when another move is clearly better against best play and no worse, within two
+   points of expected score, against the likely replies. `sf-lines.mjs` prints Stockfish's
+   best lines for a list of positions and `maia-policy.mjs` Maia's move shares.
 
 Weights: a game's weight halves every 180 days (`HALF_LIFE` environment variable).
 Ratings: Maia is trained on Lichess games, so Chess.com ratings get +400 before they reach Maia

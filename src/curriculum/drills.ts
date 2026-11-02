@@ -448,7 +448,7 @@ export const caroKannDisciplineDrill: CurriculumLesson = buildVerifiedLesson({
 export const blackburneShillingDrill: CurriculumLesson = buildVerifiedLesson({
   id: 'lesson-blackburne-shilling-drill',
   title: 'Weakness Drill: The Knight on d4',
-  subtitle: 'Five games reached 3...Nd4 and all five were lost; take the knight and go after the pawn that recaptures',
+  subtitle: 'Five games reached 3...Nd4 and all five were lost: the knight trade, and what comes after it',
   category: 'weakness_drill',
   sourceBook: 'Chess.com Live Archive',
   author: 'hoot65 Diagnostic Analysis',
@@ -461,8 +461,8 @@ export const blackburneShillingDrill: CurriculumLesson = buildVerifiedLesson({
   description:
     'The Blackburne-Shilling Gambit, 1.e4 e5 2.Nf3 Nc6 3.Bc4 Nd4, reached the board in five of your games and you lost all five. Twice you took the e5 pawn, 4.Nxe5?, and met 4...Qg5 (2026-05-28 vs Itilogic, game 169351731946, mated on move 7; 2026-09-18 vs Fantomboss, game 184018513142). Three times you played 4.Nxd4 exd4 and then 5.Qf3 (2026-05-30 vs Sarvin-2025, game 169462171410; 2026-08-26 vs Boburshox_Sharifzoda, game 173560422718; 2026-10-11 vs erenyeager01o, game 185142463810). The capture 4.Nxd4 was right; the drill is about the move after it.',
   thematicObjective:
-    'Take the knight with 4.Nxd4, never the pawn with 4.Nxe5?. After 4...exd4 play 5.c3: it attacks the pawn that nothing defends, and after ...dxc3 Nxc3 White has a knight and a bishop out against nothing.',
-  keyTacticalMotif: 'Remove the attacker; attack the undefended pawn; queen and knight mate on f3 after Nxe5?',
+    'Take the knight with 4.Nxd4, never the pawn with 4.Nxe5?. After 4...exd4 castle, then c3 against the d4 pawn that nothing defends. If the bishop comes to c5, nothing defends it either: 6.Bxf7+ and 7.Qh5+ win it back with a pawn.',
+  keyTacticalMotif: 'Remove the attacker; attack the undefended pawn; Bxf7+ and Qh5+ against an undefended bishop on c5; queen and knight mate on f3 after Nxe5?',
   moves: [
     { san: 'e4', isUserMove: true },
     { san: 'e5', isUserMove: false },
@@ -487,61 +487,84 @@ export const blackburneShillingDrill: CurriculumLesson = buildVerifiedLesson({
     },
     { san: 'exd4', isUserMove: false },
     {
-      san: 'c3',
+      san: 'O-O',
       isUserMove: true,
-      annotation: 'Hit the d4 pawn. Nothing defends it, so Black has to spend a move on it while White develops.',
-      hintTheme: 'Attack the undefended pawn',
-      arrows: [{ from: 'c3', to: 'd4', color: 'red' }],
+      annotation: 'Castle first. The king is safe before any line opens, and c3 against the d4 pawn, which nothing defends, can come next.',
+      hintTheme: 'King safe first, then the d4 pawn',
       wrongMoveFeedback: {
-        Qf3: '5.Qf3 was your move in all three games that reached this position, and all three were lost. It threatens Qxf7#, but a single defensive move stops that (...Qe7 and ...f6 were the replies in your games), and then the queen is out early with no target left. 5.c3 attacks the d4 pawn, which nothing defends, so Black has to spend time on it.',
+        Qf3: '5.Qf3 was your move in all three games that reached this position, and all three were lost. It threatens Qxf7#, but a single defensive move stops that (...Qe7 and ...f6 were the replies in your games), and then the queen is out early with no target left. Castle instead; c3 against the d4 pawn comes next.',
+        c3: '5.c3 is good too: it attacks the d4 pawn at once. Castling first is a little stronger, and c3 can follow.',
       },
     },
     {
-      san: 'dxc3',
+      san: 'Bc5',
       isUserMove: false,
-      annotation: 'Black takes on c3, and White recaptures with a developing move.',
+      annotation: 'The bishop comes out, but on c5 nothing defends it.',
       alternatives: {
-        Bc5: [
+        d6: [
           {
-            san: 'cxd4',
+            san: 'c3',
             isUserMove: true,
-            annotation: 'Take the pawn and attack the bishop. If the bishop takes back on d4, material is level and White castles next.',
-            hintTheme: 'Take the pawn with tempo',
-          },
-          { san: 'Bxd4', isUserMove: false, annotation: 'The bishop takes the pawn back. Material is level.' },
-          {
-            san: 'O-O',
-            isUserMove: true,
-            annotation: 'Castle. White has a safe king and a bishop out; Black has only the d4 bishop and the king still on e8.',
+            annotation: 'Now c3: the king is safe, and the pawn attacks d4, which nothing defends.',
+            hintTheme: 'Attack the undefended pawn',
           },
         ],
         Nf6: [
           {
-            san: 'd3',
+            san: 'Re1',
             isUserMove: true,
-            annotation: 'The knight hits e4, so guard it with the d-pawn, as in the Italian with 4.d3. The d4 pawn can wait.',
+            annotation: 'The knight hits e4, which nothing defends, so the rook guards it; c3 against the d4 pawn comes next.',
             hintTheme: 'Guard e4 first',
-          },
-          { san: 'dxc3', isUserMove: false },
-          {
-            san: 'Nxc3',
-            isUserMove: true,
-            annotation: 'Material is level, e4 is guarded twice (by the c3 knight and the d3 pawn) and White has two pieces out.',
           },
         ],
       },
     },
     {
-      san: 'Nxc3',
+      san: 'Bxf7+',
       isUserMove: true,
-      annotation: 'Material is level again, and White has a knight and a bishop out while Black has nothing developed.',
+      annotation: 'Give up the bishop for the f7 pawn. The king must take it or step aside, and nothing defends the bishop on c5.',
+      hintTheme: 'Check first: the c5 bishop has no defender',
+      wrongMoveFeedback: {
+        c3: '6.c3 is natural, but look at the c5 bishop first: nothing defends it. 6.Bxf7+ Kxf7 7.Qh5+ checks the king and attacks the bishop at the same time.',
+      },
     },
-    { san: 'Nf6', isUserMove: false, annotation: 'The knight attacks e4, which the c3 knight defends.' },
     {
-      san: 'd4',
+      san: 'Kxf7',
+      isUserMove: false,
+      annotation: 'The king takes the bishop.',
+      alternatives: {
+        Kf8: [
+          {
+            san: 'Bb3',
+            isUserMove: true,
+            annotation: 'The bishop goes back. White is a pawn up, and the black king can no longer castle.',
+          },
+        ],
+      },
+    },
+    {
+      san: 'Qh5+',
       isUserMove: true,
-      annotation: 'Two pawns in the centre, e4 still guarded by the knight, and the c1 bishop\'s diagonal is open. Castling comes next.',
-      hintTheme: 'Take the centre',
+      annotation: 'Check from h5, and along the fifth rank the queen also attacks the c5 bishop.',
+      hintTheme: 'A check that attacks something else',
+    },
+    {
+      san: 'g6',
+      isUserMove: false,
+      alternatives: {
+        Kf8: [
+          {
+            san: 'Qxc5+',
+            isUserMove: true,
+            annotation: 'The bishop falls with check. White is a pawn up, and the black king can no longer castle.',
+          },
+        ],
+      },
+    },
+    {
+      san: 'Qxc5',
+      isUserMove: true,
+      annotation: 'The bishop is back: White is a pawn up, the black king can no longer castle, and the queen attacks the d4 pawn.',
     },
   ],
   exercises: [

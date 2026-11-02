@@ -433,9 +433,9 @@ export const caroKannAdvanceLesson: CurriculumLesson = buildVerifiedLesson({
   targetRatingBand: 'intermediate',
   relevance: 'core',
   description:
-    'The Advance (3.e5) came up in 14 of your games and you scored 8.5 points; you found 3...Bf5 every time. This lesson drills what comes after: ...e6, then ...c5 against d4, with ...Nc6 and ...Qb6 adding pressure. When c5 itself is attacked, the b8 knight goes to d7, where it also hits e5. Against 4.Bd3 trade the bishops.',
+    'The Advance (3.e5) came up in 14 of your games and you scored 8.5 points; you found 3...Bf5 every time. This lesson drills what comes after: ...e6, then ...c5 against d4, with ...Nc6, the trade on d4 and ...Qb6 adding pressure. When c5 itself is attacked, the b8 knight goes to d7, where it also hits e5. Against 4.Bd3 trade the bishops.',
   thematicObjective:
-    '3...Bf5, then ...e6, ...c5 and ...Nc6; ...Qb6 lines up on b2 and d4. Against Bd3 trade on d3.',
+    '3...Bf5, then ...e6, ...c5 and ...Nc6; take on d4 before ...Qb6, which then hits b2 and d4. Against Bd3 trade on d3.',
   keyTacticalMotif: 'Undermining the pawn chain at d4; counting attackers on d4',
   moves: [
     { san: 'e4', isUserMove: false },
@@ -512,7 +512,7 @@ export const caroKannAdvanceLesson: CurriculumLesson = buildVerifiedLesson({
             hintTheme: 'Defend c5 and hit e5',
           },
           { san: 'O-O', isUserMove: false },
-          { san: 'Ne7', isUserMove: true, annotation: 'The second knight heads for c6 or f5, where it hits d4.' },
+          { san: 'Ne7', isUserMove: true, annotation: 'The second knight heads for c6, where it hits d4.' },
         ],
       },
     },
@@ -527,10 +527,21 @@ export const caroKannAdvanceLesson: CurriculumLesson = buildVerifiedLesson({
     { san: 'Nc6', isUserMove: true, annotation: 'A second attacker on d4.' },
     { san: 'O-O', isUserMove: false },
     {
+      san: 'cxd4',
+      isUserMove: true,
+      annotation: 'Trade on d4 first. With the c-pawns gone White can no longer meet ...Qb6 with dxc5, and the c-file is open.',
+      hintTheme: 'Release the tension before the queen comes out',
+      wrongMoveFeedback: {
+        Qb6: '7...Qb6 at once allows 8.dxc5 Bxc5 9.b4: the pawn hits the bishop, and it can go on to b5 against the c6 knight. Take on d4 first, then ...Qb6.',
+      },
+    },
+    { san: 'cxd4', isUserMove: false },
+    {
       san: 'Qb6',
       isUserMove: true,
+      accept: { san: ['Nge7'] },
       annotation:
-        'The queen hits b2 and stands behind the c5 pawn: after ...cxd4 cxd4 it attacks d4 directly. Today d4 is attacked by the c5 pawn and the c6 knight and defended by the c3 pawn, the f3 knight and the d1 queen; ...Nge7-f5 adds another attacker.',
+        'Now the queen hits b2 and d4. d4 is attacked by the c6 knight and the queen and defended by the f3 knight and the d1 queen; b2 is guarded only by the c1 bishop, so watch for the moment it leaves.',
       hintTheme: 'Pile up on d4',
     },
   ],
@@ -538,14 +549,26 @@ export const caroKannAdvanceLesson: CurriculumLesson = buildVerifiedLesson({
     {
       id: 'ex-advance-queen-on-b-file',
       title: 'Look Along the b-File',
-      // 1.e4 c6 2.d4 d5 3.e5 Bf5 4.Nf3 e6 5.c3 c5 6.Be2 Nc6 7.O-O Qb6 8.Bb5
-      fen: 'r3kbnr/pp3ppp/1qn1p3/1BppPb2/3P4/2P2N2/PP3PPP/RNBQ1RK1 b kq - 5 8',
+      // 1.e4 c6 2.d4 d5 3.e5 Bf5 4.Nf3 e6 5.c3 c5 6.Be2 Nc6 7.O-O cxd4 8.cxd4 Qb6 9.Bb5
+      fen: 'r3kbnr/pp3ppp/1qn1p3/1B1pPb2/3P4/5N2/PP3PPP/RNBQ1RK1 b kq - 2 9',
       turn: 'b',
       difficultyRating: 1,
       prompt: 'Black to play. White moved the bishop to b5 to pin the c6 knight. What does Black play?',
       solutionSan: ['Qxb5'],
       explanation:
-        '8...Qxb5 wins a bishop: the queen on b6 looks straight down the b-file, and nothing defends b5. Before you worry about a pin, check what your own pieces attack.',
+        '9...Qxb5 wins a bishop: the queen on b6 looks straight down the b-file, and nothing defends b5. Before you worry about a pin, check what your own pieces attack.',
+    },
+    {
+      id: 'ex-advance-b2-after-be3',
+      title: 'When the c1 Bishop Leaves',
+      // 1.e4 c6 2.d4 d5 3.e5 Bf5 4.Nf3 e6 5.c3 c5 6.Be2 Nc6 7.O-O cxd4 8.cxd4 Qb6 9.Be3
+      fen: 'r3kbnr/pp3ppp/1qn1p3/3pPb2/3P4/4BN2/PP2BPPP/RN1Q1RK1 b kq - 2 9',
+      turn: 'b',
+      difficultyRating: 1,
+      prompt: 'Black to play. White guarded d4 with 9.Be3. What does Black play?',
+      solutionSan: ['Qxb2'],
+      explanation:
+        '9...Qxb2 wins a pawn: the bishop has left c1, so nothing defends b2. Whenever that bishop moves, look at b2.',
     },
   ],
 });

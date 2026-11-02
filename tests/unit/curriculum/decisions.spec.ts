@@ -70,8 +70,10 @@ describe('enumerateDecisions', () => {
     const branch = decisions.filter((d) => d.reachProb !== 1);
     expect(main.length).toBe(9);
     // 17 branch decisions before the opening study order pass; it added 6.Bb3 (vs 3...Nf6), 7.O-O (vs 3...h6)
-    // and the five decisions of the 5...Ba5 branch
-    expect(branch.length).toBe(24);
+    // and the five decisions of the 5...Ba5 branch. The Stockfish pass rebuilt the Blackburne-Shilling
+    // branch after 4...exd4 around 5.O-O: four decisions (5.c3, 6.Nxc3, 6.cxd4, 7.O-O) became eight
+    // (5.O-O, 6.Bxf7+, 7.Qh5+, 8.Qxc5; 6.c3 against ...d6, 6.Re1 against ...Nf6, 7.Bb3 and 8.Qxc5+ against ...Kf8)
+    expect(branch.length).toBe(28);
     expect(decisions.every((d) => d.tags.includes('opening:evans-gambit-destruction'))).toBe(true);
     expect(decisions.every((d) => d.tags.includes('family:opening'))).toBe(true);
     expect(decisions.every((d) => d.color === 'w')).toBe(true);
@@ -98,10 +100,16 @@ describe('enumerateDecisions', () => {
     expect(after(`${italian} Nf6 d3 Bc5`).reachProb).toBeCloseTo(12 / 44, 6);
     expect(after(`${italian} Nf6 d3 Bc5 c3 d6`).reachProb).toBeCloseTo(12 / 44, 6);
 
-    // Nested branch: after 4.Nxd4 exd4 5.c3 the replies ...dxc3 (main) and ...Bc5 weigh 1 each
-    expect(after(`${italian} Nd4 Nxd4 exd4 c3 dxc3`).reachProb).toBeCloseTo(5 / 44, 6);
-    expect(after(`${italian} Nd4 Nxd4 exd4 c3 Bc5`).reachProb).toBeCloseTo(5 / 44 / 2, 6);
-    expect(after(`${italian} Nd4 Nxd4 exd4 c3 Bc5 cxd4 Bb6`).reachProb).toBeCloseTo(5 / 44 / 2, 6);
+    // Nested branch: after 4.Nxd4 exd4 5.O-O the scripted ...Bc5 keeps the branch's share, and the
+    // unobserved ...d6 and ...Nf6 get a third of it each (weight 1 against 1 and 1)
+    expect(after(`${italian} Nd4 Nxd4 exd4 O-O Bc5`).reachProb).toBeCloseTo(5 / 44, 6);
+    expect(after(`${italian} Nd4 Nxd4 exd4 O-O d6`).reachProb).toBeCloseTo(5 / 44 / 3, 6);
+    expect(after(`${italian} Nd4 Nxd4 exd4 O-O Nf6`).acceptedSan).toEqual(['Re1']);
+    // 6.Bxf7+ is met by ...Kxf7 or ...Kf8, and 7.Qh5+ by ...g6 or ...Kf8: the alternative gets half
+    expect(after(`${italian} Nd4 Nxd4 exd4 O-O Bc5 Bxf7+ Kxf7`).reachProb).toBeCloseTo(5 / 44, 6);
+    expect(after(`${italian} Nd4 Nxd4 exd4 O-O Bc5 Bxf7+ Kf8`).reachProb).toBeCloseTo(5 / 44 / 2, 6);
+    expect(after(`${italian} Nd4 Nxd4 exd4 O-O Bc5 Bxf7+ Kxf7 Qh5+ Kf8`).acceptedSan).toEqual(['Qxc5+']);
+    expect(after(`${italian} Nd4 Nxd4 exd4 O-O Bc5 Bxf7+ Kxf7 Qh5+ Kf8`).reachProb).toBeCloseTo(5 / 44 / 2, 6);
 
     // 4...Bxb4 was played 7 of 7 times; the declined ...Bb6 is unobserved (weight 1)
     expect(after(`${italian} Bc5 b4 Bb6`).reachProb).toBeCloseTo(1 / 8, 6);

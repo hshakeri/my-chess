@@ -60,12 +60,12 @@ describe('MoveTree (SSR)', () => {
 
   it('renders nested branches when the current path runs through them', () => {
     const html = renderToString(
-      <MoveTree lesson={evansGambitDestruction} currentPath={[...ITALIAN, 'Nd4', 'Nxd4', 'exd4', 'c3', 'Bc5']} />
+      <MoveTree lesson={evansGambitDestruction} currentPath={[...ITALIAN, 'Nd4', 'Nxd4', 'exd4', 'O-O', 'Nf6']} />
     );
-    expect(nodeTag(html, 'e4 e5 Nf3 Nc6 Bc4 Nd4 Nxd4 exd4 c3 Bc5')).toContain('data-current="true"');
-    expect(html).toContain('data-node="cxd4"');
-    expect(html).toContain('>6.cxd4<');
-    expect(html).toContain('>50%<');
+    expect(nodeTag(html, 'e4 e5 Nf3 Nc6 Bc4 Nd4 Nxd4 exd4 O-O Nf6')).toContain('data-current="true"');
+    expect(html).toContain('data-node="Re1"');
+    expect(html).toContain('>6.Re1<');
+    expect(html).toContain('>33%<');
   });
 
   it('marks the auto-played prefix before startPly', () => {

@@ -77,7 +77,7 @@ const PATTERN_META: Record<DetectorPatternId, PatternMeta> = {
     color: 'white',
     theoryVerdict: 'inferior',
     description:
-      'After 1.e4 e5 2.Nf3 Nc6 3.Bc4 Nd4 the e5 pawn is bait: 4.Nxe5? Qg5 attacks the e5 knight and g2 at once, and 5.Nxf7 Qxg2 6.Rf1 Qxe4+ 7.Be2 Nf3 is checkmate. Take the knight instead: 4.Nxd4 exd4 5.c3 hits the d4 pawn with the knight gone, or play 4.c3 first. Black has moved the same knight twice and left the e5 pawn undefended; the knight on d4, not the pawn, is the piece to take.',
+      'After 1.e4 e5 2.Nf3 Nc6 3.Bc4 Nd4 the e5 pawn is bait: 4.Nxe5? Qg5 attacks the e5 knight and g2 at once, and 5.Nxf7 Qxg2 6.Rf1 Qxe4+ 7.Be2 Nf3 is checkmate. Take the knight instead: 4.Nxd4 exd4, then castle and play c3 against the d4 pawn, or play 4.c3 first. Black has moved the same knight twice and left the e5 pawn undefended; the knight on d4, not the pawn, is the piece to take.',
   },
   'mated-while-ahead': {
     id: 'mated-while-ahead',
@@ -489,7 +489,7 @@ export class DiagnosticAnalyzer {
       evaluationDelta: '',
       patternId: 'blackburne-shilling-handling',
       description:
-        'After 3...Nd4 the e5 pawn is poisoned: 4.Nxe5? Qg5 hits the e5 knight and g2 at the same time, and 5.Nxf7 Qxg2 6.Rf1 Qxe4+ 7.Be2 Nf3 is checkmate. 4.Nxd4 exd4 5.c3 removes the knight and attacks the d4 pawn; 4.c3 also works.',
+        'After 3...Nd4 the e5 pawn is poisoned: 4.Nxe5? Qg5 hits the e5 knight and g2 at the same time, and 5.Nxf7 Qxg2 6.Rf1 Qxe4+ 7.Be2 Nf3 is checkmate. 4.Nxd4 exd4 removes the knight, and after 5.O-O the c-pawn goes after the d4 pawn; 4.c3 also works.',
     };
   }
 
