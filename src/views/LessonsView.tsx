@@ -39,6 +39,8 @@ import { BoardQuestion, isRight, questionSquareStyles, type QuestionAnswer, type
 import { WarmupPanel } from './WarmupPanel';
 import { SpeedRunPanel, SPEED_MIN_MOVES, speedMoves } from './SpeedRunPanel';
 import { ProgressPanel } from './ProgressPanel';
+import { PlanReviewPanel } from './PlanReviewPanel';
+import { dueIdeas } from '../services/ideaCards';
 import type { SparRequest } from '../services/sparLog';
 import type { HumanElo } from '../types/engine';
 
@@ -253,6 +255,9 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
   const [warmupOpen, setWarmupOpen] = useState(false);
   const [speedOpen, setSpeedOpen] = useState(false);
   const [progressOpen, setProgressOpen] = useState(false);
+  const [plansOpen, setPlansOpen] = useState(false);
+  // Read again whenever the plan review closes
+  const plansDue = useMemo(() => (plansOpen ? 0 : dueIdeas(allCurriculumLessons).length), [plansOpen]);
 
   useEffect(() => {
     onLessonChange?.(currentLesson.id);
@@ -1085,6 +1090,7 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
     <div className="lessons-view w-full max-w-7xl mx-auto flex flex-col gap-6" data-view="lessons">
       {warmupOpen && <WarmupPanel onClose={() => setWarmupOpen(false)} />}
       {speedOpen && <SpeedRunPanel lesson={currentLesson} onClose={() => setSpeedOpen(false)} />}
+      {plansOpen && <PlanReviewPanel onClose={() => setPlansOpen(false)} />}
       {progressOpen && (
         <ProgressPanel
           onClose={() => setProgressOpen(false)}
@@ -1145,6 +1151,16 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
             title="Your review cards: how much you would recall today, the positions most likely to cost a game, the moves you mix up"
           >
             Progress
+          </button>
+
+          <button
+            type="button"
+            data-action="plans"
+            onClick={() => setPlansOpen(true)}
+            className="bg-slate-950/80 border border-teal-500/40 rounded-lg px-3 py-2 text-xs font-semibold text-teal-300 hover:bg-teal-950/40"
+            title="Rehearse the plans of your openings: the position a line reaches, and what you do there"
+          >
+            <span data-plans-due={plansDue}>Plans: {plansDue}</span>
           </button>
 
           <label className="flex items-center gap-1.5 text-xs text-slate-300" title="Before each move of a line, answer one question about the position: what the last move attacks, what is undefended, or how many checks the opponent has">

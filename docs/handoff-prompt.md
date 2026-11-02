@@ -16,9 +16,9 @@ also runs on every push to another branch).
 
 - React 18 + Vite 6 + TypeScript (strict) + Tailwind; chess.js 1.4; Dexie 4 (IndexedDB); ts-fsrs 5
   for scheduling; maia3-js + onnxruntime-web in a Web Worker for the human-like engine.
-- Tests: Vitest (`npm test`, 395 tests: SSR `renderToString` specs, jsdom interaction specs under
+- Tests: Vitest (`npm test`, 398 tests: SSR `renderToString` specs, jsdom interaction specs under
   `tests/unit/curriculum/lessons-view-interactions.spec.tsx`, fake-indexeddb for the database) and
-  Playwright (`npm run test:e2e`, 89 tests incl. iPhone-viewport tests). Keep both green or update
+  Playwright (`npm run test:e2e`, 90 tests incl. iPhone-viewport tests). Keep both green or update
   tests deliberately and say why. The board question before each lesson move (CL-5) is on by default:
   a test that plays lesson moves either answers it or sets localStorage `my_chess_cct_gate` to `off`
   first (`page.addInitScript` in e2e, the jsdom spec's beforeEach). No `if (await ...isVisible())` guards in specs: a missing control
@@ -202,7 +202,9 @@ Next: the roadmap below.
   today, the riskiest positions by `reachProb x (1 - recall)`, the moves mixed up, reviews due over
   two weeks), and a habit scorecard on the Diagnostics "Your Mistake Patterns" tab (castled by move
   10, minor pieces out by move 10, queen kept home, nothing left hanging in reviewed games).
-- CL-7 visual coaching grammar.
+- CL-7 first slice done (2026-11-01): plan review, one FSRS idea card per opening lesson (the
+  position the line reaches, the plan on demand, a self-grade), in localStorage. Not built: the
+  automatic relation cues, multiple-choice plans, idea cards in Today's session and the backup.
 - DC-1 re-scoped curriculum content for the lines above (this is where the opening order applies).
 
 ## How to verify before pushing

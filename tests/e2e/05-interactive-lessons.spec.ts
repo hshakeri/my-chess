@@ -351,6 +351,22 @@ test.describe('05. Interactive Lessons, Feedback Loops & Spaced Repetition (F16 
     await expect(page.locator('[data-modal="progress"]')).toHaveCount(0);
   });
 
+  test('Plan review: the position a line reaches, the plan on demand, and the student\'s own grade (CL-7)', async ({ page }) => {
+    const button = page.locator('button[data-action="plans"]');
+    const due = Number(await button.locator('[data-plans-due]').getAttribute('data-plans-due'));
+    expect(due).toBeGreaterThan(5);
+    await button.click();
+    const modal = page.locator('[data-modal="plans"]');
+    await expect(modal).toHaveAttribute('data-plans-left', String(due));
+    await modal.locator('[data-action="plans-show"]').click();
+    await expect(modal.locator('[data-section="plan-answer"]')).toBeVisible();
+    await modal.locator('[data-grade="good"]').click();
+    await expect(modal).toHaveAttribute('data-plans-left', String(due - 1));
+    await modal.locator('[data-action="plans-close"]').click();
+    // The graded plan is no longer due
+    await expect(button.locator('[data-plans-due]')).toHaveAttribute('data-plans-due', String(due - 1));
+  });
+
   test('Spar: the finished Scandinavian line is played on against Maia, with the plan goals and a review (CL-6)', async ({ page }) => {
     test.setTimeout(150_000);
     await page.locator('[data-lesson-id="lesson-scandinavian-refutation-drill"]').click();
