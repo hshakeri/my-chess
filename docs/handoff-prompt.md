@@ -16,7 +16,7 @@ also runs on every push to another branch).
 
 - React 18 + Vite 6 + TypeScript (strict) + Tailwind; chess.js 1.4; Dexie 4 (IndexedDB); ts-fsrs 5
   for scheduling; maia3-js + onnxruntime-web in a Web Worker for the human-like engine.
-- Tests: Vitest (`npm test`, 405 tests: SSR `renderToString` specs, jsdom interaction specs under
+- Tests: Vitest (`npm test`, 406 tests: SSR `renderToString` specs, jsdom interaction specs under
   `tests/unit/curriculum/lessons-view-interactions.spec.tsx`, fake-indexeddb for the database) and
   Playwright (`npm run test:e2e`, 90 tests incl. iPhone-viewport tests). Keep both green or update
   tests deliberately and say why. The board question before each lesson move (CL-5) is on by default:
@@ -191,7 +191,8 @@ Next: the roadmap below.
   likeliest reply after the student's move.
 - CL-6 done (2026-11-01): play a finished lesson line on against Maia 1100/1300 from the Play tab,
   with plan goals (castle, develop, keep material, plus any `planMilestones`) and a review of the
-  spar's moves; the engine worker is shared through `src/engine/EngineContext.tsx`.
+  spar's moves; the engine worker is shared through `src/engine/EngineContext.tsx`. A game review's
+  critical moments offer the same ("Play it again vs Maia", from the move before the mistake).
 - Opening speed run done (2026-11-01): the Lessons header plays the current lesson's main line
   against the clock (`src/views/SpeedRunPanel.tsx`), the opponent's replies at once, three seconds a
   move as the target, the runs kept in localStorage.

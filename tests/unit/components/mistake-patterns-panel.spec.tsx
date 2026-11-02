@@ -6,7 +6,8 @@ import { db } from '../../../src/db/database';
 import { EngineContext } from '../../../src/engine/EngineContext';
 import type { EngineClient } from '../../../src/engine/worker/engineClient';
 import { MistakePatternsPanel } from '../../../src/views/MistakePatternsPanel';
-import { GameReviewPanel } from '../../../src/views/GameReviewPanel';
+import { GameReviewPanel, nearestBand } from '../../../src/views/GameReviewPanel';
+import type { SparRequest } from '../../../src/services/sparLog';
 import type { StoredGame } from '../../../src/types/db';
 import type { CriticalMoment, GameReview } from '../../../src/types/review';
 
@@ -108,6 +109,30 @@ describe('Mistake patterns and the batch review (CL-3)', () => {
     fireEvent.click(view.container.querySelector('[data-action="batch-cancel"]')!);
     await waitFor(() => expect(view.container.querySelector('[data-section="batch-review"]')?.getAttribute('data-batch-running')).toBe('false'));
     expect(await db.reviews.count()).toBe(0);
+  });
+
+  it('a revealed moment can be played again against Maia from the move before it, at the opponent\'s band', async () => {
+    expect([nearestBand(1150), nearestBand(1250), nearestBand(1610), nearestBand(2100), nearestBand(undefined)]).toEqual([1100, 1300, 1700, 1900, 1100]);
+    await db.reviews.put(reviewOf('b'));
+    const requests: SparRequest[] = [];
+    const view = render(
+      <EngineContext.Provider value={fakeClient('forbidden').client}>
+        <GameReviewPanel game={game('b', 2)} currentPly={0} onShowPly={() => undefined} onSpar={(r) => requests.push(r)} />
+      </EngineContext.Provider>
+    );
+    await waitFor(() => expect(view.container.querySelector('[data-review-moment="6"]')).toBeTruthy());
+    fireEvent.click(view.container.querySelector('[data-review-moment="6"] [data-action="review-spar"]')!);
+    expect(requests).toEqual([
+      {
+        lessonId: 'review:b',
+        title: 'Your game vs Itilogic, move 4',
+        initialFen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
+        movesSan: MOVES.slice(0, 6),
+        studentColor: 'w',
+        elo: 1100,
+        milestones: [],
+      },
+    ]);
   });
 
   it('a game with a batch review still asks for the marks first, then shows the batch review without running the engine', async () => {

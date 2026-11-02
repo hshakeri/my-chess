@@ -62,7 +62,9 @@ export const SparPanel: React.FC<SparPanelProps> = ({ request, startFen, moves, 
   return (
     <section data-section="spar" data-spar-moves={ownMoves} className="rounded-xl border border-sky-500/40 bg-sky-950/30 p-4 text-sm text-slate-200 space-y-3">
       <div>
-        <div className="text-xs font-semibold uppercase tracking-wide text-sky-300">Spar from a lesson</div>
+        <div className="text-xs font-semibold uppercase tracking-wide text-sky-300">
+          {request.lessonId.startsWith('review:') ? 'Play on from your game' : 'Spar from a lesson'}
+        </div>
         <div className="font-bold text-white">{request.title}</div>
         <div className="text-xs text-slate-400">
           You have {side} against Maia {request.elo}, without the opening book. Your moves: {Math.min(ownMoves, SPAR_MOVES)} of {SPAR_MOVES}

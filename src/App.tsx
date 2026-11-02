@@ -765,7 +765,7 @@ export const App: React.FC = () => {
         )}
 
         {/* Tab 2: Game Database */}
-        {activeTab === 'database' && <DatabaseView />}
+        {activeTab === 'database' && <DatabaseView onSpar={startSpar} />}
 
         {/* Tab 3: Opening Diagnostics */}
         {activeTab === 'diagnostics' && (

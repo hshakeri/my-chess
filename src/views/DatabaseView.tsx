@@ -27,10 +27,16 @@ import type { StoredGame, GameFilter } from '../types/db';
 import { ChessPiece } from '../components/ChessPiece';
 import { GameReviewPanel } from './GameReviewPanel';
 import seedGamesRaw from '../data/seed_hoot65_games.json';
+import type { SparRequest } from '../services/sparLog';
 
 const seedGames = seedGamesRaw as unknown as StoredGame[];
 
-export const DatabaseView: React.FC = () => {
+interface DatabaseViewProps {
+  /** Play a reviewed game's critical moment on against Maia (handed to the game review). */
+  onSpar?: (request: SparRequest) => void;
+}
+
+export const DatabaseView: React.FC<DatabaseViewProps> = ({ onSpar }) => {
   const [games, setGames] = useState<StoredGame[]>([]);
   const [loading, setLoading] = useState(true);
   const [totalDbCount, setTotalDbCount] = useState(0);
@@ -711,6 +717,7 @@ export const DatabaseView: React.FC = () => {
         <GameReplayModal
           game={selectedGame}
           onClose={() => setSelectedGame(null)}
+          onSpar={onSpar}
         />
       )}
 
@@ -764,9 +771,10 @@ export const DatabaseView: React.FC = () => {
 interface GameReplayModalProps {
   game: StoredGame;
   onClose: () => void;
+  onSpar?: (request: SparRequest) => void;
 }
 
-const GameReplayModal: React.FC<GameReplayModalProps> = ({ game, onClose }) => {
+const GameReplayModal: React.FC<GameReplayModalProps> = ({ game, onClose, onSpar }) => {
   const [currentPly, setCurrentPly] = useState(0);
   const [orientation, setOrientation] = useState<'white' | 'black'>(
     game.userColor === 'black' ? 'black' : 'white'
@@ -1089,7 +1097,7 @@ const GameReplayModal: React.FC<GameReplayModalProps> = ({ game, onClose }) => {
           </div>
 
           {/* Post-game review (CL-3) */}
-          <GameReviewPanel game={game} currentPly={currentPly} onShowPly={setCurrentPly} />
+          <GameReviewPanel game={game} currentPly={currentPly} onShowPly={setCurrentPly} onSpar={onSpar} />
         </div>
       </div>
     </div>

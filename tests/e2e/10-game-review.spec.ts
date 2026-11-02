@@ -54,5 +54,18 @@ test.describe('10. Post-game review (CL-3)', () => {
     await page.locator('[data-tab="lessons"]').click();
     await page.locator('button[data-action="review-due"]').click();
     await expect(page.locator('h3').first()).toContainText('Your game vs chestrine2, move');
+
+    // A moment can be played again against Maia, from the move before it, on the Play tab
+    await page.locator('[data-tab="database"]').click();
+    await row.scrollIntoViewIfNeeded();
+    await row.click();
+    await expect(panel).toHaveAttribute('data-review-phase', 'revealed');
+    await panel.locator('[data-review-moment="45"] [data-action="review-spar"]').click();
+    const spar = page.locator('[data-section="spar"]');
+    await expect(spar).toBeVisible();
+    await expect(spar).toContainText('Your game vs chestrine2, move 23');
+    await expect(spar).toContainText('Play on from your game');
+    await expect(spar).toContainText('You have Black against Maia 1100');
+    await expect(page.getByText('45 plies')).toBeVisible();
   });
 });

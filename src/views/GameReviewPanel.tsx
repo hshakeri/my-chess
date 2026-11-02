@@ -7,6 +7,8 @@ import type { ReviewProgress } from '../engine/worker/engineClient';
 import { useEngineClient } from '../engine/EngineContext';
 import type { StoredGame } from '../types/db';
 import type { CriticalMoment, GameReview, StudentMark } from '../types/review';
+import type { SparRequest } from '../services/sparLog';
+import type { HumanElo } from '../types/engine';
 
 /** At most this many moves can be marked before the engine's review is shown. */
 const MAX_MARKS = 3;
@@ -16,7 +18,15 @@ interface GameReviewPanelProps {
   /** The position on the replay board: the number of moves played to reach it. */
   currentPly: number;
   onShowPly: (ply: number) => void;
+  /** Play a critical moment's position on against Maia on the Play tab (CL-6). */
+  onSpar?: (request: SparRequest) => void;
 }
+
+const START_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
+const BANDS: HumanElo[] = [1100, 1300, 1500, 1700, 1900];
+/** The Maia band nearest the opponent's rating (the app's bands run from 1100 to 1900). */
+export const nearestBand = (rating: number | undefined): HumanElo =>
+  BANDS.reduce((best, b) => (Math.abs(b - (rating ?? 1100)) < Math.abs(best - (rating ?? 1100)) ? b : best), BANDS[0]);
 
 type Phase = 'loading' | 'idle' | 'marking' | 'revealed';
 type Run = { result: Promise<GameReview | null>; cancel: () => void };
@@ -36,7 +46,7 @@ const stageText: Record<ReviewProgress['stage'], string> = {
  * critical moments are shown beside the marks, and every mistake with a material answer becomes a
  * review card for Today's session.
  */
-export const GameReviewPanel: React.FC<GameReviewPanelProps> = ({ game, currentPly, onShowPly }) => {
+export const GameReviewPanel: React.FC<GameReviewPanelProps> = ({ game, currentPly, onShowPly, onSpar }) => {
   // The app's one engine worker, so a review does not load the Maia model a second time
   const engineClient = useEngineClient();
   const userColor: 'white' | 'black' = game.userColor === 'black' ? 'black' : 'white';
@@ -251,11 +261,32 @@ export const GameReviewPanel: React.FC<GameReviewPanelProps> = ({ game, currentP
         )}
         <li className="text-slate-400 italic">{MISTAKE_CHECK[m.type]}</li>
       </ul>
-      <div className="mt-1.5 text-xs" data-review-marked={mark ? 'yes' : 'no'}>
+      <div className="mt-1.5 text-xs flex flex-wrap items-center justify-between gap-2" data-review-marked={mark ? 'yes' : 'no'}>
         {mark ? (
           <span className="text-emerald-300">You marked it{mark.reason ? `: "${mark.reason}"` : '.'}</span>
         ) : (
           <span className="text-slate-500">You did not mark this move.</span>
+        )}
+        {onSpar && (
+          <button
+            type="button"
+            data-action="review-spar"
+            onClick={() =>
+              onSpar({
+                lessonId: `review:${game.id}`,
+                title: `Your game vs ${opponent}, move ${Math.floor(m.ply / 2) + 1}`,
+                initialFen: START_FEN,
+                movesSan: game.movesSan.slice(0, m.ply),
+                studentColor: userColor === 'white' ? 'w' : 'b',
+                elo: nearestBand(userColor === 'white' ? game.black.rating : game.white.rating),
+                milestones: [],
+              })
+            }
+            className="px-2 py-1 rounded bg-sky-800 hover:bg-sky-700 text-white"
+            title="Play this position again against Maia, from the move before the mistake"
+          >
+            Play it again vs Maia
+          </button>
         )}
       </div>
     </li>
