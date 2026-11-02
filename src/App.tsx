@@ -261,6 +261,9 @@ export const App: React.FC = () => {
         ...(spar ? { options: { enableOpeningBook: false, thinkingTimeMs: 300 } } : {}),
       });
 
+      // A takeback, a new game or a loaded position while the engine thought: its move is for a position
+      // that is gone, so it is dropped
+      if (rulesRef.current !== game || game.getFen() !== fen) return;
       if (response && response.bestMoveSan) {
         const moveRes = game.makeMove(response.bestMoveSan);
         if (moveRes.success) {
@@ -707,7 +710,7 @@ export const App: React.FC = () => {
                   onNavigateNext={handleNavigateNext}
                   onNavigateEnd={handleNavigateEnd}
                   onTakeback={handleTakeback}
-                  canTakeback={history.length > 0 && !isThinking}
+                  canTakeback={history.length > 0}
                   onNewGame={handleNewGame}
                   onOpenPositionSetup={() => setIsSetupOpen(true)}
                   onExportPgn={handleExportPgn}
