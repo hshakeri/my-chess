@@ -1103,7 +1103,8 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
       {/* Header Banner */}
       <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-lg flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2 mb-1 flex-wrap">
+          {/* The badges and the description stay off small screens, so the board comes up sooner */}
+          <div className="hidden sm:flex items-center gap-2 mb-1 flex-wrap">
             <span className="px-2 py-0.5 rounded text-[11px] font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 uppercase tracking-wider">
               Lichess-Inspired Interactive Drills
             </span>
@@ -1115,7 +1116,7 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
             <BookOpen className="w-5 h-5 text-emerald-400" />
             Interactive Repertoire & Curriculum Lessons
           </h2>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="hidden sm:block text-xs text-slate-400 mt-1">
             Step-by-step lessons distilled from the local chess books, with specific feedback on mistakes, the refutation
             played out on the board, and review scheduling driven by how the drill actually went.
           </p>
