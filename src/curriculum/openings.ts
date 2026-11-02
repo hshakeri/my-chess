@@ -357,6 +357,73 @@ export const evansGambitDestruction: CurriculumLesson = buildVerifiedLesson({
             hintTheme: 'King safety first',
           },
         ],
+        // Stockfish 19 at depth 20-22: 4.O-O +0.37 (4.d4 +0.39, 4.c3 +0.43); after 4...Bg4, 5.h3 +0.53 and
+        // 5.Re1 +0.16, after which 5...Nd4 leaves 6.Be2 (+0.20) as the only move that holds
+        d6: [
+          {
+            san: 'O-O',
+            isUserMove: true,
+            frequency: 4,
+            annotation: '3...d6 blocks the f8 bishop\'s diagonal: it can only come out to e7. Castle, as you did in three of your four games with 3...d6.',
+            wrongMoveFeedback: {
+              d4: '4.d4 is as good (Stockfish rates it about the same). This lesson castles first, as you do.',
+              c3: '4.c3 is as good (Stockfish rates it about the same). This lesson castles first, as you do.',
+            },
+          },
+          {
+            san: 'Bg4',
+            isUserMove: false,
+            // After 4.O-O: ...Bg4 2, ...Be6 1.
+            frequency: 2,
+            annotation: 'The bishop pins the f3 knight to your queen. Nothing defends it on g4.',
+            alternatives: {
+              Be6: [
+                {
+                  san: 'Bxe6',
+                  isUserMove: true,
+                  frequency: 1,
+                  annotation: 'Trade the bishops, as in your game: after ...fxe6 Black has two pawns on the e-file.',
+                },
+                { san: 'fxe6', isUserMove: false },
+                {
+                  san: 'd4',
+                  isUserMove: true,
+                  annotation: 'Open the centre: Black has only the c6 knight out, and the king is still on e8.',
+                  accept: { san: ['c3'] },
+                },
+              ],
+            },
+          },
+          {
+            san: 'h3',
+            isUserMove: true,
+            annotation: 'Ask the bishop at once: it takes on f3, keeps the pin from h5, or goes back.',
+            hintTheme: 'Ask the pinning bishop',
+            wrongMoveFeedback: {
+              Re1: '5.Re1?! was your move in both of these games, and you lost both. After 5...Nd4 the knight and the bishop both hit f3, and only 6.Be2 holds: 6.Re3? Bxf3 7.Rxf3 Nxf3+ loses the exchange, and 6.c3? Nxf3+ 7.gxf3 Bh3 breaks open your king. Ask the bishop first.',
+            },
+          },
+          {
+            san: 'Bh5',
+            isUserMove: false,
+            annotation: 'The bishop keeps the pin.',
+            alternatives: {
+              Bxf3: [
+                {
+                  san: 'Qxf3',
+                  isUserMove: true,
+                  annotation: 'Take back with the queen: with the c4 bishop it threatens Qxf7#, and you keep the two bishops.',
+                },
+              ],
+            },
+          },
+          {
+            san: 'c3',
+            isUserMove: true,
+            annotation: 'Prepare d4, with the c3 pawn to support it. Stockfish rates 6.Nc3 about the same.',
+            accept: { san: ['Nc3'] },
+          },
+        ],
       },
     },
     {
@@ -542,6 +609,18 @@ export const evansGambitDestruction: CurriculumLesson = buildVerifiedLesson({
       solutionSan: ['dxc5'],
       explanation:
         '5.dxc5 wins a whole bishop: the d4 pawn attacks c5 and no black piece can take back on c5. Against 3...h6 the d4 pawn arrives before Black\'s bishop does, so the usual ...Bc5 is no longer available.',
+    },
+    {
+      id: 'ex-italian-d6-two-on-f3',
+      title: 'Two Pieces on f3',
+      // 1.e4 e5 2.Nf3 Nc6 3.Bc4 d6 4.O-O Bg4 5.Re1 Nd4
+      fen: 'r2qkbnr/ppp2ppp/3p4/4p3/2BnP1b1/5N2/PPPP1PPP/RNBQR1K1 w kq - 4 6',
+      turn: 'w',
+      difficultyRating: 2,
+      prompt: 'White to play. After 5.Re1 Nd4 the knight and the bishop both hit your f3 knight. Which move holds?',
+      solutionSan: ['Be2', 'Nxe2+', 'Qxe2'],
+      explanation:
+        '6.Be2! lets the bishop take back on f3, so your g-pawn stays home: 6...Nxf3+ 7.Bxf3, or 6...Nxe2+ 7.Qxe2, and the game is level (Stockfish +0.2). 6.Re3? Bxf3 7.Rxf3 Nxf3+ 8.Qxf3 loses the exchange; 6.c3? or 6.h3? Nxf3+ 7.gxf3 breaks open your king (after 6.h3, 7...Bxh3 also takes a pawn); and 6.Nxd4?? Bxd1 loses the queen.',
     },
     {
       id: 'ex-two-knights-e4-guard',
