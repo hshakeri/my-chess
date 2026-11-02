@@ -790,9 +790,26 @@ export const caroKannClassicalLesson: CurriculumLesson = buildVerifiedLesson({
       alternatives: {
         Ng5: [
           {
+            san: 'h6',
+            isUserMove: true,
+            annotation: 'Ask the g5 knight where it is going. If it takes on f7, the king takes it back and Black is a piece for a pawn up.',
+            hintTheme: 'Kick the knight',
+            wrongMoveFeedback: {
+              e6: '5...e6 is sound too. 5...h6 asks the knight a question at once, and Maia expects two players in three at your level to answer 6.Nxf7?, which loses a piece for a pawn.',
+            },
+          },
+          {
+            san: 'N5f3',
+            isUserMove: false,
+            annotation: 'The knight goes back.',
+            alternatives: {
+              Nxf7: [{ san: 'Kxf7', isUserMove: true, annotation: 'Take the knight: Black is a piece for a pawn up.' }],
+            },
+          },
+          {
             san: 'e6',
             isUserMove: true,
-            annotation: 'Take e6 away from the g5 knight and open the f8 bishop. The c8 bishop is already outside the chain.',
+            annotation: 'Now the wall: ...e6 opens the f8 bishop, and the c8 bishop is already outside the chain.',
           },
         ],
       },

@@ -224,6 +224,20 @@ describe('Opening study order: the facts the lessons state', () => {
     expect(c3.attackers('d4' as Square, 'b')).toEqual([]);
   });
 
+  it('the practical traps: 4.dxc5 Nxe4? 5.Qa4+ in the Alapin, and 5.Ng5 h6 6.Nxf7? Kxf7 in the Classical', () => {
+    const material = (c: ReturnType<typeof play>) =>
+      c.board().flat().reduce((n, p) => n + (p ? (p.color === 'w' ? 1 : -1) * ({ p: 1, n: 3, b: 3, r: 5, q: 9, k: 0 } as const)[p.type] : 0), 0);
+    const check = play('e4 c5 c3 d6 d4 Nf6 dxc5 Nxe4 Qa4+');
+    expect(check.inCheck()).toBe(true);
+    expect(check.attackers('e4' as Square, 'w')).toEqual(['a4']);
+    expect(material(play('e4 c5 c3 d6 d4 Nf6 dxc5 Nxe4 Qa4+ Nc6 Qxe4'))).toBe(3);
+    // 4...dxc5 5.Qxd8+: the king must take, and castling is gone
+    expect(play('e4 c5 c3 d6 d4 Nf6 dxc5 dxc5 Qxd8+').moves()).toEqual(['Kxd8']);
+    expect(play('e4 c5 c3 d6 d4 Nf6 dxc5 dxc5 Qxd8+ Kxd8').fen().split(' ')[2]).not.toMatch(/[kq]/);
+    // The Classical: 6.Nxf7 Kxf7 leaves Black a piece for a pawn up
+    expect(material(play('e4 c6 d4 d5 Nc3 dxe4 Nxe4 Bf5 Ng5 h6 Nxf7 Kxf7'))).toBe(-2);
+  });
+
   it('Evans, Compromised Defence: 9.Bg5 attacks the queen, and after 10.Nxc3 Black is two pawns up with three pieces out to five', () => {
     const line = 'e4 e5 Nf3 Nc6 Bc4 Bc5 b4 Bxb4 c3 Bc5 d4 exd4 O-O dxc3 Qb3 Qf6 Bg5';
     expect(play(line).attackers('f6' as Square, 'w')).toEqual(['g5']);

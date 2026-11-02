@@ -63,8 +63,12 @@ app build. The results and what they mean are in `docs/game-analysis.md`.
    replies Maia expects from players of hoot65's rating (each reply weighted by Maia's share and
    scored by Stockfish, as centipawns and as an expected score on the Lichess curve). A lesson move
    is replaced when another move is clearly better against best play and no worse, within two
-   points of expected score, against the likely replies. `sf-lines.mjs` prints Stockfish's
-   best lines for a list of positions and `maia-policy.mjs` Maia's move shares.
+   points of expected score, against the likely replies; or, as a second rule, when it scores at
+   least five points better against the likely replies and no more than 0.3 pawns worse against best
+   play (a sound move that sets a trap most opponents fall into). `practical-audit.mjs` runs both
+   tests on every decision of the opening lessons (`npx tsx scripts/export-decisions.ts` writes them
+   out) against Stockfish's two best other moves. `sf-lines.mjs` prints Stockfish's best lines for a
+   list of positions and `maia-policy.mjs` Maia's move shares.
 
 Weights: a game's weight halves every 180 days (`HALF_LIFE` environment variable).
 Ratings: Maia is trained on Lichess games, so Chess.com ratings get +400 before they reach Maia

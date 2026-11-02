@@ -149,17 +149,37 @@ export const alapinSicilianCentre: CurriculumLesson = buildVerifiedLesson({
       alternatives: {
         Nf6: [
           {
-            san: 'Bd3',
+            san: 'dxc5',
             isUserMove: true,
-            annotation: 'Black hits e4 before taking. Guard it with the bishop, which develops at the same time.',
-            hintTheme: 'Guard e4 with a developing move',
+            annotation:
+              'Black hits e4 before taking. Take on c5 first: if the knight now takes on e4, 5.Qa4+ checks the king and hits the knight along the fourth rank.',
+            hintTheme: 'Set a trap on the fourth rank',
+            wrongMoveFeedback: {
+              Bd3: '4.Bd3 guards e4 and is sound. 4.dxc5 asks a question first: Maia expects two players in three at your level to answer 4...Nxe4?, and 5.Qa4+ wins the knight.',
+            },
           },
-          { san: 'cxd4', isUserMove: false },
           {
-            san: 'cxd4',
-            isUserMove: true,
-            annotation: 'Recapture with the pawn. White has pawns on d4 and e4, and the d3 bishop guards e4.',
+            san: 'Nxe4',
+            isUserMove: false,
+            annotation: 'The knight takes the e4 pawn.',
+            alternatives: {
+              dxc5: [
+                {
+                  san: 'Qxd8+',
+                  isUserMove: true,
+                  annotation: 'Trade queens with check: the black king has to take back and can no longer castle.',
+                },
+              ],
+            },
           },
+          {
+            san: 'Qa4+',
+            isUserMove: true,
+            annotation: 'Check, and along the fourth rank the queen also attacks the knight on e4.',
+            hintTheme: 'A check that attacks something else',
+          },
+          { san: 'Nc6', isUserMove: false },
+          { san: 'Qxe4', isUserMove: true, annotation: 'The knight falls: White is a piece up.' },
         ],
       },
     },
