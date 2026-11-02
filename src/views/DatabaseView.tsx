@@ -544,7 +544,9 @@ export const DatabaseView: React.FC<DatabaseViewProps> = ({ onSpar, openGame }) 
                   const opponentName = isUserWhite ? game.black.name : game.white.name;
                   const opponentRating = isUserWhite ? game.black.rating : game.white.rating;
                   const userRating = isUserWhite ? game.white.rating : game.black.rating;
-                  const dateStr = game.timestamp ? DATE_FORMAT.format(game.timestamp) : 'Unknown';
+                  // A restored backup can hold a timestamp that is no date, which the formatter refuses
+                  const played = new Date(game.timestamp);
+                  const dateStr = game.timestamp && !Number.isNaN(played.getTime()) ? DATE_FORMAT.format(played) : 'Unknown';
 
                   return (
                     <tr

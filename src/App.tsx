@@ -216,7 +216,8 @@ export const App: React.FC = () => {
       return false;
     }
   });
-  const [playGate, setPlayGate] = useState<{ question: MicroQuestion; fen: string; picked: string[]; status: QuestionStatus; askedAt: number; ply: number } | null>(null);
+  // Kept for one position of one game: a new game, a loaded position or a takeback that Maia answers differently asks again
+  const [playGate, setPlayGate] = useState<{ question: MicroQuestion; fen: string; picked: string[]; status: QuestionStatus; askedAt: number; ply: number; game: number } | null>(null);
   // Habit 1 in games: before each of the student's moves is played, is it safe? (Nothing left to take, no mate in one)
   const [safetyOn, setSafetyOn] = useState<boolean>(() => {
     try {
@@ -355,18 +356,19 @@ export const App: React.FC = () => {
     if (currentPly !== history.length || history.length === 0) return;
     const game = rulesRef.current;
     if (game.isGameOver() || game.getTurn() === engineColor) return;
-    if (playGate && playGate.ply === history.length) return;
+    if (playGate && playGate.ply === history.length && playGate.game === clockKey && playGate.fen === game.getFen()) return;
     const last = history[history.length - 1];
     const fenBefore = history.length >= 2 ? history[history.length - 2].fenAfter : game.getInitialFen();
     try {
-      setPlayGate({ question: questionBeforeDecision(game.getFen(), { fenBefore, san: last.san }), fen: game.getFen(), picked: [], status: 'asking', askedAt: Date.now(), ply: history.length });
+      setPlayGate({ question: questionBeforeDecision(game.getFen(), { fenBefore, san: last.san }), fen: game.getFen(), picked: [], status: 'asking', askedAt: Date.now(), ply: history.length, game: clockKey });
     } catch (err) {
       console.warn('No board question for this position:', err);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [playGateOn, activeTab, engineColor, flagged, currentPly, history.length]);
+  }, [playGateOn, activeTab, engineColor, flagged, currentPly, history.length, clockKey]);
 
-  const playGateHere = playGate && playGate.ply === history.length ? playGate : null;
+  const playGateHere =
+    playGate && playGate.ply === history.length && playGate.game === clockKey && playGate.fen === rulesRef.current.getFen() ? playGate : null;
   const playGateAsking = !!playGateHere && playGateHere.status === 'asking';
   const pickPlayGateSquare = useCallback((square: Square) => {
     setPlayGate((g) => (g && g.status === 'asking' ? { ...g, picked: g.picked.includes(square) ? g.picked.filter((x) => x !== square) : [...g.picked, square] } : g));
@@ -448,7 +450,10 @@ export const App: React.FC = () => {
     playMove(move);
   };
 
-  const safetyHere = safety && safety.ply === history.length && safety.game === clockKey && !flagged ? safety : null;
+  const safetyHere =
+    safety && safety.ply === history.length && safety.game === clockKey && safety.fen === rulesRef.current.getFen() && !flagged ? safety : null;
+  // A takeback, a move or a new game ends the check: its question and verdict were for the position before
+  useEffect(() => setSafety(null), [history.length, clockKey]);
   const safetyWaiting = !!safetyHere && !safetyHere.settled;
   const submitSafety = (answer: QuestionAnswer) => {
     if (!safetyHere || safetyHere.answer !== undefined || typeof answer !== 'boolean') return;

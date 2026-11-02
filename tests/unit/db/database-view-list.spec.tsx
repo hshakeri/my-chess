@@ -46,6 +46,14 @@ describe('Games tab on a big archive', () => {
     expect(container.querySelector('[data-stat="filtered-games"]')?.textContent).toBe('62');
   });
 
+  it('a restored game whose timestamp is no date shows "Unknown" instead of emptying the list', async () => {
+    await db.games.put({ ...game(9999), id: 'upload:bad-date', timestamp: 'not a date' as unknown as number });
+    const { container } = render(<DatabaseView />);
+    await waitFor(() => expect(container.querySelector('tr[data-game-id="upload:bad-date"]')).not.toBeNull());
+    expect(container.querySelector('tr[data-game-id="upload:bad-date"]')?.textContent).toContain('Unknown');
+    expect(container.querySelectorAll('tr.game-row').length).toBe(ROWS_AT_ONCE);
+  });
+
   it('filters a list in memory exactly as the stored-games filter does', () => {
     const list = Array.from({ length: 30 }, (_, k) => ({ ...game(k), userColor: k % 2 ? 'black' : 'white', userResult: k % 3 ? 'loss' : 'win' }) as StoredGame);
     expect(filterGameList(list, { color: 'black' }).every((g) => g.userColor === 'black')).toBe(true);

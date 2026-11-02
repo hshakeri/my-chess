@@ -56,7 +56,7 @@ export interface CctSourceStats {
   source: CctEvent['source'];
   n: number;
   correct: number;
-  /** Share right over the newest 20 answers, and over the 20 before them (null when there are none). */
+  /** Share right over the newest 20 answers, and over the 20 before them (null until there are 40 answers). */
   recent: number | null;
   before: number | null;
 }
@@ -72,7 +72,7 @@ export function cctBySource(events: CctEvent[]): CctSourceStats[] {
         n: mine.length,
         correct: mine.filter((e) => e.correct).length,
         recent: share(mine.slice(-20)),
-        before: share(mine.slice(-40, -20)),
+        before: mine.length >= 40 ? share(mine.slice(-40, -20)) : null,
       };
     })
     .filter((row) => row.n > 0);

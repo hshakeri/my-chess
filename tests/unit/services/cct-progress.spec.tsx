@@ -28,4 +28,13 @@ describe('Board questions in Progress (CL-5)', () => {
     expect(view.container.querySelector('[data-cct-source="play"]')?.textContent).toBe('Board questions in games: 3 answered, 67% right.');
     expect(view.container.querySelector('[data-cct-source="warmup"]')).toBeNull();
   });
+
+  it('compares with the 20 before only once there are 20 before', () => {
+    // 21 answers in games: the oldest wrong, the newest 20 right. One answer is not "the 20 before"
+    const events = [event(0, 'play', false), ...Array.from({ length: 20 }, (_, k) => event(10 + k, 'play', true))];
+    const [row] = cctBySource(events);
+    expect([row.n, row.recent, row.before]).toEqual([21, 1, null]);
+    const view = render(<BoardQuestionLines rows={[row]} />);
+    expect(view.container.querySelector('[data-cct-source="play"]')?.textContent).toBe('Board questions in games: 21 answered, 95% right.');
+  });
 });

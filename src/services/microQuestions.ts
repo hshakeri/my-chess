@@ -129,6 +129,8 @@ export function isMoveSafe(fen: string, san: string): MoveSafety {
   const mates = after.moves().filter((m) => m.endsWith('#'));
   if (mates.length) return { safe: false, reason: `After ${move.san} the opponent mates with ${mates[0]}.`, refutation: mates[0] };
   const { loses, refutation } = losesMaterial(fen, move.san);
+  // The search scores a stalemate as a draw: a loss for the side that was ahead, with no reply to name
+  if (loses && after.isStalemate()) return { safe: false, reason: `After ${move.san} it is stalemate: the game is a draw.` };
   if (loses) {
     // Name the piece when the winning reply takes one at once; otherwise the reply that starts it
     const target = refutation?.includes('x') ? (refutation.match(/[a-h][1-8]/g) || []).pop() : undefined;

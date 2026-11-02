@@ -74,6 +74,12 @@ describe('microQuestions: board questions with answers from chess.js (CL-5)', ()
     expect(isMoveSafe(after('e4', 'e5', 'Nf3', 'Qh4'), 'd3').safe).toBe(true);
   });
 
+  it('a stalemate when ahead is not safe, and says so', () => {
+    expect(isMoveSafe('k7/8/1K6/8/8/8/8/2Q5 w - - 0 1', 'Qc7')).toEqual({ safe: false, reason: 'After Qc7 it is stalemate: the game is a draw.' });
+    // The mate next to it is fine
+    expect(isMoveSafe('k7/8/1K6/8/8/8/8/2Q5 w - - 0 1', 'Qc8+').safe).toBe(true);
+  });
+
   it('a search past its node budget gives no answer, and the searches after it are whole again', () => {
     const exchange = after('e4', 'e5', 'Nf3', 'Nc6', 'Bb5', 'a6');
     expect(withinNodes(20, () => isMoveSafe(exchange, 'Bxc6'))).toBeUndefined();
