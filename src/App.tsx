@@ -776,6 +776,7 @@ export const App: React.FC = () => {
             onPracticeDeviation={handlePracticeDeviation}
             onAdoptRepertoire={handleAdoptRepertoire}
             adoptedRepertoireIds={adoptedRepertoireIds}
+            onSpar={startSpar}
           />
         )}
 

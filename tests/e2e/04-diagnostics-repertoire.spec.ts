@@ -158,5 +158,17 @@ test.describe('04. Personalized Diagnostics & Repertoire Recommendation (F13 - F
     await expect(clock.locator('[data-pace-move]')).toHaveCount(4);
     await expect(clock.locator('[data-lost-ahead]')).toHaveCount(5);
     await expect(clock.locator('[data-section="clock-advice"]')).toContainText('cap a think at 30 seconds');
+    // How the games end: 89 resignations, 38 with less than a rook down and no mate in one coming; the newest can be played on against Maia
+    const endings = page.locator('[data-section="endings"]');
+    await expect(endings).toHaveAttribute('data-resigned', '89');
+    await expect(endings).toHaveAttribute('data-resigned-early', '38');
+    // All 301 games here: the 26th time loss is the one 3+2 game, which the clock section leaves out
+    await expect(endings.locator('[data-ending="loss-time"]')).toHaveAttribute('data-count', '26');
+    await expect(endings.locator('[data-resigned-early]')).toHaveCount(10);
+    await endings.locator('[data-resigned-early] [data-action="ending-spar"]').first().click();
+    const spar = page.locator('[data-section="spar"]');
+    await expect(spar).toBeVisible();
+    await expect(spar).toContainText('Play on from your game');
+    await expect(spar).toContainText('play on from the end');
   });
 });

@@ -36,6 +36,7 @@ import { Chessboard, BoardArrow } from '../components/Chessboard';
 import { RulesEngine } from '../engine/rules';
 import { MistakePatternsPanel } from './MistakePatternsPanel';
 import { ClockPanel } from './ClockPanel';
+import type { SparRequest } from '../services/sparLog';
 
 interface DiagnosticsViewProps {
   /** The games to analyze (the live IndexedDB archive in the app). */
@@ -48,6 +49,8 @@ interface DiagnosticsViewProps {
   /** Adopt a repertoire plan as the active study plan. */
   onAdoptRepertoire?: (plan: RepertoirePlan) => void;
   adoptedRepertoireIds?: string[];
+  /** Play a game's final position on against Maia (the endings list). */
+  onSpar?: (request: SparRequest) => void;
 }
 
 const EMPTY_GAMES: StoredGame[] = [];
@@ -93,6 +96,7 @@ export const DiagnosticsView: React.FC<DiagnosticsViewProps> = ({
   onPracticeDeviation,
   onAdoptRepertoire,
   adoptedRepertoireIds = [],
+  onSpar,
 }) => {
   const [activeTab, setActiveTab] = useState<'leaks' | 'repertoires' | 'openings' | 'mistakes' | 'clock'>('leaks');
   const [leakFilter, setLeakFilter] = useState<'all' | 'white' | 'black' | string>('all');
@@ -330,7 +334,7 @@ export const DiagnosticsView: React.FC<DiagnosticsViewProps> = ({
           }`}
         >
           <Timer className="w-4 h-4 text-sky-400" />
-          Your Clock
+          Clock & Endings
         </button>
       </div>
 
@@ -338,7 +342,7 @@ export const DiagnosticsView: React.FC<DiagnosticsViewProps> = ({
       {activeTab === 'mistakes' && <MistakePatternsPanel games={games} />}
 
       {/* Your clock (DC-3) */}
-      {activeTab === 'clock' && <ClockPanel games={games} />}
+      {activeTab === 'clock' && <ClockPanel games={games} onSpar={onSpar} />}
 
       {/* 3. Leaks Tab */}
       {activeTab === 'leaks' && (

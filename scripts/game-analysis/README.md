@@ -69,6 +69,11 @@ app build. The results and what they mean are in `docs/game-analysis.md`.
    tests on every decision of the opening lessons (`npx tsx scripts/export-decisions.ts` writes them
    out) against Stockfish's two best other moves. `sf-lines.mjs` prints Stockfish's best lines for a
    list of positions and `maia-policy.mjs` Maia's move shares.
+10. **King and pawn against king** (`kpk-solve.mjs`): an exact retrograde solver of the ending (White
+   has the pawn), with Stockfish's bitbase rule for a safe promotion. `solve()` returns, for every
+   position and side to move, whether White wins and in how many plies with best play (White
+   fastest, Black slowest); everything not proved won is a draw. It runs in under a second and is
+   used to check the archive's king-and-pawn endings and any lesson position of that ending.
 
 Weights: a game's weight halves every 180 days (`HALF_LIFE` environment variable).
 Ratings: Maia is trained on Lichess games, so Chess.com ratings get +400 before they reach Maia

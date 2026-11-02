@@ -102,6 +102,23 @@ position in the last year is worth even 0.005 points per game: the moves played 
 as Maia's likely alternatives for players of this rating. The openings cost time instead (24
 seconds more than the opponents by move 10), which is what the lessons can save.
 
+**How the games end (checked 2026-11-02).** In the 301 seed games of 2026, hoot65 resigned 89
+times, 42 of them with less than a rook's worth of material down on the board. Stockfish 19
+(depth 16) calls 41 of those 42 positions lost: 34 at five pawns or worse and 7 with a forced mate
+against, 4 of them mate in one. Maia's value head, at the two players' ratings, still gives hoot65
+a mean expected score of 16% in them (median 13%), close to the archive's 17%: the case for
+playing on is practical, not objective, since the opponent still has to win the game. The four
+mate-in-one positions are left out of the Diagnostics list (`src/analytics/endings.ts`). Over the
+whole archive, 24 games ended in stalemate, 20 of them with hoot65 three points or more ahead and 22
+of them by hoot65's own move; none since 2024-11.
+
+**King and pawn against king.** An exact retrograde solver of the ending
+(`scripts/game-analysis/kpk-solve.mjs`) checked the 15 archive games in which hoot65 had a lone
+pawn against a lone king: 13 were won positions when the ending arose and hoot65 won 6 of them.
+Four of the other seven ended in stalemate after the pawn promoted, and three lost the win with a
+wrong king or pawn move. The ending is rare (about one game in 270), so it ranks below the board
+checks.
+
 ## The lesson order
 
 The default lesson list ("My Lessons"), the phone picker and Part I of the lesson book follow
