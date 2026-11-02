@@ -74,6 +74,21 @@ app build. The results and what they mean are in `docs/game-analysis.md`.
    position and side to move, whether White wins and in how many plies with best play (White
    fastest, Black slowest); everything not proved won is a draw. It runs in under a second and is
    used to check the archive's king-and-pawn endings and any lesson position of that ending.
+11. **Tactics deck** (`tactics.mjs`, `tactics-pick.mjs`): `node tactics.mjs scan <out.json> [max]
+   [depth]` takes every position right after a move that cost its player 0.3 or more of Maia's
+   expected score (either player, the other one not already clearly winning before it), newest game
+   first, and keeps those where Stockfish's best move wins at least 2.5 pawns (or mates in three or
+   fewer) and the second best is at least 2 pawns worse; it tags each by motif (a piece to take, a
+   fork, a check, a promotion, a mate, or a combination). `node tactics-pick.mjs <scan.json>
+   <src/data/tactics_deck.json> [depth]` leaves out plain recaptures, positions with two legal moves
+   or fewer and the ones Maia's players find nine times in ten, keeps one per game and a capped number
+   per motif, checks each again deeper, and orders the deck along the study path (pieces to take and
+   mates in one first).
+12. **Opening book** (`opening-book.mjs`): `node opening-book.mjs games.jsonl
+   ../../src/data/openingBook.json [min] [plies]` rebuilds the book Maia plays from on the Play tab
+   out of the archive: every position of the first 16 plies where the opponent was to move and that
+   came up 10 times or more, with the opponents' replies as shares (a game's weight halves every
+   year; a reply needs two games and 2%).
 
 Weights: a game's weight halves every 180 days (`HALF_LIFE` environment variable).
 Ratings: Maia is trained on Lichess games, so Chess.com ratings get +400 before they reach Maia

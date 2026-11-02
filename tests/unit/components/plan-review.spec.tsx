@@ -4,7 +4,7 @@ import { render, fireEvent, cleanup } from '@testing-library/react';
 import { Chess } from 'chess.js';
 import { allCurriculumLessons } from '../../../src/curriculum';
 import { patternPath } from '../../../src/curriculum/patternPath';
-import { dueIdeas, gradeIdea, ideaLessons, ideaPosition, IDEA_STORAGE_KEY } from '../../../src/services/ideaCards';
+import { dueIdeas, gradeIdea, ideaLessons, ideaPosition, planChoices, IDEA_STORAGE_KEY } from '../../../src/services/ideaCards';
 import { PlanReviewPanel } from '../../../src/views/PlanReviewPanel';
 
 const NOW = Date.UTC(2026, 10, 1, 12);
@@ -51,5 +51,39 @@ describe('Plan review: idea cards for the openings (CL-7)', () => {
     fireEvent.click(view.container.querySelector('[data-grade="good"]')!);
     expect(Number(modal().getAttribute('data-plans-left'))).toBe(total - 1);
     expect(view.container.querySelector('[data-plan-lesson]')?.getAttribute('data-plan-lesson')).not.toBe(firstId);
+  });
+
+  it('offers three plans to choose from: the line\'s own and two of other lessons for the same colour', () => {
+    for (const lesson of ideaLessons(allCurriculumLessons)) {
+      const choices = planChoices(lesson, allCurriculumLessons);
+      expect(choices, lesson.id).toHaveLength(3);
+      expect(new Set(choices).size, lesson.id).toBe(3);
+      expect(choices, lesson.id).toContain(lesson.thematicObjective);
+      const sameColour = ideaLessons(allCurriculumLessons).filter((l) => l.targetColor === lesson.targetColor).map((l) => l.thematicObjective);
+      for (const c of choices) expect(sameColour, lesson.id).toContain(c);
+      expect(planChoices(lesson, allCurriculumLessons)).toEqual(choices);
+    }
+    // The right plan is not always in the same place
+    const places = new Set(ideaLessons(allCurriculumLessons).map((l) => planChoices(l, allCurriculumLessons).indexOf(l.thematicObjective!)));
+    expect(places.size).toBeGreaterThan(1);
+  });
+
+  it('a wrong choice shows the plan and suggests Forgot; a right one suggests Good', () => {
+    const view = render(<PlanReviewPanel onClose={() => undefined} />);
+    const id = view.container.querySelector('[data-plan-lesson]')!.getAttribute('data-plan-lesson')!;
+    const lesson = allCurriculumLessons.find((l) => l.id === id)!;
+    const buttons = [...view.container.querySelectorAll('[data-plan-choice]')] as HTMLElement[];
+    const wrong = buttons.find((b) => b.textContent !== lesson.thematicObjective)!;
+    fireEvent.click(wrong);
+    const answer = view.container.querySelector('[data-section="plan-answer"]')!;
+    expect(answer.getAttribute('data-choice-result')).toBe('wrong');
+    expect(answer.textContent).toContain(lesson.thematicObjective!);
+    expect(answer.querySelector('[data-suggested="true"]')?.getAttribute('data-grade')).toBe('again');
+    fireEvent.click(answer.querySelector('[data-grade="again"]')!);
+    // The next card: choose right
+    const next = allCurriculumLessons.find((l) => l.id === view.container.querySelector('[data-plan-lesson]')!.getAttribute('data-plan-lesson'))!;
+    fireEvent.click(([...view.container.querySelectorAll('[data-plan-choice]')] as HTMLElement[]).find((b) => b.textContent === next.thematicObjective)!);
+    expect(view.container.querySelector('[data-section="plan-answer"]')?.getAttribute('data-choice-result')).toBe('right');
+    expect(view.container.querySelector('[data-suggested="true"]')?.getAttribute('data-grade')).toBe('good');
   });
 });

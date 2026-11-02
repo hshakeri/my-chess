@@ -4,6 +4,7 @@
 //   const sf = await Stockfish.start({ engine: 'full', threads: 6 });
 //   const { score, pv } = await sf.analyse(fen, { depth: 18 });            // best line
 //   const { score } = await sf.analyse(fen, { depth: 18, searchmoves: ['e2e4'] });  // one move
+//   await sf.analyse(fen, { depth: 18, maxMs: 5000 });                    // depth 18, or 5 s at most
 //   sf.quit();
 //
 // Scores are centipawns from the side to move; a mate in n is ±(MATE - n).
@@ -64,10 +65,12 @@ export class Stockfish {
    * variation of the first line, or of every line with `multipv` > 1. `searchmoves` restricts the
    * root to those UCI moves, which scores one move at the same depth as the best.
    */
-  async analyse(fen, { depth = 18, movetime, multipv = 1, searchmoves } = {}) {
+  async analyse(fen, { depth = 18, movetime, maxMs, multipv = 1, searchmoves } = {}) {
     if (multipv > 1) this.send(`setoption name MultiPV value ${multipv}`);
     this.send(`position fen ${fen}`);
-    const go = `go ${movetime ? `movetime ${movetime}` : `depth ${depth}`}${searchmoves?.length ? ` searchmoves ${searchmoves.join(' ')}` : ''}`;
+    // `maxMs` caps a depth search in time (whichever limit comes first)
+    const limit = movetime ? `movetime ${movetime}` : `depth ${depth}${maxMs ? ` movetime ${maxMs}` : ''}`;
+    const go = `go ${limit}${searchmoves?.length ? ` searchmoves ${searchmoves.join(' ')}` : ''}`;
     const lines = await this.command(go, (l) => l.startsWith('bestmove'));
     if (multipv > 1) this.send('setoption name MultiPV value 1');
     const byPv = new Map();

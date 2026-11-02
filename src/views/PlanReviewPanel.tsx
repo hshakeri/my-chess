@@ -3,7 +3,7 @@ import { Chessboard } from '../components/Chessboard';
 import { RulesEngine } from '../engine/rules';
 import { allCurriculumLessons } from '../curriculum';
 import { plyLabel } from '../curriculum/builder';
-import { dueIdeas, gradeIdea, ideaPosition, type IdeaGrade } from '../services/ideaCards';
+import { dueIdeas, gradeIdea, ideaPosition, planChoices, type IdeaGrade } from '../services/ideaCards';
 import type { CurriculumLesson } from '../types/curriculum';
 
 /** The main line as text: "1.e4 c6 2.d4 d5 3.e5 Bf5". */
@@ -25,9 +25,13 @@ const GRADES: Array<{ grade: IdeaGrade; label: string; tone: string }> = [
 export const PlanReviewPanel: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   const [queue, setQueue] = useState<CurriculumLesson[]>(() => dueIdeas(allCurriculumLessons));
   const [shown, setShown] = useState(false);
+  // The plan picked from the three choices, when the student chose rather than recalled
+  const [picked, setPicked] = useState<string | null>(null);
   const [done, setDone] = useState(0);
   const lesson = queue[0];
   const board = useMemo(() => (lesson ? new RulesEngine(ideaPosition(lesson)) : null), [lesson]);
+  const choices = useMemo(() => (lesson ? planChoices(lesson, allCurriculumLessons) : []), [lesson]);
+  const right = picked !== null && picked === lesson?.thematicObjective;
   const side = lesson?.targetColor === 'black' ? 'Black' : 'White';
 
   const grade = (g: IdeaGrade) => {
@@ -35,6 +39,7 @@ export const PlanReviewPanel: React.FC<{ onClose: () => void }> = ({ onClose }) 
     gradeIdea(lesson.id, g);
     setQueue((q) => q.slice(1));
     setShown(false);
+    setPicked(null);
     setDone((n) => n + 1);
   };
 
@@ -66,16 +71,49 @@ export const PlanReviewPanel: React.FC<{ onClose: () => void }> = ({ onClose }) 
               <p className="font-mono text-xs text-slate-400">{lineText(lesson)}</p>
               <p className="text-white">This is where the line goes. What is your plan, and what are you watching for?</p>
               {!shown ? (
-                <button type="button" data-action="plans-show" onClick={() => setShown(true)} className="px-3 py-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-white font-medium">
-                  Show the plan
-                </button>
+                <div className="space-y-3">
+                  <button type="button" data-action="plans-show" onClick={() => setShown(true)} className="px-3 py-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-white font-medium">
+                    Show the plan
+                  </button>
+                  {choices.length === 3 && (
+                    <div className="space-y-1.5" data-section="plan-choices">
+                      <p className="text-xs text-slate-400">Or choose it: one of these is this line's plan.</p>
+                      {choices.map((c, k) => (
+                        <button
+                          key={k}
+                          type="button"
+                          data-plan-choice={k}
+                          onClick={() => {
+                            setPicked(c);
+                            setShown(true);
+                          }}
+                          className="block w-full text-left text-xs rounded-lg border border-slate-700 bg-slate-800/40 hover:bg-slate-800 p-2"
+                        >
+                          {c}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               ) : (
-                <div className="space-y-3" data-section="plan-answer">
+                <div className="space-y-3" data-section="plan-answer" data-choice-result={picked === null ? '' : right ? 'right' : 'wrong'}>
+                  {picked !== null && (
+                    <p className={right ? 'text-emerald-300' : 'text-rose-300'}>{right ? 'Right: that is the plan.' : 'Not this one. The plan is:'}</p>
+                  )}
                   <p className="rounded-lg border border-slate-700 bg-slate-800/60 p-3">{lesson.thematicObjective}</p>
                   {lesson.keyTacticalMotif && <p className="text-xs text-slate-400">Motifs: {lesson.keyTacticalMotif}</p>}
                   <div className="flex flex-wrap gap-2">
                     {GRADES.map((g) => (
-                      <button key={g.grade} type="button" data-grade={g.grade} onClick={() => grade(g.grade)} className={`px-3 py-1.5 rounded-lg text-white text-xs font-semibold ${g.tone}`}>
+                      <button
+                        key={g.grade}
+                        type="button"
+                        data-grade={g.grade}
+                        data-suggested={picked !== null && g.grade === (right ? 'good' : 'again') ? 'true' : undefined}
+                        onClick={() => grade(g.grade)}
+                        className={`px-3 py-1.5 rounded-lg text-white text-xs font-semibold ${g.tone} ${
+                          picked !== null && g.grade === (right ? 'good' : 'again') ? 'ring-2 ring-white/70' : ''
+                        }`}
+                      >
                         {g.label}
                       </button>
                     ))}

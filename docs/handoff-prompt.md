@@ -16,9 +16,9 @@ also runs on every push to another branch).
 
 - React 18 + Vite 6 + TypeScript (strict) + Tailwind; chess.js 1.4; Dexie 4 (IndexedDB); ts-fsrs 5
   for scheduling; maia3-js + onnxruntime-web in a Web Worker for the human-like engine.
-- Tests: Vitest (`npm test`, 426 tests: SSR `renderToString` specs, jsdom interaction specs under
+- Tests: Vitest (`npm test`, 434 tests: SSR `renderToString` specs, jsdom interaction specs under
   `tests/unit/curriculum/lessons-view-interactions.spec.tsx`, fake-indexeddb for the database) and
-  Playwright (`npm run test:e2e`, 95 tests incl. iPhone-viewport tests). Keep both green or update
+  Playwright (`npm run test:e2e`, 97 tests incl. iPhone-viewport tests). Keep both green or update
   tests deliberately and say why. The board question before each lesson move (CL-5) is on by default:
   a test that plays lesson moves either answers it or sets localStorage `my_chess_cct_gate` to `off`
   first (`page.addInitScript` in e2e, the jsdom spec's beforeEach). No `if (await ...isVisible())` guards in specs: a missing control
@@ -207,8 +207,31 @@ Next: the roadmap below.
   reviewed games (`src/views/MistakeSheet.tsx`), the answers on a page of their own.
 - CL-7 first slice done (2026-11-01): plan review, one FSRS idea card per opening lesson (the
   position the line reaches, the plan on demand, a self-grade), in localStorage. Not built: the
-  automatic relation cues, multiple-choice plans, idea cards in Today's session. The JSON backup
+  automatic relation cues and idea cards in Today's session; multiple-choice plans were added on
+  2026-11-02. The JSON backup
   carries the localStorage data too (`src/services/localData.ts`).
+- DC-1 slice done (2026-11-02): the Progress panel shows mastery by study-path group (cards,
+  reviewed, mastered = FSRS stability of a week or more, recall). Nothing is locked by it.
+- DC-3 first slice done (2026-11-02): Diagnostics "Clock & Endings" tab (`src/analytics/clock.ts`,
+  `src/analytics/endings.ts`, `src/views/ClockPanel.tsx`): time losses, games lost on time while
+  ahead, the clock against the opponents after moves 10-40, long thinks; how every game ended, the
+  games resigned with less than a rook down (no mate in one coming), each playable on against Maia,
+  and stalemates given while ahead. A practice clock on the Play tab (`src/components/PracticeClock.tsx`,
+  off by default; 10+0, 5+0, 3+2) with a cue after 30 seconds on one move. Every view fits a
+  375-pixel phone (`tests/e2e/12-phone-width.spec.ts`).
+- DC-2 slice done (2026-11-02): King and Pawn against King in "Finish the game"
+  (`lesson-king-pawn-opposition`), checked by an exact retrograde solver
+  (`scripts/game-analysis/kpk-solve.mjs`, its twin `tests/unit/curriculum/kpk-solver.ts`).
+- DC-2 tactics deck done (2026-11-02): 234 positions from the archive, right after a mistake by
+  either player, one clearly winning move by Stockfish 19 (`scripts/game-analysis/tactics.mjs`,
+  `tactics-pick.mjs`, `src/data/tactics_deck.json`), Woodpecker-lite in the Lessons header
+  (`src/views/TacticsDeckPanel.tsx`): graded by solve time, Again first, retired after three Good
+  solves in a row; a Worksheets sheet and two lesson-book sheets.
+- DC-6 archive half done (2026-11-02): Maia's opening book is the archive opponents' moves
+  (`scripts/game-analysis/opening-book.mjs`, 253 positions).
+- DC-8 habit done (2026-11-02): "Kept a lead of 3 points for the next 10 moves" replaces "traded
+  when ahead", which the archive does not support; king activity in the endgame was measured too and
+  is not kept (see `docs/pedagogy-audit.md`).
 - DC-1 re-scoped curriculum content for the lines above (this is where the opening order applies).
 
 ## How to verify before pushing

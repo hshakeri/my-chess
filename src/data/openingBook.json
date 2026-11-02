@@ -1,255 +1,3058 @@
 {
-  "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1": [
-    {
-      "san": "e4",
-      "uci": "e2e4",
-      "probability": 0.48
-    },
-    {
-      "san": "d4",
-      "uci": "d2d4",
-      "probability": 0.36
-    },
-    {
-      "san": "c4",
-      "uci": "c2c4",
-      "probability": 0.08
-    },
-    {
-      "san": "Nf3",
-      "uci": "g1f3",
-      "probability": 0.08
-    }
-  ],
   "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1": [
     {
       "san": "e5",
       "uci": "e7e5",
-      "probability": 0.4
-    },
-    {
-      "san": "c5",
-      "uci": "c7c5",
-      "probability": 0.35
-    },
-    {
-      "san": "e6",
-      "uci": "e7e6",
-      "probability": 0.12
+      "probability": 0.505
     },
     {
       "san": "c6",
       "uci": "c7c6",
-      "probability": 0.08
+      "probability": 0.118
+    },
+    {
+      "san": "c5",
+      "uci": "c7c5",
+      "probability": 0.116
     },
     {
       "san": "d5",
       "uci": "d7d5",
-      "probability": 0.04
+      "probability": 0.101
+    },
+    {
+      "san": "e6",
+      "uci": "e7e6",
+      "probability": 0.058
+    },
+    {
+      "san": "g6",
+      "uci": "g7g6",
+      "probability": 0.051
     },
     {
       "san": "d6",
       "uci": "d7d6",
-      "probability": 0.01
+      "probability": 0.03
+    },
+    {
+      "san": "Nc6",
+      "uci": "b8c6",
+      "probability": 0.021
+    }
+  ],
+  "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1": [
+    {
+      "san": "e4",
+      "uci": "e2e4",
+      "probability": 0.7
+    },
+    {
+      "san": "d4",
+      "uci": "d2d4",
+      "probability": 0.275
+    },
+    {
+      "san": "c4",
+      "uci": "c2c4",
+      "probability": 0.025
     }
   ],
   "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2": [
     {
       "san": "Nf3",
       "uci": "g1f3",
-      "probability": 0.82
-    },
-    {
-      "san": "Nc3",
-      "uci": "b1c3",
-      "probability": 0.08
+      "probability": 0.591
     },
     {
       "san": "Bc4",
       "uci": "f1c4",
-      "probability": 0.06
+      "probability": 0.113
+    },
+    {
+      "san": "d4",
+      "uci": "d2d4",
+      "probability": 0.084
+    },
+    {
+      "san": "Nc3",
+      "uci": "b1c3",
+      "probability": 0.079
+    },
+    {
+      "san": "Qh5",
+      "uci": "d1h5",
+      "probability": 0.071
+    },
+    {
+      "san": "Qf3",
+      "uci": "d1f3",
+      "probability": 0.033
     },
     {
       "san": "f4",
       "uci": "f2f4",
-      "probability": 0.04
+      "probability": 0.029
+    }
+  ],
+  "rnbqkb1r/pppp1ppp/5n2/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3": [
+    {
+      "san": "Nc3",
+      "uci": "b1c3",
+      "probability": 0.367
+    },
+    {
+      "san": "Bc4",
+      "uci": "f1c4",
+      "probability": 0.308
+    },
+    {
+      "san": "Nxe5",
+      "uci": "f3e5",
+      "probability": 0.218
+    },
+    {
+      "san": "d3",
+      "uci": "d2d3",
+      "probability": 0.062
+    },
+    {
+      "san": "d4",
+      "uci": "d2d4",
+      "probability": 0.045
+    }
+  ],
+  "rnbqk2r/pppp1ppp/5n2/2b1p3/4P3/2N2N2/PPPP1PPP/R1BQKB1R w KQkq - 4 4": [
+    {
+      "san": "Bc4",
+      "uci": "f1c4",
+      "probability": 0.405
+    },
+    {
+      "san": "Nxe5",
+      "uci": "f3e5",
+      "probability": 0.265
+    },
+    {
+      "san": "d4",
+      "uci": "d2d4",
+      "probability": 0.219
+    },
+    {
+      "san": "d3",
+      "uci": "d2d3",
+      "probability": 0.111
     }
   ],
   "rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2": [
     {
       "san": "Nc6",
       "uci": "b8c6",
-      "probability": 0.75
+      "probability": 0.709
+    },
+    {
+      "san": "d6",
+      "uci": "d7d6",
+      "probability": 0.162
     },
     {
       "san": "Nf6",
       "uci": "g8f6",
+      "probability": 0.043
+    },
+    {
+      "san": "f6",
+      "uci": "f7f6",
+      "probability": 0.039
+    },
+    {
+      "san": "Qf6",
+      "uci": "d8f6",
+      "probability": 0.024
+    },
+    {
+      "san": "Bc5",
+      "uci": "f8c5",
+      "probability": 0.023
+    }
+  ],
+  "rnbqkbnr/pppp1ppp/8/4p3/8/4P3/PPPP1PPP/RNBQKBNR w KQkq - 0 2": [
+    {
+      "san": "Qh5",
+      "uci": "d1h5",
+      "probability": 0.743
+    },
+    {
+      "san": "Nf3",
+      "uci": "g1f3",
+      "probability": 0.257
+    }
+  ],
+  "rnbqkbnr/ppp1pppp/8/3p4/3P4/8/PPP1PPPP/RNBQKBNR w KQkq - 0 2": [
+    {
+      "san": "c4",
+      "uci": "c2c4",
+      "probability": 0.45
+    },
+    {
+      "san": "Bf4",
+      "uci": "c1f4",
+      "probability": 0.221
+    },
+    {
+      "san": "Nf3",
+      "uci": "g1f3",
+      "probability": 0.138
+    },
+    {
+      "san": "Nc3",
+      "uci": "b1c3",
+      "probability": 0.096
+    },
+    {
+      "san": "e3",
+      "uci": "e2e3",
+      "probability": 0.095
+    }
+  ],
+  "rnbqkb1r/pppp1ppp/5n2/4p3/2B1P3/8/PPPP1PPP/RNBQK1NR w KQkq - 2 3": [
+    {
+      "san": "Qf3",
+      "uci": "d1f3",
+      "probability": 0.386
+    },
+    {
+      "san": "Nf3",
+      "uci": "g1f3",
+      "probability": 0.214
+    },
+    {
+      "san": "d3",
+      "uci": "d2d3",
+      "probability": 0.202
+    },
+    {
+      "san": "Nc3",
+      "uci": "b1c3",
+      "probability": 0.198
+    }
+  ],
+  "rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq - 0 1": [
+    {
+      "san": "d5",
+      "uci": "d7d5",
+      "probability": 0.543
+    },
+    {
+      "san": "Nf6",
+      "uci": "g8f6",
+      "probability": 0.152
+    },
+    {
+      "san": "e5",
+      "uci": "e7e5",
+      "probability": 0.082
+    },
+    {
+      "san": "e6",
+      "uci": "e7e6",
+      "probability": 0.066
+    },
+    {
+      "san": "c6",
+      "uci": "c7c6",
+      "probability": 0.047
+    },
+    {
+      "san": "d6",
+      "uci": "d7d6",
+      "probability": 0.047
+    },
+    {
+      "san": "g6",
+      "uci": "g7g6",
+      "probability": 0.037
+    },
+    {
+      "san": "c5",
+      "uci": "c7c5",
+      "probability": 0.026
+    }
+  ],
+  "rnbqkbnr/ppp1pppp/8/3p4/2PP4/8/PP2PPPP/RNBQKBNR b KQkq - 0 2": [
+    {
+      "san": "dxc4",
+      "uci": "d5c4",
+      "probability": 0.424
+    },
+    {
+      "san": "c6",
+      "uci": "c7c6",
+      "probability": 0.196
+    },
+    {
+      "san": "Nf6",
+      "uci": "g8f6",
+      "probability": 0.172
+    },
+    {
+      "san": "e6",
+      "uci": "e7e6",
+      "probability": 0.104
+    },
+    {
+      "san": "Nc6",
+      "uci": "b8c6",
+      "probability": 0.072
+    },
+    {
+      "san": "e5",
+      "uci": "e7e5",
+      "probability": 0.032
+    }
+  ],
+  "rnbqkbnr/pppp1ppp/4p3/8/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2": [
+    {
+      "san": "d5",
+      "uci": "d7d5",
+      "probability": 1
+    }
+  ],
+  "r1bqkb1r/pppp1ppp/2n2n2/4p3/4P3/2N2N2/PPPP1PPP/R1BQKB1R w KQkq - 4 4": [
+    {
+      "san": "Bc4",
+      "uci": "f1c4",
+      "probability": 0.57
+    },
+    {
+      "san": "d4",
+      "uci": "d2d4",
+      "probability": 0.304
+    },
+    {
+      "san": "Bb5",
+      "uci": "f1b5",
+      "probability": 0.126
+    }
+  ],
+  "rnbqkbnr/pp1ppppp/2p5/8/3PP3/8/PPP2PPP/RNBQKBNR b KQkq - 0 2": [
+    {
+      "san": "d5",
+      "uci": "d7d5",
+      "probability": 1
+    }
+  ],
+  "rnbqkb1r/pppp1ppp/5n2/4p2Q/4P3/8/PPPP1PPP/RNB1KBNR w KQkq - 2 3": [
+    {
+      "san": "Qxe5+",
+      "uci": "h5e5",
+      "probability": 1
+    }
+  ],
+  "rnbqk2r/ppppbppp/5n2/4Q3/4P3/8/PPPP1PPP/RNB1KBNR w KQkq - 1 4": [
+    {
+      "san": "d3",
+      "uci": "d2d3",
+      "probability": 0.574
+    },
+    {
+      "san": "Bc4",
+      "uci": "f1c4",
+      "probability": 0.215
+    },
+    {
+      "san": "Qg5",
+      "uci": "e5g5",
+      "probability": 0.211
+    }
+  ],
+  "rnbqkb1r/pppp1ppp/5n2/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 3 3": [
+    {
+      "san": "Nc6",
+      "uci": "b8c6",
+      "probability": 0.716
+    },
+    {
+      "san": "c6",
+      "uci": "c7c6",
+      "probability": 0.174
+    },
+    {
+      "san": "Nxe4",
+      "uci": "f6e4",
+      "probability": 0.077
+    },
+    {
+      "san": "Bc5",
+      "uci": "f8c5",
+      "probability": 0.033
+    }
+  ],
+  "rnbqkbnr/pppp2pp/5p2/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 1 3": [
+    {
+      "san": "c6",
+      "uci": "c7c6",
+      "probability": 0.383
+    },
+    {
+      "san": "d6",
+      "uci": "d7d6",
+      "probability": 0.232
+    },
+    {
+      "san": "Nc6",
+      "uci": "b8c6",
+      "probability": 0.193
+    },
+    {
+      "san": "Ne7",
+      "uci": "g8e7",
+      "probability": 0.192
+    }
+  ],
+  "r1bqkbnr/pppp1ppp/2n5/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 3 3": [
+    {
+      "san": "Nf6",
+      "uci": "g8f6",
+      "probability": 0.34
+    },
+    {
+      "san": "h6",
+      "uci": "h7h6",
+      "probability": 0.256
+    },
+    {
+      "san": "Bc5",
+      "uci": "f8c5",
+      "probability": 0.232
+    },
+    {
+      "san": "Nd4",
+      "uci": "c6d4",
+      "probability": 0.092
+    },
+    {
+      "san": "d6",
+      "uci": "d7d6",
+      "probability": 0.043
+    },
+    {
+      "san": "f5",
+      "uci": "f7f5",
+      "probability": 0.037
+    }
+  ],
+  "r1bqkb1r/pppp1ppp/2n2n2/4p3/2B1P3/2N2N2/PPPP1PPP/R1BQK2R b KQkq - 5 4": [
+    {
+      "san": "Bb4",
+      "uci": "f8b4",
+      "probability": 0.384
+    },
+    {
+      "san": "h6",
+      "uci": "h7h6",
+      "probability": 0.331
+    },
+    {
+      "san": "Bc5",
+      "uci": "f8c5",
+      "probability": 0.285
+    }
+  ],
+  "r1bqkbnr/pppp1ppp/2n5/4p3/4P3/2N2N2/PPPP1PPP/R1BQKB1R b KQkq - 3 3": [
+    {
+      "san": "Nf6",
+      "uci": "g8f6",
+      "probability": 0.654
+    },
+    {
+      "san": "d6",
+      "uci": "d7d6",
+      "probability": 0.189
+    },
+    {
+      "san": "Bc5",
+      "uci": "f8c5",
+      "probability": 0.157
+    }
+  ],
+  "r1bqkbnr/pppp1ppp/2n5/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3": [
+    {
+      "san": "Nc3",
+      "uci": "b1c3",
+      "probability": 0.523
+    },
+    {
+      "san": "Bc4",
+      "uci": "f1c4",
+      "probability": 0.477
+    }
+  ],
+  "r1bqkbnr/pppppppp/2n5/8/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 2 2": [
+    {
+      "san": "d5",
+      "uci": "d7d5",
+      "probability": 0.511
+    },
+    {
+      "san": "e5",
+      "uci": "e7e5",
+      "probability": 0.489
+    }
+  ],
+  "rnbqkbnr/ppp1pppp/8/3p4/4P3/2N5/PPPP1PPP/R1BQKBNR b KQkq - 1 2": [
+    {
+      "san": "d4",
+      "uci": "d5d4",
+      "probability": 0.583
+    },
+    {
+      "san": "dxe4",
+      "uci": "d5e4",
+      "probability": 0.214
+    },
+    {
+      "san": "e6",
+      "uci": "e7e6",
+      "probability": 0.122
+    },
+    {
+      "san": "Nf6",
+      "uci": "g8f6",
+      "probability": 0.081
+    }
+  ],
+  "rnbqk1nr/pppp1ppp/8/2b1p3/2B1P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 3 3": [
+    {
+      "san": "Nc6",
+      "uci": "b8c6",
+      "probability": 0.375
+    },
+    {
+      "san": "Nf6",
+      "uci": "g8f6",
+      "probability": 0.332
+    },
+    {
+      "san": "Nh6",
+      "uci": "g8h6",
       "probability": 0.16
     },
     {
       "san": "d6",
       "uci": "d7d6",
-      "probability": 0.07
-    },
-    {
-      "san": "f5",
-      "uci": "f7f5",
-      "probability": 0.02
+      "probability": 0.133
     }
   ],
-  "r1bqkbnr/pppp1ppp/2n5/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3": [
-    {
-      "san": "Bc4",
-      "uci": "f1c4",
-      "probability": 0.55
-    },
-    {
-      "san": "Bb5",
-      "uci": "f1b5",
-      "probability": 0.3
-    },
-    {
-      "san": "d4",
-      "uci": "d2d4",
-      "probability": 0.1
-    },
-    {
-      "san": "Nc3",
-      "uci": "b1c3",
-      "probability": 0.05
-    }
-  ],
-  "r1bqkbnr/pppp1ppp/2n5/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 3 3": [
-    {
-      "san": "Bc5",
-      "uci": "f8c5",
-      "probability": 0.58
-    },
-    {
-      "san": "Nf6",
-      "uci": "g8f6",
-      "probability": 0.36
-    },
-    {
-      "san": "d6",
-      "uci": "d7d6",
-      "probability": 0.06
-    }
-  ],
-  "r1bqk1nr/pppp1ppp/2n5/2b1p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4": [
-    {
-      "san": "c3",
-      "uci": "c2c3",
-      "probability": 0.45
-    },
-    {
-      "san": "d3",
-      "uci": "d2d3",
-      "probability": 0.35
-    },
+  "r1bqk2r/pppp1ppp/2n2n2/2b1p3/2B1P3/2N2N2/PPPP1PPP/R1BQK2R w KQkq - 6 5": [
     {
       "san": "O-O",
       "uci": "e1g1",
-      "probability": 0.15
-    },
-    {
-      "san": "b4",
-      "uci": "b2b4",
-      "probability": 0.05
-    }
-  ],
-  "r1bqk1nr/pppp1ppp/2n5/2b1p3/2B1P3/2P2N2/PP1P1PPP/RNBQK2R b KQkq - 0 4": [
-    {
-      "san": "Nf6",
-      "uci": "g8f6",
-      "probability": 0.8
-    },
-    {
-      "san": "Qe7",
-      "uci": "d8e7",
-      "probability": 0.12
-    },
-    {
-      "san": "d6",
-      "uci": "d7d6",
-      "probability": 0.08
-    }
-  ],
-  "r1bqk2r/pppp1ppp/2n2n2/2b1p3/2B1P3/2P2N2/PP1P1PPP/RNBQK2R w KQkq - 1 5": [
-    {
-      "san": "d4",
-      "uci": "d2d4",
-      "probability": 0.55
+      "probability": 0.445
     },
     {
       "san": "d3",
       "uci": "d2d3",
-      "probability": 0.45
-    }
-  ],
-  "r1bqkb1r/pppp1ppp/2n2n2/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4": [
-    {
-      "san": "d3",
-      "uci": "d2d3",
-      "probability": 0.55
+      "probability": 0.414
     },
     {
       "san": "Ng5",
       "uci": "f3g5",
-      "probability": 0.3
+      "probability": 0.141
+    }
+  ],
+  "rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2": [
+    {
+      "san": "Nc6",
+      "uci": "b8c6",
+      "probability": 0.541
+    },
+    {
+      "san": "d6",
+      "uci": "d7d6",
+      "probability": 0.241
+    },
+    {
+      "san": "e6",
+      "uci": "e7e6",
+      "probability": 0.126
+    },
+    {
+      "san": "g6",
+      "uci": "g7g6",
+      "probability": 0.054
+    },
+    {
+      "san": "a6",
+      "uci": "a7a6",
+      "probability": 0.038
+    }
+  ],
+  "rnbqkbnr/ppp2ppp/3p4/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 1 3": [
+    {
+      "san": "Bg4",
+      "uci": "c8g4",
+      "probability": 0.4
+    },
+    {
+      "san": "h6",
+      "uci": "h7h6",
+      "probability": 0.362
+    },
+    {
+      "san": "a6",
+      "uci": "a7a6",
+      "probability": 0.095
+    },
+    {
+      "san": "Nf6",
+      "uci": "g8f6",
+      "probability": 0.079
+    },
+    {
+      "san": "Be7",
+      "uci": "f8e7",
+      "probability": 0.064
+    }
+  ],
+  "rnbqkb1r/pppp1ppp/5n2/4p3/4P3/2N5/PPPP1PPP/R1BQKBNR w KQkq - 2 3": [
+    {
+      "san": "Nf3",
+      "uci": "g1f3",
+      "probability": 0.631
+    },
+    {
+      "san": "d3",
+      "uci": "d2d3",
+      "probability": 0.189
+    },
+    {
+      "san": "Bc4",
+      "uci": "f1c4",
+      "probability": 0.18
+    }
+  ],
+  "rnbqkbnr/ppp1pppp/3p4/8/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2": [
+    {
+      "san": "Nf6",
+      "uci": "g8f6",
+      "probability": 0.574
+    },
+    {
+      "san": "Bg4",
+      "uci": "c8g4",
+      "probability": 0.225
+    },
+    {
+      "san": "g6",
+      "uci": "g7g6",
+      "probability": 0.201
+    }
+  ],
+  "rnbqkbnr/ppp1pppp/8/3N4/3pP3/8/PPPP1PPP/R1BQKBNR b KQkq - 1 3": [
+    {
+      "san": "e5",
+      "uci": "e7e5",
+      "probability": 0.43
+    },
+    {
+      "san": "e6",
+      "uci": "e7e6",
+      "probability": 0.428
+    },
+    {
+      "san": "c6",
+      "uci": "c7c6",
+      "probability": 0.142
+    }
+  ],
+  "r1bqkbnr/pppp1ppp/2n5/4p3/3PP3/8/PPP2PPP/RNBQKBNR w KQkq - 1 3": [
+    {
+      "san": "d5",
+      "uci": "d4d5",
+      "probability": 0.619
+    },
+    {
+      "san": "dxe5",
+      "uci": "d4e5",
+      "probability": 0.264
+    },
+    {
+      "san": "Nf3",
+      "uci": "g1f3",
+      "probability": 0.117
+    }
+  ],
+  "rnbqkbnr/pppp1ppp/4p3/8/4P3/2N5/PPPP1PPP/R1BQKBNR b KQkq - 1 2": [
+    {
+      "san": "Bb4",
+      "uci": "f8b4",
+      "probability": 0.239
+    },
+    {
+      "san": "d5",
+      "uci": "d7d5",
+      "probability": 0.231
+    },
+    {
+      "san": "g6",
+      "uci": "g7g6",
+      "probability": 0.216
+    },
+    {
+      "san": "b6",
+      "uci": "b7b6",
+      "probability": 0.177
+    },
+    {
+      "san": "a6",
+      "uci": "a7a6",
+      "probability": 0.137
+    }
+  ],
+  "rnbqkbnr/pp1ppppp/2p5/8/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2": [
+    {
+      "san": "d5",
+      "uci": "d7d5",
+      "probability": 0.904
+    },
+    {
+      "san": "e6",
+      "uci": "e7e6",
+      "probability": 0.096
+    }
+  ],
+  "rnbqkbnr/ppp1pppp/8/3p4/3P4/5N2/PPP1PPPP/RNBQKB1R b KQkq - 0 2": [
+    {
+      "san": "Nc6",
+      "uci": "b8c6",
+      "probability": 0.623
+    },
+    {
+      "san": "Bf5",
+      "uci": "c8f5",
+      "probability": 0.188
+    },
+    {
+      "san": "Nf6",
+      "uci": "g8f6",
+      "probability": 0.135
+    },
+    {
+      "san": "c6",
+      "uci": "c7c6",
+      "probability": 0.054
+    }
+  ],
+  "rnbqkbnr/ppp1pppp/8/3p4/3P4/2N5/PPP1PPPP/R1BQKBNR b KQkq - 1 2": [
+    {
+      "san": "Nf6",
+      "uci": "g8f6",
+      "probability": 0.445
+    },
+    {
+      "san": "Nc6",
+      "uci": "b8c6",
+      "probability": 0.191
+    },
+    {
+      "san": "e6",
+      "uci": "e7e6",
+      "probability": 0.155
+    },
+    {
+      "san": "Bf5",
+      "uci": "c8f5",
+      "probability": 0.113
+    },
+    {
+      "san": "c6",
+      "uci": "c7c6",
+      "probability": 0.061
+    },
+    {
+      "san": "c5",
+      "uci": "c7c5",
+      "probability": 0.035
+    }
+  ],
+  "rnbqkbnr/ppp2ppp/4p3/3p4/3PP3/2N5/PPP2PPP/R1BQKBNR b KQkq - 0 3": [
+    {
+      "san": "c5",
+      "uci": "c7c5",
+      "probability": 0.536
+    },
+    {
+      "san": "dxe4",
+      "uci": "d5e4",
+      "probability": 0.276
+    },
+    {
+      "san": "c6",
+      "uci": "c7c6",
+      "probability": 0.188
+    }
+  ],
+  "rnbqkbnr/ppp1pppp/3p4/8/3PP3/8/PPP2PPP/RNBQKBNR b KQkq - 0 2": [
+    {
+      "san": "Nf6",
+      "uci": "g8f6",
+      "probability": 0.578
+    },
+    {
+      "san": "g6",
+      "uci": "g7g6",
+      "probability": 0.311
+    },
+    {
+      "san": "e5",
+      "uci": "e7e5",
+      "probability": 0.111
+    }
+  ],
+  "r1bqkb1r/pppp1ppp/2n2n2/4N3/4P3/8/PPPP1PPP/RNBQKB1R w KQkq - 1 4": [
+    {
+      "san": "Nxc6",
+      "uci": "e5c6",
+      "probability": 0.746
+    },
+    {
+      "san": "Nxf7",
+      "uci": "e5f7",
+      "probability": 0.128
     },
     {
       "san": "d4",
       "uci": "d2d4",
-      "probability": 0.15
+      "probability": 0.126
     }
   ],
-  "r1bqkb1r/pppp1ppp/2n2n2/4p1N1/2B1P3/8/PPPP1PPP/RNBQK2R b KQkq - 5 4": [
+  "r1bqkb1r/ppp2ppp/2p2n2/8/4P3/8/PPPP1PPP/RNBQKB1R w KQkq - 0 5": [
     {
-      "san": "d5",
-      "uci": "d7d5",
-      "probability": 0.92
+      "san": "Nc3",
+      "uci": "b1c3",
+      "probability": 0.332
     },
+    {
+      "san": "e5",
+      "uci": "e4e5",
+      "probability": 0.26
+    },
+    {
+      "san": "d3",
+      "uci": "d2d3",
+      "probability": 0.248
+    },
+    {
+      "san": "Bc4",
+      "uci": "f1c4",
+      "probability": 0.16
+    }
+  ],
+  "rnbqkbnr/pppppp1p/6p1/8/4P3/2N5/PPPP1PPP/R1BQKBNR b KQkq - 1 2": [
+    {
+      "san": "Bg7",
+      "uci": "f8g7",
+      "probability": 0.842
+    },
+    {
+      "san": "d6",
+      "uci": "d7d6",
+      "probability": 0.158
+    }
+  ],
+  "rnbqkbnr/pp2pppp/2p5/3p4/4P3/2N2N2/PPPP1PPP/R1BQKB1R b KQkq - 1 3": [
+    {
+      "san": "dxe4",
+      "uci": "d5e4",
+      "probability": 0.514
+    },
+    {
+      "san": "Bg4",
+      "uci": "c8g4",
+      "probability": 0.486
+    }
+  ],
+  "r1bqk1nr/pppp1ppp/2n5/2b1p3/2B1P3/5N2/PPPP1PPP/RNBQ1RK1 b kq - 5 4": [
+    {
+      "san": "Nf6",
+      "uci": "g8f6",
+      "probability": 0.652
+    },
+    {
+      "san": "d6",
+      "uci": "d7d6",
+      "probability": 0.274
+    },
+    {
+      "san": "h6",
+      "uci": "h7h6",
+      "probability": 0.074
+    }
+  ],
+  "r1bqkb1r/pppp1ppp/2n2n2/4p3/2B1P3/5N2/PPPP1PPP/RNBQ1RK1 b kq - 5 4": [
     {
       "san": "Bc5",
       "uci": "f8c5",
-      "probability": 0.08
+      "probability": 0.41
+    },
+    {
+      "san": "d5",
+      "uci": "d7d5",
+      "probability": 0.228
+    },
+    {
+      "san": "Be7",
+      "uci": "f8e7",
+      "probability": 0.216
+    },
+    {
+      "san": "h6",
+      "uci": "h7h6",
+      "probability": 0.078
+    },
+    {
+      "san": "Nxe4",
+      "uci": "f6e4",
+      "probability": 0.068
     }
   ],
-  "r1bqkb1r/ppp2ppp/2n2n2/3pp1N1/2B1P3/8/PPPP1PPP/RNBQK2R w KQkq - 0 5": [
+  "rnbqkb1r/ppp2ppp/5n2/3pp3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 0 4": [
     {
       "san": "exd5",
       "uci": "e4d5",
-      "probability": 0.96
+      "probability": 0.872
     },
     {
-      "san": "Bd3",
-      "uci": "c4d3",
-      "probability": 0.04
+      "san": "Bxd5",
+      "uci": "c4d5",
+      "probability": 0.128
     }
   ],
-  "r1bqkb1r/ppp2ppp/2n2n2/3Pp1N1/2B5/8/PPPP1PPP/RNBQK2R b KQkq - 0 5": [
+  "r1bqkbnr/pp1ppppp/2n5/2p5/2B1P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 3 3": [
     {
-      "san": "Na5",
-      "uci": "c6a5",
-      "probability": 0.7
+      "san": "e6",
+      "uci": "e7e6",
+      "probability": 0.505
     },
     {
-      "san": "Nxd5",
-      "uci": "f6d5",
-      "probability": 0.25
+      "san": "g6",
+      "uci": "g7g6",
+      "probability": 0.179
     },
     {
-      "san": "b5",
-      "uci": "b7b5",
-      "probability": 0.05
+      "san": "h6",
+      "uci": "h7h6",
+      "probability": 0.132
+    },
+    {
+      "san": "d6",
+      "uci": "d7d6",
+      "probability": 0.105
+    },
+    {
+      "san": "Nf6",
+      "uci": "g8f6",
+      "probability": 0.079
+    }
+  ],
+  "rnbqkbnr/pppp1ppp/8/4p3/3P4/8/PPP1PPPP/RNBQKBNR w KQkq - 0 2": [
+    {
+      "san": "dxe5",
+      "uci": "d4e5",
+      "probability": 0.542
+    },
+    {
+      "san": "Nf3",
+      "uci": "g1f3",
+      "probability": 0.232
+    },
+    {
+      "san": "e3",
+      "uci": "e2e3",
+      "probability": 0.226
+    }
+  ],
+  "r1bqkb1r/pppp1ppp/2n2n2/4p3/2BPP3/5N2/PPP2PPP/RNBQK2R b KQkq - 0 4": [
+    {
+      "san": "exd4",
+      "uci": "e5d4",
+      "probability": 0.757
+    },
+    {
+      "san": "d5",
+      "uci": "d7d5",
+      "probability": 0.085
+    },
+    {
+      "san": "Bd6",
+      "uci": "f8d6",
+      "probability": 0.081
+    },
+    {
+      "san": "Bb4+",
+      "uci": "f8b4",
+      "probability": 0.048
+    },
+    {
+      "san": "Nxe4",
+      "uci": "f6e4",
+      "probability": 0.029
     }
   ],
   "r1bqkbnr/pppp1ppp/2n5/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 3 3": [
     {
+      "san": "Bc5",
+      "uci": "f8c5",
+      "probability": 0.295
+    },
+    {
       "san": "a6",
       "uci": "a7a6",
-      "probability": 0.75
+      "probability": 0.238
+    },
+    {
+      "san": "Nf6",
+      "uci": "g8f6",
+      "probability": 0.198
+    },
+    {
+      "san": "d6",
+      "uci": "d7d6",
+      "probability": 0.155
+    },
+    {
+      "san": "Nge7",
+      "uci": "g8e7",
+      "probability": 0.114
+    }
+  ],
+  "r1bqk1nr/pppp1ppp/2n5/2b1p3/1PB1P3/5N2/P1PP1PPP/RNBQK2R b KQkq - 0 4": [
+    {
+      "san": "Bxb4",
+      "uci": "c5b4",
+      "probability": 1
+    }
+  ],
+  "r1bqk1nr/pppp1ppp/2n5/4p3/1bB1P3/2P2N2/P2P1PPP/RNBQK2R b KQkq - 0 5": [
+    {
+      "san": "Bc5",
+      "uci": "b4c5",
+      "probability": 1
+    }
+  ],
+  "rnbqk2r/pppp1ppp/5n2/2b1p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4": [
+    {
+      "san": "d3",
+      "uci": "d2d3",
+      "probability": 0.718
+    },
+    {
+      "san": "O-O",
+      "uci": "e1g1",
+      "probability": 0.282
+    }
+  ],
+  "rnbqkbnr/pp2pppp/2p5/3pP3/8/5N2/PPPP1PPP/RNBQKB1R b KQkq - 0 3": [
+    {
+      "san": "Bg4",
+      "uci": "c8g4",
+      "probability": 0.469
+    },
+    {
+      "san": "Bf5",
+      "uci": "c8f5",
+      "probability": 0.246
+    },
+    {
+      "san": "c5",
+      "uci": "c6c5",
+      "probability": 0.167
+    },
+    {
+      "san": "e6",
+      "uci": "e7e6",
+      "probability": 0.118
+    }
+  ],
+  "r1bqk2r/pppp1ppp/2n2n2/2b1p3/2B1P3/2N2N2/PPPP1PPP/R1BQ1RK1 b kq - 7 5": [
+    {
+      "san": "d6",
+      "uci": "d7d6",
+      "probability": 0.52
+    },
+    {
+      "san": "O-O",
+      "uci": "e8g8",
+      "probability": 0.48
+    }
+  ],
+  "r1bqkbnr/pppp1pp1/2n4p/4p3/2B1P3/5N2/PPPP1PPP/RNBQ1RK1 b kq - 1 4": [
+    {
+      "san": "Nf6",
+      "uci": "g8f6",
+      "probability": 0.85
+    },
+    {
+      "san": "Bc5",
+      "uci": "f8c5",
+      "probability": 0.15
+    }
+  ],
+  "r1bqkb1r/pppp1pp1/2n2n1p/4p3/2BPP3/5N2/PPP2PPP/RNBQ1RK1 b kq - 0 5": [
+    {
+      "san": "exd4",
+      "uci": "e5d4",
+      "probability": 0.913
+    },
+    {
+      "san": "Nxe4",
+      "uci": "f6e4",
+      "probability": 0.087
+    }
+  ],
+  "rnbqkbnr/pppp1ppp/4p3/8/3PP3/8/PPP2PPP/RNBQKBNR b KQkq - 0 2": [
+    {
+      "san": "d5",
+      "uci": "d7d5",
+      "probability": 1
+    }
+  ],
+  "rnbqkbnr/ppp2ppp/4p3/3pP3/8/5N2/PPPP1PPP/RNBQKB1R b KQkq - 0 3": [
+    {
+      "san": "c5",
+      "uci": "c7c5",
+      "probability": 1
+    }
+  ],
+  "rnbqkbnr/pp2pppp/2p5/3pP3/3P4/8/PPP2PPP/RNBQKBNR b KQkq - 0 3": [
+    {
+      "san": "Bf5",
+      "uci": "c8f5",
+      "probability": 0.87
+    },
+    {
+      "san": "c5",
+      "uci": "c6c5",
+      "probability": 0.13
+    }
+  ],
+  "rnbqkbnr/ppp1pppp/8/3pP3/8/8/PPPP1PPP/RNBQKBNR b KQkq - 0 2": [
+    {
+      "san": "e6",
+      "uci": "e7e6",
+      "probability": 0.313
+    },
+    {
+      "san": "Nc6",
+      "uci": "b8c6",
+      "probability": 0.211
+    },
+    {
+      "san": "c5",
+      "uci": "c7c5",
+      "probability": 0.173
+    },
+    {
+      "san": "Bf5",
+      "uci": "c8f5",
+      "probability": 0.169
+    },
+    {
+      "san": "d4",
+      "uci": "d5d4",
+      "probability": 0.134
+    }
+  ],
+  "rnbqkbnr/pp2pppp/2p5/3p4/3PP3/8/PPP2PPP/RNBQKBNR w KQkq - 0 3": [
+    {
+      "san": "e5",
+      "uci": "e4e5",
+      "probability": 0.489
+    },
+    {
+      "san": "exd5",
+      "uci": "e4d5",
+      "probability": 0.24
+    },
+    {
+      "san": "Nc3",
+      "uci": "b1c3",
+      "probability": 0.141
+    },
+    {
+      "san": "f3",
+      "uci": "f2f3",
+      "probability": 0.08
+    },
+    {
+      "san": "Nd2",
+      "uci": "b1d2",
+      "probability": 0.05
+    }
+  ],
+  "rnbqkb1r/ppp2ppp/8/3np3/2B5/5N2/PPPP1PPP/RNBQK2R w KQkq - 0 5": [
+    {
+      "san": "Nxe5",
+      "uci": "f3e5",
+      "probability": 0.708
+    },
+    {
+      "san": "d3",
+      "uci": "d2d3",
+      "probability": 0.292
+    }
+  ],
+  "rnbqkbnr/ppp2ppp/4p3/3pP3/3P4/8/PPP2PPP/RNBQKBNR b KQkq - 0 3": [
+    {
+      "san": "c5",
+      "uci": "c7c5",
+      "probability": 0.535
+    },
+    {
+      "san": "a6",
+      "uci": "a7a6",
+      "probability": 0.234
+    },
+    {
+      "san": "f6",
+      "uci": "f7f6",
+      "probability": 0.177
+    },
+    {
+      "san": "Nc6",
+      "uci": "b8c6",
+      "probability": 0.054
+    }
+  ],
+  "rnbqkb1r/pppppppp/5n2/8/2PP4/8/PP2PPPP/RNBQKBNR b KQkq - 0 2": [
+    {
+      "san": "g6",
+      "uci": "g7g6",
+      "probability": 0.498
+    },
+    {
+      "san": "d5",
+      "uci": "d7d5",
+      "probability": 0.3
+    },
+    {
+      "san": "d6",
+      "uci": "d7d6",
+      "probability": 0.202
+    }
+  ],
+  "rnbqkbnr/ppp1pppp/8/8/2pPP3/8/PP3PPP/RNBQKBNR b KQkq - 0 3": [
+    {
+      "san": "e6",
+      "uci": "e7e6",
+      "probability": 0.237
+    },
+    {
+      "san": "Nf6",
+      "uci": "g8f6",
+      "probability": 0.237
+    },
+    {
+      "san": "b5",
+      "uci": "b7b5",
+      "probability": 0.178
+    },
+    {
+      "san": "Be6",
+      "uci": "c8e6",
+      "probability": 0.119
+    },
+    {
+      "san": "f6",
+      "uci": "f7f6",
+      "probability": 0.116
+    },
+    {
+      "san": "Nc6",
+      "uci": "b8c6",
+      "probability": 0.113
+    }
+  ],
+  "rnbqkbnr/pppp1ppp/8/4P3/8/8/PPP1PPPP/RNBQKBNR b KQkq - 0 2": [
+    {
+      "san": "Nc6",
+      "uci": "b8c6",
+      "probability": 0.611
+    },
+    {
+      "san": "Bc5",
+      "uci": "f8c5",
+      "probability": 0.171
+    },
+    {
+      "san": "d6",
+      "uci": "d7d6",
+      "probability": 0.086
+    },
+    {
+      "san": "f6",
+      "uci": "f7f6",
+      "probability": 0.072
+    },
+    {
+      "san": "Qe7",
+      "uci": "d8e7",
+      "probability": 0.06
+    }
+  ],
+  "rnbqkbnr/pp2pppp/2p5/3p4/2PP4/2N5/PP2PPPP/R1BQKBNR b KQkq - 1 3": [
+    {
+      "san": "Nf6",
+      "uci": "g8f6",
+      "probability": 0.664
+    },
+    {
+      "san": "dxc4",
+      "uci": "d5c4",
+      "probability": 0.203
+    },
+    {
+      "san": "e6",
+      "uci": "e7e6",
+      "probability": 0.133
+    }
+  ],
+  "rnbqkb1r/ppp1pppp/5n2/3p4/2PP4/2N5/PP2PPPP/R1BQKBNR b KQkq - 2 3": [
+    {
+      "san": "dxc4",
+      "uci": "d5c4",
+      "probability": 0.578
+    },
+    {
+      "san": "e6",
+      "uci": "e7e6",
+      "probability": 0.422
+    }
+  ],
+  "r1bqkbnr/pppp1ppp/2n5/4P3/8/5N2/PPP1PPPP/RNBQKB1R b KQkq - 2 3": [
+    {
+      "san": "Qe7",
+      "uci": "d8e7",
+      "probability": 0.681
+    },
+    {
+      "san": "Bc5",
+      "uci": "f8c5",
+      "probability": 0.149
+    },
+    {
+      "san": "f6",
+      "uci": "f7f6",
+      "probability": 0.117
+    },
+    {
+      "san": "d6",
+      "uci": "d7d6",
+      "probability": 0.053
+    }
+  ],
+  "rnbqkbnr/ppppp1pp/8/5p2/3P1B2/8/PPP1PPPP/RN1QKBNR b KQkq - 1 2": [
+    {
+      "san": "Nf6",
+      "uci": "g8f6",
+      "probability": 1
+    }
+  ],
+  "rnbqkb1r/ppppp1pp/5n2/5p2/3P1B2/4P3/PPP2PPP/RN1QKBNR b KQkq - 0 3": [
+    {
+      "san": "g6",
+      "uci": "g7g6",
+      "probability": 0.529
+    },
+    {
+      "san": "e6",
+      "uci": "e7e6",
+      "probability": 0.471
+    }
+  ],
+  "rnbqkbnr/ppp1pppp/8/8/2pP4/2N5/PP2PPPP/R1BQKBNR b KQkq - 1 3": [
+    {
+      "san": "Nf6",
+      "uci": "g8f6",
+      "probability": 0.672
+    },
+    {
+      "san": "a6",
+      "uci": "a7a6",
+      "probability": 0.196
+    },
+    {
+      "san": "Nc6",
+      "uci": "b8c6",
+      "probability": 0.132
+    }
+  ],
+  "r1b1kbnr/ppppqppp/2n5/4P3/5B2/5N2/PPP1PPPP/RN1QKB1R b KQkq - 2 4": [
+    {
+      "san": "Qb4+",
+      "uci": "e7b4",
+      "probability": 1
+    }
+  ],
+  "rnbqkbnr/pp1ppppp/2p5/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2": [
+    {
+      "san": "d4",
+      "uci": "d2d4",
+      "probability": 0.377
+    },
+    {
+      "san": "Nf3",
+      "uci": "g1f3",
+      "probability": 0.318
+    },
+    {
+      "san": "Bc4",
+      "uci": "f1c4",
+      "probability": 0.113
+    },
+    {
+      "san": "Nc3",
+      "uci": "b1c3",
+      "probability": 0.052
+    },
+    {
+      "san": "f4",
+      "uci": "f2f4",
+      "probability": 0.042
+    },
+    {
+      "san": "d3",
+      "uci": "d2d3",
+      "probability": 0.041
+    },
+    {
+      "san": "e5",
+      "uci": "e4e5",
+      "probability": 0.031
+    },
+    {
+      "san": "Qf3",
+      "uci": "d1f3",
+      "probability": 0.026
+    }
+  ],
+  "rnbqkbnr/pp2pppp/2pp4/8/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 0 3": [
+    {
+      "san": "d4",
+      "uci": "d2d4",
+      "probability": 0.449
+    },
+    {
+      "san": "Bc4",
+      "uci": "f1c4",
+      "probability": 0.434
+    },
+    {
+      "san": "Nc3",
+      "uci": "b1c3",
+      "probability": 0.117
+    }
+  ],
+  "rnbqkb1r/pp2pppp/2pp1n2/8/3PP3/5N2/PPP2PPP/RNBQKB1R w KQkq - 1 4": [
+    {
+      "san": "Nc3",
+      "uci": "b1c3",
+      "probability": 0.896
+    },
+    {
+      "san": "Bd3",
+      "uci": "f1d3",
+      "probability": 0.104
+    }
+  ],
+  "rnb1kb1r/pp2pppp/2pp1n2/q7/3PP3/2N2N2/PPP2PPP/R1BQKB1R w KQkq - 3 5": [
+    {
+      "san": "Bd2",
+      "uci": "c1d2",
+      "probability": 0.428
+    },
+    {
+      "san": "Bd3",
+      "uci": "f1d3",
+      "probability": 0.395
+    },
+    {
+      "san": "Bc4",
+      "uci": "f1c4",
+      "probability": 0.132
+    },
+    {
+      "san": "e5",
+      "uci": "e4e5",
+      "probability": 0.045
+    }
+  ],
+  "rnbqkbnr/ppp1pppp/3p4/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2": [
+    {
+      "san": "d4",
+      "uci": "d2d4",
+      "probability": 0.419
+    },
+    {
+      "san": "Nf3",
+      "uci": "g1f3",
+      "probability": 0.408
+    },
+    {
+      "san": "Bc4",
+      "uci": "f1c4",
+      "probability": 0.088
+    },
+    {
+      "san": "Nc3",
+      "uci": "b1c3",
+      "probability": 0.061
+    },
+    {
+      "san": "f4",
+      "uci": "f2f4",
+      "probability": 0.024
+    }
+  ],
+  "rnbqkb1r/pp2pppp/2pp1n2/8/4P3/2N2N2/PPPP1PPP/R1BQKB1R w KQkq - 2 4": [
+    {
+      "san": "d4",
+      "uci": "d2d4",
+      "probability": 0.798
+    },
+    {
+      "san": "Bc4",
+      "uci": "f1c4",
+      "probability": 0.202
+    }
+  ],
+  "rnbqkb1r/ppp1pppp/3p1n2/8/4P3/5Q2/PPPP1PPP/RNB1KBNR w KQkq - 2 3": [
+    {
+      "san": "Bc4",
+      "uci": "f1c4",
+      "probability": 0.609
+    },
+    {
+      "san": "d3",
+      "uci": "d2d3",
+      "probability": 0.391
+    }
+  ],
+  "rnbqkb1r/ppp1pppp/3p1n2/8/3P4/4P3/PPP2PPP/RNBQKBNR w KQkq - 0 3": [
+    {
+      "san": "c4",
+      "uci": "c2c4",
+      "probability": 0.465
+    },
+    {
+      "san": "Bd3",
+      "uci": "f1d3",
+      "probability": 0.171
+    },
+    {
+      "san": "Nc3",
+      "uci": "b1c3",
+      "probability": 0.166
+    },
+    {
+      "san": "f4",
+      "uci": "f2f4",
+      "probability": 0.126
+    },
+    {
+      "san": "Nf3",
+      "uci": "g1f3",
+      "probability": 0.072
+    }
+  ],
+  "rnbqkb1r/ppp1pppp/3p1n2/8/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3": [
+    {
+      "san": "Nc3",
+      "uci": "b1c3",
+      "probability": 0.551
+    },
+    {
+      "san": "Bc4",
+      "uci": "f1c4",
+      "probability": 0.18
+    },
+    {
+      "san": "e5",
+      "uci": "e4e5",
+      "probability": 0.089
+    },
+    {
+      "san": "d3",
+      "uci": "d2d3",
+      "probability": 0.077
+    },
+    {
+      "san": "d4",
+      "uci": "d2d4",
+      "probability": 0.051
+    },
+    {
+      "san": "Bd3",
+      "uci": "f1d3",
+      "probability": 0.029
+    },
+    {
+      "san": "c3",
+      "uci": "c2c3",
+      "probability": 0.023
+    }
+  ],
+  "rnbqkbnr/pp2pppp/2pp4/8/3PP3/8/PPP2PPP/RNBQKBNR w KQkq - 0 3": [
+    {
+      "san": "Nf3",
+      "uci": "g1f3",
+      "probability": 0.714
+    },
+    {
+      "san": "Nc3",
+      "uci": "b1c3",
+      "probability": 0.147
+    },
+    {
+      "san": "c4",
+      "uci": "c2c4",
+      "probability": 0.1
+    },
+    {
+      "san": "d5",
+      "uci": "d4d5",
+      "probability": 0.039
+    }
+  ],
+  "rnbqkb1r/ppp1pppp/3p1n2/8/3PP3/8/PPP2PPP/RNBQKBNR w KQkq - 1 3": [
+    {
+      "san": "Nc3",
+      "uci": "b1c3",
+      "probability": 0.764
+    },
+    {
+      "san": "Bd3",
+      "uci": "f1d3",
+      "probability": 0.088
+    },
+    {
+      "san": "e5",
+      "uci": "e4e5",
+      "probability": 0.079
+    },
+    {
+      "san": "f3",
+      "uci": "f2f3",
+      "probability": 0.037
+    },
+    {
+      "san": "Nf3",
+      "uci": "g1f3",
+      "probability": 0.032
+    }
+  ],
+  "rnbqkbnr/ppp1pppp/3p4/8/3P4/8/PPP1PPPP/RNBQKBNR w KQkq - 0 2": [
+    {
+      "san": "Bf4",
+      "uci": "c1f4",
+      "probability": 0.298
+    },
+    {
+      "san": "c4",
+      "uci": "c2c4",
+      "probability": 0.268
+    },
+    {
+      "san": "e4",
+      "uci": "e2e4",
+      "probability": 0.173
+    },
+    {
+      "san": "Nf3",
+      "uci": "g1f3",
+      "probability": 0.133
+    },
+    {
+      "san": "e3",
+      "uci": "e2e3",
+      "probability": 0.054
+    },
+    {
+      "san": "Nc3",
+      "uci": "b1c3",
+      "probability": 0.045
+    },
+    {
+      "san": "d5",
+      "uci": "d4d5",
+      "probability": 0.029
+    }
+  ],
+  "rnbqkb1r/ppp1pppp/3p1n2/8/3P4/5N2/PPP1PPPP/RNBQKB1R w KQkq - 2 3": [
+    {
+      "san": "g3",
+      "uci": "g2g3",
+      "probability": 0.271
+    },
+    {
+      "san": "Bf4",
+      "uci": "c1f4",
+      "probability": 0.255
+    },
+    {
+      "san": "e3",
+      "uci": "e2e3",
+      "probability": 0.147
+    },
+    {
+      "san": "Bg5",
+      "uci": "c1g5",
+      "probability": 0.146
+    },
+    {
+      "san": "c4",
+      "uci": "c2c4",
+      "probability": 0.097
+    },
+    {
+      "san": "Nc3",
+      "uci": "b1c3",
+      "probability": 0.084
+    }
+  ],
+  "rnbqkb1r/pp2pppp/2pp1n2/8/3PP3/2N5/PPP2PPP/R1BQKBNR w KQkq - 2 4": [
+    {
+      "san": "Nf3",
+      "uci": "g1f3",
+      "probability": 0.433
+    },
+    {
+      "san": "Bc4",
+      "uci": "f1c4",
+      "probability": 0.178
+    },
+    {
+      "san": "Bg5",
+      "uci": "c1g5",
+      "probability": 0.125
+    },
+    {
+      "san": "Bf4",
+      "uci": "c1f4",
+      "probability": 0.085
+    },
+    {
+      "san": "e5",
+      "uci": "e4e5",
+      "probability": 0.072
+    },
+    {
+      "san": "f4",
+      "uci": "f2f4",
+      "probability": 0.061
+    },
+    {
+      "san": "g3",
+      "uci": "g2g3",
+      "probability": 0.046
+    }
+  ],
+  "rnbqkb1r/ppp1pppp/3p1n2/8/4P3/2N5/PPPP1PPP/R1BQKBNR w KQkq - 2 3": [
+    {
+      "san": "d4",
+      "uci": "d2d4",
+      "probability": 0.348
+    },
+    {
+      "san": "Nf3",
+      "uci": "g1f3",
+      "probability": 0.214
+    },
+    {
+      "san": "Bc4",
+      "uci": "f1c4",
+      "probability": 0.188
+    },
+    {
+      "san": "f4",
+      "uci": "f2f4",
+      "probability": 0.144
+    },
+    {
+      "san": "d3",
+      "uci": "d2d3",
+      "probability": 0.06
+    },
+    {
+      "san": "g3",
+      "uci": "g2g3",
+      "probability": 0.046
+    }
+  ],
+  "rnbqkb1r/pp2pppp/2pp1n2/8/3P1B2/5N2/PPP1PPPP/RN1QKB1R w KQkq - 0 4": [
+    {
+      "san": "e3",
+      "uci": "e2e3",
+      "probability": 0.873
+    },
+    {
+      "san": "Nc3",
+      "uci": "b1c3",
+      "probability": 0.057
+    },
+    {
+      "san": "c3",
+      "uci": "c2c3",
+      "probability": 0.038
+    },
+    {
+      "san": "c4",
+      "uci": "c2c4",
+      "probability": 0.032
+    }
+  ],
+  "rnbqkb1r/ppp1pppp/3p1n2/8/2B1P3/8/PPPP1PPP/RNBQK1NR w KQkq - 2 3": [
+    {
+      "san": "Nc3",
+      "uci": "b1c3",
+      "probability": 0.486
+    },
+    {
+      "san": "d3",
+      "uci": "d2d3",
+      "probability": 0.25
+    },
+    {
+      "san": "Qe2",
+      "uci": "d1e2",
+      "probability": 0.102
+    },
+    {
+      "san": "Nf3",
+      "uci": "g1f3",
+      "probability": 0.071
+    },
+    {
+      "san": "Qf3",
+      "uci": "d1f3",
+      "probability": 0.067
+    },
+    {
+      "san": "Bxf7+",
+      "uci": "c4f7",
+      "probability": 0.024
+    }
+  ],
+  "rnbqkbnr/ppp1pppp/3p4/8/2P5/8/PP1PPPPP/RNBQKBNR w KQkq - 0 2": [
+    {
+      "san": "Nc3",
+      "uci": "b1c3",
+      "probability": 0.505
+    },
+    {
+      "san": "g3",
+      "uci": "g2g3",
+      "probability": 0.257
+    },
+    {
+      "san": "d4",
+      "uci": "d2d4",
+      "probability": 0.16
+    },
+    {
+      "san": "Nf3",
+      "uci": "g1f3",
+      "probability": 0.078
+    }
+  ],
+  "rnbqkbnr/pppppppp/8/8/8/3P4/PPP1PPPP/RNBQKBNR b KQkq - 0 1": [
+    {
+      "san": "d5",
+      "uci": "d7d5",
+      "probability": 0.512
+    },
+    {
+      "san": "e5",
+      "uci": "e7e5",
+      "probability": 0.407
+    },
+    {
+      "san": "e6",
+      "uci": "e7e6",
+      "probability": 0.081
+    }
+  ],
+  "rnb1kb1r/ppq1pppp/2pp1n2/8/3PP3/2N2N2/PPPB1PPP/R2QKB1R w KQkq - 5 6": [
+    {
+      "san": "e5",
+      "uci": "e4e5",
+      "probability": 0.72
+    },
+    {
+      "san": "Bc4",
+      "uci": "f1c4",
+      "probability": 0.109
+    },
+    {
+      "san": "Bd3",
+      "uci": "f1d3",
+      "probability": 0.096
+    },
+    {
+      "san": "Bg5",
+      "uci": "d2g5",
+      "probability": 0.075
+    }
+  ],
+  "r1bqkbnr/ppp2ppp/2n5/3pp3/Q7/2PP1N2/PP2PPPP/RNB1KB1R b KQkq - 3 4": [
+    {
+      "san": "Bd7",
+      "uci": "c8d7",
+      "probability": 1
+    }
+  ],
+  "rnbqkb1r/pp2pppp/2pp1n2/8/2PP4/2N5/PP2PPPP/R1BQKBNR w KQkq - 2 4": [
+    {
+      "san": "e4",
+      "uci": "e2e4",
+      "probability": 0.753
+    },
+    {
+      "san": "Nf3",
+      "uci": "g1f3",
+      "probability": 0.172
+    },
+    {
+      "san": "Bf4",
+      "uci": "c1f4",
+      "probability": 0.075
+    }
+  ],
+  "rnb1kb1r/pp2pppp/2pp1n2/q7/3P1B2/4PN2/PPP2PPP/RN1QKB1R w KQkq - 1 5": [
+    {
+      "san": "c3",
+      "uci": "c2c3",
+      "probability": 0.804
+    },
+    {
+      "san": "Nbd2",
+      "uci": "b1d2",
+      "probability": 0.196
+    }
+  ],
+  "rnbqkb1r/pp2pppp/2pp1n2/8/3P1B2/4P3/PPP2PPP/RN1QKBNR w KQkq - 1 4": [
+    {
+      "san": "Bd3",
+      "uci": "f1d3",
+      "probability": 0.557
+    },
+    {
+      "san": "Nf3",
+      "uci": "g1f3",
+      "probability": 0.415
+    },
+    {
+      "san": "c4",
+      "uci": "c2c4",
+      "probability": 0.028
+    }
+  ],
+  "rnbqkbnr/ppp1pppp/3p4/8/8/4P3/PPPP1PPP/RNBQKBNR w KQkq - 0 2": [
+    {
+      "san": "d4",
+      "uci": "d2d4",
+      "probability": 0.254
+    },
+    {
+      "san": "c3",
+      "uci": "c2c3",
+      "probability": 0.216
+    },
+    {
+      "san": "Nf3",
+      "uci": "g1f3",
+      "probability": 0.153
+    },
+    {
+      "san": "Nh3",
+      "uci": "g1h3",
+      "probability": 0.148
+    },
+    {
+      "san": "b3",
+      "uci": "b2b3",
+      "probability": 0.137
+    },
+    {
+      "san": "Qf3",
+      "uci": "d1f3",
+      "probability": 0.092
+    }
+  ],
+  "rnbqkbnr/ppp1pppp/3p4/8/8/5N2/PPPPPPPP/RNBQKB1R w KQkq - 0 2": [
+    {
+      "san": "d4",
+      "uci": "d2d4",
+      "probability": 0.335
+    },
+    {
+      "san": "g3",
+      "uci": "g2g3",
+      "probability": 0.31
+    },
+    {
+      "san": "e4",
+      "uci": "e2e4",
+      "probability": 0.272
+    },
+    {
+      "san": "Nc3",
+      "uci": "b1c3",
+      "probability": 0.083
+    }
+  ],
+  "rnbqkb1r/ppp1pppp/3p4/8/2B1n3/5N2/PPPP1PPP/RNBQK2R w KQkq - 0 4": [
+    {
+      "san": "d3",
+      "uci": "d2d3",
+      "probability": 0.422
+    },
+    {
+      "san": "Qe2",
+      "uci": "d1e2",
+      "probability": 0.311
+    },
+    {
+      "san": "O-O",
+      "uci": "e1g1",
+      "probability": 0.176
+    },
+    {
+      "san": "Ng5",
+      "uci": "f3g5",
+      "probability": 0.049
+    },
+    {
+      "san": "Nc3",
+      "uci": "b1c3",
+      "probability": 0.042
+    }
+  ],
+  "rnbqkb1r/ppp1pppp/3p1n2/8/4P3/3P4/PPP2PPP/RNBQKBNR w KQkq - 1 3": [
+    {
+      "san": "Nc3",
+      "uci": "b1c3",
+      "probability": 0.714
+    },
+    {
+      "san": "Nf3",
+      "uci": "g1f3",
+      "probability": 0.286
+    }
+  ],
+  "rnbqkb1r/ppp1pppp/5n2/4p3/3P4/8/PPP2PPP/RNBQKBNR w KQkq - 0 4": [
+    {
+      "san": "dxe5",
+      "uci": "d4e5",
+      "probability": 0.854
+    },
+    {
+      "san": "Nf3",
+      "uci": "g1f3",
+      "probability": 0.092
+    },
+    {
+      "san": "Bc4",
+      "uci": "f1c4",
+      "probability": 0.054
+    }
+  ],
+  "rnb1kb1r/ppp1pppp/5n2/4P3/8/8/PPP2PPP/RNBqKBNR w KQkq - 0 5": [
+    {
+      "san": "Kxd1",
+      "uci": "e1d1",
+      "probability": 1
+    }
+  ],
+  "rnb1kb1r/ppp1pppp/8/4P3/6n1/8/PPP2PPP/RNBK1BNR w kq - 1 6": [
+    {
+      "san": "Be3",
+      "uci": "c1e3",
+      "probability": 0.686
+    },
+    {
+      "san": "Nh3",
+      "uci": "g1h3",
+      "probability": 0.183
+    },
+    {
+      "san": "Ke1",
+      "uci": "d1e1",
+      "probability": 0.131
+    }
+  ],
+  "rnbqkb1r/ppp1pppp/3p1n2/8/3P1B2/8/PPP1PPPP/RN1QKBNR w KQkq - 2 3": [
+    {
+      "san": "e3",
+      "uci": "e2e3",
+      "probability": 0.652
+    },
+    {
+      "san": "Nf3",
+      "uci": "g1f3",
+      "probability": 0.248
+    },
+    {
+      "san": "c3",
+      "uci": "c2c3",
+      "probability": 0.054
+    },
+    {
+      "san": "Nc3",
+      "uci": "b1c3",
+      "probability": 0.046
+    }
+  ],
+  "rnbqkb1r/ppp1pppp/3p1n2/8/3P4/2N5/PPP1PPPP/R1BQKBNR w KQkq - 2 3": [
+    {
+      "san": "Bf4",
+      "uci": "c1f4",
+      "probability": 0.468
+    },
+    {
+      "san": "e4",
+      "uci": "e2e4",
+      "probability": 0.399
+    },
+    {
+      "san": "f3",
+      "uci": "f2f3",
+      "probability": 0.133
+    }
+  ],
+  "rnbqkb1r/ppp1pppp/5n2/4p3/8/5N2/PPPP1PPP/RNBQKB1R w KQkq - 0 4": [
+    {
+      "san": "Nxe5",
+      "uci": "f3e5",
+      "probability": 1
+    }
+  ],
+  "rnb1kb1r/ppp1pppp/8/4P3/4n3/8/PPP2PPP/RNBK1BNR w kq - 1 6": [
+    {
+      "san": "Be3",
+      "uci": "c1e3",
+      "probability": 0.352
+    },
+    {
+      "san": "Nh3",
+      "uci": "g1h3",
+      "probability": 0.182
+    },
+    {
+      "san": "f3",
+      "uci": "f2f3",
+      "probability": 0.179
+    },
+    {
+      "san": "Bd3",
+      "uci": "f1d3",
+      "probability": 0.178
+    },
+    {
+      "san": "Ke1",
+      "uci": "d1e1",
+      "probability": 0.109
+    }
+  ],
+  "rnbqkb1r/ppp1pp1p/3p1np1/8/3P1B2/5N2/PPP1PPPP/RN1QKB1R w KQkq - 0 4": [
+    {
+      "san": "e3",
+      "uci": "e2e3",
+      "probability": 0.797
+    },
+    {
+      "san": "Nc3",
+      "uci": "b1c3",
+      "probability": 0.203
+    }
+  ],
+  "rnbqk2r/ppp1ppbp/3p1np1/8/3P1B2/4PN2/PPP2PPP/RN1QKB1R w KQkq - 1 5": [
+    {
+      "san": "Bd3",
+      "uci": "f1d3",
+      "probability": 0.525
+    },
+    {
+      "san": "c3",
+      "uci": "c2c3",
+      "probability": 0.278
+    },
+    {
+      "san": "Nc3",
+      "uci": "b1c3",
+      "probability": 0.101
+    },
+    {
+      "san": "c4",
+      "uci": "c2c4",
+      "probability": 0.096
+    }
+  ],
+  "rnbqkb1r/ppp1pppp/3p1n2/8/2PP4/8/PP2PPPP/RNBQKBNR w KQkq - 1 3": [
+    {
+      "san": "Nc3",
+      "uci": "b1c3",
+      "probability": 0.828
+    },
+    {
+      "san": "Nf3",
+      "uci": "g1f3",
+      "probability": 0.076
+    },
+    {
+      "san": "Bf4",
+      "uci": "c1f4",
+      "probability": 0.053
+    },
+    {
+      "san": "e3",
+      "uci": "e2e3",
+      "probability": 0.043
+    }
+  ],
+  "rnbqkb1r/ppp1pppp/3p1n2/8/4PP2/8/PPPP2PP/RNBQKBNR w KQkq - 1 3": [
+    {
+      "san": "Nc3",
+      "uci": "b1c3",
+      "probability": 0.804
+    },
+    {
+      "san": "e5",
+      "uci": "e4e5",
+      "probability": 0.115
+    },
+    {
+      "san": "d4",
+      "uci": "d2d4",
+      "probability": 0.081
+    }
+  ],
+  "rnbqkbnr/pp2pppp/3p4/2p5/2B1P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 1 3": [
+    {
+      "san": "Nf6",
+      "uci": "g8f6",
+      "probability": 0.358
+    },
+    {
+      "san": "Nc6",
+      "uci": "b8c6",
+      "probability": 0.336
+    },
+    {
+      "san": "e6",
+      "uci": "e7e6",
+      "probability": 0.306
+    }
+  ],
+  "rnbqkb1r/ppp1pp1p/3p1np1/8/4P3/2N2N2/PPPP1PPP/R1BQKB1R w KQkq - 0 4": [
+    {
+      "san": "d4",
+      "uci": "d2d4",
+      "probability": 0.6
+    },
+    {
+      "san": "Bc4",
+      "uci": "f1c4",
+      "probability": 0.261
+    },
+    {
+      "san": "e5",
+      "uci": "e4e5",
+      "probability": 0.036
+    },
+    {
+      "san": "Bb5+",
+      "uci": "f1b5",
+      "probability": 0.035
+    },
+    {
+      "san": "d3",
+      "uci": "d2d3",
+      "probability": 0.034
+    },
+    {
+      "san": "b3",
+      "uci": "b2b3",
+      "probability": 0.034
+    }
+  ],
+  "rnbqk2r/ppp1ppbp/3p1np1/8/3PP3/2N2N2/PPP2PPP/R1BQKB1R w KQkq - 1 5": [
+    {
+      "san": "e5",
+      "uci": "e4e5",
+      "probability": 0.258
+    },
+    {
+      "san": "Bg5",
+      "uci": "c1g5",
+      "probability": 0.195
+    },
+    {
+      "san": "Be3",
+      "uci": "c1e3",
+      "probability": 0.158
+    },
+    {
+      "san": "Bc4",
+      "uci": "f1c4",
+      "probability": 0.117
+    },
+    {
+      "san": "Bd3",
+      "uci": "f1d3",
+      "probability": 0.092
+    },
+    {
+      "san": "Bf4",
+      "uci": "c1f4",
+      "probability": 0.074
+    },
+    {
+      "san": "h3",
+      "uci": "h2h3",
+      "probability": 0.044
+    },
+    {
+      "san": "d5",
+      "uci": "d4d5",
+      "probability": 0.035
+    },
+    {
+      "san": "Be2",
+      "uci": "f1e2",
+      "probability": 0.027
+    }
+  ],
+  "rnbqk2r/ppp1ppbp/5np1/4p3/3P4/2N2N2/PPP2PPP/R1BQKB1R w KQkq - 0 6": [
+    {
+      "san": "dxe5",
+      "uci": "d4e5",
+      "probability": 0.693
+    },
+    {
+      "san": "Nxe5",
+      "uci": "f3e5",
+      "probability": 0.307
+    }
+  ],
+  "rnbqkb1r/ppp1pp1p/3p1np1/8/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 0 4": [
+    {
+      "san": "Nc3",
+      "uci": "b1c3",
+      "probability": 0.399
+    },
+    {
+      "san": "Ng5",
+      "uci": "f3g5",
+      "probability": 0.261
+    },
+    {
+      "san": "d3",
+      "uci": "d2d3",
+      "probability": 0.221
+    },
+    {
+      "san": "O-O",
+      "uci": "e1g1",
+      "probability": 0.119
+    }
+  ],
+  "rnbqk2r/ppp1ppbp/3p1np1/8/2B1P3/2N2N2/PPPP1PPP/R1BQK2R w KQkq - 2 5": [
+    {
+      "san": "d3",
+      "uci": "d2d3",
+      "probability": 0.292
+    },
+    {
+      "san": "Ng5",
+      "uci": "f3g5",
+      "probability": 0.245
+    },
+    {
+      "san": "O-O",
+      "uci": "e1g1",
+      "probability": 0.226
+    },
+    {
+      "san": "d4",
+      "uci": "d2d4",
+      "probability": 0.174
+    },
+    {
+      "san": "e5",
+      "uci": "e4e5",
+      "probability": 0.063
+    }
+  ],
+  "rnbq1rk1/ppp1ppbp/3p1np1/8/2B1P3/2NP1N2/PPP2PPP/R1BQK2R w KQ - 1 6": [
+    {
+      "san": "O-O",
+      "uci": "e1g1",
+      "probability": 1
+    }
+  ],
+  "rnbqkb1r/ppp1pp1p/3p1np1/8/2PP4/2N5/PP2PPPP/R1BQKBNR w KQkq - 0 4": [
+    {
+      "san": "e4",
+      "uci": "e2e4",
+      "probability": 0.292
+    },
+    {
+      "san": "Bg5",
+      "uci": "c1g5",
+      "probability": 0.279
+    },
+    {
+      "san": "Nf3",
+      "uci": "g1f3",
+      "probability": 0.268
+    },
+    {
+      "san": "e3",
+      "uci": "e2e3",
+      "probability": 0.058
+    },
+    {
+      "san": "g3",
+      "uci": "g2g3",
+      "probability": 0.058
+    },
+    {
+      "san": "Bf4",
+      "uci": "c1f4",
+      "probability": 0.045
+    }
+  ],
+  "rnbqk2r/ppp1ppbp/3p1np1/8/2PPP3/2N5/PP3PPP/R1BQKBNR w KQkq - 1 5": [
+    {
+      "san": "Nf3",
+      "uci": "g1f3",
+      "probability": 0.497
+    },
+    {
+      "san": "Bg5",
+      "uci": "c1g5",
+      "probability": 0.355
+    },
+    {
+      "san": "Be3",
+      "uci": "c1e3",
+      "probability": 0.084
+    },
+    {
+      "san": "Bd3",
+      "uci": "f1d3",
+      "probability": 0.064
+    }
+  ],
+  "rn1qk2r/ppp1ppbp/3p1np1/8/2PPP1b1/2N2N2/PP3PPP/R1BQKB1R w KQkq - 3 6": [
+    {
+      "san": "Be2",
+      "uci": "f1e2",
+      "probability": 0.677
+    },
+    {
+      "san": "h3",
+      "uci": "h2h3",
+      "probability": 0.323
+    }
+  ],
+  "rnbqkb1r/ppp1pp1p/3p1np1/8/3PP3/2N5/PPP2PPP/R1BQKBNR w KQkq - 0 4": [
+    {
+      "san": "Nf3",
+      "uci": "g1f3",
+      "probability": 0.372
+    },
+    {
+      "san": "Bg5",
+      "uci": "c1g5",
+      "probability": 0.243
+    },
+    {
+      "san": "e5",
+      "uci": "e4e5",
+      "probability": 0.083
+    },
+    {
+      "san": "f4",
+      "uci": "f2f4",
+      "probability": 0.061
+    },
+    {
+      "san": "d5",
+      "uci": "d4d5",
+      "probability": 0.053
+    },
+    {
+      "san": "Bc4",
+      "uci": "f1c4",
+      "probability": 0.05
+    },
+    {
+      "san": "Be3",
+      "uci": "c1e3",
+      "probability": 0.048
+    },
+    {
+      "san": "Bf4",
+      "uci": "c1f4",
+      "probability": 0.046
+    },
+    {
+      "san": "Bd3",
+      "uci": "f1d3",
+      "probability": 0.044
+    }
+  ],
+  "rnbqk2r/ppp1ppbp/3p1np1/8/3PP3/2NB4/PPP2PPP/R1BQK1NR w KQkq - 2 5": [
+    {
+      "san": "Nf3",
+      "uci": "g1f3",
+      "probability": 1
+    }
+  ],
+  "rn1qk2r/ppp1ppbp/3p1np1/8/3PPBb1/2N2N2/PPP2PPP/R2QKB1R w KQkq - 4 6": [
+    {
+      "san": "Be2",
+      "uci": "f1e2",
+      "probability": 0.51
+    },
+    {
+      "san": "e5",
+      "uci": "e4e5",
+      "probability": 0.216
+    },
+    {
+      "san": "h3",
+      "uci": "h2h3",
+      "probability": 0.172
+    },
+    {
+      "san": "Bc4",
+      "uci": "f1c4",
+      "probability": 0.102
+    }
+  ],
+  "rnbqkb1r/ppp1pp1p/3p1np1/8/3P1B2/4P3/PPP2PPP/RN1QKBNR w KQkq - 0 4": [
+    {
+      "san": "Nf3",
+      "uci": "g1f3",
+      "probability": 0.647
+    },
+    {
+      "san": "Bd3",
+      "uci": "f1d3",
+      "probability": 0.199
+    },
+    {
+      "san": "Nd2",
+      "uci": "b1d2",
+      "probability": 0.065
+    },
+    {
+      "san": "c4",
+      "uci": "c2c4",
+      "probability": 0.046
+    },
+    {
+      "san": "Nc3",
+      "uci": "b1c3",
+      "probability": 0.043
+    }
+  ],
+  "rnbqkb1r/ppp1pp1p/5np1/4p3/3P4/2N5/PPP2PPP/R1BQKBNR w KQkq - 0 5": [
+    {
+      "san": "dxe5",
+      "uci": "d4e5",
+      "probability": 1
+    }
+  ],
+  "rnb1kb1r/ppp1pp1p/5np1/4P3/8/2N5/PPP2PPP/R1BqKBNR w KQkq - 0 6": [
+    {
+      "san": "Nxd1",
+      "uci": "c3d1",
+      "probability": 1
+    }
+  ],
+  "rnbqkb1r/ppp1pp1p/3p1np1/8/2B1P3/3P4/PPP2PPP/RNBQK1NR w KQkq - 0 4": [
+    {
+      "san": "Bg5",
+      "uci": "c1g5",
+      "probability": 0.505
+    },
+    {
+      "san": "Nf3",
+      "uci": "g1f3",
+      "probability": 0.285
+    },
+    {
+      "san": "Nc3",
+      "uci": "b1c3",
+      "probability": 0.21
+    }
+  ],
+  "rnbqkbnr/pp1ppppp/2p5/8/4P3/2N5/PPPP1PPP/R1BQKBNR b KQkq - 1 2": [
+    {
+      "san": "d5",
+      "uci": "d7d5",
+      "probability": 1
+    }
+  ],
+  "r1bqkb1r/pppp1pp1/2n2n1p/4p3/2B1P3/5N2/PPPP1PPP/RNBQR1K1 b kq - 3 5": [
+    {
+      "san": "Bc5",
+      "uci": "f8c5",
+      "probability": 0.588
+    },
+    {
+      "san": "d6",
+      "uci": "d7d6",
+      "probability": 0.412
+    }
+  ],
+  "rnbqkb1r/ppp1pppp/3p4/8/3Pn3/5N2/PPP2PPP/RNBQKB1R w KQkq - 0 4": [
+    {
+      "san": "Bd3",
+      "uci": "f1d3",
+      "probability": 0.397
+    },
+    {
+      "san": "Nc3",
+      "uci": "b1c3",
+      "probability": 0.249
+    },
+    {
+      "san": "Bb5+",
+      "uci": "f1b5",
+      "probability": 0.121
+    },
+    {
+      "san": "d5",
+      "uci": "d4d5",
+      "probability": 0.103
+    },
+    {
+      "san": "Bc4",
+      "uci": "f1c4",
+      "probability": 0.081
+    },
+    {
+      "san": "Qd3",
+      "uci": "d1d3",
+      "probability": 0.049
+    }
+  ],
+  "rnbqk2r/ppp1ppbp/3p1np1/6B1/3PP3/2N5/PPP2PPP/R2QKBNR w KQkq - 2 5": [
+    {
+      "san": "Nf3",
+      "uci": "g1f3",
+      "probability": 0.368
+    },
+    {
+      "san": "e5",
+      "uci": "e4e5",
+      "probability": 0.268
+    },
+    {
+      "san": "Qd2",
+      "uci": "d1d2",
+      "probability": 0.212
+    },
+    {
+      "san": "Bxf6",
+      "uci": "g5f6",
+      "probability": 0.078
+    },
+    {
+      "san": "Qf3",
+      "uci": "d1f3",
+      "probability": 0.045
+    },
+    {
+      "san": "Bc4",
+      "uci": "f1c4",
+      "probability": 0.029
+    }
+  ],
+  "rnbqk2r/ppp1ppbp/3p1np1/3P4/4P3/2N5/PPP2PPP/R1BQKBNR w KQkq - 1 5": [
+    {
+      "san": "Nf3",
+      "uci": "g1f3",
+      "probability": 0.517
+    },
+    {
+      "san": "Bg5",
+      "uci": "c1g5",
+      "probability": 0.288
+    },
+    {
+      "san": "f3",
+      "uci": "f2f3",
+      "probability": 0.195
+    }
+  ],
+  "rnbqk2r/ppp1ppbp/3p1np1/8/3PPB2/2N5/PPP2PPP/R2QKBNR w KQkq - 2 5": [
+    {
+      "san": "e5",
+      "uci": "e4e5",
+      "probability": 0.685
+    },
+    {
+      "san": "Nf3",
+      "uci": "g1f3",
+      "probability": 0.315
+    }
+  ],
+  "rnbqkb1r/ppp1pp1p/3p1np1/8/2PP4/5N2/PP2PPPP/RNBQKB1R w KQkq - 0 4": [
+    {
+      "san": "Nc3",
+      "uci": "b1c3",
+      "probability": 0.585
+    },
+    {
+      "san": "e3",
+      "uci": "e2e3",
+      "probability": 0.415
+    }
+  ],
+  "rnbq1rk1/ppp1ppbp/3p1np1/8/2BPP3/2N2N2/PPP2PPP/R1BQK2R w KQ - 4 6": [
+    {
+      "san": "O-O",
+      "uci": "e1g1",
+      "probability": 0.49
+    },
+    {
+      "san": "Bg5",
+      "uci": "c1g5",
+      "probability": 0.381
+    },
+    {
+      "san": "Ng5",
+      "uci": "f3g5",
+      "probability": 0.129
+    }
+  ],
+  "rnbqkb1r/ppp1pp1p/3p1np1/8/4P3/3P1N2/PPP2PPP/RNBQKB1R w KQkq - 0 4": [
+    {
+      "san": "Bg5",
+      "uci": "c1g5",
+      "probability": 0.667
+    },
+    {
+      "san": "g3",
+      "uci": "g2g3",
+      "probability": 0.241
+    },
+    {
+      "san": "Nc3",
+      "uci": "b1c3",
+      "probability": 0.092
+    }
+  ],
+  "rnbqkb1r/ppp1pp1p/5np1/4N3/8/8/PPPP1PPP/RNBQKB1R w KQkq - 0 5": [
+    {
+      "san": "Qf3",
+      "uci": "d1f3",
+      "probability": 0.476
+    },
+    {
+      "san": "Bc4",
+      "uci": "f1c4",
+      "probability": 0.394
+    },
+    {
+      "san": "d4",
+      "uci": "d2d4",
+      "probability": 0.13
+    }
+  ],
+  "rnbqkb1r/ppp1pp1p/3p1np1/8/4PP2/2N5/PPPP2PP/R1BQKBNR w KQkq - 0 4": [
+    {
+      "san": "Nf3",
+      "uci": "g1f3",
+      "probability": 0.371
+    },
+    {
+      "san": "e5",
+      "uci": "e4e5",
+      "probability": 0.268
+    },
+    {
+      "san": "Bc4",
+      "uci": "f1c4",
+      "probability": 0.221
+    },
+    {
+      "san": "d4",
+      "uci": "d2d4",
+      "probability": 0.14
+    }
+  ],
+  "rnbqk2r/ppp1ppbp/3p1np1/8/3PPP2/2N5/PPP3PP/R1BQKBNR w KQkq - 1 5": [
+    {
+      "san": "Nf3",
+      "uci": "g1f3",
+      "probability": 1
+    }
+  ],
+  "rnbqkb1r/ppp1pp1p/3p1np1/8/2B1P3/2N5/PPPP1PPP/R1BQK1NR w KQkq - 0 4": [
+    {
+      "san": "Nf3",
+      "uci": "g1f3",
+      "probability": 0.348
+    },
+    {
+      "san": "d3",
+      "uci": "d2d3",
+      "probability": 0.315
+    },
+    {
+      "san": "h3",
+      "uci": "h2h3",
+      "probability": 0.168
+    },
+    {
+      "san": "Qf3",
+      "uci": "d1f3",
+      "probability": 0.095
+    },
+    {
+      "san": "d4",
+      "uci": "d2d4",
+      "probability": 0.074
+    }
+  ],
+  "rnbqkb1r/ppp1pp1p/3p1np1/8/3PP3/3B4/PPP2PPP/RNBQK1NR w KQkq - 0 4": [
+    {
+      "san": "Nf3",
+      "uci": "g1f3",
+      "probability": 0.429
+    },
+    {
+      "san": "Be3",
+      "uci": "c1e3",
+      "probability": 0.234
+    },
+    {
+      "san": "f4",
+      "uci": "f2f4",
+      "probability": 0.223
+    },
+    {
+      "san": "c4",
+      "uci": "c2c4",
+      "probability": 0.114
+    }
+  ],
+  "rnbqk2r/ppp1ppbp/3p1np1/8/2BPP3/2N5/PPP2PPP/R1BQK1NR w KQkq - 1 5": [
+    {
+      "san": "Nf3",
+      "uci": "g1f3",
+      "probability": 0.71
+    },
+    {
+      "san": "e5",
+      "uci": "e4e5",
+      "probability": 0.151
+    },
+    {
+      "san": "Qf3",
+      "uci": "d1f3",
+      "probability": 0.139
+    }
+  ],
+  "rnbqkbnr/ppp1pppp/3p4/8/3P1B2/8/PPP1PPPP/RN1QKBNR b KQkq - 1 2": [
+    {
+      "san": "Nf6",
+      "uci": "g8f6",
+      "probability": 0.621
+    },
+    {
+      "san": "g6",
+      "uci": "g7g6",
+      "probability": 0.325
+    },
+    {
+      "san": "e5",
+      "uci": "e7e5",
+      "probability": 0.054
+    }
+  ],
+  "rnbqkb1r/ppp1pppp/5n2/3p4/3P1B2/5N2/PPP1PPPP/RN1QKB1R b KQkq - 3 3": [
+    {
+      "san": "Nc6",
+      "uci": "b8c6",
+      "probability": 0.583
+    },
+    {
+      "san": "Bf5",
+      "uci": "c8f5",
+      "probability": 0.248
+    },
+    {
+      "san": "e6",
+      "uci": "e7e6",
+      "probability": 0.169
+    }
+  ],
+  "rn1qkb1r/ppp1pppp/5n2/3p1b2/3P1B2/4PN2/PPP2PPP/RN1QKB1R b KQkq - 0 4": [
+    {
+      "san": "e6",
+      "uci": "e7e6",
+      "probability": 0.78
+    },
+    {
+      "san": "c5",
+      "uci": "c7c5",
+      "probability": 0.22
+    }
+  ],
+  "rnb1k2r/ppp1ppbp/5np1/4P3/8/2N2N2/PPP2PPP/R1BqKB1R w KQkq - 0 7": [
+    {
+      "san": "Nxd1",
+      "uci": "c3d1",
+      "probability": 0.847
+    },
+    {
+      "san": "Kxd1",
+      "uci": "e1d1",
+      "probability": 0.153
+    }
+  ],
+  "rnbqkb1r/pppppppp/5n2/8/3P4/5N2/PPP1PPPP/RNBQKB1R b KQkq - 2 2": [
+    {
+      "san": "d5",
+      "uci": "d7d5",
+      "probability": 0.54
+    },
+    {
+      "san": "g6",
+      "uci": "g7g6",
+      "probability": 0.234
+    },
+    {
+      "san": "d6",
+      "uci": "d7d6",
+      "probability": 0.226
+    }
+  ],
+  "r1bqkb1r/ppp1pppp/2n2n2/3p4/3P1B2/4PN2/PPP2PPP/RN1QKB1R b KQkq - 0 4": [
+    {
+      "san": "Bg4",
+      "uci": "c8g4",
+      "probability": 0.36
+    },
+    {
+      "san": "Bf5",
+      "uci": "c8f5",
+      "probability": 0.34
+    },
+    {
+      "san": "e6",
+      "uci": "e7e6",
+      "probability": 0.24
+    },
+    {
+      "san": "Nh5",
+      "uci": "f6h5",
+      "probability": 0.06
+    }
+  ],
+  "r2qkb1r/ppp1pppp/2n2n2/3p1b2/3P1B2/2P1PN2/PP3PPP/RN1QKB1R b KQkq - 0 5": [
+    {
+      "san": "e6",
+      "uci": "e7e6",
+      "probability": 1
+    }
+  ],
+  "r2qkbnr/ppp1pppp/2n5/3p1b2/3P1B2/4PN2/PPP2PPP/RN1QKB1R b KQkq - 0 4": [
+    {
+      "san": "Nf6",
+      "uci": "g8f6",
+      "probability": 0.412
+    },
+    {
+      "san": "e6",
+      "uci": "e7e6",
+      "probability": 0.397
+    },
+    {
+      "san": "Nb4",
+      "uci": "c6b4",
+      "probability": 0.191
+    }
+  ],
+  "r1bqkbnr/ppp1pppp/2n5/3p4/3P1B2/5N2/PPP1PPPP/RN1QKB1R b KQkq - 3 3": [
+    {
+      "san": "Nf6",
+      "uci": "g8f6",
+      "probability": 0.502
+    },
+    {
+      "san": "Bf5",
+      "uci": "c8f5",
+      "probability": 0.4
+    },
+    {
+      "san": "Bg4",
+      "uci": "c8g4",
+      "probability": 0.098
+    }
+  ],
+  "r1bqkb1r/ppp1pppp/2n2n2/3p4/3P1B2/2P2N2/PP2PPPP/RN1QKB1R b KQkq - 0 4": [
+    {
+      "san": "Bg4",
+      "uci": "c8g4",
+      "probability": 0.557
+    },
+    {
+      "san": "e6",
+      "uci": "e7e6",
+      "probability": 0.443
+    }
+  ],
+  "rnbqkb1r/pp2pppp/2p2n2/3p4/3P1B2/4PN2/PPP2PPP/RN1QKB1R b KQkq - 0 4": [
+    {
+      "san": "Bg4",
+      "uci": "c8g4",
+      "probability": 1
+    }
+  ],
+  "rn1qk2r/ppp1ppbp/3p1np1/8/2BPP1b1/2N2N2/PPP2PPP/R1BQK2R w KQkq - 4 6": [
+    {
+      "san": "h3",
+      "uci": "h2h3",
+      "probability": 1
+    }
+  ],
+  "rnbqk2r/ppp1ppbp/3p1np1/8/4P3/2NP1N2/PPP2PPP/R1BQKB1R w KQkq - 1 5": [
+    {
+      "san": "Bg5",
+      "uci": "c1g5",
+      "probability": 0.705
+    },
+    {
+      "san": "h3",
+      "uci": "h2h3",
+      "probability": 0.295
+    }
+  ],
+  "rnbqkbnr/pp1ppppp/2p5/8/3P1B2/8/PPP1PPPP/RN1QKBNR b KQkq - 1 2": [
+    {
+      "san": "d5",
+      "uci": "d7d5",
+      "probability": 0.755
     },
     {
       "san": "Nf6",
@@ -259,915 +3062,1139 @@
     {
       "san": "d6",
       "uci": "d7d6",
-      "probability": 0.04
-    },
-    {
-      "san": "Bc5",
-      "uci": "f8c5",
-      "probability": 0.03
-    }
-  ],
-  "r1bqkbnr/1ppp1ppp/p1n5/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 0 4": [
-    {
-      "san": "Ba4",
-      "uci": "b5a4",
-      "probability": 0.88
-    },
-    {
-      "san": "Bxc6",
-      "uci": "b5c6",
-      "probability": 0.12
-    }
-  ],
-  "r1bqkbnr/1ppp1ppp/p1n5/4p3/B3P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 1 4": [
-    {
-      "san": "Nf6",
-      "uci": "g8f6",
-      "probability": 0.85
-    },
-    {
-      "san": "d6",
-      "uci": "d7d6",
-      "probability": 0.1
-    },
-    {
-      "san": "Bc5",
-      "uci": "f8c5",
-      "probability": 0.05
-    }
-  ],
-  "r1bqkb1r/1ppp1ppp/p1n2n2/4p3/B3P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 2 5": [
-    {
-      "san": "O-O",
-      "uci": "e1g1",
-      "probability": 0.85
-    },
-    {
-      "san": "d3",
-      "uci": "d2d3",
-      "probability": 0.1
-    },
-    {
-      "san": "Qe2",
-      "uci": "d1e2",
-      "probability": 0.05
-    }
-  ],
-  "r1bqkb1r/1ppp1ppp/p1n2n2/4p3/B3P3/5N2/PPPP1PPP/RNBQ1RK1 b kq - 3 5": [
-    {
-      "san": "Be7",
-      "uci": "f8e7",
-      "probability": 0.75
-    },
-    {
-      "san": "Nxe4",
-      "uci": "f6e4",
-      "probability": 0.2
-    },
-    {
-      "san": "b5",
-      "uci": "b7b5",
-      "probability": 0.05
-    }
-  ],
-  "r1bqkbnr/pppp1ppp/2n5/4p3/3PP3/5N2/PPP2PPP/RNBQKB1R b KQkq - 0 3": [
-    {
-      "san": "exd4",
-      "uci": "e5d4",
-      "probability": 0.94
-    },
-    {
-      "san": "Nxd4",
-      "uci": "c6d4",
-      "probability": 0.06
-    }
-  ],
-  "r1bqkbnr/pppp1ppp/2n5/8/3pP3/5N2/PPP2PPP/RNBQKB1R w KQkq - 0 4": [
-    {
-      "san": "Nxd4",
-      "uci": "f3d4",
-      "probability": 0.8
-    },
-    {
-      "san": "Bc4",
-      "uci": "f1c4",
-      "probability": 0.15
-    },
-    {
-      "san": "c3",
-      "uci": "c2c3",
-      "probability": 0.05
-    }
-  ],
-  "r1bqkbnr/pppp1ppp/2n5/8/3NP3/8/PPP2PPP/RNBQKB1R b KQkq - 0 4": [
-    {
-      "san": "Nf6",
-      "uci": "g8f6",
-      "probability": 0.5
-    },
-    {
-      "san": "Bc5",
-      "uci": "f8c5",
-      "probability": 0.4
-    },
-    {
-      "san": "Qh4",
-      "uci": "d8h4",
-      "probability": 0.1
-    }
-  ],
-  "rnbqkb1r/pppp1ppp/5n2/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3": [
-    {
-      "san": "Nxe5",
-      "uci": "f3e5",
-      "probability": 0.75
-    },
-    {
-      "san": "d4",
-      "uci": "d2d4",
-      "probability": 0.15
-    },
-    {
-      "san": "Nc3",
-      "uci": "b1c3",
-      "probability": 0.1
-    }
-  ],
-  "rnbqkb1r/pppp1ppp/5n2/4N3/4P3/8/PPPP1PPP/RNBQKB1R b KQkq - 0 3": [
-    {
-      "san": "d6",
-      "uci": "d7d6",
-      "probability": 0.85
-    },
-    {
-      "san": "Nxe4",
-      "uci": "f6e4",
-      "probability": 0.15
-    }
-  ],
-  "rnbqkb1r/ppp2ppp/3p1n2/4N3/4P3/8/PPPP1PPP/RNBQKB1R w KQkq - 0 4": [
-    {
-      "san": "Nf3",
-      "uci": "e5f3",
-      "probability": 0.92
-    },
-    {
-      "san": "Nc4",
-      "uci": "e5c4",
-      "probability": 0.08
-    }
-  ],
-  "rnbqkb1r/ppp2ppp/3p1n2/8/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 4": [
-    {
-      "san": "Nxe4",
-      "uci": "f6e4",
-      "probability": 0.95
-    },
-    {
-      "san": "d5",
-      "uci": "d6d5",
-      "probability": 0.05
-    }
-  ],
-  "rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2": [
-    {
-      "san": "Nf3",
-      "uci": "g1f3",
-      "probability": 0.75
-    },
-    {
-      "san": "Nc3",
-      "uci": "b1c3",
-      "probability": 0.12
-    },
-    {
-      "san": "c3",
-      "uci": "c2c3",
-      "probability": 0.08
-    },
-    {
-      "san": "d4",
-      "uci": "d2d4",
-      "probability": 0.05
-    }
-  ],
-  "rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2": [
-    {
-      "san": "d6",
-      "uci": "d7d6",
-      "probability": 0.45
-    },
-    {
-      "san": "Nc6",
-      "uci": "b8c6",
-      "probability": 0.3
-    },
-    {
-      "san": "e6",
-      "uci": "e7e6",
-      "probability": 0.2
-    },
-    {
-      "san": "a6",
-      "uci": "a7a6",
-      "probability": 0.05
-    }
-  ],
-  "rnbqkbnr/pp2pppp/3p4/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 0 3": [
-    {
-      "san": "d4",
-      "uci": "d2d4",
-      "probability": 0.85
-    },
-    {
-      "san": "Bb5+",
-      "uci": "f1b5",
-      "probability": 0.12
-    },
-    {
-      "san": "c3",
-      "uci": "c2c3",
-      "probability": 0.03
-    }
-  ],
-  "rnbqkbnr/pp2pppp/3p4/2p5/3PP3/5N2/PPP2PPP/RNBQKB1R b KQkq - 0 3": [
-    {
-      "san": "cxd4",
-      "uci": "c5d4",
-      "probability": 0.98
-    },
-    {
-      "san": "Nf6",
-      "uci": "g8f6",
-      "probability": 0.02
-    }
-  ],
-  "rnbqkbnr/pp2pppp/3p4/8/3pP3/5N2/PPP2PPP/RNBQKB1R w KQkq - 0 4": [
-    {
-      "san": "Nxd4",
-      "uci": "f3d4",
-      "probability": 0.96
-    },
-    {
-      "san": "Qxd4",
-      "uci": "d1d4",
-      "probability": 0.04
-    }
-  ],
-  "rnbqkbnr/pp2pppp/3p4/8/3NP3/8/PPP2PPP/RNBQKB1R b KQkq - 0 4": [
-    {
-      "san": "Nf6",
-      "uci": "g8f6",
-      "probability": 0.88
-    },
-    {
-      "san": "a6",
-      "uci": "a7a6",
-      "probability": 0.08
-    },
-    {
-      "san": "g6",
-      "uci": "g7g6",
-      "probability": 0.04
-    }
-  ],
-  "rnbqkb1r/pp2pppp/3p1n2/8/3NP3/8/PPP2PPP/RNBQKB1R w KQkq - 1 5": [
-    {
-      "san": "Nc3",
-      "uci": "b1c3",
-      "probability": 0.95
-    },
-    {
-      "san": "f3",
-      "uci": "f2f3",
-      "probability": 0.05
-    }
-  ],
-  "rnbqkb1r/pp2pppp/3p1n2/8/3NP3/2N5/PPP2PPP/R1BQKB1R b KQkq - 2 5": [
-    {
-      "san": "a6",
-      "uci": "a7a6",
-      "probability": 0.55
-    },
-    {
-      "san": "g6",
-      "uci": "g7g6",
-      "probability": 0.25
-    },
-    {
-      "san": "Nc6",
-      "uci": "b8c6",
-      "probability": 0.15
-    },
-    {
-      "san": "e6",
-      "uci": "e7e6",
-      "probability": 0.05
-    }
-  ],
-  "r1bqkbnr/pp1ppppp/2n5/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3": [
-    {
-      "san": "d4",
-      "uci": "d2d4",
-      "probability": 0.8
-    },
-    {
-      "san": "Bb5",
-      "uci": "f1b5",
-      "probability": 0.15
-    },
-    {
-      "san": "Nc3",
-      "uci": "b1c3",
-      "probability": 0.05
-    }
-  ],
-  "r1bqkbnr/pp1ppppp/2n5/2p5/3PP3/5N2/PPP2PPP/RNBQKB1R b KQkq - 0 3": [
-    {
-      "san": "cxd4",
-      "uci": "c5d4",
-      "probability": 0.96
-    },
-    {
-      "san": "e5",
-      "uci": "e7e5",
-      "probability": 0.04
-    }
-  ],
-  "r1bqkbnr/pp1ppppp/2n5/8/3pP3/5N2/PPP2PPP/RNBQKB1R w KQkq - 0 4": [
-    {
-      "san": "Nxd4",
-      "uci": "f3d4",
-      "probability": 0.95
-    },
-    {
-      "san": "Qxd4",
-      "uci": "d1d4",
-      "probability": 0.05
-    }
-  ],
-  "r1bqkbnr/pp1ppppp/2n5/8/3NP3/8/PPP2PPP/RNBQKB1R b KQkq - 0 4": [
-    {
-      "san": "Nf6",
-      "uci": "g8f6",
-      "probability": 0.55
-    },
-    {
-      "san": "e5",
-      "uci": "e7e5",
-      "probability": 0.25
-    },
-    {
-      "san": "g6",
-      "uci": "g7g6",
-      "probability": 0.12
-    },
-    {
-      "san": "e6",
-      "uci": "e7e6",
-      "probability": 0.08
-    }
-  ],
-  "rnbqkbnr/pppp1ppp/4p3/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2": [
-    {
-      "san": "d4",
-      "uci": "d2d4",
-      "probability": 0.9
-    },
-    {
-      "san": "d3",
-      "uci": "d2d3",
-      "probability": 0.05
-    },
-    {
-      "san": "Nf3",
-      "uci": "g1f3",
-      "probability": 0.05
-    }
-  ],
-  "rnbqkbnr/pppp1ppp/4p3/8/3PP3/8/PPP2PPP/RNBQKBNR b KQkq - 0 2": [
-    {
-      "san": "d5",
-      "uci": "d7d5",
-      "probability": 0.96
-    },
-    {
-      "san": "c5",
-      "uci": "c7c5",
-      "probability": 0.04
-    }
-  ],
-  "rnbqkbnr/ppp2ppp/4p3/3p4/3PP3/8/PPP2PPP/RNBQKBNR w KQkq - 0 3": [
-    {
-      "san": "Nc3",
-      "uci": "b1c3",
-      "probability": 0.45
-    },
-    {
-      "san": "Nd2",
-      "uci": "b1d2",
-      "probability": 0.25
-    },
-    {
-      "san": "e5",
-      "uci": "e4e5",
-      "probability": 0.2
-    },
-    {
-      "san": "exd5",
-      "uci": "e4d5",
-      "probability": 0.1
-    }
-  ],
-  "rnbqkbnr/ppp2ppp/4p3/3p4/3PP3/2N5/PPP2PPP/R1BQKBNR b KQkq - 1 3": [
-    {
-      "san": "Nf6",
-      "uci": "g8f6",
-      "probability": 0.5
-    },
-    {
-      "san": "Bb4",
-      "uci": "f8b4",
-      "probability": 0.35
-    },
-    {
-      "san": "dxe4",
-      "uci": "d5e4",
-      "probability": 0.15
-    }
-  ],
-  "rnbqkbnr/ppp2ppp/4p3/3pP3/3P4/8/PPP2PPP/RNBQKBNR b KQkq - 0 3": [
-    {
-      "san": "c5",
-      "uci": "c7c5",
-      "probability": 0.9
-    },
-    {
-      "san": "b6",
-      "uci": "b7b6",
-      "probability": 0.1
-    }
-  ],
-  "rnbqkbnr/pp3ppp/4p3/2ppP3/3P4/8/PPP2PPP/RNBQKBNR w KQkq - 0 4": [
-    {
-      "san": "c3",
-      "uci": "c2c3",
-      "probability": 0.85
-    },
-    {
-      "san": "Nf3",
-      "uci": "g1f3",
-      "probability": 0.1
-    },
-    {
-      "san": "Qg4",
-      "uci": "d1g4",
-      "probability": 0.05
-    }
-  ],
-  "rnbqkbnr/ppp2ppp/4p3/3P4/3P4/8/PPP2PPP/RNBQKBNR b KQkq - 0 3": [
-    {
-      "san": "exd5",
-      "uci": "e6d5",
-      "probability": 0.95
-    },
-    {
-      "san": "Qxd5",
-      "uci": "d8d5",
-      "probability": 0.05
-    }
-  ],
-  "rnbqkbnr/pp1ppppp/2p5/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2": [
-    {
-      "san": "d4",
-      "uci": "d2d4",
-      "probability": 0.88
-    },
-    {
-      "san": "Nc3",
-      "uci": "b1c3",
-      "probability": 0.07
-    },
-    {
-      "san": "Nf3",
-      "uci": "g1f3",
-      "probability": 0.05
-    }
-  ],
-  "rnbqkbnr/pp1ppppp/2p5/8/3PP3/8/PPP2PPP/RNBQKBNR b KQkq - 0 2": [
-    {
-      "san": "d5",
-      "uci": "d7d5",
-      "probability": 0.96
-    },
-    {
-      "san": "g6",
-      "uci": "g7g6",
-      "probability": 0.04
-    }
-  ],
-  "rnbqkbnr/pp2pppp/2p5/3p4/3PP3/8/PPP2PPP/RNBQKBNR w KQkq - 0 3": [
-    {
-      "san": "Nc3",
-      "uci": "b1c3",
-      "probability": 0.45
-    },
-    {
-      "san": "e5",
-      "uci": "e4e5",
-      "probability": 0.35
-    },
-    {
-      "san": "exd5",
-      "uci": "e4d5",
-      "probability": 0.15
-    },
-    {
-      "san": "Nd2",
-      "uci": "b1d2",
-      "probability": 0.05
-    }
-  ],
-  "rnbqkbnr/pp2pppp/2p5/3p4/3PP3/2N5/PPP2PPP/R1BQKBNR b KQkq - 1 3": [
-    {
-      "san": "dxe4",
-      "uci": "d5e4",
-      "probability": 0.95
-    },
-    {
-      "san": "g6",
-      "uci": "g7g6",
-      "probability": 0.05
-    }
-  ],
-  "rnbqkbnr/pp2pppp/2p5/8/3Pp3/2N5/PPP2PPP/R1BQKBNR w KQkq - 0 4": [
-    {
-      "san": "Nxe4",
-      "uci": "c3e4",
-      "probability": 0.98
-    },
-    {
-      "san": "f3",
-      "uci": "f2f3",
-      "probability": 0.02
-    }
-  ],
-  "rnbqkbnr/pp2pppp/2p5/8/3PN3/8/PPP2PPP/R1BQKBNR b KQkq - 0 4": [
-    {
-      "san": "Bf5",
-      "uci": "c8f5",
-      "probability": 0.5
-    },
-    {
-      "san": "Nd7",
-      "uci": "b8d7",
-      "probability": 0.3
-    },
-    {
-      "san": "Nf6",
-      "uci": "g8f6",
-      "probability": 0.2
-    }
-  ],
-  "rnbqkbnr/pp2pppp/2p5/3pP3/3P4/8/PPP2PPP/RNBQKBNR b KQkq - 0 3": [
-    {
-      "san": "Bf5",
-      "uci": "c8f5",
-      "probability": 0.85
-    },
-    {
-      "san": "c5",
-      "uci": "c6c5",
-      "probability": 0.15
-    }
-  ],
-  "rnbqkbnr/ppp1pppp/8/3p4/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2": [
-    {
-      "san": "exd5",
-      "uci": "e4d5",
-      "probability": 0.92
-    },
-    {
-      "san": "e5",
-      "uci": "e4e5",
-      "probability": 0.05
-    },
-    {
-      "san": "Nc3",
-      "uci": "b1c3",
-      "probability": 0.03
-    }
-  ],
-  "rnbqkbnr/ppp1pppp/8/3P4/8/8/PPPP1PPP/RNBQKBNR b KQkq - 0 2": [
-    {
-      "san": "Qxd5",
-      "uci": "d8d5",
-      "probability": 0.7
-    },
-    {
-      "san": "Nf6",
-      "uci": "g8f6",
-      "probability": 0.3
-    }
-  ],
-  "rnb1kbnr/ppp1pppp/8/3q4/8/8/PPPP1PPP/RNBQKBNR w KQkq - 0 3": [
-    {
-      "san": "Nc3",
-      "uci": "b1c3",
-      "probability": 0.95
-    },
-    {
-      "san": "Nf3",
-      "uci": "g1f3",
-      "probability": 0.05
-    }
-  ],
-  "rnb1kbnr/ppp1pppp/8/3q4/8/2N5/PPPP1PPP/R1BQKBNR b KQkq - 1 3": [
-    {
-      "san": "Qa5",
-      "uci": "d5a5",
-      "probability": 0.65
-    },
-    {
-      "san": "Qd6",
-      "uci": "d5d6",
-      "probability": 0.25
-    },
-    {
-      "san": "Qd8",
-      "uci": "d5d8",
-      "probability": 0.1
-    }
-  ],
-  "rnbqkb1r/ppp1pppp/5n2/3P4/8/8/PPPP1PPP/RNBQKBNR w KQkq - 1 3": [
-    {
-      "san": "d4",
-      "uci": "d2d4",
-      "probability": 0.6
-    },
-    {
-      "san": "c4",
-      "uci": "c2c4",
-      "probability": 0.25
-    },
-    {
-      "san": "Nf3",
-      "uci": "g1f3",
-      "probability": 0.15
-    }
-  ],
-  "rnbqkbnr/pppppppp/8/8/3P4/8/PPP1PPPP/RNBQKBNR b KQkq - 0 1": [
-    {
-      "san": "d5",
-      "uci": "d7d5",
-      "probability": 0.45
-    },
-    {
-      "san": "Nf6",
-      "uci": "g8f6",
-      "probability": 0.4
-    },
-    {
-      "san": "e6",
-      "uci": "e7e6",
-      "probability": 0.07
-    },
-    {
-      "san": "f5",
-      "uci": "f7f5",
-      "probability": 0.05
-    },
-    {
-      "san": "d6",
-      "uci": "d7d6",
-      "probability": 0.03
-    }
-  ],
-  "rnbqkbnr/ppp1pppp/8/3p4/3P4/8/PPP1PPPP/RNBQKBNR w KQkq - 0 2": [
-    {
-      "san": "c4",
-      "uci": "c2c4",
-      "probability": 0.6
-    },
-    {
-      "san": "Nf3",
-      "uci": "g1f3",
-      "probability": 0.25
-    },
-    {
-      "san": "Bf4",
-      "uci": "c1f4",
-      "probability": 0.15
-    }
-  ],
-  "rnbqkbnr/ppp1pppp/8/3p4/2PP4/8/PP2PPPP/RNBQKBNR b KQkq - 0 2": [
-    {
-      "san": "e6",
-      "uci": "e7e6",
-      "probability": 0.5
-    },
-    {
-      "san": "c6",
-      "uci": "c7c6",
-      "probability": 0.35
-    },
-    {
-      "san": "dxc4",
-      "uci": "d5c4",
-      "probability": 0.1
-    },
-    {
-      "san": "Nf6",
-      "uci": "g8f6",
-      "probability": 0.05
-    }
-  ],
-  "rnbqkbnr/ppp2ppp/4p3/3p4/2PP4/8/PP2PPPP/RNBQKBNR w KQkq - 0 3": [
-    {
-      "san": "Nc3",
-      "uci": "b1c3",
-      "probability": 0.5
-    },
-    {
-      "san": "Nf3",
-      "uci": "g1f3",
-      "probability": 0.35
-    },
-    {
-      "san": "cxd5",
-      "uci": "c4d5",
-      "probability": 0.15
-    }
-  ],
-  "rnbqkbnr/ppp2ppp/4p3/3p4/2PP4/2N5/PP2PPPP/R1BQKBNR b KQkq - 1 3": [
-    {
-      "san": "Nf6",
-      "uci": "g8f6",
-      "probability": 0.75
-    },
-    {
-      "san": "c6",
-      "uci": "c7c6",
-      "probability": 0.15
-    },
-    {
-      "san": "Be7",
-      "uci": "f8e7",
-      "probability": 0.1
-    }
-  ],
-  "rnbqkbnr/pp2pppp/2p5/3p4/2PP4/8/PP2PPPP/RNBQKBNR w KQkq - 0 3": [
-    {
-      "san": "Nf3",
-      "uci": "g1f3",
-      "probability": 0.6
-    },
-    {
-      "san": "Nc3",
-      "uci": "b1c3",
-      "probability": 0.3
-    },
-    {
-      "san": "cxd5",
-      "uci": "c4d5",
-      "probability": 0.1
-    }
-  ],
-  "rnbqkbnr/pp2pppp/2p5/3p4/2PP4/5N2/PP2PPPP/RNBQKB1R b KQkq - 1 3": [
-    {
-      "san": "Nf6",
-      "uci": "g8f6",
-      "probability": 0.85
-    },
-    {
-      "san": "e6",
-      "uci": "e7e6",
-      "probability": 0.15
+      "probability": 0.065
     }
   ],
   "rnbqkbnr/ppp1pppp/8/3p4/3P1B2/8/PPP1PPPP/RN1QKBNR b KQkq - 1 2": [
     {
+      "san": "Nc6",
+      "uci": "b8c6",
+      "probability": 0.427
+    },
+    {
       "san": "Nf6",
       "uci": "g8f6",
-      "probability": 0.7
-    },
-    {
-      "san": "c5",
-      "uci": "c7c5",
-      "probability": 0.2
-    },
-    {
-      "san": "e6",
-      "uci": "e7e6",
-      "probability": 0.1
-    }
-  ],
-  "rnbqkb1r/ppp1pppp/5n2/3p4/3P1B2/8/PPP1PPPP/RN1QKBNR w KQkq - 2 3": [
-    {
-      "san": "e3",
-      "uci": "e2e3",
-      "probability": 0.8
-    },
-    {
-      "san": "Nf3",
-      "uci": "g1f3",
-      "probability": 0.2
-    }
-  ],
-  "rnbqkb1r/ppp1pppp/5n2/3p4/3P4/5N2/PPP1PPPP/RNBQKB1R w KQkq - 2 3": [
-    {
-      "san": "Bf4",
-      "uci": "c1f4",
-      "probability": 0.5
-    },
-    {
-      "san": "c4",
-      "uci": "c2c4",
-      "probability": 0.4
-    },
-    {
-      "san": "e3",
-      "uci": "e2e3",
-      "probability": 0.1
-    }
-  ],
-  "rnbqkb1r/ppp1pppp/5n2/3p4/3P1B2/5N2/PPP1PPPP/RN1QKB1R b KQkq - 3 3": [
-    {
-      "san": "e6",
-      "uci": "e7e6",
-      "probability": 0.5
-    },
-    {
-      "san": "c5",
-      "uci": "c7c5",
-      "probability": 0.35
+      "probability": 0.264
     },
     {
       "san": "Bf5",
       "uci": "c8f5",
-      "probability": 0.15
-    }
-  ],
-  "rnbqkb1r/pppppppp/5n2/8/3P4/8/PPP1PPPP/RNBQKBNR w KQkq - 1 2": [
-    {
-      "san": "c4",
-      "uci": "c2c4",
-      "probability": 0.65
-    },
-    {
-      "san": "Nf3",
-      "uci": "g1f3",
-      "probability": 0.2
-    },
-    {
-      "san": "Bf4",
-      "uci": "c1f4",
-      "probability": 0.15
-    }
-  ],
-  "rnbqkb1r/pppppppp/5n2/8/2PP4/8/PP2PPPP/RNBQKBNR b KQkq - 0 2": [
-    {
-      "san": "g6",
-      "uci": "g7g6",
-      "probability": 0.45
+      "probability": 0.11
     },
     {
       "san": "e6",
       "uci": "e7e6",
-      "probability": 0.4
+      "probability": 0.105
     },
     {
       "san": "c5",
       "uci": "c7c5",
-      "probability": 0.15
+      "probability": 0.065
+    },
+    {
+      "san": "c6",
+      "uci": "c7c6",
+      "probability": 0.029
+    }
+  ],
+  "rn1qk2r/ppp1ppbp/3p1np1/8/3PP1b1/2NB1N2/PPP2PPP/R1BQK2R w KQkq - 4 6": [
+    {
+      "san": "O-O",
+      "uci": "e1g1",
+      "probability": 0.651
+    },
+    {
+      "san": "h3",
+      "uci": "h2h3",
+      "probability": 0.349
+    }
+  ],
+  "r1bqkb1r/ppp2ppp/2n1pn2/3p4/3P1B2/2P1PN2/PP3PPP/RN1QKB1R b KQkq - 0 5": [
+    {
+      "san": "Bd6",
+      "uci": "f8d6",
+      "probability": 1
+    }
+  ],
+  "rn1qk2r/ppp1ppbp/3p1np1/8/3PP1b1/2N1BN2/PPP2PPP/R2QKB1R w KQkq - 4 6": [
+    {
+      "san": "Be2",
+      "uci": "f1e2",
+      "probability": 0.804
+    },
+    {
+      "san": "h3",
+      "uci": "h2h3",
+      "probability": 0.196
+    }
+  ],
+  "rn1qk2r/ppp1ppbp/3p1np1/8/3P1Bb1/3BPN2/PPP2PPP/RN1QK2R w KQkq - 3 6": [
+    {
+      "san": "Nbd2",
+      "uci": "b1d2",
+      "probability": 0.734
+    },
+    {
+      "san": "h3",
+      "uci": "h2h3",
+      "probability": 0.164
+    },
+    {
+      "san": "c3",
+      "uci": "c2c3",
+      "probability": 0.102
+    }
+  ],
+  "rnbqkb1r/ppp2ppp/4pn2/3p4/3P1B2/4PN2/PPP2PPP/RN1QKB1R b KQkq - 0 4": [
+    {
+      "san": "Bd6",
+      "uci": "f8d6",
+      "probability": 0.575
+    },
+    {
+      "san": "Nc6",
+      "uci": "b8c6",
+      "probability": 0.318
+    },
+    {
+      "san": "c5",
+      "uci": "c7c5",
+      "probability": 0.107
+    }
+  ],
+  "rnbqk2r/ppp2ppp/3bpn2/3p4/3P4/4PNB1/PPP2PPP/RN1QKB1R b KQkq - 2 5": [
+    {
+      "san": "O-O",
+      "uci": "e8g8",
+      "probability": 0.651
+    },
+    {
+      "san": "Ne4",
+      "uci": "f6e4",
+      "probability": 0.349
+    }
+  ],
+  "rnbqkb1r/ppp1pppp/3p1n2/8/2B5/3P1N2/PPP2PPP/RNBQK2R w KQkq - 1 5": [
+    {
+      "san": "Ng5",
+      "uci": "f3g5",
+      "probability": 0.597
+    },
+    {
+      "san": "Bg5",
+      "uci": "c1g5",
+      "probability": 0.232
+    },
+    {
+      "san": "O-O",
+      "uci": "e1g1",
+      "probability": 0.171
+    }
+  ],
+  "rnbqkb1r/ppp2ppp/3ppn2/6N1/2B5/3P4/PPP2PPP/RNBQK2R w KQkq - 0 6": [
+    {
+      "san": "Nc3",
+      "uci": "b1c3",
+      "probability": 0.645
+    },
+    {
+      "san": "O-O",
+      "uci": "e1g1",
+      "probability": 0.191
+    },
+    {
+      "san": "Qf3",
+      "uci": "d1f3",
+      "probability": 0.164
+    }
+  ],
+  "rn1qkbnr/ppp2ppp/4p3/3p1b2/3P1B2/4PN2/PPP2PPP/RN1QKB1R b KQkq - 0 4": [
+    {
+      "san": "Bd6",
+      "uci": "f8d6",
+      "probability": 0.485
+    },
+    {
+      "san": "Nf6",
+      "uci": "g8f6",
+      "probability": 0.264
+    },
+    {
+      "san": "c5",
+      "uci": "c7c5",
+      "probability": 0.251
+    }
+  ],
+  "rnbqkb1r/ppp1pppp/3p1n2/8/3P1B2/4P3/PPP2PPP/RN1QKBNR b KQkq - 0 3": [
+    {
+      "san": "g6",
+      "uci": "g7g6",
+      "probability": 0.427
+    },
+    {
+      "san": "c6",
+      "uci": "c7c6",
+      "probability": 0.313
+    },
+    {
+      "san": "Nc6",
+      "uci": "b8c6",
+      "probability": 0.26
+    }
+  ],
+  "rnbqk2r/ppp1ppbp/3p1np1/8/2PP4/2N2N2/PP2PPPP/R1BQKB1R w KQkq - 2 5": [
+    {
+      "san": "e4",
+      "uci": "e2e4",
+      "probability": 0.746
+    },
+    {
+      "san": "Bg5",
+      "uci": "c1g5",
+      "probability": 0.16
+    },
+    {
+      "san": "Bf4",
+      "uci": "c1f4",
+      "probability": 0.094
+    }
+  ],
+  "rnbqkbnr/pppppp1p/6p1/8/3P1B2/8/PPP1PPPP/RN1QKBNR b KQkq - 1 2": [
+    {
+      "san": "Bg7",
+      "uci": "f8g7",
+      "probability": 1
+    }
+  ],
+  "rnbqkbnr/pppp1ppp/4p3/8/3P1B2/8/PPP1PPPP/RN1QKBNR b KQkq - 1 2": [
+    {
+      "san": "d5",
+      "uci": "d7d5",
+      "probability": 0.492
+    },
+    {
+      "san": "b6",
+      "uci": "b7b6",
+      "probability": 0.179
+    },
+    {
+      "san": "Nf6",
+      "uci": "g8f6",
+      "probability": 0.113
+    },
+    {
+      "san": "c5",
+      "uci": "c7c5",
+      "probability": 0.077
+    },
+    {
+      "san": "Nc6",
+      "uci": "b8c6",
+      "probability": 0.071
+    },
+    {
+      "san": "Qf6",
+      "uci": "d8f6",
+      "probability": 0.068
+    }
+  ],
+  "rnbqkb1r/pppppppp/5n2/8/3P1B2/8/PPP1PPPP/RN1QKBNR b KQkq - 2 2": [
+    {
+      "san": "g6",
+      "uci": "g7g6",
+      "probability": 0.327
+    },
+    {
+      "san": "d5",
+      "uci": "d7d5",
+      "probability": 0.28
+    },
+    {
+      "san": "d6",
+      "uci": "d7d6",
+      "probability": 0.19
+    },
+    {
+      "san": "e6",
+      "uci": "e7e6",
+      "probability": 0.129
+    },
+    {
+      "san": "c5",
+      "uci": "c7c5",
+      "probability": 0.048
+    },
+    {
+      "san": "c6",
+      "uci": "c7c6",
+      "probability": 0.026
+    }
+  ],
+  "rnbqkbnr/ppp2ppp/4p3/3p4/3P1B2/4P3/PPP2PPP/RN1QKBNR b KQkq - 0 3": [
+    {
+      "san": "Bd6",
+      "uci": "f8d6",
+      "probability": 0.379
+    },
+    {
+      "san": "c5",
+      "uci": "c7c5",
+      "probability": 0.345
+    },
+    {
+      "san": "Nc6",
+      "uci": "b8c6",
+      "probability": 0.146
+    },
+    {
+      "san": "Nf6",
+      "uci": "g8f6",
+      "probability": 0.13
+    }
+  ],
+  "rnbqkb1r/ppp1pppp/5n2/3p4/3P1B2/4P3/PPP2PPP/RN1QKBNR b KQkq - 0 3": [
+    {
+      "san": "e6",
+      "uci": "e7e6",
+      "probability": 0.304
+    },
+    {
+      "san": "Nc6",
+      "uci": "b8c6",
+      "probability": 0.232
+    },
+    {
+      "san": "Bf5",
+      "uci": "c8f5",
+      "probability": 0.216
+    },
+    {
+      "san": "c5",
+      "uci": "c7c5",
+      "probability": 0.084
+    },
+    {
+      "san": "a6",
+      "uci": "a7a6",
+      "probability": 0.068
+    },
+    {
+      "san": "g6",
+      "uci": "g7g6",
+      "probability": 0.066
+    },
+    {
+      "san": "Bg4",
+      "uci": "c8g4",
+      "probability": 0.03
+    }
+  ],
+  "r1bqkbnr/ppp1pppp/2n5/3p4/3P1B2/4P3/PPP2PPP/RN1QKBNR b KQkq - 0 3": [
+    {
+      "san": "Bf5",
+      "uci": "c8f5",
+      "probability": 0.427
+    },
+    {
+      "san": "Nf6",
+      "uci": "g8f6",
+      "probability": 0.327
+    },
+    {
+      "san": "f6",
+      "uci": "f7f6",
+      "probability": 0.125
+    },
+    {
+      "san": "e6",
+      "uci": "e7e6",
+      "probability": 0.087
+    },
+    {
+      "san": "a6",
+      "uci": "a7a6",
+      "probability": 0.034
+    }
+  ],
+  "r2qkbnr/ppp1pppp/2n5/3p1b2/3P1BP1/4P3/PPP2P1P/RN1QKBNR b KQkq - 0 4": [
+    {
+      "san": "Be4",
+      "uci": "f5e4",
+      "probability": 0.684
+    },
+    {
+      "san": "Bg6",
+      "uci": "f5g6",
+      "probability": 0.316
+    }
+  ],
+  "rnbqkbnr/pp2pppp/8/2pp4/3P1B2/4P3/PPP2PPP/RN1QKBNR b KQkq - 0 3": [
+    {
+      "san": "Nc6",
+      "uci": "b8c6",
+      "probability": 0.602
+    },
+    {
+      "san": "cxd4",
+      "uci": "c5d4",
+      "probability": 0.293
+    },
+    {
+      "san": "Qb6",
+      "uci": "d8b6",
+      "probability": 0.105
+    }
+  ],
+  "rnbqkbnr/ppp2ppp/4p3/3p4/3P1B2/2N5/PPP1PPPP/R2QKBNR b KQkq - 1 3": [
+    {
+      "san": "Bb4",
+      "uci": "f8b4",
+      "probability": 0.38
+    },
+    {
+      "san": "Nf6",
+      "uci": "g8f6",
+      "probability": 0.367
+    },
+    {
+      "san": "Bd6",
+      "uci": "f8d6",
+      "probability": 0.253
+    }
+  ],
+  "rn1qkbnr/ppp1pppp/8/3p1b2/3P1B2/2N5/PPP1PPPP/R2QKBNR b KQkq - 3 3": [
+    {
+      "san": "e6",
+      "uci": "e7e6",
+      "probability": 0.813
+    },
+    {
+      "san": "Nf6",
+      "uci": "g8f6",
+      "probability": 0.187
+    }
+  ],
+  "rn1qkbnr/ppp2ppp/4p3/3p1b2/3P1B2/2N1P3/PPP2PPP/R2QKBNR b KQkq - 0 4": [
+    {
+      "san": "Bd6",
+      "uci": "f8d6",
+      "probability": 0.344
+    },
+    {
+      "san": "Bb4",
+      "uci": "f8b4",
+      "probability": 0.339
+    },
+    {
+      "san": "Nc6",
+      "uci": "b8c6",
+      "probability": 0.161
+    },
+    {
+      "san": "a6",
+      "uci": "a7a6",
+      "probability": 0.156
+    }
+  ],
+  "rn1qkbnr/ppp1pppp/8/3p1b2/3P1B2/4P3/PPP2PPP/RN1QKBNR b KQkq - 0 3": [
+    {
+      "san": "e6",
+      "uci": "e7e6",
+      "probability": 0.685
+    },
+    {
+      "san": "Nf6",
+      "uci": "g8f6",
+      "probability": 0.132
+    },
+    {
+      "san": "Nc6",
+      "uci": "b8c6",
+      "probability": 0.123
+    },
+    {
+      "san": "a6",
+      "uci": "a7a6",
+      "probability": 0.06
+    }
+  ],
+  "r1bqkbnr/ppp1pppp/2n5/3p4/3P1B2/2N5/PPP1PPPP/R2QKBNR b KQkq - 3 3": [
+    {
+      "san": "Bf5",
+      "uci": "c8f5",
+      "probability": 0.345
+    },
+    {
+      "san": "e6",
+      "uci": "e7e6",
+      "probability": 0.259
+    },
+    {
+      "san": "a6",
+      "uci": "a7a6",
+      "probability": 0.207
+    },
+    {
+      "san": "Nf6",
+      "uci": "g8f6",
+      "probability": 0.131
+    },
+    {
+      "san": "Nxd4",
+      "uci": "c6d4",
+      "probability": 0.058
+    }
+  ],
+  "rnbqk1nr/ppppppbp/6p1/8/3P1B2/2N5/PPP1PPPP/R2QKBNR b KQkq - 3 3": [
+    {
+      "san": "Nf6",
+      "uci": "g8f6",
+      "probability": 0.511
+    },
+    {
+      "san": "d6",
+      "uci": "d7d6",
+      "probability": 0.418
+    },
+    {
+      "san": "Bxd4",
+      "uci": "g7d4",
+      "probability": 0.071
+    }
+  ],
+  "rnbqkb1r/ppp1pppp/5n2/3p4/3P1B2/2N5/PPP1PPPP/R2QKBNR b KQkq - 3 3": [
+    {
+      "san": "Nc6",
+      "uci": "b8c6",
+      "probability": 0.305
+    },
+    {
+      "san": "Bf5",
+      "uci": "c8f5",
+      "probability": 0.274
+    },
+    {
+      "san": "e6",
+      "uci": "e7e6",
+      "probability": 0.153
+    },
+    {
+      "san": "c5",
+      "uci": "c7c5",
+      "probability": 0.106
+    },
+    {
+      "san": "a6",
+      "uci": "a7a6",
+      "probability": 0.081
+    },
+    {
+      "san": "c6",
+      "uci": "c7c6",
+      "probability": 0.059
+    },
+    {
+      "san": "Nbd7",
+      "uci": "b8d7",
+      "probability": 0.022
+    }
+  ],
+  "r1bqkb1r/ppp1pppp/2n2n2/3p4/3P1B2/2N1P3/PPP2PPP/R2QKBNR b KQkq - 0 4": [
+    {
+      "san": "e6",
+      "uci": "e7e6",
+      "probability": 0.438
+    },
+    {
+      "san": "Bf5",
+      "uci": "c8f5",
+      "probability": 0.329
+    },
+    {
+      "san": "Bg4",
+      "uci": "c8g4",
+      "probability": 0.12
+    },
+    {
+      "san": "a6",
+      "uci": "a7a6",
+      "probability": 0.113
+    }
+  ],
+  "r2qkbnr/ppp1pppp/2n5/3p1b2/3P1B2/2N1P3/PPP2PPP/R2QKBNR b KQkq - 0 4": [
+    {
+      "san": "Nf6",
+      "uci": "g8f6",
+      "probability": 0.484
+    },
+    {
+      "san": "e6",
+      "uci": "e7e6",
+      "probability": 0.362
+    },
+    {
+      "san": "a6",
+      "uci": "a7a6",
+      "probability": 0.154
+    }
+  ],
+  "rnbqkb1r/ppp2ppp/4pn2/3p4/3P1B2/2N1P3/PPP2PPP/R2QKBNR b KQkq - 1 4": [
+    {
+      "san": "Bd6",
+      "uci": "f8d6",
+      "probability": 0.511
+    },
+    {
+      "san": "Bb4",
+      "uci": "f8b4",
+      "probability": 0.394
+    },
+    {
+      "san": "c5",
+      "uci": "c7c5",
+      "probability": 0.095
+    }
+  ],
+  "rnbqkb1r/pppp1ppp/4pn2/8/3P1B2/2N5/PPP1PPPP/R2QKBNR b KQkq - 1 3": [
+    {
+      "san": "b6",
+      "uci": "b7b6",
+      "probability": 0.449
+    },
+    {
+      "san": "d5",
+      "uci": "d7d5",
+      "probability": 0.319
+    },
+    {
+      "san": "Bb4",
+      "uci": "f8b4",
+      "probability": 0.232
+    }
+  ],
+  "rnb1k2r/ppp1ppbp/6p1/4P3/6n1/5N2/PPP2PPP/R1BNKB1R w KQkq - 1 8": [
+    {
+      "san": "Bf4",
+      "uci": "c1f4",
+      "probability": 0.4
+    },
+    {
+      "san": "h3",
+      "uci": "h2h3",
+      "probability": 0.331
+    },
+    {
+      "san": "Be2",
+      "uci": "f1e2",
+      "probability": 0.12
+    },
+    {
+      "san": "Bc4",
+      "uci": "f1c4",
+      "probability": 0.082
+    },
+    {
+      "san": "Bg5",
+      "uci": "c1g5",
+      "probability": 0.067
+    }
+  ],
+  "rn1qkb1r/ppp1pppp/5n2/3p1b2/3P1B2/2N1P3/PPP2PPP/R2QKBNR b KQkq - 0 4": [
+    {
+      "san": "e6",
+      "uci": "e7e6",
+      "probability": 0.835
+    },
+    {
+      "san": "Nc6",
+      "uci": "b8c6",
+      "probability": 0.165
+    }
+  ],
+  "rnbqkbnr/p1pppppp/1p6/8/3P1B2/8/PPP1PPPP/RN1QKBNR b KQkq - 1 2": [
+    {
+      "san": "Bb7",
+      "uci": "c8b7",
+      "probability": 1
+    }
+  ],
+  "rnbqk1nr/ppp2ppp/3bp3/3p4/3P4/4P1B1/PPP2PPP/RN1QKBNR b KQkq - 2 4": [
+    {
+      "san": "Bxg3",
+      "uci": "d6g3",
+      "probability": 0.604
+    },
+    {
+      "san": "Nf6",
+      "uci": "g8f6",
+      "probability": 0.396
+    }
+  ],
+  "rnbqkb1r/ppp1pppp/3p1n2/8/3P1B2/2N5/PPP1PPPP/R2QKBNR b KQkq - 3 3": [
+    {
+      "san": "g6",
+      "uci": "g7g6",
+      "probability": 0.914
+    },
+    {
+      "san": "Nbd7",
+      "uci": "b8d7",
+      "probability": 0.086
+    }
+  ],
+  "rnbqk2r/ppp1ppbp/3p1np1/8/3PPB2/2N5/PPPQ1PPP/R3KBNR b KQkq - 4 5": [
+    {
+      "san": "O-O",
+      "uci": "e8g8",
+      "probability": 0.685
+    },
+    {
+      "san": "b6",
+      "uci": "b7b6",
+      "probability": 0.196
+    },
+    {
+      "san": "h6",
+      "uci": "h7h6",
+      "probability": 0.119
+    }
+  ],
+  "rnbqkbnr/pp2pppp/2p5/3p4/3P1B2/4P3/PPP2PPP/RN1QKBNR b KQkq - 0 3": [
+    {
+      "san": "Bf5",
+      "uci": "c8f5",
+      "probability": 0.502
+    },
+    {
+      "san": "Nf6",
+      "uci": "g8f6",
+      "probability": 0.387
+    },
+    {
+      "san": "Qb6",
+      "uci": "d8b6",
+      "probability": 0.111
+    }
+  ],
+  "rnbqkb1r/pppppp1p/5np1/8/3P1B2/2N5/PPP1PPPP/R2QKBNR b KQkq - 1 3": [
+    {
+      "san": "Bg7",
+      "uci": "f8g7",
+      "probability": 0.908
+    },
+    {
+      "san": "d6",
+      "uci": "d7d6",
+      "probability": 0.092
+    }
+  ],
+  "rnbqkb1r/pppppppp/5n2/8/3P4/2N5/PPP1PPPP/R1BQKBNR b KQkq - 2 2": [
+    {
+      "san": "d5",
+      "uci": "d7d5",
+      "probability": 0.413
+    },
+    {
+      "san": "g6",
+      "uci": "g7g6",
+      "probability": 0.361
+    },
+    {
+      "san": "e6",
+      "uci": "e7e6",
+      "probability": 0.14
+    },
+    {
+      "san": "d6",
+      "uci": "d7d6",
+      "probability": 0.086
+    }
+  ],
+  "rnbqkbnr/pp2pppp/2p5/3p4/3P1B2/2N5/PPP1PPPP/R2QKBNR b KQkq - 1 3": [
+    {
+      "san": "Bf5",
+      "uci": "c8f5",
+      "probability": 0.486
+    },
+    {
+      "san": "Nf6",
+      "uci": "g8f6",
+      "probability": 0.374
+    },
+    {
+      "san": "e6",
+      "uci": "e7e6",
+      "probability": 0.14
+    }
+  ],
+  "rnbqk2r/ppppppbp/5np1/8/3P1B2/2N5/PPPQPPPP/R3KBNR b KQkq - 5 4": [
+    {
+      "san": "O-O",
+      "uci": "e8g8",
+      "probability": 0.532
+    },
+    {
+      "san": "d6",
+      "uci": "d7d6",
+      "probability": 0.357
+    },
+    {
+      "san": "h6",
+      "uci": "h7h6",
+      "probability": 0.111
+    }
+  ],
+  "rnbq1rk1/ppppppbp/5np1/8/3P1B2/2N5/PPPQPPPP/2KR1BNR b - - 7 5": [
+    {
+      "san": "d6",
+      "uci": "d7d6",
+      "probability": 1
+    }
+  ],
+  "rnbqk1nr/ppp1ppbp/3p2p1/8/3P1B2/2N5/PPPQPPPP/R3KBNR b KQkq - 1 4": [
+    {
+      "san": "Nf6",
+      "uci": "g8f6",
+      "probability": 0.618
+    },
+    {
+      "san": "Nc6",
+      "uci": "b8c6",
+      "probability": 0.382
+    }
+  ],
+  "r1b1kbnr/pppp1ppp/2n5/4P3/1q6/5N2/PPPBPPPP/RN1QKB1R b KQkq - 6 5": [
+    {
+      "san": "Qxb2",
+      "uci": "b4b2",
+      "probability": 1
+    }
+  ],
+  "r1b1kbnr/pppp1ppp/2n5/4P3/8/2N2N2/PqPBPPPP/R2QKB1R b KQkq - 1 6": [
+    {
+      "san": "Bb4",
+      "uci": "f8b4",
+      "probability": 0.864
+    },
+    {
+      "san": "Nb4",
+      "uci": "c6b4",
+      "probability": 0.136
+    }
+  ],
+  "rnbq1rk1/ppp1ppbp/3p1np1/8/3PPB2/2N5/PPPQ1PPP/2KR1BNR b - - 0 6": [
+    {
+      "san": "d5",
+      "uci": "d6d5",
+      "probability": 0.24
+    },
+    {
+      "san": "Nbd7",
+      "uci": "b8d7",
+      "probability": 0.237
+    },
+    {
+      "san": "Nc6",
+      "uci": "b8c6",
+      "probability": 0.188
+    },
+    {
+      "san": "Re8",
+      "uci": "f8e8",
+      "probability": 0.12
+    },
+    {
+      "san": "a5",
+      "uci": "a7a5",
+      "probability": 0.091
+    },
+    {
+      "san": "c5",
+      "uci": "c7c5",
+      "probability": 0.072
+    },
+    {
+      "san": "e5",
+      "uci": "e7e5",
+      "probability": 0.052
+    }
+  ],
+  "r1b1k1nr/pppp1ppp/2n5/4P3/1b6/2N2N2/PqPBPPPP/1R1QKB1R b Kkq - 3 7": [
+    {
+      "san": "Qa3",
+      "uci": "b2a3",
+      "probability": 1
+    }
+  ],
+  "r1b1k1nr/pppp1ppp/2n5/1N2P3/1b6/q4N2/P1PBPPPP/1R1QKB1R b Kkq - 5 8": [
+    {
+      "san": "Bxd2+",
+      "uci": "b4d2",
+      "probability": 0.627
+    },
+    {
+      "san": "Qa5",
+      "uci": "a3a5",
+      "probability": 0.265
+    },
+    {
+      "san": "Qxa2",
+      "uci": "a3a2",
+      "probability": 0.108
+    }
+  ],
+  "rn1qkb1r/ppp2ppp/4pn2/3p1b2/3P1B2/2N1PN2/PPP2PPP/R2QKB1R b KQkq - 1 5": [
+    {
+      "san": "Bb4",
+      "uci": "f8b4",
+      "probability": 0.518
+    },
+    {
+      "san": "Bd6",
+      "uci": "f8d6",
+      "probability": 0.482
+    }
+  ],
+  "rnbqkb1r/ppp1pp1p/3p1np1/8/3P1B2/2N5/PPPQPPPP/R3KBNR b KQkq - 1 4": [
+    {
+      "san": "Bg7",
+      "uci": "f8g7",
+      "probability": 1
+    }
+  ],
+  "rnbqk2r/ppp1ppbp/3p1np1/8/3P1B2/2N5/PPPQPPPP/2KR1BNR b kq - 3 5": [
+    {
+      "san": "O-O",
+      "uci": "e8g8",
+      "probability": 0.849
+    },
+    {
+      "san": "Nh5",
+      "uci": "f6h5",
+      "probability": 0.151
+    }
+  ],
+  "rnbqk2r/pp2ppbp/2pp1np1/6B1/3PP3/2N2N2/PPP2PPP/R2QKB1R w KQkq - 0 6": [
+    {
+      "san": "e5",
+      "uci": "e4e5",
+      "probability": 0.36
+    },
+    {
+      "san": "Bc4",
+      "uci": "f1c4",
+      "probability": 0.202
+    },
+    {
+      "san": "Be2",
+      "uci": "f1e2",
+      "probability": 0.162
+    },
+    {
+      "san": "Bd3",
+      "uci": "f1d3",
+      "probability": 0.139
+    },
+    {
+      "san": "Bxf6",
+      "uci": "g5f6",
+      "probability": 0.137
+    }
+  ],
+  "rnb1kb1r/ppp1pp1p/6p1/4P3/6n1/8/PPP2PPP/R1BNKBNR w KQkq - 1 7": [
+    {
+      "san": "Nf3",
+      "uci": "g1f3",
+      "probability": 0.397
+    },
+    {
+      "san": "h3",
+      "uci": "h2h3",
+      "probability": 0.25
+    },
+    {
+      "san": "Bf4",
+      "uci": "c1f4",
+      "probability": 0.235
+    },
+    {
+      "san": "Be2",
+      "uci": "f1e2",
+      "probability": 0.118
+    }
+  ],
+  "rnbqkbnr/pppppp1p/6p1/8/3P4/2N5/PPP1PPPP/R1BQKBNR b KQkq - 1 2": [
+    {
+      "san": "Bg7",
+      "uci": "f8g7",
+      "probability": 0.845
+    },
+    {
+      "san": "Nf6",
+      "uci": "g8f6",
+      "probability": 0.155
+    }
+  ],
+  "rn1qk2r/ppp1ppbp/3p1np1/6B1/3PP1b1/2N2N2/PPP2PPP/R2QKB1R w KQkq - 3 6": [
+    {
+      "san": "Be2",
+      "uci": "f1e2",
+      "probability": 0.765
+    },
+    {
+      "san": "h3",
+      "uci": "h2h3",
+      "probability": 0.235
+    }
+  ],
+  "r2qkb1r/ppp1pppp/2n2n2/1N1p1b2/3P1B2/4P3/PPP2PPP/R2QKBNR b KQkq - 4 5": [
+    {
+      "san": "e5",
+      "uci": "e7e5",
+      "probability": 0.762
+    },
+    {
+      "san": "Rc8",
+      "uci": "a8c8",
+      "probability": 0.238
+    }
+  ],
+  "rnbqkbnr/pppppppp/8/8/8/2N5/PPPPPPPP/R1BQKBNR b KQkq - 1 1": [
+    {
+      "san": "e5",
+      "uci": "e7e5",
+      "probability": 0.454
+    },
+    {
+      "san": "Nf6",
+      "uci": "g8f6",
+      "probability": 0.272
+    },
+    {
+      "san": "e6",
+      "uci": "e7e6",
+      "probability": 0.137
+    },
+    {
+      "san": "d5",
+      "uci": "d7d5",
+      "probability": 0.137
+    }
+  ],
+  "rnbqkb1r/pppppppp/5n2/8/3P4/8/PPP1PPPP/RNBQKBNR w KQkq - 1 2": [
+    {
+      "san": "Bf4",
+      "uci": "c1f4",
+      "probability": 0.383
+    },
+    {
+      "san": "c4",
+      "uci": "c2c4",
+      "probability": 0.29
+    },
+    {
+      "san": "Nc3",
+      "uci": "b1c3",
+      "probability": 0.151
+    },
+    {
+      "san": "Nf3",
+      "uci": "g1f3",
+      "probability": 0.105
+    },
+    {
+      "san": "Bg5",
+      "uci": "c1g5",
+      "probability": 0.049
+    },
+    {
+      "san": "e3",
+      "uci": "e2e3",
+      "probability": 0.022
+    }
+  ],
+  "rnbqkb1r/pppppp1p/5np1/8/3P4/2N5/PPP1PPPP/R1BQKBNR w KQkq - 0 3": [
+    {
+      "san": "Bf4",
+      "uci": "c1f4",
+      "probability": 0.795
+    },
+    {
+      "san": "e4",
+      "uci": "e2e4",
+      "probability": 0.205
+    }
+  ],
+  "rnbqk1nr/ppppppbp/6p1/8/3PP3/2N5/PPP2PPP/R1BQKBNR b KQkq - 0 3": [
+    {
+      "san": "d6",
+      "uci": "d7d6",
+      "probability": 0.609
+    },
+    {
+      "san": "e6",
+      "uci": "e7e6",
+      "probability": 0.27
+    },
+    {
+      "san": "e5",
+      "uci": "e7e5",
+      "probability": 0.121
+    }
+  ],
+  "rnbqkb1r/pppppp1p/5np1/8/3P1B2/8/PPP1PPPP/RN1QKBNR w KQkq - 0 3": [
+    {
+      "san": "e3",
+      "uci": "e2e3",
+      "probability": 0.536
+    },
+    {
+      "san": "Nf3",
+      "uci": "g1f3",
+      "probability": 0.286
+    },
+    {
+      "san": "Nc3",
+      "uci": "b1c3",
+      "probability": 0.109
+    },
+    {
+      "san": "c4",
+      "uci": "c2c4",
+      "probability": 0.069
+    }
+  ],
+  "rnbqk2r/ppppppbp/5np1/8/3P1B2/4P3/PPP2PPP/RN1QKBNR w KQkq - 1 4": [
+    {
+      "san": "Nf3",
+      "uci": "g1f3",
+      "probability": 0.699
+    },
+    {
+      "san": "c3",
+      "uci": "c2c3",
+      "probability": 0.161
+    },
+    {
+      "san": "Bc4",
+      "uci": "f1c4",
+      "probability": 0.14
     }
   ],
   "rnbqkb1r/pppppp1p/5np1/8/2PP4/8/PP2PPPP/RNBQKBNR w KQkq - 0 3": [
     {
       "san": "Nc3",
       "uci": "b1c3",
-      "probability": 0.8
+      "probability": 0.786
     },
     {
       "san": "Nf3",
       "uci": "g1f3",
-      "probability": 0.15
+      "probability": 0.114
     },
     {
-      "san": "g3",
-      "uci": "g2g3",
-      "probability": 0.05
-    }
-  ],
-  "rnbqkb1r/pppppp1p/5np1/8/2PP4/2N5/PP2PPPP/R1BQKBNR b KQkq - 1 3": [
-    {
-      "san": "Bg7",
-      "uci": "f8g7",
-      "probability": 0.9
-    },
-    {
-      "san": "d5",
-      "uci": "d7d5",
+      "san": "Bg5",
+      "uci": "c1g5",
       "probability": 0.1
     }
   ],
@@ -1175,182 +4202,502 @@
     {
       "san": "e4",
       "uci": "e2e4",
-      "probability": 0.85
+      "probability": 0.65
     },
     {
       "san": "Nf3",
       "uci": "g1f3",
-      "probability": 0.15
+      "probability": 0.178
+    },
+    {
+      "san": "Bg5",
+      "uci": "c1g5",
+      "probability": 0.172
     }
   ],
-  "rnbqk2r/ppppppbp/5np1/8/2PPP3/2N5/PP3PPP/R1BQKBNR b KQkq - 0 4": [
+  "rnbqkbnr/pppp1ppp/8/4p3/3P4/2N5/PPP1PPPP/R1BQKBNR b KQkq - 0 2": [
+    {
+      "san": "exd4",
+      "uci": "e5d4",
+      "probability": 0.498
+    },
+    {
+      "san": "f6",
+      "uci": "f7f6",
+      "probability": 0.251
+    },
+    {
+      "san": "e4",
+      "uci": "e5e4",
+      "probability": 0.251
+    }
+  ],
+  "rnbqkbnr/pp1ppppp/2p5/8/3P4/2N5/PPP1PPPP/R1BQKBNR b KQkq - 0 2": [
+    {
+      "san": "d5",
+      "uci": "d7d5",
+      "probability": 1
+    }
+  ],
+  "rnbqk2r/pp1pppbp/2p2np1/8/3P1B2/4PN2/PPP2PPP/RN1QKB1R w KQkq - 0 5": [
+    {
+      "san": "c3",
+      "uci": "c2c3",
+      "probability": 0.572
+    },
+    {
+      "san": "Bd3",
+      "uci": "f1d3",
+      "probability": 0.428
+    }
+  ],
+  "rnbqkbnr/pppp1ppp/4p3/8/3P4/2N5/PPP1PPPP/R1BQKBNR b KQkq - 0 2": [
+    {
+      "san": "d5",
+      "uci": "d7d5",
+      "probability": 0.525
+    },
     {
       "san": "d6",
       "uci": "d7d6",
-      "probability": 0.9
-    },
-    {
-      "san": "O-O",
-      "uci": "e8g8",
-      "probability": 0.1
-    }
-  ],
-  "rnbqkb1r/pppp1ppp/4pn2/8/2PP4/8/PP2PPPP/RNBQKBNR w KQkq - 0 3": [
-    {
-      "san": "Nc3",
-      "uci": "b1c3",
-      "probability": 0.6
-    },
-    {
-      "san": "Nf3",
-      "uci": "g1f3",
-      "probability": 0.35
-    },
-    {
-      "san": "g3",
-      "uci": "g2g3",
-      "probability": 0.05
-    }
-  ],
-  "rnbqkb1r/pppp1ppp/4pn2/8/2PP4/2N5/PP2PPPP/R1BQKBNR b KQkq - 1 3": [
-    {
-      "san": "Bb4",
-      "uci": "f8b4",
-      "probability": 0.85
-    },
-    {
-      "san": "d5",
-      "uci": "d7d5",
-      "probability": 0.15
-    }
-  ],
-  "rnbqkb1r/pppp1ppp/4pn2/8/2PP4/5N2/PP2PPPP/RNBQKB1R b KQkq - 1 3": [
-    {
-      "san": "b6",
-      "uci": "b7b6",
-      "probability": 0.5
-    },
-    {
-      "san": "d5",
-      "uci": "d7d5",
-      "probability": 0.35
-    },
-    {
-      "san": "Bb4+",
-      "uci": "f8b4",
-      "probability": 0.15
-    }
-  ],
-  "rnbqkbnr/pppppppp/8/8/2P5/8/PP1PPPPP/RNBQKBNR b KQkq - 0 1": [
-    {
-      "san": "e5",
-      "uci": "e7e5",
-      "probability": 0.35
-    },
-    {
-      "san": "c5",
-      "uci": "c7c5",
-      "probability": 0.3
+      "probability": 0.247
     },
     {
       "san": "Nf6",
       "uci": "g8f6",
-      "probability": 0.25
-    },
-    {
-      "san": "e6",
-      "uci": "e7e6",
-      "probability": 0.1
+      "probability": 0.228
     }
   ],
-  "rnbqkbnr/pppp1ppp/8/4p3/2P5/8/PP1PPPPP/RNBQKBNR w KQkq - 0 2": [
+  "rnbqk2r/ppppppbp/5np1/8/3P1B2/5N2/PPP1PPPP/RN1QKB1R w KQkq - 2 4": [
+    {
+      "san": "e3",
+      "uci": "e2e3",
+      "probability": 1
+    }
+  ],
+  "rnbqk2r/ppppppbp/5np1/8/3P1B2/2N5/PPP1PPPP/R2QKBNR w KQkq - 2 4": [
+    {
+      "san": "e3",
+      "uci": "e2e3",
+      "probability": 0.401
+    },
+    {
+      "san": "e4",
+      "uci": "e2e4",
+      "probability": 0.222
+    },
+    {
+      "san": "Qd2",
+      "uci": "d1d2",
+      "probability": 0.189
+    },
+    {
+      "san": "Nf3",
+      "uci": "g1f3",
+      "probability": 0.188
+    }
+  ],
+  "rnbqkb1r/ppp1pppp/3p4/8/2B1n3/2N5/PPPP1PPP/R1BQK1NR w KQkq - 0 4": [
+    {
+      "san": "Nxe4",
+      "uci": "c3e4",
+      "probability": 0.782
+    },
+    {
+      "san": "Bxf7+",
+      "uci": "c4f7",
+      "probability": 0.218
+    }
+  ],
+  "rnbqkb1r/pppppppp/5n2/8/2P5/8/PP1PPPPP/RNBQKBNR w KQkq - 1 2": [
     {
       "san": "Nc3",
       "uci": "b1c3",
       "probability": 0.8
     },
     {
-      "san": "g3",
-      "uci": "g2g3",
-      "probability": 0.15
+      "san": "d4",
+      "uci": "d2d4",
+      "probability": 0.2
+    }
+  ],
+  "rn1qkb1r/ppp1pppp/3p1n2/8/4P1b1/2N2N2/PPPP1PPP/R1BQKB1R w KQkq - 4 4": [
+    {
+      "san": "Be2",
+      "uci": "f1e2",
+      "probability": 0.533
+    },
+    {
+      "san": "h3",
+      "uci": "h2h3",
+      "probability": 0.467
+    }
+  ],
+  "r1bqkb1r/pppp1ppp/2n2n2/8/2BpP3/5N2/PPP2PPP/RNBQ1RK1 b kq - 1 5": [
+    {
+      "san": "Nxe4",
+      "uci": "f6e4",
+      "probability": 0.406
+    },
+    {
+      "san": "Bc5",
+      "uci": "f8c5",
+      "probability": 0.333
+    },
+    {
+      "san": "d6",
+      "uci": "d7d6",
+      "probability": 0.211
+    },
+    {
+      "san": "Be7",
+      "uci": "f8e7",
+      "probability": 0.05
+    }
+  ],
+  "r1bqkbnr/pp1p1ppp/2n1p3/2p5/2B1P3/5N2/PPPP1PPP/RNBQ1RK1 b kq - 1 4": [
+    {
+      "san": "a6",
+      "uci": "a7a6",
+      "probability": 0.297
+    },
+    {
+      "san": "d5",
+      "uci": "d7d5",
+      "probability": 0.236
+    },
+    {
+      "san": "Nf6",
+      "uci": "g8f6",
+      "probability": 0.19
+    },
+    {
+      "san": "d6",
+      "uci": "d7d6",
+      "probability": 0.147
+    },
+    {
+      "san": "Nge7",
+      "uci": "g8e7",
+      "probability": 0.13
+    }
+  ],
+  "r1bqk2r/pppp1ppp/2n2n2/2b1P3/2Bp4/5N2/PPP2PPP/RNBQ1RK1 b kq - 0 6": [
+    {
+      "san": "Ng4",
+      "uci": "f6g4",
+      "probability": 0.554
+    },
+    {
+      "san": "d5",
+      "uci": "d7d5",
+      "probability": 0.184
+    },
+    {
+      "san": "Ng8",
+      "uci": "f6g8",
+      "probability": 0.17
+    },
+    {
+      "san": "Ne4",
+      "uci": "f6e4",
+      "probability": 0.092
+    }
+  ],
+  "rnbqkb1r/pp1ppppp/2p2n2/8/3P1B2/8/PPP1PPPP/RN1QKBNR w KQkq - 0 3": [
+    {
+      "san": "e3",
+      "uci": "e2e3",
+      "probability": 0.589
     },
     {
       "san": "Nf3",
       "uci": "g1f3",
-      "probability": 0.05
-    }
-  ],
-  "rnbqkbnr/pppp1ppp/8/4p3/2P5/2N5/PP1PPPPP/R1BQKBNR b KQkq - 1 2": [
-    {
-      "san": "Nf6",
-      "uci": "g8f6",
-      "probability": 0.6
+      "probability": 0.28
     },
     {
-      "san": "Nc6",
-      "uci": "b8c6",
-      "probability": 0.3
-    },
-    {
-      "san": "Bb4",
-      "uci": "f8b4",
-      "probability": 0.1
+      "san": "c3",
+      "uci": "c2c3",
+      "probability": 0.131
     }
   ],
-  "rnbqkbnr/pppppppp/8/8/8/5N2/PPPPPPPP/RNBQKB1R b KQkq - 1 1": [
+  "rnbqkb1r/pp1ppppp/2p2n2/8/3P4/2N5/PPP1PPPP/R1BQKBNR w KQkq - 0 3": [
+    {
+      "san": "e4",
+      "uci": "e2e4",
+      "probability": 0.664
+    },
+    {
+      "san": "Bf4",
+      "uci": "c1f4",
+      "probability": 0.336
+    }
+  ],
+  "r1bqkb1r/pppp1ppp/2n2n2/4P3/2Bp4/5N2/PPP2PPP/RNBQK2R b KQkq - 0 5": [
+    {
+      "san": "Qe7",
+      "uci": "d8e7",
+      "probability": 0.271
+    },
+    {
+      "san": "Ne4",
+      "uci": "f6e4",
+      "probability": 0.246
+    },
+    {
+      "san": "Ng4",
+      "uci": "f6g4",
+      "probability": 0.185
+    },
+    {
+      "san": "Ng8",
+      "uci": "f6g8",
+      "probability": 0.135
+    },
+    {
+      "san": "Nxe5",
+      "uci": "c6e5",
+      "probability": 0.098
+    },
     {
       "san": "d5",
       "uci": "d7d5",
-      "probability": 0.45
-    },
-    {
-      "san": "Nf6",
-      "uci": "g8f6",
-      "probability": 0.4
-    },
-    {
-      "san": "c5",
-      "uci": "c7c5",
-      "probability": 0.1
-    },
-    {
-      "san": "g6",
-      "uci": "g7g6",
-      "probability": 0.05
+      "probability": 0.065
     }
   ],
-  "rnbqkbnr/ppp1pppp/8/3p4/8/5N2/PPPPPPPP/RNBQKB1R w KQkq - 0 2": [
+  "rnbqkbnr/pp1ppppp/2p5/8/3P4/8/PPP1PPPP/RNBQKBNR w KQkq - 0 2": [
     {
-      "san": "g3",
-      "uci": "g2g3",
-      "probability": 0.5
+      "san": "c4",
+      "uci": "c2c4",
+      "probability": 0.495
+    },
+    {
+      "san": "Bf4",
+      "uci": "c1f4",
+      "probability": 0.185
+    },
+    {
+      "san": "e4",
+      "uci": "e2e4",
+      "probability": 0.161
+    },
+    {
+      "san": "Nc3",
+      "uci": "b1c3",
+      "probability": 0.159
+    }
+  ],
+  "r1bqk2r/pppp1ppp/2n2n2/2b1p3/2BPP3/5N2/PPP2PPP/RNBQ1RK1 b kq - 0 5": [
+    {
+      "san": "exd4",
+      "uci": "e5d4",
+      "probability": 1
+    }
+  ],
+  "rnbqkb1r/pp1ppppp/2p2n2/8/2PP4/8/PP2PPPP/RNBQKBNR w KQkq - 0 3": [
+    {
+      "san": "Nc3",
+      "uci": "b1c3",
+      "probability": 0.758
+    },
+    {
+      "san": "Nf3",
+      "uci": "g1f3",
+      "probability": 0.242
+    }
+  ],
+  "rnbqkbnr/pp2pppp/8/3p4/3P4/8/PPP2PPP/RNBQKBNR w KQkq - 0 4": [
+    {
+      "san": "Nc3",
+      "uci": "b1c3",
+      "probability": 0.624
+    },
+    {
+      "san": "Nf3",
+      "uci": "g1f3",
+      "probability": 0.301
+    },
+    {
+      "san": "Bb5+",
+      "uci": "f1b5",
+      "probability": 0.075
+    }
+  ],
+  "rnbqkbnr/pp2pppp/2p5/3p4/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 0 3": [
+    {
+      "san": "exd5",
+      "uci": "e4d5",
+      "probability": 0.469
+    },
+    {
+      "san": "e5",
+      "uci": "e4e5",
+      "probability": 0.403
+    },
+    {
+      "san": "d3",
+      "uci": "d2d3",
+      "probability": 0.088
+    },
+    {
+      "san": "Nc3",
+      "uci": "b1c3",
+      "probability": 0.04
+    }
+  ],
+  "rnbqkbnr/pp2pppp/8/3p4/8/5N2/PPPP1PPP/RNBQKB1R w KQkq - 0 4": [
+    {
+      "san": "d4",
+      "uci": "d2d4",
+      "probability": 0.57
+    },
+    {
+      "san": "Bb5+",
+      "uci": "f1b5",
+      "probability": 0.241
+    },
+    {
+      "san": "Nc3",
+      "uci": "b1c3",
+      "probability": 0.122
+    },
+    {
+      "san": "Bd3",
+      "uci": "f1d3",
+      "probability": 0.067
+    }
+  ],
+  "rn1qkbnr/pp2pppp/2p5/3pP3/6b1/5N2/PPPP1PPP/RNBQKB1R w KQkq - 1 4": [
+    {
+      "san": "d4",
+      "uci": "d2d4",
+      "probability": 0.583
+    },
+    {
+      "san": "h3",
+      "uci": "h2h3",
+      "probability": 0.221
+    },
+    {
+      "san": "Be2",
+      "uci": "f1e2",
+      "probability": 0.196
+    }
+  ],
+  "rn1qkbnr/pp2pppp/8/3p4/3P2b1/5N2/PPP2PPP/RNBQKB1R w KQkq - 1 5": [
+    {
+      "san": "Be2",
+      "uci": "f1e2",
+      "probability": 0.445
+    },
+    {
+      "san": "h3",
+      "uci": "h2h3",
+      "probability": 0.21
+    },
+    {
+      "san": "Nc3",
+      "uci": "b1c3",
+      "probability": 0.207
+    },
+    {
+      "san": "Bb5+",
+      "uci": "f1b5",
+      "probability": 0.138
+    }
+  ],
+  "rn1qkbnr/pp2pppp/2p5/3pPb2/3P4/8/PPP2PPP/RNBQKBNR w KQkq - 1 4": [
+    {
+      "san": "Nf3",
+      "uci": "g1f3",
+      "probability": 0.572
+    },
+    {
+      "san": "Bd3",
+      "uci": "f1d3",
+      "probability": 0.233
+    },
+    {
+      "san": "f4",
+      "uci": "f2f4",
+      "probability": 0.107
+    },
+    {
+      "san": "h3",
+      "uci": "h2h3",
+      "probability": 0.088
+    }
+  ],
+  "rnbqkbnr/pp2pppp/2p5/3p4/2B1P3/8/PPPP1PPP/RNBQK1NR w KQkq - 0 3": [
+    {
+      "san": "exd5",
+      "uci": "e4d5",
+      "probability": 1
+    }
+  ],
+  "rnbqkbnr/pp2pppp/8/3p4/2B5/8/PPPP1PPP/RNBQK1NR w KQkq - 0 4": [
+    {
+      "san": "Bb3",
+      "uci": "c4b3",
+      "probability": 0.571
+    },
+    {
+      "san": "Bb5+",
+      "uci": "c4b5",
+      "probability": 0.429
+    }
+  ],
+  "rn1qkbnr/ppp1pppp/3p4/8/4P1b1/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3": [
+    {
+      "san": "Nc3",
+      "uci": "b1c3",
+      "probability": 0.488
     },
     {
       "san": "d4",
       "uci": "d2d4",
-      "probability": 0.3
+      "probability": 0.299
     },
     {
-      "san": "c4",
-      "uci": "c2c4",
-      "probability": 0.2
+      "san": "h3",
+      "uci": "h2h3",
+      "probability": 0.213
     }
   ],
-  "rnbqkb1r/pppppppp/5n2/8/8/5N2/PPPPPPPP/RNBQKB1R w KQkq - 2 2": [
+  "rn1qkb1r/pp2pppp/2pp1n2/8/3PP1b1/2N2N2/PPP2PPP/R1BQKB1R w KQkq - 4 5": [
     {
-      "san": "g3",
-      "uci": "g2g3",
-      "probability": 0.5
+      "san": "Be2",
+      "uci": "f1e2",
+      "probability": 1
+    }
+  ],
+  "rn2kb1r/pp2pppp/2pp1n2/q7/3PP1b1/2N2N2/PPP1BPPP/R1BQK2R w KQkq - 6 6": [
+    {
+      "san": "Bd2",
+      "uci": "c1d2",
+      "probability": 0.731
     },
     {
-      "san": "c4",
-      "uci": "c2c4",
-      "probability": 0.3
+      "san": "O-O",
+      "uci": "e1g1",
+      "probability": 0.269
+    }
+  ],
+  "rn1qkbnr/pp3ppp/2p1p3/3pPb2/3P4/5N2/PPP2PPP/RNBQKB1R w KQkq - 0 5": [
+    {
+      "san": "c3",
+      "uci": "c2c3",
+      "probability": 0.454
     },
     {
-      "san": "d4",
-      "uci": "d2d4",
-      "probability": 0.2
+      "san": "Bd3",
+      "uci": "f1d3",
+      "probability": 0.274
+    },
+    {
+      "san": "Nc3",
+      "uci": "b1c3",
+      "probability": 0.272
     }
   ]
 }

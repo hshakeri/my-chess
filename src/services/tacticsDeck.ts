@@ -1,0 +1,173 @@
+import deckData from '../data/tactics_deck.json';
+
+/**
+ * The tactics deck (DC-2), Woodpecker style: positions from hoot65's own games right after a blunder,
+ * by either player, where the side to move has one clearly winning move (Stockfish 19; the build is
+ * in `scripts/game-analysis/tactics.mjs`). A position is graded by the time to the right move: under
+ * five seconds Good, up to twenty Hard, slower or wrong Again. A session takes the Again ones first,
+ * then the Hard ones, then new ones, then the Good ones seen longest ago, mixing the motifs; a
+ * position retires after three Good solves in a row. Kept in this browser.
+ */
+
+export type TacticMotif = 'mate-in-one' | 'mate' | 'free-piece' | 'fork' | 'check' | 'promotion' | 'other';
+
+export const MOTIF_LABEL: Record<TacticMotif, string> = {
+  'mate-in-one': 'Mate in one',
+  mate: 'A forced mate',
+  'free-piece': 'A piece to take',
+  fork: 'A fork',
+  check: 'A check that wins material',
+  promotion: 'A promotion',
+  other: 'A winning combination',
+};
+
+export interface TacticPosition {
+  id: string;
+  fen: string;
+  /** The move that had just been played, the blunder. */
+  lastMove: { from: string; to: string; san: string };
+  /** Stockfish's best move; `accepted` adds the others that win about as much (every mate, when it mates). */
+  solution: string;
+  accepted: string[];
+  /** Stockfish's line from the solution on, a few plies. */
+  line: string[];
+  motif: TacticMotif;
+  mateIn: number | null;
+  date: string;
+  /** Whether hoot65 is the side to move (the opponent had blundered), and the move played in the game. */
+  ownSide: boolean;
+  played: string;
+  game?: string;
+}
+
+export const tacticsDeck = deckData as TacticPosition[];
+
+export const TACTICS_STORAGE_KEY = 'my_chess_tactics_v1';
+export const GOOD_MS = 5_000;
+export const HARD_MS = 20_000;
+export const RETIRE_STREAK = 3;
+export const SESSION_SIZE = 10;
+
+export type TacticGrade = 'good' | 'hard' | 'again';
+
+export interface TacticState {
+  tries: number;
+  /** Good solves in a row. */
+  streak: number;
+  grade: TacticGrade;
+  at: number;
+  bestMs?: number;
+}
+
+export function gradeSolve(correct: boolean, ms: number): TacticGrade {
+  if (!correct || ms > HARD_MS) return 'again';
+  return ms < GOOD_MS ? 'good' : 'hard';
+}
+
+export const isRetired = (state?: TacticState) => (state?.streak ?? 0) >= RETIRE_STREAK;
+
+export function readTacticStates(): Record<string, TacticState> {
+  try {
+    const raw = window.localStorage.getItem(TACTICS_STORAGE_KEY);
+    const parsed = raw ? JSON.parse(raw) : {};
+    return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
+  } catch {
+    return {};
+  }
+}
+
+/** The states with one more solve of `id`, also written to this browser. */
+export function recordSolve(states: Record<string, TacticState>, id: string, correct: boolean, ms: number, now = Date.now()): Record<string, TacticState> {
+  const grade = gradeSolve(correct, ms);
+  const old = states[id];
+  const next: TacticState = {
+    tries: (old?.tries ?? 0) + 1,
+    streak: grade === 'good' ? (old?.streak ?? 0) + 1 : 0,
+    grade,
+    at: now,
+    bestMs: correct ? Math.min(old?.bestMs ?? Infinity, ms) : old?.bestMs,
+  };
+  const all = { ...states, [id]: next };
+  try {
+    window.localStorage.setItem(TACTICS_STORAGE_KEY, JSON.stringify(all));
+  } catch {
+    // the session still runs; it is just not kept
+  }
+  return all;
+}
+
+export const TACTICS_LOG_KEY = 'my_chess_tactics_log_v1';
+
+/** One finished session: how many positions, by grade, and the time on them. */
+export interface TacticSession {
+  at: number;
+  good: number;
+  hard: number;
+  again: number;
+  ms: number;
+}
+
+export function readTacticSessions(): TacticSession[] {
+  try {
+    const raw = window.localStorage.getItem(TACTICS_LOG_KEY);
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+/** Keep a finished session (the newest 200). */
+export function logTacticSession(session: TacticSession): TacticSession[] {
+  const all = [...readTacticSessions(), session].slice(-200);
+  try {
+    window.localStorage.setItem(TACTICS_LOG_KEY, JSON.stringify(all));
+  } catch {
+    // shown, just not kept
+  }
+  return all;
+}
+
+/** Positions last graded Again or Hard, and not retired: the ones a session takes first. */
+export function toRedo(deck: TacticPosition[], states: Record<string, TacticState>): number {
+  return deck.filter((t) => states[t.id] && states[t.id].grade !== 'good').length;
+}
+
+/** The same positions with no two neighbours of one motif where that can be helped. */
+export function interleave(items: TacticPosition[]): TacticPosition[] {
+  const left = [...items];
+  const out: TacticPosition[] = [];
+  while (left.length) {
+    const prev = out[out.length - 1]?.motif;
+    const k = left.findIndex((t) => t.motif !== prev);
+    out.push(...left.splice(k < 0 ? 0 : k, 1));
+  }
+  return out;
+}
+
+/** The next session: Again first, then Hard, then new ones in deck order, then Good, the oldest first; never a retired one. */
+export function pickSession(deck: TacticPosition[], states: Record<string, TacticState>, size = SESSION_SIZE): TacticPosition[] {
+  const rank = (t: TacticPosition) => {
+    const s = states[t.id];
+    if (!s) return 2;
+    return s.grade === 'again' ? 0 : s.grade === 'hard' ? 1 : 3;
+  };
+  const live = deck.map((t, i) => ({ t, i })).filter(({ t }) => !isRetired(states[t.id]));
+  live.sort((a, b) => rank(a.t) - rank(b.t) || (states[a.t.id]?.at ?? 0) - (states[b.t.id]?.at ?? 0) || a.i - b.i);
+  return interleave(live.slice(0, size).map(({ t }) => t));
+}
+
+/** "27...Qf6#" style labels for a line starting in `fen`. */
+export function numberLine(fen: string, sans: string[]): string {
+  const [, turn, , , , full] = fen.split(' ');
+  let n = Number(full);
+  let white = turn === 'w';
+  return sans
+    .map((san, k) => {
+      const label = white ? `${n}.${san}` : k === 0 ? `${n}...${san}` : san;
+      if (!white) n++;
+      white = !white;
+      return label;
+    })
+    .join(' ');
+}

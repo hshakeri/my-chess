@@ -25,6 +25,7 @@ import { allCurriculumLessons, curriculumCourses } from '../src/curriculum';
 import { PatternGroup, patternGroupOf, patternPath, inPatternOrder } from '../src/curriculum/patternPath';
 import { plyLabel, replyOptions } from '../src/curriculum/builder';
 import { drillSetOf, gameDrillData } from '../src/curriculum/gameDrills';
+import { MOTIF_LABEL, numberLine, tacticsDeck, type TacticPosition } from '../src/services/tacticsDeck';
 import { lessonUrl } from '../src/router';
 import { getRecommendedWhiteRepertoire, getRecommendedBlackRepertoire } from '../src/analytics/repertoire';
 import { CurriculumLesson, CurriculumMove } from '../src/types/curriculum';
@@ -357,6 +358,34 @@ function renderDrillSet(lessons: CurriculumLesson[], n: number, group: PatternGr
   return front + back;
 }
 
+/** The tactics deck's first positions on sheets of twelve: the deck follows the study path, pieces to take and mates in one first. */
+const BOOK_TACTICS = 24;
+
+/** A sheet of the tactics deck: each position just after a mistake in one of hoot65's games, from the side to move; the back holds the answers. */
+function renderTacticsSheet(positions: TacticPosition[], n: number, sheetNo: number, sheets: number): string {
+  const name = `Tactics from your games${sheets > 1 ? `, sheet ${sheetNo} of ${sheets}` : ''}`;
+  const chapter = `${n}. ${name}`;
+  toc.push({ heading: chapter, id: `ch-${n}`, no: `${n}.`, title: `${name} (${positions.length} positions)` });
+  const intro =
+    sheetNo === 1
+      ? `<p>Positions from your games, each just after a mistake, yours or your opponent's: one move wins clearly (checked with Stockfish 19). Each diagram is drawn from the side to move, with the move that had just been played. Aim for under a minute each. The answers are on the back. The app's Tactics deck holds ${tacticsDeck.length} of them and brings back the ones you miss.</p>`
+      : '';
+  let front = `<section class="sheet sheet-front drill-set" id="ch-${n}">${chapterHead(chapter, undefined, intro)}<div class="drills">`;
+  let answers = '';
+  positions.forEach((t, k) => {
+    const side: 'w' | 'b' = t.fen.split(' ')[1] === 'b' ? 'b' : 'w';
+    const label = `${n}.${k + 1}`;
+    front += `<div class="drill"><figure class="diagram">${diagram(t.fen, side)}<figcaption><b>${esc(label)}</b> ${esc(`${side === 'w' ? 'White' : 'Black'} to play, after ${t.lastMove.san}.`)}</figcaption></figure><p class="blankline">Your move: __________</p></div>`;
+    const also = t.accepted.filter((san) => san !== t.solution);
+    const others = also.length ? ` (${also.join(' and ')} also win${also.length === 1 ? 's' : ''})` : '';
+    answers += `<p><b>${esc(label)}</b> ${esc(`${t.solution}: ${MOTIF_LABEL[t.motif].toLowerCase()}${others}. Stockfish's line: ${numberLine(t.fen, t.line)}. From your game of ${t.date}.`)}</p>`;
+    answerCount++;
+  });
+  front += `</div></section>`;
+  const back = `<section class="sheet sheet-back"><details class="answers"><summary>Answers to ${esc(chapter)}</summary><h2 class="sheet-title">Answers · ${esc(chapter)}</h2><div class="answer-body">${answers}</div></details></section>`;
+  return front + back;
+}
+
 function renderPlan(plan: RepertoirePlan, n: number): string {
   toc.push({ heading: `${n}. Repertoire plan: ${plan.name}`, id: `ch-${n}`, no: `${n}.`, title: plan.name });
   let html = `<section class="chapter" id="ch-${n}">${chapterHead(`${n}. Repertoire plan: ${plan.name}`, undefined)}<p>${esc(plan.description)}</p>`;
@@ -395,9 +424,9 @@ function partHead(title: string, text: string, extraClass = '', id = ''): string
 }
 
 const howToUse =
-  "These chapters come from your own Chess.com games (hoot65) and the openings you actually play, in the order of the app's study path: lessons that repeat the same pattern follow one another, and each group opens with the check that catches it. The first four chapters are positions from your games: a piece your opponent's move attacked that stayed where it was, a piece of theirs that could have been won, a move of yours that left a piece where it could be taken, and a move of yours that let your opponent give mate. Each lesson chapter after them explains the position: the line with its notes, the other replies your opponents chose, and the mistakes to avoid. The practice for every lesson, the main line and each of those replies as moves to find plus the exercises, is on the practice sheets at the end of the book, to be played out on a real board.";
+  "These chapters come from your own Chess.com games (hoot65) and the openings you actually play, in the order of the app's study path: lessons that repeat the same pattern follow one another, and each group opens with the check that catches it. The first four chapters are positions from your games: a piece your opponent's move attacked that stayed where it was, a piece of theirs that could have been won, a move of yours that left a piece where it could be taken, and a move of yours that let your opponent give mate. Each lesson chapter after them explains the position: the line with its notes, the other replies your opponents chose, and the mistakes to avoid. The practice for every lesson, the main line and each of those replies as moves to find plus the exercises, is on the practice sheets at the end of the book, to be played out on a real board. Part I closes with two sheets of tactics from your games: positions just after a mistake, yours or your opponent's, where one move wins.";
 const printing =
-  'Print the book double-sided, flipping on the long edge. Every page with questions, the four pages of positions from your games and each practice sheet, is the front of a sheet with its answers on the back, so each sheet can be taken to the board on its own. Where a practice sheet would otherwise start on the back of a page, a page for notes comes first.';
+  'Print the book double-sided, flipping on the long edge. Every page with questions, the six pages of positions from your games (four drill sheets and two tactics sheets) and each practice sheet, is the front of a sheet with its answers on the back, so each sheet can be taken to the board on its own. Where a practice sheet would otherwise start on the back of a page, a page for notes comes first.';
 
 const playing = (l: CurriculumLesson) => `${l.title} (you play ${l.targetColor === 'black' ? 'Black' : 'White'})`;
 
@@ -426,6 +455,10 @@ for (const lesson of openingLessons) {
   previousGroup = group;
   previousLessonId = lesson.id;
 }
+// The tactics deck closes Part I, two sheets of twelve
+const bookTactics = tacticsDeck.slice(0, BOOK_TACTICS);
+const tacticSheets = Math.ceil(bookTactics.length / SHEET_DRILLS);
+for (let k = 0; k < tacticSheets; k++) chapters.push(renderTacticsSheet(bookTactics.slice(k * SHEET_DRILLS, (k + 1) * SHEET_DRILLS), ++n, k + 1, tacticSheets));
 chapters.push(
   partHead(
     'Part II · The repertoire plans',

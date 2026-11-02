@@ -107,4 +107,15 @@ test.describe('06. Printable Physical-Board Worksheets & @media print (F19 - F20
     await expect(page.locator('[data-printable="sheet"]').first()).toBeVisible();
     await expect(sheet).toHaveCount(0);
   });
+
+  test('The tactics sheet prints the next twelve positions of the deck, the answers on a page of their own (DC-2)', async ({ page }) => {
+    await page.locator('button[data-action="tactics-sheet"]').click();
+    const sheet = page.locator('[data-section="tactics-sheet"]');
+    await expect(sheet).toHaveAttribute('data-items', '12');
+    await expect(sheet.locator('[data-tactics-item]')).toHaveCount(12);
+    await expect(sheet.locator('[data-tactics-answer]')).toHaveCount(12);
+    await expect(sheet.locator('[data-printable="answer-key"]')).toHaveCSS('break-before', 'page');
+    await page.locator('button[data-action="tactics-sheet"]').click();
+    await expect(sheet).toHaveCount(0);
+  });
 });

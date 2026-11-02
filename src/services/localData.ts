@@ -11,6 +11,8 @@ export const BACKED_UP_KEYS = [
   'my_chess_idea_cards_v1',
   'my_chess_spar_log_v1',
   'my_chess_speedrun_v1',
+  'my_chess_tactics_v1',
+  'my_chess_tactics_log_v1',
 ] as const;
 
 function storage(): Storage | null {

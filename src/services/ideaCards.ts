@@ -37,6 +37,26 @@ export function ideaLessons(lessons: CurriculumLesson[]): CurriculumLesson[] {
   );
 }
 
+/**
+ * Three plans to choose from (CL-7's multiple choice): the lesson's own and two of other lessons for the
+ * same colour, in an order fixed for each lesson, so the right one is not always first.
+ */
+export function planChoices(lesson: CurriculumLesson, lessons: CurriculumLesson[]): string[] {
+  const own = lesson.thematicObjective ?? '';
+  const others = [...new Set(ideaLessons(lessons).filter((l) => l.id !== lesson.id && l.targetColor === lesson.targetColor).map((l) => l.thematicObjective!))].filter(
+    (o) => o !== own
+  );
+  const h = [...lesson.id].reduce((a, c) => (a * 31 + c.charCodeAt(0)) >>> 0, 7);
+  const n = others.length;
+  // Two different others: the second is 1 to n - 1 places after the first
+  const first = h % n;
+  const second = (first + 1 + ((h >>> 4) % Math.max(1, n - 1))) % n;
+  const picks = n <= 2 ? others : [others[first], others[second]];
+  const options = [own, ...picks];
+  const shift = h % options.length;
+  return [...options.slice(shift), ...options.slice(0, shift)];
+}
+
 /** The position the lesson's main line reaches. */
 export function ideaPosition(lesson: CurriculumLesson): string {
   const chess = new Chess(lesson.initialFen);

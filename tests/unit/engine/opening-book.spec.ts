@@ -1,23 +1,36 @@
 import { describe, it, expect } from 'vitest';
+import { Chess } from 'chess.js';
 import { HumanOpeningBook } from '@/engine/human/openingBook';
+import bookData from '@/data/openingBook.json';
 
 describe('F05 Tier 1 Human Opening Book', () => {
   const startFen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
 
   it('provides human opening moves with frequencies from starting position', () => {
+    // The book is hoot65's opponents' moves (DC-6, scripts/game-analysis/opening-book.mjs): as White
+    // they open 1.e4 most, then 1.d4 and 1.c4 (1.Nf3 is under the 2% a move needs)
     const candidates = HumanOpeningBook.lookup(startFen);
     expect(candidates).not.toBeNull();
-    expect(candidates!.length).toBeGreaterThanOrEqual(4);
-
     const moves = candidates!.map((c) => c.san);
-    expect(moves).toContain('e4');
-    expect(moves).toContain('d4');
+    expect(moves.slice(0, 2)).toEqual(['e4', 'd4']);
     expect(moves).toContain('c4');
-    expect(moves).toContain('Nf3');
 
     // Probabilities sum to 1.0 (within float tolerance)
     const totalProb = candidates!.reduce((acc, c) => acc + c.probability, 0);
     expect(totalProb).toBeCloseTo(1.0, 2);
+  });
+
+  it('every book position is a legal position, every move legal there, and the shares add up to 1', () => {
+    const entries = Object.entries(bookData as Record<string, Array<{ san: string; uci: string; probability: number }>>);
+    expect(entries.length).toBeGreaterThanOrEqual(200);
+    for (const [fen, candidates] of entries) {
+      for (const c of candidates) {
+        const move = new Chess(fen).move(c.san);
+        expect(move.from + move.to + (move.promotion ?? ''), `${fen} ${c.san}`).toBe(c.uci);
+        expect(c.probability).toBeGreaterThan(0);
+      }
+      expect(candidates.reduce((a, c) => a + c.probability, 0), fen).toBeCloseTo(1, 3);
+    }
   });
 
   it('provides human response distribution against 1.e4', () => {

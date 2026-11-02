@@ -7,9 +7,9 @@
 // in the browser, where fonts and widths are those of the print: as many items as fit on a page make a
 // sheet, and that sheet's answers become the page after it. Chromium cannot put a page on a front side
 // (it treats `break-before: right` as a plain page break), so the book is rendered once as a draft:
-// its bookmarks say where each heading landed, a notes page goes in where a practice sheet would
-// otherwise start on the back of a page, the contents get their page numbers, and the second rendering
-// is the book. The build fails if any sheet is not a front page followed by its answers.
+// its bookmarks say where each heading landed, a notes page goes in wherever a sheet would otherwise
+// start on the back of a page (rendering again after each), the contents get their page numbers, and
+// the last rendering is the book. The build fails if any sheet is not a front page followed by its answers.
 import { chromium } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -198,15 +198,19 @@ const layout = await page.evaluate(layOutSheets, {
 });
 if (layout.tooTall.length) throw new Error(`taller than a page: ${layout.tooTall.join('; ')}`);
 
-// The draft says where the first practice sheet lands; if that is the back of a page, a notes page goes first
+// The draft says where each sheet lands: the first one that would start on the back of a page gets a
+// notes page before it, and the book is drawn again, until every sheet starts on a front
 let draft = bookmarkPages(await page.pdf(options));
-if (draft.pages.get('Practice sheet 1') % 2 === 0) {
-  await page.evaluate(() => {
+for (let pass = 0; pass < 12; pass++) {
+  const fronts = await page.evaluate(sheetHeadings);
+  const k = fronts.findIndex(({ front }) => (draft.pages.get(front) ?? 1) % 2 === 0);
+  if (k < 0) break;
+  await page.evaluate((k) => {
     const notes = document.createElement('section');
     notes.className = 'sheet notes-page';
     notes.innerHTML = '<h2 class="sheet-title">Notes</h2>';
-    document.querySelector('#practice-items > .sheet-front').before(notes);
-  });
+    document.querySelectorAll('.sheet-front')[k].before(notes);
+  }, k);
   draft = bookmarkPages(await page.pdf(options));
 }
 

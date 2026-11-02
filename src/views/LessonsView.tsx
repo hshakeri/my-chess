@@ -40,6 +40,8 @@ import { WarmupPanel } from './WarmupPanel';
 import { SpeedRunPanel, SPEED_MIN_MOVES, speedMoves } from './SpeedRunPanel';
 import { ProgressPanel } from './ProgressPanel';
 import { PlanReviewPanel } from './PlanReviewPanel';
+import { TacticsDeckPanel } from './TacticsDeckPanel';
+import { readTacticStates, tacticsDeck, toRedo } from '../services/tacticsDeck';
 import { dueIdeas } from '../services/ideaCards';
 import type { SparRequest } from '../services/sparLog';
 import type { HumanElo } from '../types/engine';
@@ -256,6 +258,8 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
   const [speedOpen, setSpeedOpen] = useState(false);
   const [progressOpen, setProgressOpen] = useState(false);
   const [plansOpen, setPlansOpen] = useState(false);
+  const [tacticsOpen, setTacticsOpen] = useState(false);
+  const tacticsRedo = useMemo(() => (tacticsOpen ? 0 : toRedo(tacticsDeck, readTacticStates())), [tacticsOpen]);
   // Read again whenever the plan review closes
   const plansDue = useMemo(() => (plansOpen ? 0 : dueIdeas(allCurriculumLessons).length), [plansOpen]);
 
@@ -1091,6 +1095,7 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
       {warmupOpen && <WarmupPanel onClose={() => setWarmupOpen(false)} />}
       {speedOpen && <SpeedRunPanel lesson={currentLesson} onClose={() => setSpeedOpen(false)} />}
       {plansOpen && <PlanReviewPanel onClose={() => setPlansOpen(false)} />}
+      {tacticsOpen && <TacticsDeckPanel onClose={() => setTacticsOpen(false)} />}
       {progressOpen && (
         <ProgressPanel
           onClose={() => setProgressOpen(false)}
@@ -1131,6 +1136,16 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
             title="Two minutes of board-vision questions on positions from your own games"
           >
             Warm-up · 2 min
+          </button>
+
+          <button
+            type="button"
+            data-action="tactics"
+            onClick={() => setTacticsOpen(true)}
+            className="bg-slate-950/80 border border-rose-500/40 rounded-lg px-3 py-2 text-xs font-semibold text-rose-300 hover:bg-rose-950/40"
+            title="Positions from your own games where one move wins: solve them fast, ten at a time"
+          >
+            <span data-tactics-redo={tacticsRedo}>Tactics{tacticsRedo ? ` · ${tacticsRedo} to redo` : ''}</span>
           </button>
 
           <button
@@ -1733,14 +1748,28 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
                   {session!.completed} card{session!.completed === 1 ? '' : 's'} reviewed: {session!.ratings.again} again, {session!.ratings.hard} hard,{' '}
                   {session!.ratings.good} good, {session!.ratings.easy} easy.
                 </p>
-                <button
-                  type="button"
-                  data-action="end-session"
-                  onClick={handleEndSession}
-                  className="mt-2 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold"
-                >
-                  Back to the lessons
-                </button>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    data-action="end-session"
+                    onClick={handleEndSession}
+                    className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold"
+                  >
+                    Back to the lessons
+                  </button>
+                  <button
+                    type="button"
+                    data-action="session-tactics"
+                    onClick={() => {
+                      handleEndSession();
+                      setTacticsOpen(true);
+                    }}
+                    className="px-3 py-1.5 rounded-lg bg-rose-700 hover:bg-rose-600 text-white text-xs font-semibold"
+                    title="Ten positions from your own games where one move wins"
+                  >
+                    Now ten tactics
+                  </button>
+                </div>
               </div>
             )}
 

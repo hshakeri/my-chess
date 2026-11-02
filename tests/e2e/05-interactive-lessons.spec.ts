@@ -2,9 +2,11 @@ import { test, expect } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 import { Chess } from 'chess.js';
 import type { GameDrill } from '../../src/curriculum/gameDrills';
+import type { TacticPosition } from '../../src/services/tacticsDeck';
 
 // Read as a file: the test runner loads specs as ES modules, where a JSON import needs an attribute
 const gameDrills: { threat: GameDrill[]; free: GameDrill[]; hang: GameDrill[]; mate: GameDrill[] } = JSON.parse(readFileSync('src/data/game_drills.json', 'utf8'));
+const tacticsDeck: TacticPosition[] = JSON.parse(readFileSync('src/data/tactics_deck.json', 'utf8'));
 
 test.describe('05. Interactive Lessons, Feedback Loops & Spaced Repetition (F16 - F18)', () => {
   test.beforeEach(async ({ page }) => {
@@ -320,6 +322,37 @@ test.describe('05. Interactive Lessons, Feedback Loops & Spaced Repetition (F16 
     await expect(question).toHaveAttribute('data-question-status', 'asking');
     await modal.locator('button[data-action="warmup-close"]').click();
     await expect(modal).toHaveCount(0);
+  });
+
+  test('Tactics deck: a position from your games, the winning move graded by time, and a wrong one shown the answer (DC-2)', async ({ page }) => {
+    await page.locator('button[data-action="tactics"]').click();
+    const modal = page.locator('[data-modal="tactics"]');
+    await expect(modal.locator('[data-tactics-deck]')).toHaveAttribute('data-tactics-deck', String(tacticsDeck.length));
+    await modal.locator('button[data-action="tactics-start"]').click();
+    // A fresh profile starts with the deck's first position
+    const first = tacticsDeck[0];
+    await expect(modal.locator(`[data-tactic="${first.id}"]`)).toBeVisible();
+    const m = new Chess(first.fen).move(first.solution);
+    await modal.locator(`[data-square="${m.from}"]`).click();
+    await modal.locator(`[data-square="${m.to}"]`).click();
+    const PIECE: Record<string, string> = { q: 'Queen', r: 'Rook', b: 'Bishop', n: 'Knight' };
+    if (m.promotion) await page.getByRole('button', { name: `${m.color === 'w' ? 'White' : 'Black'} ${m.promotion} ${PIECE[m.promotion]}` }).click();
+    const result = modal.locator('[data-tactic-result]');
+    await expect(result).toHaveAttribute('data-correct', 'true');
+    await expect(result).toHaveAttribute('data-tactic-result', /good|hard|again/);
+    await modal.locator('button[data-action="tactics-next"]').click();
+    // The second: a wrong move (any legal move outside the accepted ones) is Again, and the answer goes on the board
+    const id = await modal.locator('[data-tactic]').getAttribute('data-tactic');
+    const second = tacticsDeck.find((t) => t.id === id)!;
+    const wrong = new Chess(second.fen).moves({ verbose: true }).find((mv) => !second.accepted.includes(mv.san) && !mv.promotion)!;
+    await modal.locator(`[data-square="${wrong.from}"]`).click();
+    await modal.locator(`[data-square="${wrong.to}"]`).click();
+    await expect(result).toHaveAttribute('data-tactic-result', 'again');
+    await expect(result).toContainText(`The move is ${second.solution}.`);
+    await modal.locator('button[data-action="tactics-close"]').click();
+    await expect(modal).toHaveCount(0);
+    const states = await page.evaluate(() => JSON.parse(window.localStorage.getItem('my_chess_tactics_v1') ?? '{}'));
+    expect(Object.keys(states).sort()).toEqual([first.id, second.id].sort());
   });
 
   test('King and pawn: the king takes the opposition, the pawn runs, and it promotes (Finish the game)', async ({ page }) => {
