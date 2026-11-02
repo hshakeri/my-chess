@@ -179,6 +179,7 @@ test.describe('04. Personalized Diagnostics & Repertoire Recommendation (F13 - F
     // All 301 games here: the 26th time loss is the one 3+2 game, which the clock section leaves out
     await expect(endings.locator('[data-ending="loss-time"]')).toHaveAttribute('data-count', '26');
     await expect(endings.locator('[data-resigned-early]')).toHaveCount(10);
+    await expect(endings.locator('[data-resigned-early] [data-action="ending-replay"]').first()).toHaveAttribute('href', /^#\/game\/chesscom%3A/);
     await endings.locator('[data-resigned-early] [data-action="ending-spar"]').first().click();
     const spar = page.locator('[data-section="spar"]');
     await expect(spar).toBeVisible();

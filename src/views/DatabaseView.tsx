@@ -34,9 +34,11 @@ const seedGames = seedGamesRaw as unknown as StoredGame[];
 interface DatabaseViewProps {
   /** Play a reviewed game's critical moment on against Maia (handed to the game review). */
   onSpar?: (request: SparRequest) => void;
+  /** A game to open on arrival (a #/game/<id> link); `seq` changes when the same game is asked for again. */
+  openGame?: { id: string; seq: number };
 }
 
-export const DatabaseView: React.FC<DatabaseViewProps> = ({ onSpar }) => {
+export const DatabaseView: React.FC<DatabaseViewProps> = ({ onSpar, openGame }) => {
   const [games, setGames] = useState<StoredGame[]>([]);
   const [loading, setLoading] = useState(true);
   const [totalDbCount, setTotalDbCount] = useState(0);
@@ -49,6 +51,25 @@ export const DatabaseView: React.FC<DatabaseViewProps> = ({ onSpar }) => {
 
   // Modals & Panels
   const [selectedGame, setSelectedGame] = useState<StoredGame | null>(null);
+  // Open the linked game once: on a first visit the archive may still be loading, so look again when the list arrives
+  const openedRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!openGame) return;
+    const key = `${openGame.id}:${openGame.seq}`;
+    if (openedRef.current === key) return;
+    let alive = true;
+    gamesRepo
+      .getGame(openGame.id)
+      .then((game) => {
+        if (!alive || !game) return;
+        openedRef.current = key;
+        setSelectedGame(game);
+      })
+      .catch(() => undefined);
+    return () => {
+      alive = false;
+    };
+  }, [openGame?.id, openGame?.seq, games]);
   const [isSyncing, setIsSyncing] = useState(false);
   const [syncProgress, setSyncProgress] = useState<SyncProgress | null>(null);
   const [showUploadModal, setShowUploadModal] = useState(false);

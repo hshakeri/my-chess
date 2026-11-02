@@ -3,6 +3,7 @@ import { AHEAD_POINTS, LONG_THINK_S, summarizeClock, type ClockSummary } from '.
 import { END_LABEL, ROOK_POINTS, summarizeEndings, type EndedGame, type EndingsSummary } from '../analytics/endings';
 import { nearestBand } from './GameReviewPanel';
 import type { SparRequest } from '../services/sparLog';
+import { formatRoute } from '../router';
 import type { StoredGame } from '../types/db';
 
 const START_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
@@ -92,11 +93,15 @@ export const ClockSummaryView: React.FC<{ summary: ClockSummary | null }> = ({ s
             {s.lostAhead.map((g) => (
               <li key={g.gameId} data-lost-ahead={g.gameId}>
                 {g.date}, vs {g.opponent}: up {g.lead} after {g.moves} moves
+                {' '}
+                <a href={formatRoute({ view: 'database', gameId: g.gameId })} data-action="lost-ahead-replay" className="text-emerald-300 hover:text-white underline">
+                  replay and review
+                </a>
                 {g.url && (
                   <>
                     {' '}
-                    <a href={g.url} target="_blank" rel="noreferrer" className="text-emerald-300 hover:text-white underline">
-                      open the game
+                    <a href={g.url} target="_blank" rel="noreferrer" className="text-slate-400 hover:text-white underline">
+                      on Chess.com
                     </a>
                   </>
                 )}
@@ -142,9 +147,12 @@ const EndedRow: React.FC<{ e: EndedGame; attr: string; onSpar?: (request: SparRe
           Play on vs Maia
         </button>
       )}
+      <a href={formatRoute({ view: 'database', gameId: g.id })} data-action="ending-replay" className="text-emerald-300 hover:text-white underline text-xs">
+        replay and review
+      </a>
       {g.url && (
-        <a href={g.url} target="_blank" rel="noreferrer" className="text-emerald-300 hover:text-white underline text-xs">
-          open the game
+        <a href={g.url} target="_blank" rel="noreferrer" className="text-slate-400 hover:text-white underline text-xs">
+          on Chess.com
         </a>
       )}
     </li>

@@ -70,6 +70,10 @@ export const App: React.FC = () => {
   );
   // The lesson on screen in the Lessons tab, for the URL hash
   const [shownLessonId, setShownLessonId] = useState<string | null>(null);
+  // A game opened by a link (#/game/<id>): the Games tab opens its replay and review
+  const [pendingGame, setPendingGame] = useState<{ id: string; seq: number } | null>(() =>
+    initialRoute?.gameId ? { id: initialRoute.gameId, seq: 0 } : null
+  );
   const [adoptedRepertoireIds, setAdoptedRepertoireIds] = useState<string[]>(() =>
     typeof window === 'undefined' ? [] : readAdoptedRepertoires()
   );
@@ -398,6 +402,7 @@ export const App: React.FC = () => {
       if (route.view === 'lessons') {
         setPendingLesson(route.lessonId && isAuthoredLesson(route.lessonId) ? { id: route.lessonId, seq: Date.now() } : null);
       }
+      if (route.view === 'database' && route.gameId) setPendingGame({ id: route.gameId, seq: Date.now() });
       if (route.view === 'play' && route.fen && loadFenRef.current(route.fen).success && route.color) {
         setEngineColor(route.color === 'w' ? 'b' : 'w');
       }
@@ -794,7 +799,7 @@ export const App: React.FC = () => {
         )}
 
         {/* Tab 2: Game Database */}
-        {activeTab === 'database' && <DatabaseView onSpar={startSpar} />}
+        {activeTab === 'database' && <DatabaseView onSpar={startSpar} openGame={pendingGame ?? undefined} />}
 
         {/* Tab 3: Opening Diagnostics */}
         {activeTab === 'diagnostics' && (

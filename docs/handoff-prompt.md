@@ -16,9 +16,9 @@ also runs on every push to another branch).
 
 - React 18 + Vite 6 + TypeScript (strict) + Tailwind; chess.js 1.4; Dexie 4 (IndexedDB); ts-fsrs 5
   for scheduling; maia3-js + onnxruntime-web in a Web Worker for the human-like engine.
-- Tests: Vitest (`npm test`, 442 tests: SSR `renderToString` specs, jsdom interaction specs under
+- Tests: Vitest (`npm test`, 443 tests: SSR `renderToString` specs, jsdom interaction specs under
   `tests/unit/curriculum/lessons-view-interactions.spec.tsx`, fake-indexeddb for the database) and
-  Playwright (`npm run test:e2e`, 98 tests incl. iPhone-viewport tests). Keep both green or update
+  Playwright (`npm run test:e2e`, 99 tests incl. iPhone-viewport tests). Keep both green or update
   tests deliberately and say why. The board question before each lesson move (CL-5) is on by default:
   a test that plays lesson moves either answers it or sets localStorage `my_chess_cct_gate` to `off`
   first (`page.addInitScript` in e2e, the jsdom spec's beforeEach). No `if (await ...isVisible())` guards in specs: a missing control
@@ -204,7 +204,7 @@ Next: the roadmap below.
   against the clock (`src/views/SpeedRunPanel.tsx`), the opponent's replies at once, three seconds a
   move as the target, the runs kept in localStorage.
 - DC-5 done (2026-11-01): hash routes (`src/router.ts`: `#/lesson/<id>`, `#/play?fen=...`, one per
-  tab) that the address bar follows, and a QR code to the lesson beside every chapter and drill sheet
+  tab, `#/game/<id>` for a stored game's replay and review) that the address bar follows, and a QR code to the lesson beside every chapter and drill sheet
   of the lesson book.
 - DC-8 first slice done (2026-11-01): a Progress panel in the Lessons header (cards by state, recall
   today, the riskiest positions by `reachProb x (1 - recall)`, the moves mixed up, reviews due over

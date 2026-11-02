@@ -6,6 +6,7 @@
  *   #/play                    the Play tab; #/play?fen=<FEN>&color=w|b opens a position there
  *   #/database  #/diagnostics  #/worksheets  #/lessons
  *   #/lesson/<lesson id>      a lesson on the Lessons tab
+ *   #/game/<game id>          a stored game's replay and review on the Games tab
  */
 
 export type View = 'play' | 'database' | 'diagnostics' | 'lessons' | 'worksheets';
@@ -13,6 +14,7 @@ export type View = 'play' | 'database' | 'diagnostics' | 'lessons' | 'worksheets
 export interface Route {
   view: View;
   lessonId?: string;
+  gameId?: string;
   fen?: string;
   color?: 'w' | 'b';
 }
@@ -34,7 +36,8 @@ export function parseHash(hash: string): Route | null {
     }
   });
   const params = new URLSearchParams(query);
-  if (parts[0] === 'lesson' && parts[1]) return { view: 'lessons', lessonId: parts[1] };
+  if (parts[0] === 'lesson' && parts[1] && parts.length === 2) return { view: 'lessons', lessonId: parts[1] };
+  if (parts[0] === 'game' && parts[1] && parts.length === 2) return { view: 'database', gameId: parts[1] };
   if (parts.length !== 1 || !VIEWS.includes(parts[0] as View)) return null;
   const route: Route = { view: parts[0] as View };
   if (route.view === 'play') {
@@ -48,6 +51,7 @@ export function parseHash(hash: string): Route | null {
 
 export function formatRoute(route: Route): string {
   if (route.view === 'lessons' && route.lessonId) return `#/lesson/${encodeURIComponent(route.lessonId)}`;
+  if (route.view === 'database' && route.gameId) return `#/game/${encodeURIComponent(route.gameId)}`;
   if (route.view === 'play' && route.fen) {
     const params = new URLSearchParams({ fen: route.fen });
     if (route.color) params.set('color', route.color);

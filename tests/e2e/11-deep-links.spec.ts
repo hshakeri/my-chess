@@ -24,6 +24,13 @@ test.describe('11. Deep links', () => {
     await expect(page.locator('[data-square="f1"] img[alt="White q"]')).toBeVisible();
   });
 
+  test('a game link opens the stored game\'s replay and review on the Games tab', async ({ page }) => {
+    const id = 'chesscom:23e807b0-45fc-11f1-80e2-8556be01000f';
+    await page.goto(`/#/game/${encodeURIComponent(id)}`);
+    await expect(page.locator('[data-modal="replay"]')).toBeVisible({ timeout: 15000 });
+    await expect(page.locator('[data-modal="replay"] [data-section="game-review"]')).toBeVisible();
+  });
+
   test('a position link opens it on the Play tab from the given side', async ({ page }) => {
     const fen = 'r1bqkbnr/pppp1ppp/2n5/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 3 3';
     await page.goto(`/#/play?fen=${encodeURIComponent(fen)}&color=b`);

@@ -11,6 +11,14 @@ describe('Deep links (DC-5): the URL hash names the tab, the lesson or a positio
     expect(parseHash('#/play?color=x')).toEqual({ view: 'play' });
   });
 
+  it('opens a stored game by its id, encoded', () => {
+    const id = 'chesscom:23e807b0-45fc-11f1-80e2-8556be01000f';
+    expect(formatRoute({ view: 'database', gameId: id })).toBe('#/game/chesscom%3A23e807b0-45fc-11f1-80e2-8556be01000f');
+    expect(parseHash(formatRoute({ view: 'database', gameId: id }))).toEqual({ view: 'database', gameId: id });
+    expect(parseHash('#/game')).toBeNull();
+    expect(parseHash('#/game/a/b')).toBeNull();
+  });
+
   it('ignores what it does not know', () => {
     for (const bad of ['', '#', '#/', '#/nowhere', '#/lesson', '#/lessons/extra', 'lessons']) expect(parseHash(bad), bad).toBeNull();
   });
