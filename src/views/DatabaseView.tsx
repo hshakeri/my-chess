@@ -25,11 +25,18 @@ import { gamesRepo } from '../db/gamesRepo';
 import { syncPlayerGames, type SyncProgress } from '../services/chesscom';
 import type { StoredGame, GameFilter } from '../types/db';
 import { ChessPiece } from '../components/ChessPiece';
+import { GameReviewPanel } from './GameReviewPanel';
+import type { EngineClient } from '../engine/worker/engineClient';
 import seedGamesRaw from '../data/seed_hoot65_games.json';
 
 const seedGames = seedGamesRaw as unknown as StoredGame[];
 
-export const DatabaseView: React.FC = () => {
+interface DatabaseViewProps {
+  /** The app's engine worker, shared so a game review does not load the Maia model a second time. */
+  getEngineClient?: () => EngineClient | null;
+}
+
+export const DatabaseView: React.FC<DatabaseViewProps> = ({ getEngineClient }) => {
   const [games, setGames] = useState<StoredGame[]>([]);
   const [loading, setLoading] = useState(true);
   const [totalDbCount, setTotalDbCount] = useState(0);
@@ -710,6 +717,7 @@ export const DatabaseView: React.FC = () => {
         <GameReplayModal
           game={selectedGame}
           onClose={() => setSelectedGame(null)}
+          getEngineClient={getEngineClient}
         />
       )}
 
@@ -763,9 +771,10 @@ export const DatabaseView: React.FC = () => {
 interface GameReplayModalProps {
   game: StoredGame;
   onClose: () => void;
+  getEngineClient?: () => EngineClient | null;
 }
 
-const GameReplayModal: React.FC<GameReplayModalProps> = ({ game, onClose }) => {
+const GameReplayModal: React.FC<GameReplayModalProps> = ({ game, onClose, getEngineClient }) => {
   const [currentPly, setCurrentPly] = useState(0);
   const [orientation, setOrientation] = useState<'white' | 'black'>(
     game.userColor === 'black' ? 'black' : 'white'
@@ -808,6 +817,9 @@ const GameReplayModal: React.FC<GameReplayModalProps> = ({ game, onClose }) => {
   // Key navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      // Typing a reason in the review panel must not move the board
+      const target = e.target as HTMLElement | null;
+      if (target && ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName) && e.key !== 'Escape') return;
       if (e.key === 'ArrowLeft') {
         setCurrentPly((p) => Math.max(0, p - 1));
       } else if (e.key === 'ArrowRight') {
@@ -1083,6 +1095,9 @@ const GameReplayModal: React.FC<GameReplayModalProps> = ({ game, onClose }) => {
               {game.result}
             </div>
           </div>
+
+          {/* Post-game review (CL-3) */}
+          <GameReviewPanel game={game} currentPly={currentPly} onShowPly={setCurrentPly} getEngineClient={getEngineClient} />
         </div>
       </div>
     </div>

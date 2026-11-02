@@ -136,10 +136,22 @@ describe('ChessDatabase version 2 (cards, revlog, reviews, explorer_cache)', () 
     expect(await testDb.revlog.where('sessionId').equals('s-1').count()).toBe(2);
   });
 
-  it('stores reviews and explorer_cache placeholders', async () => {
-    await testDb.reviews.put({ gameId: 'g1', reviewedAt: NOW, criticalMoments: [{ ply: 12 }] });
+  it('stores game reviews (CL-3) and explorer_cache placeholders', async () => {
+    // A review row is now a full GameReview; the placeholder shape { ply } no longer type-checks
+    const moment = {
+      ply: 12,
+      label: '7.Bxf7+',
+      fenBefore: 'r1bqk2r/pppp1ppp/2n2n2/2b1p3/2B1P3/2NP1N2/PPP2PPP/R1BQK2R w KQkq - 1 6',
+      played: 'Bxf7+',
+      type: 'moved_piece_hangs' as const,
+      loss: 200,
+      keeping: ['O-O'],
+      squares: ['f7'],
+      phase: 'opening' as const,
+    };
+    await testDb.reviews.put({ gameId: 'g1', reviewedAt: NOW, engine: 'maia', userColor: 'white', movesReviewed: 30, criticalMoments: [moment], marks: [], cardIds: [] });
     await testDb.explorer_cache.put({ key: 'fen|rapid', fetchedAt: NOW, payload: { moves: [] } });
-    expect((await testDb.reviews.get('g1'))?.criticalMoments).toEqual([{ ply: 12 }]);
+    expect((await testDb.reviews.get('g1'))?.criticalMoments).toEqual([moment]);
     expect((await testDb.explorer_cache.where('fetchedAt').aboveOrEqual(NOW).toArray()).map((r) => r.key)).toEqual(['fen|rapid']);
   });
 

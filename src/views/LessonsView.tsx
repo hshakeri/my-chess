@@ -32,7 +32,7 @@ import { Square, ChessPosition } from '../types/chess';
 import { StoredCard } from '../types/db';
 import { CardService, CardRating } from '../services/cards';
 import { canonicalFenKey } from '../services/fenKey';
-import { buildQueue, LearningSteps } from '../services/sessionQueue';
+import { buildQueue, isGameCard, LearningSteps } from '../services/sessionQueue';
 
 type LessonPhase = 'line' | 'exercises' | 'complete';
 
@@ -277,7 +277,8 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
     []
   );
   const isActiveCard = useCallback(
-    (card: StoredCard) => card.reps > 0 || card.lessonIds.some((id) => coreLessonIds.has(id)),
+    // A card counts once studied, when a core lesson owns it, or when it comes from a game review (CL-3)
+    (card: StoredCard) => card.reps > 0 || card.lessonIds.some((id) => coreLessonIds.has(id)) || isGameCard(card),
     [coreLessonIds]
   );
 

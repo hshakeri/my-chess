@@ -16,9 +16,9 @@ also runs on every push to another branch).
 
 - React 18 + Vite 6 + TypeScript (strict) + Tailwind; chess.js 1.4; Dexie 4 (IndexedDB); ts-fsrs 5
   for scheduling; maia3-js + onnxruntime-web in a Web Worker for the human-like engine.
-- Tests: Vitest (`npm test`, 343 tests: SSR `renderToString` specs, jsdom interaction specs under
+- Tests: Vitest (`npm test`, 356 tests: SSR `renderToString` specs, jsdom interaction specs under
   `tests/unit/curriculum/lessons-view-interactions.spec.tsx`, fake-indexeddb for the database) and
-  Playwright (`npm run test:e2e`, 80 tests incl. iPhone-viewport tests). Keep both green or update
+  Playwright (`npm run test:e2e`, 81 tests incl. iPhone-viewport tests). Keep both green or update
   tests deliberately and say why. No `if (await ...isVisible())` guards in specs: a missing control
   must fail, and every Chess.com request in a spec must be mocked.
 - `npm run build` must pass (`tsc && vite build`). Base path is `/my-chess/`.
@@ -164,7 +164,13 @@ Next: the roadmap below.
   the answer page), Black sheets are drawn from Black's side, squares print with
   `print-color-adjust: exact`, every exercise with its own position has a diagram, the Scotch
   exercise-2 FEN is fixed, and each sheet has a Date / Attempt / Score / Next review row.
-- CL-3 post-game review with Maia (blunder-to-drill), CL-5 plan-first gates, CL-6 sparring from a
+- CL-3, first slice done (2026-11-01): a game opened in the database can be reviewed (marks first,
+  then Maia's critical moments named by `src/analytics/errorTaxonomy.ts`, in the engine worker), and
+  each mistake with a material answer becomes a card that comes first among a session's new cards.
+  Next slice: the "Your patterns" dashboard over many reviewed games (errors per 100 moves by type,
+  phase and clock, rolling trend) with a batch review in the worker, reviews in the JSON backup, and
+  the Maia-in-Vitest spec (DC-7).
+- CL-5 plan-first gates, CL-6 sparring from a
   tabiya, CL-7 visual coaching grammar.
 - DC-1 re-scoped curriculum content for the lines above (this is where the opening order applies).
 

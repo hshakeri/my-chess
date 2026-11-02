@@ -1,11 +1,14 @@
 import { EngineRequest, EngineResponse } from '../../types/engine';
 import { HybridEngine } from '../human/hybridEngine';
+import { reviewGame, ReviewCancelled, type PositionScorer } from '../../analytics/review';
 import { thinkingDelayMs } from './thinkingDelay';
+import type { CancelMessage, ReviewProgressMessage, ReviewRequestMessage, ReviewResultMessage } from './reviewProtocol';
 
 const engine = new HybridEngine();
 
-// Auto-initialize Maia in background
-engine.initMaia().then((loaded) => {
+// Auto-initialize Maia in background; a review waits for this load rather than starting a second one
+const maiaReady = engine.initMaia();
+maiaReady.then((loaded) => {
   self.postMessage({
     type: 'status',
     modelLoaded: loaded,
@@ -19,9 +22,42 @@ engine.initMaia().then((loaded) => {
   });
 });
 
-self.onmessage = async (event: MessageEvent<EngineRequest>) => {
-  const req = event.data;
-  if (!req) return;
+/** Reviews asked to stop; checked between Maia's batches and between classified moves. */
+const cancelled = new Set<string>();
+
+/** A post-game review: Maia scores the game in batches, then the flagged moves are classified (CL-3). */
+async function runReview(req: ReviewRequestMessage): Promise<void> {
+  const progress = (stage: ReviewProgressMessage['stage'], done: number, total: number) =>
+    self.postMessage({ type: 'review-progress', id: req.id, stage, done, total } satisfies ReviewProgressMessage);
+  const isCancelled = () => cancelled.has(req.id);
+  let result: ReviewResultMessage;
+  try {
+    progress('loading', 0, 1);
+    const loaded = await maiaReady.catch(() => false);
+    const maia = engine.getMaiaEngine();
+    const scorer: PositionScorer | null = loaded ? (requests, onProgress) => maia.scoreBatch(requests, onProgress, isCancelled) : null;
+    const review = await reviewGame(req.input, scorer, { onProgress: progress, isCancelled });
+    result = { type: 'review-result', id: req.id, review };
+  } catch (err: any) {
+    result = err instanceof ReviewCancelled ? { type: 'review-result', id: req.id, cancelled: true } : { type: 'review-result', id: req.id, error: err?.message || 'Review failed' };
+  } finally {
+    cancelled.delete(req.id);
+  }
+  self.postMessage(result);
+}
+
+self.onmessage = async (event: MessageEvent<EngineRequest | ReviewRequestMessage | CancelMessage>) => {
+  const data = event.data;
+  if (!data) return;
+  if (data.type === 'cancel') {
+    cancelled.add(data.id);
+    return;
+  }
+  if (data.type === 'review') {
+    await runReview(data);
+    return;
+  }
+  const req = data;
 
   if (req.type === 'init') {
     const loaded = await engine.initMaia();

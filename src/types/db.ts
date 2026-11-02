@@ -2,6 +2,7 @@
  * Database & Sync TypeScript Interfaces
  * Conforms to PROJECT.md § 3. Database & Sync Contract
  */
+import type { GameReview } from './review';
 
 export interface StoredGame {
   id: string; // dedupKey
@@ -136,11 +137,8 @@ export interface StoredRevlog {
 }
 
 /** Placeholder for the post-game review pipeline (CL-3). */
-export interface StoredReview {
-  gameId: string;
-  reviewedAt: number;
-  criticalMoments: unknown[];
-}
+/** One reviewed game (CL-3), keyed by game id. */
+export type StoredReview = GameReview;
 
 /** Placeholder for the opening-explorer snapshot cache (DC-6). */
 export interface StoredExplorerCache {

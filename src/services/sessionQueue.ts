@@ -60,6 +60,11 @@ export function interleaveByFamily(ranked: StoredCard[], priorityOf: (c: StoredC
   return interleaveBy(ranked, priorityOf, familyOf);
 }
 
+/** A card made from a mistake in one of the student's reviewed games (CL-3). */
+export function isGameCard(card: StoredCard): boolean {
+  return (card.tags || []).some((t) => t.startsWith('blunder:'));
+}
+
 /** The lesson a card was first created for (its `lesson:` tag), used to spread new cards across lessons. */
 export function lessonOf(card: StoredCard): string {
   const tag = (card.tags || []).find((t) => t.startsWith('lesson:'));
@@ -122,9 +127,15 @@ export function buildQueue(cards: StoredCard[], opts: BuildQueueOptions): Stored
   // Overdue reviews always come before new material: a New card has retrievability 0 and would
   // otherwise outrank every review that is days late. New cards are spread across lessons before
   // the daily cap is applied, so a first session does not consist of one lesson's decisions.
+  // Mistakes from the student's own reviewed games (CL-3) come first among the new cards, but take
+  // at most half the new slots, so the curriculum keeps moving while many games are reviewed.
+  const fromGames = rankedNew.filter((r) => isGameCard(r.card)).map((r) => r.card);
+  const curriculum = rankedNew.filter((r) => !isGameCard(r.card)).map((r) => r.card);
+  const gameNew = interleaveBy(fromGames, priorityOf, lessonOf).slice(0, Math.min(maxNew, Math.ceil(maxNew / 2)));
   return [
     ...interleaveByFamily(rankedReviews.map((r) => r.card), priorityOf),
-    ...interleaveBy(rankedNew.map((r) => r.card), priorityOf, lessonOf).slice(0, maxNew),
+    ...gameNew,
+    ...interleaveBy(curriculum, priorityOf, lessonOf).slice(0, maxNew - gameNew.length),
   ];
 }
 

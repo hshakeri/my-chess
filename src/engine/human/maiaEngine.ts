@@ -60,6 +60,34 @@ export class MaiaEngine {
   }
 
   /**
+   * Maia's expected score and policy for many positions (one forward pass each, no candidate
+   * re-scoring), in chunks so that progress can be reported and a cancel takes effect between
+   * chunks. Null for a position Maia cannot score, such as one with no legal move.
+   */
+  public async scoreBatch(
+    requests: Array<{ fen: string; priorFens: string[]; selfElo: number; oppoElo: number }>,
+    onProgress?: (done: number, total: number) => void,
+    isCancelled?: () => boolean
+  ): Promise<Array<{ winProbability: number; moves: Map<string, number> } | null>> {
+    if (!this.isModelLoaded || !this.maiaInstance) return requests.map(() => null);
+    const chunkSize = 16;
+    const out: Array<{ winProbability: number; moves: Map<string, number> } | null> = [];
+    for (let i = 0; i < requests.length; i += chunkSize) {
+      if (isCancelled?.()) break;
+      const inputs = requests.slice(i, i + chunkSize).map((r) => ({
+        fen: r.fen,
+        priorFens: r.priorFens.length ? r.priorFens : undefined,
+        selfElo: r.selfElo,
+        oppoElo: r.oppoElo,
+      }));
+      const results = await this.maiaInstance.predictBatch(inputs, { topK: 0, onError: 'collect', maxBatchSize: chunkSize });
+      for (const r of results) out.push(r instanceof Error ? null : { winProbability: r.winProbability, moves: r.moves });
+      onProgress?.(Math.min(i + chunkSize, requests.length), requests.length);
+    }
+    return out;
+  }
+
+  /**
    * Run neural human move prediction.
    */
   public async predict(
