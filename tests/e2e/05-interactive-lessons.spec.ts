@@ -321,6 +321,21 @@ test.describe('05. Interactive Lessons, Feedback Loops & Spaced Repetition (F16 
     await expect(modal).toHaveCount(0);
   });
 
+  test('Speed run: the lesson\'s line against the clock, the replies at once', async ({ page }) => {
+    await page.locator('[data-lesson-id="lesson-scandinavian-refutation-drill"]').click();
+    await page.locator('button[data-action="speed-run"]').click();
+    const modal = page.locator('[data-modal="speed-run"]');
+    await expect(modal).toHaveAttribute('data-speed-phase', 'ready');
+    await modal.locator('button[data-action="speed-start"]').click();
+    // The drill starts after 1.e4 d5: the student plays 2.exd5, and 2...Qxd5 comes at once
+    await modal.locator('[data-square="e4"]').click();
+    await modal.locator('[data-square="d5"]').click();
+    await expect(modal.locator('[data-speed-move]')).toHaveCount(1);
+    await expect(modal.locator('[data-square="d5"] img[alt="Black q"]')).toBeVisible();
+    await modal.locator('button[data-action="speed-close"]').click();
+    await expect(modal).toHaveCount(0);
+  });
+
   test('Spar: the finished Scandinavian line is played on against Maia, with the plan goals and a review (CL-6)', async ({ page }) => {
     test.setTimeout(150_000);
     await page.locator('[data-lesson-id="lesson-scandinavian-refutation-drill"]').click();
