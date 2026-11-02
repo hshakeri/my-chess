@@ -126,7 +126,12 @@ export const TacticsProgressLine: React.FC<{ progress: TacticsProgress }> = ({ p
   </p>
 );
 
-const SOURCE_LABEL: Record<CctSourceStats['source'], string> = { lesson: 'In lessons', play: 'In games', warmup: 'In the warm-up' };
+const SOURCE_LABEL: Record<CctSourceStats['source'], string> = {
+  lesson: 'Board questions in lessons',
+  play: 'Board questions in games',
+  'play-safety': 'Safety checks in games',
+  warmup: 'Board questions in the warm-up',
+};
 
 /** The board questions answered, by where, with the share right lately against before. */
 export const BoardQuestionLines: React.FC<{ rows: CctSourceStats[] }> = ({ rows }) =>
@@ -134,7 +139,7 @@ export const BoardQuestionLines: React.FC<{ rows: CctSourceStats[] }> = ({ rows 
     <ul className="text-sm text-slate-300 space-y-0.5" data-section="cct-progress">
       {rows.map((r) => (
         <li key={r.source} data-cct-source={r.source} data-cct-n={r.n}>
-          Board questions {SOURCE_LABEL[r.source].toLowerCase()}: {r.n} answered, {pct(r.correct / r.n)} right
+          {SOURCE_LABEL[r.source]}: {r.n} answered, {pct(r.correct / r.n)} right
           {r.recent !== null && r.before !== null ? ` (the newest 20: ${pct(r.recent)}; the 20 before: ${pct(r.before)})` : ''}.
         </li>
       ))}

@@ -29,6 +29,19 @@ describe('Board questions in Progress (CL-5)', () => {
     expect(view.container.querySelector('[data-cct-source="warmup"]')).toBeNull();
   });
 
+  it('gives the safety checks in games a line of their own, apart from the board question', () => {
+    const events = [event(1, 'play', true), { ...event(2, 'play', true), kind: 'safe' as const }, { ...event(3, 'play', false), kind: 'safe' as const }, { ...event(4, 'warmup', false), kind: 'safe' as const }];
+    const rows = cctBySource(events);
+    expect(rows.map((r) => [r.source, r.n, r.correct])).toEqual([
+      ['play', 1, 1],
+      ['play-safety', 2, 1],
+      ['warmup', 1, 0],
+    ]);
+    const view = render(<BoardQuestionLines rows={rows} />);
+    expect(view.container.querySelector('[data-cct-source="play-safety"]')?.textContent).toBe('Safety checks in games: 2 answered, 50% right.');
+    expect(view.container.querySelector('[data-cct-source="warmup"]')?.textContent).toBe('Board questions in the warm-up: 1 answered, 0% right.');
+  });
+
   it('compares with the 20 before only once there are 20 before', () => {
     // 21 answers in games: the oldest wrong, the newest 20 right. One answer is not "the 20 before"
     const events = [event(0, 'play', false), ...Array.from({ length: 20 }, (_, k) => event(10 + k, 'play', true))];

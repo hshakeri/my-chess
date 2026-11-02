@@ -53,7 +53,8 @@ export function cctStats(events: CctEvent[]): Partial<Record<QuestionKind, { n: 
 }
 
 export interface CctSourceStats {
-  source: CctEvent['source'];
+  /** Where the answers were given; in games the safety check (kind "safe") has a row of its own, apart from the board question. */
+  source: CctEvent['source'] | 'play-safety';
   n: number;
   correct: number;
   /** Share right over the newest 20 answers, and over the 20 before them (null until there are 40 answers). */
@@ -61,12 +62,13 @@ export interface CctSourceStats {
   before: number | null;
 }
 
-/** The board questions answered, by where they were asked: the lessons, games, the warm-up. */
+/** The board questions answered, by where they were asked: the lessons, games (the safety check apart), the warm-up. */
 export function cctBySource(events: CctEvent[]): CctSourceStats[] {
   const share = (xs: CctEvent[]) => (xs.length ? xs.filter((e) => e.correct).length / xs.length : null);
-  return (['lesson', 'play', 'warmup'] as const)
+  const rowOf = (e: CctEvent): CctSourceStats['source'] => (e.source === 'play' && e.kind === 'safe' ? 'play-safety' : e.source);
+  return (['lesson', 'play', 'play-safety', 'warmup'] as const)
     .map((source) => {
-      const mine = events.filter((e) => e.source === source).sort((a, b) => a.at - b.at);
+      const mine = events.filter((e) => rowOf(e) === source).sort((a, b) => a.at - b.at);
       return {
         source,
         n: mine.length,
