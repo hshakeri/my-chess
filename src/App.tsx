@@ -1061,6 +1061,7 @@ export const App: React.FC = () => {
             onAdoptRepertoire={handleAdoptRepertoire}
             adoptedRepertoireIds={adoptedRepertoireIds}
             onSpar={startSpar}
+            onPlayWithChecks={playWithChecks}
           />
         )}
 

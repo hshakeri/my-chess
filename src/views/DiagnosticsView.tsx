@@ -52,6 +52,8 @@ interface DiagnosticsViewProps {
   adoptedRepertoireIds?: string[];
   /** Play a game's final position on against Maia (the endings list). */
   onSpar?: (request: SparRequest) => void;
+  /** A game against Maia with the Play tab's two checks on (the board checks of the points card). */
+  onPlayWithChecks?: () => void;
 }
 
 const EMPTY_GAMES: StoredGame[] = [];
@@ -103,6 +105,7 @@ export const DiagnosticsView: React.FC<DiagnosticsViewProps> = ({
   onAdoptRepertoire,
   adoptedRepertoireIds = [],
   onSpar,
+  onPlayWithChecks,
 }) => {
   const [activeTab, setActiveTab] = useState<'leaks' | 'repertoires' | 'openings' | 'mistakes' | 'clock'>('leaks');
   const [leakFilter, setLeakFilter] = useState<'all' | 'white' | 'black' | string>('all');
@@ -376,7 +379,7 @@ export const DiagnosticsView: React.FC<DiagnosticsViewProps> = ({
       {activeTab === 'leaks' && (
         <div className="space-y-6">
           {/* The archive analysis first: the board checks and the clock, each with its trainer */}
-          <PointsCard onOpenClock={() => setActiveTab('clock')} />
+          <PointsCard onOpenClock={() => setActiveTab('clock')} onPlayWithChecks={onPlayWithChecks} />
           {reading ? (
             readingNote
           ) : (

@@ -46,4 +46,16 @@ describe('Where your points go (Diagnostics)', () => {
       expect(r.textContent).toContain(row.points);
     });
   });
+
+  it('offers a game with the checks from the two board-check rows the Play tab practises', () => {
+    let played = 0;
+    const view = render(<PointsCard onPlayWithChecks={() => played++} />);
+    const buttons = Array.from(view.container.querySelectorAll('[data-points-play]'));
+    expect(buttons.map((b) => b.getAttribute('data-points-play'))).toEqual(['hang', 'threat']);
+    fireEvent.click(buttons[0]);
+    expect(played).toBe(1);
+    // Without the handler there is nothing to click
+    cleanup();
+    expect(render(<PointsCard />).container.querySelector('[data-points-play]')).toBeNull();
+  });
 });

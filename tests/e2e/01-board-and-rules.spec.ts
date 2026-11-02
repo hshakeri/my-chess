@@ -287,6 +287,13 @@ test.describe('01d. The board question in games (CL-5)', () => {
     await expect(page.locator('button[data-engine-color="b"]')).toHaveClass(/bg-slate-700/);
   });
 
+  test('Where your points go: the board-check rows open a game with both checks on', async ({ page }) => {
+    await page.goto('/#/diagnostics');
+    await page.locator('[data-points-play="hang"]').click();
+    await expect(page.locator('input[data-toggle="play-gate"]')).toBeChecked();
+    await expect(page.locator('input[data-toggle="play-safety"]')).toBeChecked();
+  });
+
   test('the safety check: a move that loses a piece waits for the answer, and a safe move judged safe is played', async ({ page }) => {
     // 1.e4 e5 2.Nf3 Nc6, White to move: 3.Nxe5? Nxe5 gives a knight for a pawn
     const fen = 'r1bqkbnr/pppp1ppp/2n5/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3';

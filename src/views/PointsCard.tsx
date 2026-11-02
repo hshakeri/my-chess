@@ -13,6 +13,8 @@ export interface PointsRow {
   /** A study-path group whose first lesson the row links to, or the Clock & Endings tab. */
   group?: string;
   clock?: boolean;
+  /** Practised in games by one of the Play tab's two checks. */
+  inGames?: boolean;
   also?: string;
 }
 
@@ -22,6 +24,7 @@ export const POINTS_ROWS: PointsRow[] = [
     habit: 'Before every move, check that nothing you leave can be taken for free',
     points: '5.7',
     group: 'pattern-is-your-move-safe',
+    inGames: true,
     also: 'and the safety check in games on the Play tab',
   },
   {
@@ -29,6 +32,7 @@ export const POINTS_ROWS: PointsRow[] = [
     habit: 'After every opponent move, ask what it attacks, then move or guard that piece',
     points: '4.1 to 4.9',
     group: 'pattern-what-does-it-attack',
+    inGames: true,
     also: 'and the board question in games on the Play tab',
   },
   {
@@ -85,7 +89,7 @@ export const BoardCardSheet: React.FC = () => (
   </div>
 );
 
-export const PointsCard: React.FC<{ onOpenClock?: () => void }> = ({ onOpenClock }) => (
+export const PointsCard: React.FC<{ onOpenClock?: () => void; onPlayWithChecks?: () => void }> = ({ onOpenClock, onPlayWithChecks }) => (
   <section className="bg-slate-900 border border-emerald-500/30 rounded-2xl p-5 space-y-3" data-section="points">
     <div>
       <h3 className="text-base font-bold text-white">Where your points go</h3>
@@ -108,6 +112,11 @@ export const PointsCard: React.FC<{ onOpenClock?: () => void }> = ({ onOpenClock
               <a href={`#/lesson/${lesson}`} data-points-train={row.key} className="text-xs text-emerald-300 hover:text-white underline">
                 Drill it
               </a>
+            )}
+            {row.inGames && onPlayWithChecks && (
+              <button type="button" data-points-play={row.key} onClick={onPlayWithChecks} className="text-xs text-sky-300 hover:text-white underline">
+                Practise in a game
+              </button>
             )}
             {row.clock && onOpenClock && (
               <button type="button" data-points-clock={row.key} onClick={onOpenClock} className="text-xs text-sky-300 hover:text-white underline">
