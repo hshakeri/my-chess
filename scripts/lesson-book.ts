@@ -27,6 +27,7 @@ import { plyLabel, replyOptions } from '../src/curriculum/builder';
 import { drillSetOf, gameDrillData } from '../src/curriculum/gameDrills';
 import { MOTIF_LABEL, isControl, numberLine, tacticsDeck, type TacticPosition } from '../src/services/tacticsDeck';
 import { lessonUrl } from '../src/router';
+import { POINTS_ROWS } from '../src/views/PointsCard';
 import { getRecommendedWhiteRepertoire, getRecommendedBlackRepertoire } from '../src/analytics/repertoire';
 import { CurriculumLesson, CurriculumMove } from '../src/types/curriculum';
 import { RepertoirePlan } from '../src/types/diagnostics';
@@ -435,6 +436,13 @@ const howToUse =
 const printing =
   'Print the book double-sided, flipping on the long edge. Every page with questions, the seven pages of positions from your games (four drill sheets and three tactics sheets) and each practice sheet, is the front of a sheet with its answers on the back, so each sheet can be taken to the board on its own. Where a practice sheet would otherwise start on the back of a page, a page for notes comes first.';
 
+// The habits the archive ranks (the app's "Where your points go"), in the order a player meets them at
+// the board: the opponent's move, then one's own, then the clock and the result. A card to cut out
+const BOARD_ORDER = ['threat', 'hang', 'mate', 'free', 'clock', 'resign'];
+const boardCard = `<div class="card"><table><thead><tr><th colspan="2">At the board, every move: the checks in order</th><th class="pts">Points</th></tr></thead><tbody>${BOARD_ORDER.map((key) => POINTS_ROWS.find((r) => r.key === key)!)
+  .map((r, k) => `<tr><td class="n">${k + 1}.</td><td>${esc(r.habit)}</td><td class="pts">${esc(r.points)}</td></tr>`)
+  .join('')}</tbody></table><p class="card-note">From your 4,101 Chess.com games: the points per 100 games each habit would have won if kept every time (near a 50% score, one point per 100 games is about 7 rating points). Cut along the dashed line and keep it by the board.</p></div>`;
+
 const playing = (l: CurriculumLesson) => `${l.title} (you play ${l.targetColor === 'black' ? 'Black' : 'White'})`;
 
 let n = 0;
@@ -584,6 +592,13 @@ ol.practice li { break-inside: avoid; margin-bottom: 1.5pt; text-indent: -1.2em;
 .exercise p { text-align: left; font-size: 9.5pt; }
 .blankline { text-align: left; margin: 3pt 0 0; }
 code { font: 8pt 'Courier New', 'Liberation Mono', monospace; }
+.card { border: 1pt dashed #000; padding: 6pt 9pt 5pt; margin: 14pt 0 0; width: 140mm; break-inside: avoid; }
+.card table { border-collapse: collapse; width: 100%; margin: 0 0 4pt; font-size: 10.5pt; }
+.card th { font: bold 9pt ${SANS}; text-align: left; padding: 0 0 3pt; border-bottom: .75pt solid #000; }
+.card td { padding: 3pt 0 2pt; vertical-align: top; border-bottom: .25pt solid #999; }
+.card td.n { width: 1.4em; }
+.card .pts { text-align: right; white-space: nowrap; padding-left: 8pt; font-family: ${SANS}; font-size: 9pt; }
+.card-note { font: 7.5pt/1.25 ${SANS}; text-align: left; margin: 0; }
 details.answers { margin: 2pt 0 0; }
 details.answers > summary { font: 8.5pt ${SANS}; cursor: pointer; }
 .answer-body { columns: 2; column-gap: 8mm; font-size: 9pt; line-height: 1.25; }
@@ -601,7 +616,7 @@ ul.notes { padding-left: 13pt; font-size: 9.5pt; }
 const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>The hoot65 Opening Book</title><style>${css}</style></head><body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">${pieceSymbols}</svg>
 <section class="front"><h1 class="title">The hoot65 Opening Book</h1><p class="subtitle">Personalized opening lessons, weakness drills and repertoire lines, generated from the my-chess curriculum on ${new Date().toISOString().slice(0, 10)}.</p><p class="counts">${openingLessons.length - drillCount} lessons · ${drillCount} positions from your games · ${answerCount} practice answers · ${library.length} pattern-library chapters</p>${contents}</section>
-<section class="howto"><h2>How to use this book</h2><p>${esc(howToUse)}</p><p>${esc(printing)}</p></section>
+<section class="howto"><h2>How to use this book</h2><p>${esc(howToUse)}</p><p>${esc(printing)}</p>${boardCard}</section>
 ${chapters.join('\n')}
 ${practicePart}
 </body></html>`;
