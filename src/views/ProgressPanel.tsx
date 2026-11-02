@@ -33,6 +33,27 @@ export const ProgressSummaryView: React.FC<{ summary: ProgressSummary; onOpenLes
           : `Of the ${summary.reviewed} positions you have reviewed, you would recall ${pct(summary.meanRecall)} today on average (FSRS estimate).`}
       </p>
 
+      <div className="space-y-2" data-section="mastery">
+        <h4 className="text-xs font-semibold uppercase tracking-wide text-slate-400">By pattern, in the order of the study path</h4>
+        <p className="text-xs text-slate-400">Mastered: FSRS expects you to keep the position for a week or more.</p>
+        <ul className="space-y-1.5">
+          {summary.byGroup.map((g) => (
+            <li key={g.groupId} data-mastery-group={g.groupId} data-mastered={g.mastered} data-cards={g.cards}>
+              <div className="flex justify-between gap-2">
+                <span>{g.title}</span>
+                <span className="font-mono text-xs text-slate-400">
+                  {g.mastered}/{g.cards} mastered{g.recall !== null ? `, recall ${pct(g.recall)}` : ''}
+                </span>
+              </div>
+              <div className="h-2 rounded bg-slate-800 w-full" aria-hidden>
+                <div className="h-2 rounded bg-emerald-500/70" style={{ width: `${g.cards ? Math.round((100 * g.mastered) / g.cards) : 0}%` }} />
+                <div className="h-2 -mt-2 rounded bg-emerald-500/25" style={{ width: `${g.cards ? Math.round((100 * g.reviewed) / g.cards) : 0}%` }} />
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
+
       {summary.riskiest.length > 0 && (
         <div className="space-y-2">
           <h4 className="text-xs font-semibold uppercase tracking-wide text-slate-400">Most likely to cost you a game</h4>

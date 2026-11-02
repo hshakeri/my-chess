@@ -1,4 +1,5 @@
 import { CardService } from '../services/cards';
+import { patternPath } from '../curriculum/patternPath';
 import type { StoredCard, StoredRevlog } from '../types/db';
 
 /**
@@ -24,6 +25,20 @@ export interface ConfusionRow {
   count: number;
 }
 
+/** A card counts as mastered once FSRS expects it to last a week (stability of 7 days or more). */
+export const MASTERY_DAYS = 7;
+
+export interface GroupMastery {
+  groupId: string;
+  title: string;
+  /** Cards of the group's lessons, those reviewed at least once, and those mastered. */
+  cards: number;
+  reviewed: number;
+  mastered: number;
+  /** Mean recall now of the reviewed cards; null when none is reviewed. */
+  recall: number | null;
+}
+
 export interface ProgressSummary {
   total: number;
   byState: Array<{ state: number; label: string; count: number }>;
@@ -35,6 +50,8 @@ export interface ProgressSummary {
   confusions: ConfusionRow[];
   /** Reviewed cards falling due on each of the next days (day 0 is today and counts the overdue ones). */
   dueByDay: number[];
+  /** Mastery by study-path group, in path order (DC-1's skill tree, as a table). */
+  byGroup: GroupMastery[];
 }
 
 const DAY_MS = 86_400_000;
@@ -79,5 +96,17 @@ export function summarizeProgress(cards: StoredCard[], revlog: StoredRevlog[], n
     riskiest,
     confusions: [...confusionCount.values()].sort((a, b) => b.count - a.count).slice(0, 8),
     dueByDay,
+    byGroup: patternPath.map((g) => {
+      const own = cards.filter((c) => c.lessonIds.some((id) => g.lessonIds.includes(id)));
+      const seen = own.filter((c) => c.state !== 0);
+      return {
+        groupId: g.id,
+        title: g.title,
+        cards: own.length,
+        reviewed: seen.length,
+        mastered: seen.filter((c) => c.state === 2 && c.stability >= MASTERY_DAYS).length,
+        recall: seen.length ? seen.reduce((sum, c) => sum + (recall.get(c.id) ?? 0), 0) / seen.length : null,
+      };
+    }),
   };
 }

@@ -3,6 +3,7 @@ import { describe, it, expect, afterEach } from 'vitest';
 import { render, fireEvent, cleanup } from '@testing-library/react';
 import { summarizeProgress } from '../../../src/analytics/progress';
 import { ProgressSummaryView } from '../../../src/views/ProgressPanel';
+import { patternPath } from '../../../src/curriculum/patternPath';
 import type { StoredCard, StoredRevlog } from '../../../src/types/db';
 
 const DAY = 86_400_000;
@@ -75,6 +76,31 @@ describe('Progress from the review cards (DC-8)', () => {
     ]);
     const view = render(<ProgressSummaryView summary={s} />);
     expect(view.container.querySelector('[data-confusion="e5"]')?.textContent).toContain('you played 2.e5 instead of 2.exd5 (2 times)');
+  });
+
+  it('counts mastery by study-path group: a Review card that FSRS expects to last a week or more', () => {
+    const cards = [
+      // The g4 group (the Scandinavian lesson): one mastered, one reviewed but short-lived, one new
+      reviewed('a', 1, 1),
+      card('short', { state: 2, stability: 3, reps: 2, last_review: NOW - DAY, due: NOW + 2 * DAY }),
+      card('new', {}),
+      // The rook mate, in "Finish the game", in relearning: reviewed, not mastered
+      card('rook', { lessonIds: ['lesson-rook-back-rank-mate'], state: 3, stability: 9, reps: 4, lapses: 1, last_review: NOW - DAY, due: NOW + DAY }),
+    ];
+    const s = summarizeProgress(cards, [], NOW);
+    expect(s.byGroup.map((g) => g.groupId)).toEqual(patternPath.map((g) => g.id));
+    const g4 = s.byGroup.find((g) => g.groupId === 'pattern-queen-takes-on-g4')!;
+    expect([g4.cards, g4.reviewed, g4.mastered]).toEqual([3, 2, 1]);
+    expect(g4.recall).not.toBeNull();
+    const finish = s.byGroup.find((g) => g.groupId === 'pattern-finish-the-game')!;
+    expect([finish.cards, finish.reviewed, finish.mastered]).toEqual([1, 1, 0]);
+    const empty = s.byGroup.find((g) => g.groupId === 'pattern-caro-bishop-both-sides')!;
+    expect([empty.cards, empty.reviewed, empty.mastered, empty.recall]).toEqual([0, 0, 0, null]);
+    const view = render(<ProgressSummaryView summary={s} />);
+    const row = view.container.querySelector('[data-mastery-group="pattern-queen-takes-on-g4"]')!;
+    expect(row.getAttribute('data-mastered')).toBe('1');
+    expect(row.textContent).toContain('1/3 mastered, recall');
+    expect(view.container.querySelector('[data-mastery-group="pattern-caro-bishop-both-sides"]')?.textContent).toContain('0/0 mastered');
   });
 
   it('offers to open the lesson of a risky card', () => {

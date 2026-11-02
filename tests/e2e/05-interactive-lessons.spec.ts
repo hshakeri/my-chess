@@ -348,6 +348,9 @@ test.describe('05. Interactive Lessons, Feedback Loops & Spaced Repetition (F16 
     await expect(summary).toBeVisible();
     await expect(summary).toHaveAttribute('data-reviewed', '1');
     await expect(summary.locator('[data-due-day]')).toHaveCount(14);
+    // Mastery by study-path group: one row per group, and a card played once is not mastered yet
+    await expect(summary.locator('[data-mastery-group]')).toHaveCount(9);
+    await expect(summary.locator('[data-mastery-group="pattern-queen-takes-on-g4"]')).toHaveAttribute('data-mastered', '0');
     await page.locator('[data-action="progress-close"]').click();
     await expect(page.locator('[data-modal="progress"]')).toHaveCount(0);
   });
