@@ -126,21 +126,23 @@ allowing mate in one.
 ## Drills from the games
 
 The study path now opens with four drill sets made from hoot65's own positions
-(`src/data/game_drills.json`, picked by `scripts/game-analysis/drills.mjs`), in the order the checks
-are made at the board. The first three come from the last 120 days:
+(`src/data/game_drills.json`, picked by `scripts/game-analysis/drills.mjs` and vetted by Stockfish 19
+with `scripts/game-analysis/verify-drills.mjs`), in the order the checks are made at the board. The
+first three come from a scan of the last year (144 candidates; 92 sound by Stockfish, see below):
 
-1. **What does the last move attack?** Twelve positions where the opponent's move put a piece in
-   danger (a minor piece or more, undefended or attacked by something cheaper) and hoot65 left it
-   there. In six of them the piece was the queen. In every one the opponent's next move was a
-   capture, and three times it took the queen.
-2. **Take what is free.** Twelve positions where an enemy piece could be won and hoot65 did not take
-   it: five knights, four bishops, two rooks and a queen (on d1, attacked by a bishop on g4). Two
-   of them were recaptures right after the opponent had taken a piece.
-3. **Is your move safe?** Twelve positions where nothing of either side was in danger until hoot65's
-   own move left a piece where it could be taken: six bishops, three knights, two rooks and a queen.
-   Half of those moves took a pawn and gave up the piece for it: three bishop captures on f7, a
-   knight on a6, a rook on g3 and the queen on b5. In nine of the games the opponent took the piece
-   on the next move.
+1. **What does the last move attack?** Twelve positions (June to October 2026) where the opponent's
+   move put a piece in danger (a minor piece or more, undefended or attacked by something cheaper)
+   and hoot65 left it there: three queens, three rooks, three knights and three bishops. In ten of
+   the games the opponent took it on the next move.
+2. **Take what is free.** Twelve positions (June to October 2026) where an enemy piece could be won
+   and hoot65 did not take it: six knights, three bishops, two queens (one on d1, attacked by a
+   bishop on g4) and a rook. Five came right after the opponent had taken a piece, so the free piece
+   was a recapture.
+3. **Is your move safe?** Twelve positions (September and October 2026) where nothing of either side
+   was in danger until hoot65's own move left a piece where it could be taken: six bishops, four
+   knights and two rooks. Seven of those moves took a pawn and gave up the piece for it: three bishop
+   captures on f7, knights on a6 and d4, and rooks on g3 and e5. In eight of the games the opponent
+   took the piece on the next move.
 4. **Does your move allow mate?** Twelve positions where hoot65's own move let the opponent give mate
    at once, while the game was still open: Maia's expected score between 15% and 85%, and Stockfish
    19 no worse than -2.5 for hoot65 before the move. Allowed mates are rarer than loose pieces, so
@@ -153,13 +155,20 @@ are made at the board. The first three come from the last 120 days:
 Each position is a one-decision lesson with its own review card. The opponent's last move is
 replayed first, then every move that keeps the material (threats, safe moves, moves that allow no
 mate) or wins it (free pieces) is accepted, measured by a material search over every legal move and
-checked again one ply deeper. For the mate set Stockfish 19 (depth 18) then cut the accepted moves to
-those within 1.5 pawns of its best move or still winning by 3 pawns, best first
-(`scripts/game-analysis/verify-drills.mjs`). That removed 44 of the moves the material search had
-accepted: each stops the mate in one but scores at least 1.5 pawns below Stockfish's best and below
-+3 (in one position four of them let a lead of 8.8 pawns fall to about 0). A wrong move that stops the
-mate is told so, and that a stronger move exists; one that allows a mate asks for the opponent's
-checks.
-Playing the move from the game shows what it cost: the capture that followed is played out on the
-board. 50 recent positions passed every test, and the twelve newest of each kind were kept, one per
-game. Re-run the scan as more games are played.
+checked again one ply deeper. Stockfish 19 then vetted every candidate (depth 16, the picks again at
+18, `scripts/game-analysis/verify-drills.mjs`): it dropped the positions from games that were already
+lost (below -2.5 for hoot65; 39 of the 144 threat, free and hang candidates), those where the move
+played cost less than 1.5 pawns (7), those left with no sound answer or no capture to replay (4), and
+two whose facts the app's own tests reject (a capture that is taken straight back, an answer that no
+longer saves the attacked piece); and it cut the accepted moves to those within 1.5 pawns of its best
+move or still winning by 3 pawns, best first. Of the 36 drills on the path before, 27 survived: seven
+came from games that were already lost (in one of them the move played was even Stockfish's first
+choice), one cost less than 1.5 pawns at depth 18, and one gave way to a later position of the same
+game. In the mate set the cut removed 44 of the moves the material search had accepted: each stops
+the mate in one but scores at least 1.5 pawns below Stockfish's best and below +3 (in one position
+four of them let a lead of 8.8 pawns fall to about 0). A wrong move that passes the drill's check
+(it saves the piece, leaves nothing to take, or stops the mate) is told so, and that a stronger move
+exists; the others get the drill's question again.
+Playing the move from the game shows what it cost: the capture that followed (or the mate) is
+played out on the board. The twelve newest positions of each kind are kept, one per game. Re-run the
+scan, the vetting and `pick` as more games are played.

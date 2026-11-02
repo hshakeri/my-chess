@@ -61,6 +61,11 @@ async function vet([outFile, minArg = '-250', depthArg = '16', ...inFiles]) {
   const kept = [];
   for (const d of all) {
     const head = `${d.date} ${d.kind} ${d.opponent} ${d.played}`;
+    // A threat or hang drill replays the capture that punishes the move played
+    if ((d.kind === 'threat' || d.kind === 'hang') && !d.refutation) {
+      console.log(`${head}: no capture to replay, dropped`);
+      continue;
+    }
     const { score: best } = await sf.analyse(positionOf(d), { depth });
     if (best < min) {
       console.log(`${head}: ${best}, lost already`);
