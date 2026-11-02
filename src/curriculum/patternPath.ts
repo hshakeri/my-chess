@@ -82,11 +82,12 @@ export const patternPath: PatternGroup[] = [
     id: 'pattern-king-in-the-centre',
     title: 'The king in the centre',
     idea:
-      'A king that has not castled can be mated by a knight check. In Legal\'s mate nothing can take the knight on d5; against Nd6# and Nf3# the only piece that could take it is pinned. In the Evans, White castles before taking back on d4, and in the Two Knights with 4.d4 the rook on e1 pins a knight on e4 to the king.',
+      'A king that has not castled can be mated by a knight check. In Legal\'s mate nothing can take the knight on d5; against Nd6# and Nf3# the only piece that could take it is pinned. In the Evans, White castles before taking back on d4, in the Two Knights with 4.d4 the rook on e1 pins a knight on e4 to the king, and against 1...Nc6 a knight on b5 eyes a check on c7 that forks king and rook.',
     check: 'With a king still on e1 or e8: which knight checks are possible, and can each checking knight be taken?',
     lessonIds: [
       'lesson-evans-gambit-destruction',
       'lesson-two-knights-d4',
+      'lesson-white-vs-nimzowitsch',
       'lesson-legals-mate',
       'lesson-black-wall-vs-nc3-bg5',
       'lesson-blackburne-shilling-drill',

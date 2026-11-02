@@ -913,10 +913,111 @@ export const caroKannForWhiteLesson: CurriculumLesson = buildVerifiedLesson({
   ],
 });
 
+/**
+ * White against 1...Nc6 along hoot65's 2.Nf3: 2...e5 is the Italian, and against 2...d5 the
+ * Scandinavian idea (take on d5 and hit the queen with Nc3). Evaluations are Stockfish 19's at depth
+ * 20; the counts are the seed games'.
+ */
+export const nimzowitschForWhiteLesson: CurriculumLesson = buildVerifiedLesson({
+  id: 'lesson-white-vs-nimzowitsch',
+  title: 'Against 1...Nc6 as White',
+  subtitle: "When Black's queen comes out early",
+  category: 'opening',
+  sourceBook: 'Chess.com Live Archive',
+  author: 'hoot65 Diagnostic Analysis',
+  publicationYear: 2026,
+  eco: 'B00',
+  targetColor: 'white',
+  targetRatingBand: 'beginner',
+  relevance: 'core',
+  startPly: 2,
+  description:
+    '1...Nc6 came up in 5 of your White games (2 points), and you answered 2.Nf3 every time. Against 2...e5 that is your Italian (2 games). Against 2...d5 you played 3.e5 both times (1 point), but taking on d5 is stronger: as against the Scandinavian, the queen that takes back is hit by Nc3 and has to move again.',
+  thematicObjective:
+    '2.Nf3 d5 3.exd5 Qxd5 4.Nc3 and 5.d4. If the queen goes to a5, pin with 5.Bb5; if it goes to h5, 5.Nb5 eyes c7.',
+  keyTacticalMotif: 'Developing with an attack on the queen; a knight check on c7 that forks the king and the rook',
+  moves: [
+    { san: 'e4', isUserMove: true },
+    { san: 'Nc6', isUserMove: false },
+    {
+      san: 'Nf3',
+      isUserMove: true,
+      annotation: 'Develop: against 2...e5 this is your Italian.',
+      hintTheme: 'Develop toward the centre',
+      wrongMoveFeedback: {
+        d4: '2.d4 is good too (Stockfish even rates it higher). 2.Nf3 lets 2...e5 bring the game into your Italian.',
+      },
+    },
+    {
+      san: 'd5',
+      isUserMove: false,
+      // After 2.Nf3: 2...d5 2, 2...e5 2, 2...a6 1.
+      frequency: 2,
+      annotation: 'Black attacks e4 at once.',
+      alternatives: {
+        e5: [
+          { san: 'Bc4', isUserMove: true, frequency: 2, annotation: 'The Italian: the lessons on 3.Bc4 take over from here.', accept: { san: ['Bb5', 'd4'] } },
+        ],
+        a6: [
+          { san: 'd4', isUserMove: true, frequency: 1, annotation: 'Take the centre.', accept: { san: ['Nc3'] } },
+        ],
+      },
+    },
+    {
+      san: 'exd5',
+      isUserMove: true,
+      annotation: 'Take: the queen that takes back will be hit.',
+      hintTheme: 'Take, then hit the queen',
+      wrongMoveFeedback: {
+        e5: '3.e5 was your move in both of these games (1 point). Stockfish rates 3.exd5 about two thirds of a pawn higher: as against the Scandinavian, the queen that takes back is hit by Nc3.',
+      },
+    },
+    { san: 'Qxd5', isUserMove: false },
+    { san: 'Nc3', isUserMove: true, annotation: 'Develop with an attack on the queen.', hintTheme: 'Develop with a gain of time' },
+    {
+      san: 'Qd6',
+      isUserMove: false,
+      annotation: 'The queen steps back.',
+      alternatives: {
+        Qa5: [
+          { san: 'Bb5', isUserMove: true, annotation: 'Pin the knight to the king on e8.', accept: { san: ['d4'] } },
+        ],
+        Qh5: [
+          {
+            san: 'Nb5',
+            isUserMove: true,
+            annotation: 'The knight eyes c7: Nxc7+ would fork the king and the rook.',
+            hintTheme: 'A knight check on c7',
+          },
+        ],
+        Qd8: [
+          { san: 'd4', isUserMove: true, annotation: 'Take the centre.', accept: { san: ['Bb5'] } },
+        ],
+      },
+    },
+    { san: 'd4', isUserMove: true, annotation: 'Take the centre with the pawn.' },
+  ],
+  exercises: [
+    {
+      id: 'ex-white-nimzowitsch-qh5',
+      title: 'The Queen on h5',
+      // 1.e4 Nc6 2.Nf3 d5 3.exd5 Qxd5 4.Nc3 Qh5
+      fen: 'r1b1kbnr/ppp1pppp/2n5/7q/8/2N2N2/PPPP1PPP/R1BQKB1R w KQkq - 2 5',
+      turn: 'w',
+      difficultyRating: 2,
+      prompt: 'White to play. The queen went back to h5. What does White play?',
+      solutionSan: ['Nb5'],
+      explanation:
+        '5.Nb5 attacks c7, which nothing defends: Nxc7+ would fork the king on e8 and the rook on a8, so Black has to meet the threat.',
+    },
+  ],
+});
+
 export const openingLessons: CurriculumLesson[] = [
   scotchGambitBreakthrough,
   evansGambitDestruction,
   twoKnightsD4Lesson,
   caroKannForWhiteLesson,
+  nimzowitschForWhiteLesson,
   adamsAttackSicilian,
 ];

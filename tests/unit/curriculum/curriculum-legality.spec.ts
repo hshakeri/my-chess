@@ -118,6 +118,7 @@ describe('Curriculum Move Legality & Verification (chess.js)', () => {
       'lesson-scandinavian-refutation-drill',
       'lesson-two-knights-d4',
       'lesson-white-vs-caro-kann',
+      'lesson-white-vs-nimzowitsch',
     ]);
   });
 

@@ -443,6 +443,35 @@ test.describe('05. Interactive Lessons, Feedback Loops & Spaced Repetition (F16 
     await expect(page.locator('.correct-feedback').first()).toContainText('7.Qxh8 wins it', { timeout: 10000 });
   });
 
+  test('Against 1...Nc6 as White: take on d5 and hit the queen, and the knight that eyes c7', async ({ page }) => {
+    await page.goto('/#/lesson/lesson-white-vs-nimzowitsch');
+    const move = async (from: string, to: string) => {
+      await page.locator(`[data-square="${from}"]`).click();
+      await page.locator(`[data-square="${to}"]`).click();
+    };
+    const yourTurn = page.getByText(/Your turn: find White/);
+    await expect(page.locator('[data-square="c6"] img[alt="Black n"]')).toBeVisible({ timeout: 5000 });
+    await expect(yourTurn).toBeVisible({ timeout: 5000 });
+    await move('g1', 'f3');
+    await expect(page.locator('[data-square="d5"] img[alt="Black p"]')).toBeVisible({ timeout: 5000 });
+    // Your move in both games, answered
+    await move('e4', 'e5');
+    await expect(page.locator('.wrong-move-feedback, [data-feedback="wrong"]').first()).toContainText('3.e5 was your move', { timeout: 5000 });
+    await expect(page.locator('[data-square="e4"] img[alt="White p"]')).toBeVisible({ timeout: 8000 });
+    await expect(yourTurn).toBeVisible({ timeout: 8000 });
+    await move('e4', 'd5');
+    await expect(page.locator('[data-square="d5"] img[alt="Black q"]')).toBeVisible({ timeout: 5000 });
+    await expect(yourTurn).toBeVisible({ timeout: 5000 });
+    await move('b1', 'c3');
+    await expect(page.locator('[data-square="d6"] img[alt="Black q"]')).toBeVisible({ timeout: 5000 });
+    await expect(yourTurn).toBeVisible({ timeout: 5000 });
+    await move('d2', 'd4');
+    // The exercise: 4...Qh5 and 5.Nb5
+    await expect(page.locator('[data-square="h5"] img[alt="Black q"]')).toBeVisible({ timeout: 10000 });
+    await move('c3', 'b5');
+    await expect(page.locator('.correct-feedback').first()).toContainText('5.Nb5 attacks c7', { timeout: 10000 });
+  });
+
   test('Black-perspective lessons play the opponent\'s first move for the student', async ({ page }) => {
     await page.locator('[data-course="pattern-library"]').click();
     await page.locator('[data-lesson-id="lesson-siberian-trap"]').click();
