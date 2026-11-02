@@ -115,13 +115,13 @@ export function knightSquares(square: string): string[] {
  * Whether `san` from `fen` is safe: the opponent has no mate in one after it, and it loses no material
  * the review's search can see (two plies, then the captures): at least two pawns against what the
  * mover could keep. A trade is safe (4.Bxc6 dxc6 in the Exchange Ruy Lopez), and so is a move that
- * only leaves a capture untaken.
+ * only leaves a capture untaken. With the opponent's reply that mates or wins the material.
  */
-export function isMoveSafe(fen: string, san: string): { safe: boolean; reason: string } {
+export function isMoveSafe(fen: string, san: string): { safe: boolean; reason: string; refutation?: string } {
   const after = new Chess(fen);
   const move = after.move(san);
   const mates = after.moves().filter((m) => m.endsWith('#'));
-  if (mates.length) return { safe: false, reason: `After ${move.san} the opponent mates with ${mates[0]}.` };
+  if (mates.length) return { safe: false, reason: `After ${move.san} the opponent mates with ${mates[0]}.`, refutation: mates[0] };
   const { loses, refutation } = losesMaterial(fen, move.san);
   if (loses) {
     // Name the piece when the winning reply takes one at once; otherwise the reply that starts it
@@ -133,6 +133,7 @@ export function isMoveSafe(fen: string, san: string): { safe: boolean; reason: s
         victim && victim.type !== 'p'
           ? `After ${move.san}, ${pieceOn(after.fen(), target!)} can be taken.`
           : `After ${move.san}, ${refutation} wins material.`,
+      refutation,
     };
   }
   return { safe: true, reason: `After ${move.san} nothing of yours can be won and there is no mate in one.` };

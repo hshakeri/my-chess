@@ -272,6 +272,34 @@ test.describe('01d. The board question in games (CL-5)', () => {
     // Switched on across visits
     expect(await page.evaluate(() => window.localStorage.getItem('my_chess_play_gate'))).toBe('on');
   });
+
+  test('the safety check: a move that loses a piece waits for the answer, and a safe move judged safe is played', async ({ page }) => {
+    // 1.e4 e5 2.Nf3 Nc6, White to move: 3.Nxe5? Nxe5 gives a knight for a pawn
+    const fen = 'r1bqkbnr/pppp1ppp/2n5/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3';
+    await page.goto(`/#/play?fen=${encodeURIComponent(fen)}&color=w`);
+    await expect(page.locator('[data-square="f3"] img[alt="White n"]')).toBeVisible({ timeout: 10000 });
+    await page.locator('input[data-toggle="play-safety"]').check();
+    await page.locator('[data-square="f3"]').click();
+    await page.locator('[data-square="e5"]').click();
+    const check = page.locator('[data-section="play-safety"] [data-section="board-question"]');
+    await expect(check).toHaveAttribute('data-question-status', 'asking');
+    // Not played yet
+    await expect(page.locator('[data-square="f3"] img[alt="White n"]')).toBeVisible();
+    await check.locator('button[data-answer="yes"]').click();
+    await expect(check).toHaveAttribute('data-question-status', 'wrong');
+    await expect(check).toContainText('After Nxe5, the knight on e5 can be taken.');
+    // Another move instead: 3.Bc4 is safe, judged safe, and played; Maia replies
+    await page.locator('[data-square="f1"]').click();
+    await page.locator('[data-square="c4"]').click();
+    await expect(check).toHaveAttribute('data-question-status', 'asking');
+    await check.locator('button[data-answer="yes"]').click();
+    await expect(page.locator('[data-square="c4"] img[alt="White b"]')).toBeVisible();
+    await expect(page.locator('[data-square="f3"] img[alt="White n"]')).toBeVisible();
+    await expect(page.locator('button[data-ply="2"]').first()).toBeVisible({ timeout: 15000 });
+    expect(await page.evaluate(() => window.localStorage.getItem('my_chess_play_safety'))).toBe('on');
+    const log = await page.evaluate(() => JSON.parse(window.localStorage.getItem('my_chess_cct_log_v1') || '[]'));
+    expect(log.filter((e: { source: string; kind: string }) => e.source === 'play' && e.kind === 'safe').map((e: { correct: boolean }) => e.correct)).toEqual([false, true]);
+  });
 });
 
 test.describe('01c. Practice clock (DC-3)', () => {

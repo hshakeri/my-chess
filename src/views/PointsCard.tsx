@@ -17,8 +17,20 @@ export interface PointsRow {
 }
 
 export const POINTS_ROWS: PointsRow[] = [
-  { key: 'hang', habit: 'Before every move, check that nothing you leave can be taken for free', points: '5.7', group: 'pattern-is-your-move-safe' },
-  { key: 'threat', habit: 'After every opponent move, ask what it attacks, then move or guard that piece', points: '4.1 to 4.9', group: 'pattern-what-does-it-attack' },
+  {
+    key: 'hang',
+    habit: 'Before every move, check that nothing you leave can be taken for free',
+    points: '5.7',
+    group: 'pattern-is-your-move-safe',
+    also: 'and the safety check in games on the Play tab',
+  },
+  {
+    key: 'threat',
+    habit: 'After every opponent move, ask what it attacks, then move or guard that piece',
+    points: '4.1 to 4.9',
+    group: 'pattern-what-does-it-attack',
+    also: 'and the board question in games on the Play tab',
+  },
   {
     key: 'free',
     habit: 'Before every move, look for an enemy piece that nothing defends, and take it',

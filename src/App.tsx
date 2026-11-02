@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { Chess } from 'chess.js';
 import {
   Gamepad2,
   Database,
@@ -16,11 +17,12 @@ import { BoardControls } from './components/BoardControls';
 import { PracticeClock, newClockStore, type PaceTargets } from './components/PracticeClock';
 import { cannotMate } from './analytics/finalPosition';
 import { BoardQuestion, isRight, questionSquareStyles, type QuestionAnswer, type QuestionStatus } from './components/BoardQuestion';
-import { questionBeforeDecision, type MicroQuestion } from './services/microQuestions';
+import { isMoveSafe, questionBeforeDecision, type MicroQuestion } from './services/microQuestions';
 import { logCct } from './services/cctLog';
 
 /** The Play tab's board question before each of the student's moves (CL-5 in real games); off unless switched on. */
 const PLAY_GATE_KEY = 'my_chess_play_gate';
+const PLAY_SAFETY_KEY = 'my_chess_play_safety';
 import { summarizeClock } from './analytics/clock';
 import { MoveList } from './components/MoveList';
 import { PositionSetupModal } from './components/PositionSetupModal';
@@ -212,6 +214,24 @@ export const App: React.FC = () => {
     }
   });
   const [playGate, setPlayGate] = useState<{ question: MicroQuestion; fen: string; picked: string[]; status: QuestionStatus; askedAt: number; ply: number } | null>(null);
+  // Habit 1 in games: before each of the student's moves is played, is it safe? (Nothing left to take, no mate in one)
+  const [safetyOn, setSafetyOn] = useState<boolean>(() => {
+    try {
+      return window.localStorage.getItem(PLAY_SAFETY_KEY) === 'on';
+    } catch {
+      return false;
+    }
+  });
+  const [safety, setSafety] = useState<{
+    move: { from: Square; to: Square; promotion?: 'q' | 'r' | 'b' | 'n' };
+    question: Extract<MicroQuestion, { kind: 'safe' }>;
+    refutation?: { from: string; to: string };
+    fen: string;
+    status: QuestionStatus;
+    askedAt: number;
+    ply: number;
+    game: number;
+  } | null>(null);
   const [tierUsed, setTierUsed] = useState<'human_opening_book' | 'maia_neural' | 'heuristic_fallback' | undefined>(undefined);
   const [centipawns, setCentipawns] = useState<number | undefined>(undefined);
   const [modelLoaded, setModelLoaded] = useState<boolean>(false);
@@ -378,13 +398,7 @@ export const App: React.FC = () => {
   }, [activeTab, engineColor, currentPly, history.length, isThinking, requestEngineMove, flagged]);
 
   // Handle player move from the board
-  const handleBoardMove = (move: { from: Square; to: Square; promotion?: 'q' | 'r' | 'b' | 'n' }) => {
-    if (flagged) return;
-    // If reviewing history, snap to end before moving
-    if (currentPly !== history.length) {
-      setCurrentPly(history.length);
-    }
-
+  const playMove = (move: { from: Square; to: Square; promotion?: 'q' | 'r' | 'b' | 'n' }) => {
     const game = rulesRef.current;
     const result = game.makeMove(move);
     if (result.success) {
@@ -393,6 +407,72 @@ export const App: React.FC = () => {
       setCurrentPly(newHist.length);
       setPosition(game.getPosition());
     }
+  };
+
+  const handleBoardMove = (move: { from: Square; to: Square; promotion?: 'q' | 'r' | 'b' | 'n' }) => {
+    if (flagged) return;
+    // If reviewing history, snap to end before moving
+    if (currentPly !== history.length) {
+      setCurrentPly(history.length);
+    }
+
+    const game = rulesRef.current;
+    // The safety check: in a game against the engine, the student's move waits for the answer
+    if (safetyOn && engineColor !== 'none' && game.getTurn() !== engineColor && !game.isGameOver()) {
+      const fen = game.getFen();
+      let san: string | null = null;
+      try {
+        san = new Chess(fen).move(move).san;
+      } catch {
+        san = null;
+      }
+      if (san) {
+        const { safe, reason, refutation } = isMoveSafe(fen, san);
+        let refutationSquares: { from: string; to: string } | undefined;
+        if (refutation) {
+          const afterMove = new Chess(fen);
+          afterMove.move(san);
+          const reply = afterMove.move(refutation);
+          refutationSquares = { from: reply.from, to: reply.to };
+        }
+        setSafety({
+          move,
+          question: { kind: 'safe', prompt: `Before ${san} is played: is it safe? Nothing of yours left to take, and no mate in one.`, answer: safe, move: san, reason },
+          refutation: refutationSquares,
+          fen,
+          status: 'asking',
+          askedAt: Date.now(),
+          ply: history.length,
+          game: clockKey,
+        });
+        return;
+      }
+    }
+    playMove(move);
+  };
+
+  const safetyHere = safety && safety.ply === history.length && safety.game === clockKey && !flagged ? safety : null;
+  const submitSafety = (answer: QuestionAnswer) => {
+    if (!safetyHere || safetyHere.status !== 'asking') return;
+    const right = isRight(safetyHere.question, answer);
+    const now = Date.now();
+    logCct({ at: now, kind: 'safe', correct: right, ms: now - safetyHere.askedAt, source: 'play', fen: safetyHere.fen });
+    // A safe move judged safe is simply played; otherwise the answer stays up, with the choice
+    if (right && safetyHere.question.answer) {
+      setSafety(null);
+      playMove(safetyHere.move);
+      return;
+    }
+    setSafety({ ...safetyHere, status: right ? 'right' : 'wrong' });
+  };
+  const toggleSafety = (on: boolean) => {
+    setSafetyOn(on);
+    try {
+      window.localStorage.setItem(PLAY_SAFETY_KEY, on ? 'on' : 'off');
+    } catch {
+      // the switch still works for this visit
+    }
+    if (!on) setSafety(null);
   };
 
   // Flip board orientation
@@ -794,9 +874,40 @@ export const App: React.FC = () => {
                 <input type="checkbox" data-toggle="play-gate" checked={playGateOn} onChange={(e) => togglePlayGate(e.target.checked)} className="accent-sky-500" />
                 Board question before each of your moves
               </label>
+              <label className="w-full max-w-[560px] flex items-center gap-1.5 text-xs text-slate-300" title="Before each of your moves is played: can your opponent then take something for free, or mate?">
+                <input type="checkbox" data-toggle="play-safety" checked={safetyOn} onChange={(e) => toggleSafety(e.target.checked)} className="accent-sky-500" />
+                Safety check before each of your moves is played
+              </label>
               {playGateHere && (
                 <div className="w-full max-w-[560px]">
                   <BoardQuestion question={playGateHere.question} fen={playGateHere.fen} picked={playGateHere.picked} status={playGateHere.status} onSubmit={submitPlayGate} />
+                </div>
+              )}
+              {safetyHere && (
+                <div className="w-full max-w-[560px] space-y-2" data-section="play-safety">
+                  <BoardQuestion question={safetyHere.question} fen={safetyHere.fen} picked={[]} status={safetyHere.status} onSubmit={submitSafety} />
+                  {safetyHere.status !== 'asking' && (
+                    <div className="flex flex-wrap items-center gap-2 text-xs">
+                      {safetyHere.question.answer ? (
+                        <button type="button" data-action="safety-play" onClick={() => { setSafety(null); playMove(safetyHere.move); }} className="px-2.5 py-1 rounded-md font-semibold bg-emerald-600 hover:bg-emerald-500 text-white">
+                          Play {safetyHere.question.move}
+                        </button>
+                      ) : (
+                        <span className="text-slate-300">Make another move on the board, or</span>
+                      )}
+                      <button
+                        type="button"
+                        data-action={safetyHere.question.answer ? 'safety-other' : 'safety-play'}
+                        onClick={() => {
+                          setSafety(null);
+                          if (!safetyHere.question.answer) playMove(safetyHere.move);
+                        }}
+                        className="px-2.5 py-1 rounded-md font-semibold border border-slate-600 text-slate-200 hover:bg-slate-800"
+                      >
+                        {safetyHere.question.answer ? 'Choose another move' : `play ${safetyHere.question.move} anyway`}
+                      </button>
+                    </div>
+                  )}
                 </div>
               )}
               <Chessboard
@@ -804,9 +915,17 @@ export const App: React.FC = () => {
                 position={displayPosition}
                 orientation={orientation}
                 lastMove={lastMove}
-                interactive={currentPly === history.length && !isThinking && !flagged && !playGateAsking}
+                interactive={currentPly === history.length && !isThinking && !flagged && !playGateAsking && safetyHere?.status !== 'asking'}
                 onSquarePick={playGateAsking && playGateHere && playGateHere.question.kind !== 'checks' && playGateHere.question.kind !== 'safe' ? pickPlayGateSquare : undefined}
                 customSquareStyles={playGateHere ? questionSquareStyles(playGateHere.question, playGateHere.picked, playGateHere.status) : undefined}
+                arrows={
+                  safetyHere
+                    ? [
+                        { from: safetyHere.move.from, to: safetyHere.move.to, color: 'blue' as const },
+                        ...(safetyHere.status !== 'asking' && safetyHere.refutation ? [{ ...safetyHere.refutation, color: 'red' as const }] : []),
+                      ]
+                    : undefined
+                }
                 onMove={handleBoardMove}
                 getLegalMovesForSquare={(sq) => displayEngine.getLegalMovesForSquare(sq)}
               />

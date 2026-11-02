@@ -1,7 +1,7 @@
 /**
  * What the app keeps in this browser's localStorage rather than in IndexedDB, carried in the JSON
  * backup so a restore on another browser brings it along: the adopted plans, the board-question
- * setting and answers (CL-5), the spar log (CL-6), the idea cards (CL-7) and the speed runs. The
+ * setting and answers (CL-5) and the Play tab's two switches, the spar log (CL-6), the idea cards (CL-7) and the speed runs. The
  * in-progress session and the migration flags are left out. Only these keys are ever written back.
  */
 export const BACKED_UP_KEYS = [
@@ -9,6 +9,8 @@ export const BACKED_UP_KEYS = [
   'my_chess_cct_gate',
   'my_chess_cct_log_v1',
   'my_chess_idea_cards_v1',
+  'my_chess_play_gate',
+  'my_chess_play_safety',
   'my_chess_spar_log_v1',
   'my_chess_speedrun_v1',
   'my_chess_tactics_v1',

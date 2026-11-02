@@ -55,7 +55,7 @@ describe('microQuestions: board questions with answers from chess.js (CL-5)', ()
     const fen = after('e4', 'e5', 'Qh5', 'Nc6');
     expect(isMoveSafe(fen, 'Qxe5+')).toMatchObject({ safe: false, reason: 'After Qxe5+, the queen on e5 can be taken.' });
     expect(isMoveSafe(fen, 'Bc4').safe).toBe(true);
-    expect(isMoveSafe(after('f3', 'e5'), 'g4')).toEqual({ safe: false, reason: 'After g4 the opponent mates with Qh4#.' });
+    expect(isMoveSafe(after('f3', 'e5'), 'g4')).toEqual({ safe: false, reason: 'After g4 the opponent mates with Qh4#.', refutation: 'Qh4#' });
   });
 
   it('a trade is safe, and so is a capture left untaken; a loss the search sees is not', () => {
@@ -66,9 +66,9 @@ describe('microQuestions: board questions with answers from chess.js (CL-5)', ()
     // Recapturing on f3 rather than leaving the queen
     const pinned = after('e4', 'e5', 'Nf3', 'd6', 'd4', 'Bg4', 'dxe5', 'Bxf3');
     expect(isMoveSafe(pinned, 'Qxf3').safe).toBe(true);
-    expect(isMoveSafe(pinned, 'h3')).toEqual({ safe: false, reason: 'After h3, the queen on d1 can be taken.' });
+    expect(isMoveSafe(pinned, 'h3')).toEqual({ safe: false, reason: 'After h3, the queen on d1 can be taken.', refutation: 'Bxd1' });
     // 5.Nxe5? Nxe5: a knight for a pawn
-    expect(isMoveSafe(after('e4', 'e5', 'Nf3', 'Nc6', 'Bc4', 'h6', 'Nc3', 'd6'), 'Nxe5')).toEqual({ safe: false, reason: 'After Nxe5, the knight on e5 can be taken.' });
+    expect(isMoveSafe(after('e4', 'e5', 'Nf3', 'Nc6', 'Bc4', 'h6', 'Nc3', 'd6'), 'Nxe5')).toEqual({ safe: false, reason: 'After Nxe5, the knight on e5 can be taken.', refutation: 'Nxe5' });
     // 2...Qh4?? hangs the queen to 3.Nxh4; 3.d3 misses it but loses nothing, so it is safe
     expect(isMoveSafe(after('e4', 'e5', 'Nf3', 'Qh4'), 'd3').safe).toBe(true);
   });
