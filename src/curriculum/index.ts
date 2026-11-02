@@ -141,12 +141,12 @@ export const curriculumCourses: ChessCurriculumCourse[] = [
   },
   {
     id: 'course-game-drills',
-    title: 'From Your Games: Threats, Free Pieces and Safe Moves',
-    subtitle: 'Positions from your recent games where an attacked piece was left, a free piece was not taken, or a move left a piece hanging',
+    title: 'From Your Games: Threats, Free Pieces, Safe Moves and Mates',
+    subtitle: 'Positions from your games where an attacked piece was left, a free piece was not taken, a move left a piece hanging, or a move allowed mate',
     category: 'tactical_patterns',
     targetColor: 'both',
     targetRatingBand: 'beginner',
-    description: `The board checks that cost you the most points in recent games, drilled on your own positions from ${gameDrillData.from} to ${gameDrillData.to}: answer the threat of the opponent's last move, take a piece that can be won, and check that your own move leaves nothing to take.`,
+    description: `The board checks that cost you the most points in recent games, drilled on your own positions from ${gameDrillData.from} to ${gameDrillData.to}: answer the threat of the opponent's last move, take a piece that can be won, check that your own move leaves nothing to take, and check that it allows no mate.`,
     sourceAttribution: {
       bookTitle: 'Chess.com Live Archive',
       author: 'hoot65 game analysis',

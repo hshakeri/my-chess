@@ -1,6 +1,6 @@
 {
   "source": "hoot65 Chess.com archive",
-  "from": "2026-08-01",
+  "from": "2024-08-25",
   "to": "2026-10-31",
   "threat": [
     {
@@ -778,6 +778,256 @@
       ],
       "target": "b5",
       "refutation": "axb5",
+      "refutationPlayed": true
+    }
+  ],
+  "mate": [
+    {
+      "id": "mate-185129553252-47",
+      "url": "https://www.chess.com/game/live/185129553252",
+      "date": "2026-10-10",
+      "opponent": "taifoonsmart",
+      "color": "black",
+      "fenBefore": "5rk1/pp5p/2p1ppp1/4qr2/P1P4Q/7P/1P3PP1/3R1RK1 w - - 0 24",
+      "lastSan": "Rd7",
+      "played": "Qxb2",
+      "accepted": [
+        "Rh5"
+      ],
+      "target": "h7",
+      "refutation": "Qxh7#",
+      "refutationPlayed": true
+    },
+    {
+      "id": "mate-184528483246-53",
+      "url": "https://www.chess.com/game/live/184528483246",
+      "date": "2026-09-29",
+      "opponent": "Killer20013",
+      "color": "black",
+      "fenBefore": "kn1r3r/5p2/1pp1p2p/3p2p1/3P1b2/2P2B1P/PR3PP1/1R4K1 w - - 0 27",
+      "lastSan": "Rxb6",
+      "played": "Nd7",
+      "accepted": [
+        "Bd6",
+        "Rhe8",
+        "Rhf8",
+        "Rhg8",
+        "h5",
+        "Rc8",
+        "f6",
+        "Rd7",
+        "f5",
+        "Bd2",
+        "Rh7",
+        "Rde8"
+      ],
+      "target": "a6",
+      "refutation": "Ra6#",
+      "refutationPlayed": true
+    },
+    {
+      "id": "mate-184432059452-111",
+      "url": "https://www.chess.com/game/live/184432059452",
+      "date": "2026-09-27",
+      "opponent": "just_win_baby_33",
+      "color": "black",
+      "fenBefore": "6r1/2R5/kpQ5/2p1pK2/4P2P/5qP1/8/8 w - - 11 56",
+      "lastSan": "Kxe5",
+      "played": "Rf8",
+      "accepted": [
+        "Qh5+",
+        "Qc3+",
+        "Qxg3+"
+      ],
+      "target": "a4",
+      "refutation": "Qa4#",
+      "refutationPlayed": false
+    },
+    {
+      "id": "mate-170529209638-44",
+      "url": "https://www.chess.com/game/live/170529209638",
+      "date": "2026-06-21",
+      "opponent": "snugsondrugs",
+      "color": "white",
+      "fenBefore": "8/pp4pr/4p1k1/1N1pP1qp/2p3P1/6Q1/PPPr2P1/1K1R3R b - - 0 22",
+      "lastSan": "hxg4",
+      "played": "Rxh7",
+      "accepted": [
+        "Rhg1",
+        "a4",
+        "Rhf1",
+        "Rhe1",
+        "a3",
+        "Nd6",
+        "Rc1",
+        "Rde1",
+        "b3",
+        "b4",
+        "Rdg1"
+      ],
+      "target": "d1",
+      "refutation": "Rxd1#",
+      "refutationPlayed": true
+    },
+    {
+      "id": "mate-166524909444-28",
+      "url": "https://www.chess.com/game/live/166524909444",
+      "date": "2026-03-28",
+      "opponent": "alvaro_fig7",
+      "color": "white",
+      "fenBefore": "rnb1k1nr/pp3pp1/3qp3/8/1P1P4/1B3NPp/P1PQ1P1P/RN2R1K1 b kq - 2 14",
+      "lastSan": "Qc6",
+      "played": "Ne5",
+      "accepted": [
+        "d5",
+        "Qd3",
+        "Re3",
+        "Qf4",
+        "Nh4",
+        "Qd1",
+        "Qe2",
+        "Qe3",
+        "Qc3"
+      ],
+      "target": "g2",
+      "refutation": "Qg2#",
+      "refutationPlayed": true
+    },
+    {
+      "id": "mate-137771205580-24",
+      "url": "https://www.chess.com/game/live/137771205580",
+      "date": "2025-04-25",
+      "opponent": "Sal0970",
+      "color": "white",
+      "fenBefore": "r1bqr1k1/ppppbp1p/2n4B/8/2n3Q1/8/PPP2PPP/RN2R1K1 b - - 2 12",
+      "lastSan": "Bg5",
+      "played": "Bxg5",
+      "accepted": [
+        "Qxg5+",
+        "Rxe8+"
+      ],
+      "target": "e1",
+      "refutation": "Rxe1#",
+      "refutationPlayed": true
+    },
+    {
+      "id": "mate-121802314860-15",
+      "url": "https://www.chess.com/game/live/121802314860",
+      "date": "2024-12-30",
+      "opponent": "Muhammad_Limon",
+      "color": "black",
+      "fenBefore": "2kr1bnr/1ppqpppp/2n5/1p1p1b2/P2P4/2N1PN2/1PP2PPP/R1BQ1RK1 w - - 0 8",
+      "lastSan": "axb5",
+      "played": "Nb4",
+      "accepted": [
+        "Nb8"
+      ],
+      "target": "a8",
+      "refutation": "Ra8#",
+      "refutationPlayed": true
+    },
+    {
+      "id": "mate-121774617780-52",
+      "url": "https://www.chess.com/game/live/121774617780",
+      "date": "2024-12-29",
+      "opponent": "DustinSelva",
+      "color": "white",
+      "fenBefore": "1q2r1k1/3R1p2/p1Q2bpp/8/1p2P3/7N/PPP4P/1K1R4 b - - 0 26",
+      "lastSan": "Qe5",
+      "played": "Re1",
+      "accepted": [
+        "R7d4",
+        "R1d4"
+      ],
+      "target": "b2",
+      "refutation": "Qxb2#",
+      "refutationPlayed": true
+    },
+    {
+      "id": "mate-127571376123-34",
+      "url": "https://www.chess.com/game/live/127571376123",
+      "date": "2024-12-10",
+      "opponent": "eugenylozenko",
+      "color": "white",
+      "fenBefore": "r3r1k1/pbp3pp/1q2pn2/1Np2pN1/2P5/3PQ3/PP3PPP/R4RK1 b - - 2 17",
+      "lastSan": "Qc6",
+      "played": "Rfe1",
+      "accepted": [
+        "Nf3",
+        "f3",
+        "Qh3",
+        "Qf3"
+      ],
+      "target": "g2",
+      "refutation": "Qxg2#",
+      "refutationPlayed": true
+    },
+    {
+      "id": "mate-121043400472-41",
+      "url": "https://www.chess.com/game/live/121043400472",
+      "date": "2024-11-22",
+      "opponent": "emmanuelkisanda",
+      "color": "black",
+      "fenBefore": "3r1rk1/pbp1p2p/1p3ppn/2q5/2P1pP2/1PQ1P2P/PB1N2P1/R3R1K1 w - - 1 21",
+      "lastSan": "g4",
+      "played": "f5",
+      "accepted": [
+        "Rd3",
+        "a5",
+        "Nf7",
+        "e5",
+        "Qc6"
+      ],
+      "target": "g7",
+      "refutation": "Qg7#",
+      "refutationPlayed": true
+    },
+    {
+      "id": "mate-119975381438-47",
+      "url": "https://www.chess.com/game/live/119975381438",
+      "date": "2024-10-09",
+      "opponent": "Mazzo69",
+      "color": "black",
+      "fenBefore": "r4r1k/p3q1pp/1pp3n1/4p3/P2P2B1/1QP2P1R/5P1P/R6K w - - 2 24",
+      "lastSan": "Qc2",
+      "played": "Nf4",
+      "accepted": [
+        "Rf6"
+      ],
+      "target": "h7",
+      "refutation": "Qxh7#",
+      "refutationPlayed": true
+    },
+    {
+      "id": "mate-108899219792-38",
+      "url": "https://www.chess.com/game/live/108899219792",
+      "date": "2024-08-25",
+      "opponent": "GoldenChild2610",
+      "color": "white",
+      "fenBefore": "1r1r2k1/p4pqp/6p1/8/Q2Np3/8/PPP2PPP/2KR3R b - - 3 19",
+      "lastSan": "Rb6",
+      "played": "Nc6",
+      "accepted": [
+        "Nb3",
+        "Kb1",
+        "Rhe1",
+        "g3",
+        "Rd2",
+        "c3",
+        "h4",
+        "Qxa7",
+        "f3",
+        "g4",
+        "a3",
+        "f4",
+        "h3",
+        "Rhg1",
+        "Qc4",
+        "b3",
+        "b4"
+      ],
+      "target": "b2",
+      "refutation": "Qxb2#",
       "refutationPlayed": true
     }
   ]

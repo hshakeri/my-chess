@@ -1,7 +1,8 @@
-// Drill positions from hoot65's recent games, for the app's three drill sets:
+// Drill positions from hoot65's games, for the app's four drill sets:
 //   threat: the opponent's last move attacked a piece (a minor piece or more) and hoot65 left it there;
 //   free:   an enemy piece could be won and hoot65 did not take it;
-//   hang:   nothing of either side was in danger, and hoot65's move put a piece where it can be taken.
+//   hang:   nothing of either side was in danger, and hoot65's move put a piece where it can be taken;
+//   mate:   hoot65's move let the opponent give mate at once.
 // Every legal move of a candidate is scored with a material search (captures are followed until the
 // position is quiet). A threat drill accepts the moves that keep the material balance and answer the
 // threat: the piece is safe afterwards, or the move captures or gives check (a quiet move that leaves
@@ -9,12 +10,15 @@
 // that win as much as the best one; all of them must be captures and one must take the free piece,
 // otherwise the position is not used. A hang drill accepts the moves that keep the material balance
 // and leave nothing of hoot65's where it can be taken (or capture, or give check). The move played
-// must come out at least two pawns worse.
+// must come out at least two pawns worse. A mate drill accepts the moves that allow no mate in one and
+// keep the material balance.
 // Accepted moves and the move played are checked again one ply deeper, and the drill keeps only the
 // moves that pass.
 //
 //   node drills.mjs scan games.jsonl features.csv drills-0.json 120 0 7   (days, shard, number of shards)
 //   node drills.mjs pick game_drills.json 12 drills-*.json                (drills per set, newest first)
+//   node drills.mjs add game_drills.json mate 12 mate-*.json              (one set, the others kept)
+// verify-drills.mjs then checks the picks with Stockfish.
 import fs from 'node:fs';
 import { Chess } from 'chess.js';
 
@@ -147,8 +151,9 @@ function bestMoves(fen) {
   return { best, moves };
 }
 
-function scan([gamesFile, featuresFile, outFile, daysArg = '120', shardArg = '0', nShardsArg = '1']) {
+function scan([gamesFile, featuresFile, outFile, daysArg = '120', shardArg = '0', nShardsArg = '1', kindsArg = 'threat,free,hang,mate']) {
   const DAYS = Number(daysArg), SHARD = Number(shardArg), NSHARDS = Number(nShardsArg);
+  const KINDS = new Set(kindsArg.split(','));
   // Maia's expected score before each of hoot65's moves (features.csv): drills come from open games
   const wpBefore = new Map();
   const lines = fs.readFileSync(featuresFile, 'utf8').split('\n');
@@ -174,6 +179,38 @@ function scan([gamesFile, featuresFile, outFile, daysArg = '120', shardArg = '0'
       if (chess.moves().some((m) => m.endsWith('#'))) continue; // mate in one is a different drill
       const wp = wpBefore.get(gi * 1000 + p);
       if (wp === undefined || wp < 0.15 || wp > 0.85) continue;
+
+      // Mate: the move played lets the opponent mate at once. The right moves allow no mate in one and
+      // keep the material balance; the punishment is the mate (the game's reply when it was one)
+      if (KINDS.has('mate')) {
+        const allowsMate = (m) => {
+          const c = new Chess(fen);
+          c.move(m);
+          return c.moves().filter((x) => x.endsWith('#'));
+        };
+        const mates = allowsMate(g.san[p]);
+        if (mates.length) {
+          const base = material(chess);
+          const safe = chess.moves().filter((m) => allowsMate(m).length === 0);
+          const accepted = safe.filter((m) => reaches(fen, m, base - 50)).filter((m) => reaches(fen, m, base - 50, CONFIRM_DEPTH));
+          if (accepted.length) {
+            const reply = g.san[p + 1] ?? null;
+            const refutationPlayed = !!reply && mates.includes(reply);
+            const refutation = refutationPlayed ? reply : mates[0];
+            // Main answer: the best of the safe moves by the material search
+            const { moves: bestSet } = bestMoves(fen);
+            const main = bestSet.find((m) => accepted.includes(m)) ?? accepted[0];
+            found.push({
+              gameIndex: gi, url: g.url, end: g.end, date: new Date(g.end * 1000).toISOString().slice(0, 10),
+              opponent: g.opp, color: g.me === 'w' ? 'white' : 'black', ply: p, fenBefore: g.fens[p - 1], lastSan: g.san[p - 1],
+              played: g.san[p], reply, base, wp: +wp.toFixed(3),
+              kind: 'mate', target: dest(refutation), accepted: [main, ...accepted.filter((m) => m !== main)],
+              refutation, refutationPlayed,
+            });
+          }
+        }
+      }
+      if (!KINDS.has('threat') && !KINDS.has('free') && !KINDS.has('hang')) continue;
       const last = new Chess(g.fens[p - 1]).move(g.san[p - 1]);
       const wasAttacked = enPrise(new Chess(g.fens[p - 1]), g.me).map((t) => t.square);
       const inDanger = enPrise(chess, g.me);
@@ -308,7 +345,35 @@ function pick([outFile, perSetArg = '12', ...inFiles]) {
   console.error(`threat ${out.threat.length}, free ${out.free.length}, hang ${out.hang.length} (of ${all.length})`);
 }
 
+/**
+ * Add the set of one kind to an existing drills file, newest first, one per game, leaving the sets
+ * already there unchanged (their positions are review cards) and skipping positions they hold.
+ */
+function add([drillsFile, kind, perSetArg = '12', ...inFiles]) {
+  const perSet = Number(perSetArg);
+  const current = JSON.parse(fs.readFileSync(drillsFile, 'utf8'));
+  const taken = new Set(Object.values(current).filter(Array.isArray).flat().map((d) => `${d.url}#${d.fenBefore}`));
+  const all = inFiles.flatMap((f) => JSON.parse(fs.readFileSync(f, 'utf8'))).filter((d) => d.kind === kind).sort((a, b) => b.end - a.end || b.ply - a.ply);
+  const set = [];
+  for (const d of all) {
+    if (set.length >= perSet || set.some((x) => x.url === d.url) || taken.has(`${d.url}#${d.fenBefore}`)) continue;
+    set.push({
+      id: `${kind}-${d.url.split('/').pop()}-${d.ply}`,
+      url: d.url, date: d.date, opponent: d.opponent, color: d.color,
+      fenBefore: d.fenBefore, lastSan: d.lastSan, played: d.played, accepted: d.accepted, target: d.target,
+      refutation: d.refutation, refutationPlayed: d.refutationPlayed,
+    });
+  }
+  current[kind] = set;
+  const dates = Object.values(current).filter(Array.isArray).flat().map((d) => d.date).sort();
+  current.from = dates[0];
+  current.to = dates[dates.length - 1];
+  fs.writeFileSync(drillsFile, JSON.stringify(current, null, 2) + '\n');
+  console.error(`${kind} ${set.length} (of ${all.length})`);
+}
+
 const [mode, ...args] = process.argv.slice(2);
 if (mode === 'scan') scan(args);
 else if (mode === 'pick') pick(args);
-else throw new Error('usage: node drills.mjs scan|pick ...');
+else if (mode === 'add') add(args);
+else throw new Error('usage: node drills.mjs scan|pick|add ...');

@@ -5,6 +5,7 @@ import {
   missedThreatLessons,
   freePieceLessons,
   hangingMoveLessons,
+  allowedMateLessons,
   gameDrillLessons,
   drillSetOf,
   isGameDrill,
@@ -75,6 +76,7 @@ describe('Drill positions from hoot65 games: the data', () => {
       ['threat', gameDrillData.threat],
       ['free', gameDrillData.free],
       ['hang', gameDrillData.hang],
+      ['mate', gameDrillData.mate ?? []],
     ] as const) {
       expect(set).toHaveLength(12);
       const dates = set.map((d) => d.date);
@@ -91,7 +93,7 @@ describe('Drill positions from hoot65 games: the data', () => {
       expect(new Set(set.map((d) => d.url)).size, `${kind}: one position per game`).toBe(set.length);
     }
     // A position belongs to one set only
-    const keys = [gameDrillData.threat, gameDrillData.free, gameDrillData.hang].flatMap((set) => set.map((d) => d.id.slice(d.id.indexOf('-') + 1)));
+    const keys = [gameDrillData.threat, gameDrillData.free, gameDrillData.hang, gameDrillData.mate ?? []].flatMap((set) => set.map((d) => d.id.slice(d.id.indexOf('-') + 1)));
     expect(new Set(keys).size).toBe(keys.length);
   });
 
@@ -164,11 +166,27 @@ describe('Drill positions from hoot65 games: the data', () => {
       }
     }
   });
+
+  it('mate: the move played let the opponent mate at once, no answer does, and there was no mate to give first', () => {
+    const mates = (c: Chess) => c.moves().filter((m) => m.endsWith('#'));
+    for (const d of gameDrillData.mate ?? []) {
+      const { chess, fen } = decision(d);
+      // Not in check and no mate of hoot65's own: the decision was only whether the move allows mate
+      expect(chess.inCheck(), d.id).toBe(false);
+      expect(mates(chess), d.id).toEqual([]);
+      const played = after(fen, d.played);
+      const mate = after(played.fen, d.refutation!);
+      expect(mate.chess.isCheckmate(), `${d.id}: ${d.refutation} mates`).toBe(true);
+      expect(mate.move.to).toBe(d.target);
+      expect(d.accepted.map((s) => after(fen, s).move.san)).not.toContain(played.move.san);
+      for (const san of d.accepted) expect(mates(after(fen, san).chess), `${d.id}: ${san} allows no mate`).toEqual([]);
+    }
+  });
 });
 
 describe('Drill positions from hoot65 games: the lessons', () => {
   it('each position is a one-decision lesson: the opponent move is replayed, then every answer is accepted', () => {
-    for (const d of [...gameDrillData.threat, ...gameDrillData.free, ...gameDrillData.hang]) {
+    for (const d of [...gameDrillData.threat, ...gameDrillData.free, ...gameDrillData.hang, ...(gameDrillData.mate ?? [])]) {
       const l = lessonOf(d);
       const { fen, last } = decision(d);
       expect(l.initialFen).toBe(d.fenBefore);
@@ -319,16 +337,51 @@ describe('Drill positions from hoot65 games: the lessons', () => {
       ]);
     }
   });
+
+  it('mate text: the mate the move played allowed, and for each other wrong move whether it allows one', () => {
+    for (const d of gameDrillData.mate ?? []) {
+      const l = lessonOf(d);
+      const { fen, last } = decision(d);
+      const played = after(fen, d.played);
+      const playedLabel = plyLabel(fen, 0, played.move.san);
+      const mate = after(played.fen, d.refutation!);
+      const mateLabel = plyLabel(played.fen, 0, mate.move.san);
+      expect(l.moves[0].annotation).toBe(
+        `${plyLabel(d.fenBefore, 0, last.san)} in your game vs ${d.opponent}. Before you move: after your move, can your opponent give mate?`
+      );
+      expect(l.moves[1].annotation).toBe(
+        d.refutationPlayed ? `In the game you played ${playedLabel}, and ${mateLabel} was mate.` : `In the game you played ${playedLabel}; ${mateLabel} would have been mate.`
+      );
+      expect(l.thematicObjective).toBe(`Before every move, look at the checks your opponent would have after it. After ${playedLabel}, ${mateLabel} is mate.`);
+      expect(playedNote(l, d)).toBe(`This is what you played vs ${d.opponent} on ${d.date}: ${mateLabel} is mate.`);
+      expect(l.commonMistakesAndTraps).toEqual([
+        expect.objectContaining({ triggerFen: fen, attemptedSan: played.move.san, refutationSanList: [mate.move.san] }),
+      ]);
+      // A wrong move that allows mate asks for the checks; one that stops it is told there is a better move
+      const feedback = l.moves[1].wrongMoveFeedback ?? {};
+      for (const san of new Chess(fen).moves()) {
+        if (answers(l).includes(san) || san === played.move.san) continue;
+        const allows = after(fen, san).chess.moves().some((m) => m.endsWith('#'));
+        expect(feedback[san], `${d.id}: ${san}`).toBe(
+          allows
+            ? 'Not this one. After it, which checks would your opponent have, and is one of them mate?'
+            : 'That stops the mate, but it costs you more than it should: there is a stronger move.'
+        );
+      }
+    }
+  });
 });
 
 describe('Drill positions from hoot65 games: where they appear', () => {
-  it('opens the study path with the three sets, newest first, and lists them as a course', () => {
+  it('opens the study path with the four sets, newest first, and lists them as a course', () => {
     expect(patternPath[0].lessonIds).toEqual(gameDrillData.threat.map((d) => `lesson-game-${d.id}`));
     expect(patternPath[1].lessonIds).toEqual(gameDrillData.free.map((d) => `lesson-game-${d.id}`));
     expect(patternPath[2].lessonIds).toEqual(gameDrillData.hang.map((d) => `lesson-game-${d.id}`));
+    expect(patternPath[3].lessonIds).toEqual((gameDrillData.mate ?? []).map((d) => `lesson-game-${d.id}`));
     expect(missedThreatLessons.map((l) => l.id)).toEqual(patternPath[0].lessonIds);
     expect(freePieceLessons.map((l) => l.id)).toEqual(patternPath[1].lessonIds);
     expect(hangingMoveLessons.map((l) => l.id)).toEqual(patternPath[2].lessonIds);
+    expect(allowedMateLessons.map((l) => l.id)).toEqual(patternPath[3].lessonIds);
     for (const l of gameDrillLessons) {
       expect(isGameDrill(l.id)).toBe(true);
       expect(allCurriculumLessons).toContain(l);
@@ -336,6 +389,7 @@ describe('Drill positions from hoot65 games: where they appear', () => {
     expect(drillSetOf(missedThreatLessons[3].id)).toBe(missedThreatLessons);
     expect(drillSetOf(freePieceLessons[0].id)).toBe(freePieceLessons);
     expect(drillSetOf(hangingMoveLessons[5].id)).toBe(hangingMoveLessons);
+    expect(drillSetOf(allowedMateLessons[2].id)).toBe(allowedMateLessons);
     expect(drillSetOf('lesson-legals-mate')).toBeUndefined();
     expect(allCurriculumLessons.filter((l) => !isGameDrill(l.id)).every((l) => drillSetOf(l.id) === undefined)).toBe(true);
     expect(curriculumCourses.find((c) => c.id === 'course-game-drills')?.lessons).toEqual(gameDrillLessons);

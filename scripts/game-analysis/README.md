@@ -29,11 +29,13 @@ app build. The results and what they mean are in `docs/game-analysis.md`.
    the better move, and the outcomes are compared. The simulated games are independent of the
    estimates that picked the better move, so they also measure the selection bias directly.
 
-8. **Drills** (`drills.mjs`): positions for the app's three drill sets, from the last 120 days. A
-   threat drill is a position where the opponent's last move put a piece (a minor piece or more) in
-   danger and hoot65 left it there; a free drill is a position where an enemy piece could be won and
-   was not taken; a hang drill is a position where nothing of either side was in danger until
-   hoot65's own move left a piece where it could be taken. Only positions where the game was still
+8. **Drills** (`drills.mjs`): positions for the app's four drill sets. A threat drill is a position
+   where the opponent's last move put a piece (a minor piece or more) in danger and hoot65 left it
+   there; a free drill is a position where an enemy piece could be won and was not taken; a hang
+   drill is a position where nothing of either side was in danger until hoot65's own move left a
+   piece where it could be taken; a mate drill is a position where hoot65's move let the opponent
+   give mate at once. The first three sets come from the last 120 days; allowed mates are rarer, so
+   their scan reaches back to January 2024. Only positions where the game was still
    open count (Maia between 15% and 85%). Every legal move is scored with a material search (two
    plies, then captures until quiet), and the accepted moves and the move played are checked again
    one ply deeper. A threat drill accepts the moves that keep the material balance and answer the
@@ -41,9 +43,22 @@ app build. The results and what they mean are in `docs/game-analysis.md`.
    moves that win as much as the best one, which must all be captures, one of them of the free
    piece; a hang drill accepts the moves that keep the balance and leave nothing in danger (or
    capture, or check), and the capture that punishes the move played must take the piece it left.
-   The move played must come out at least two pawns worse. `pick` keeps the twelve newest per set,
-   one per game, and writes `src/data/game_drills.json`; `src/curriculum/gameDrills.ts` turns each
-   into a lesson and states only facts it works out from the position with chess.js.
+   The move played must come out at least two pawns worse. A mate drill accepts the moves that allow
+   no mate in one and keep the balance. `pick` keeps the twelve newest per set, one per game, and
+   writes `src/data/game_drills.json` (`add` replaces one set and keeps the others);
+   `src/curriculum/gameDrills.ts` turns each into a lesson and states only facts it works out from
+   the position with chess.js.
+9. **Stockfish** (`stockfish.mjs`, `verify-drills.mjs`, `../engine-audit.ts`): Stockfish 19 (the
+   `stockfish` npm package, WASM, run with Node; `STOCKFISH_JS` can point at another build) checks
+   what the material search and Maia picked. `verify-drills.mjs vet` keeps the scan's candidates
+   that make a sound drill by Stockfish's scores: the game still open before hoot65's move (not
+   below -2.5 for hoot65), the move played losing at least 1.5 pawns, and at least one accepted move
+   within 1.5 pawns of Stockfish's best, or still winning by 3 pawns or more, that does not walk into
+   a forced mate (for a free drill, one that takes the free piece). The accepted moves are cut to those, best first, before `pick` or
+   `add` chooses. `verify-drills.mjs check` runs the same test on `src/data/game_drills.json`. The engine audit
+   (`npx tsx scripts/engine-audit.ts [depth] [out.json] [lesson-id-prefix]` from the repository)
+   scores every answer, alternative, warned-against move and exercise of the curriculum against
+   Stockfish's best move and lists the ones that give away too much.
 
 Weights: a game's weight halves every 180 days (`HALF_LIFE` environment variable).
 Ratings: Maia is trained on Lichess games, so Chess.com ratings get +400 before they reach Maia

@@ -3,7 +3,7 @@
  * curriculum, plus the tailored repertoire lines, as one dense printable document.
  *
  * Printed double-sided, every page with questions is the front of a sheet whose back holds its answers,
- * so each sheet can be used on its own. The three drill pages from hoot65's games come first, each
+ * so each sheet can be used on its own. The four drill pages from hoot65's games come first, each
  * with its answers on the back. The lesson chapters that follow are study pages: the annotated line,
  * the opponent's known replies and the mistakes to avoid. The practice for every lesson (the line and
  * each reply as blanks, and the exercises) is gathered at the end as practice items, which
@@ -307,7 +307,9 @@ function renderLesson(lesson: CurriculumLesson, n: number, group?: PatternGroup,
   return html;
 }
 
-const drillById = new Map([...gameDrillData.threat, ...gameDrillData.free, ...gameDrillData.hang].map((d) => [`lesson-game-${d.id}`, d] as const));
+const drillById = new Map(
+  [...gameDrillData.threat, ...gameDrillData.free, ...gameDrillData.hang, ...(gameDrillData.mate ?? [])].map((d) => [`lesson-game-${d.id}`, d] as const)
+);
 
 /**
  * A drill set from hoot65's games as one sheet: the front holds each position as a diagram from the
@@ -317,7 +319,7 @@ function renderDrillSet(lessons: CurriculumLesson[], n: number, group: PatternGr
   const name = group ? group.title : 'Positions from your games';
   const chapter = `${n}. ${name}`;
   toc.push({ heading: chapter, id: `ch-${n}`, no: `${n}.`, title: `${name} (${lessons.length} positions from your games)` });
-  const intro = `<p>${lessons.length} positions from your recent games, newest first. Each diagram is drawn from your side just after your opponent's move, which is named under it. Find your move and write it down. The answers are on the back of this page: every move that is right, and what happened in the game.</p>`;
+  const intro = `<p>${lessons.length} positions from your games, newest first. Each diagram is drawn from your side just after your opponent's move, which is named under it. Find your move and write it down. The answers are on the back of this page: every move that is right, and what happened in the game.</p>`;
   let front = `<section class="sheet sheet-front drill-set" id="ch-${n}">${before}${chapterHead(chapter, group, intro)}<div class="drills">`;
   let answers = '';
   lessons.forEach((lesson, k) => {
@@ -374,9 +376,9 @@ function partHead(title: string, text: string, extraClass = '', id = ''): string
 }
 
 const howToUse =
-  "These chapters come from your own Chess.com games (hoot65) and the openings you actually play, in the order of the app's study path: lessons that repeat the same pattern follow one another, and each group opens with the check that catches it. The first three chapters are positions from your recent games: a piece your opponent's move attacked that stayed where it was, a piece of theirs that could have been won, and a move of yours that left a piece where it could be taken. Each lesson chapter after them explains the position: the line with its notes, the other replies your opponents chose, and the mistakes to avoid. The practice for every lesson, the main line and each of those replies as moves to find plus the exercises, is on the practice sheets at the end of the book, to be played out on a real board.";
+  "These chapters come from your own Chess.com games (hoot65) and the openings you actually play, in the order of the app's study path: lessons that repeat the same pattern follow one another, and each group opens with the check that catches it. The first four chapters are positions from your games: a piece your opponent's move attacked that stayed where it was, a piece of theirs that could have been won, a move of yours that left a piece where it could be taken, and a move of yours that let your opponent give mate. Each lesson chapter after them explains the position: the line with its notes, the other replies your opponents chose, and the mistakes to avoid. The practice for every lesson, the main line and each of those replies as moves to find plus the exercises, is on the practice sheets at the end of the book, to be played out on a real board.";
 const printing =
-  'Print the book double-sided, flipping on the long edge. Every page with questions, the three pages of positions from your games and each practice sheet, is the front of a sheet with its answers on the back, so each sheet can be taken to the board on its own. Where a practice sheet would otherwise start on the back of a page, a page for notes comes first.';
+  'Print the book double-sided, flipping on the long edge. Every page with questions, the four pages of positions from your games and each practice sheet, is the front of a sheet with its answers on the back, so each sheet can be taken to the board on its own. Where a practice sheet would otherwise start on the back of a page, a page for notes comes first.';
 
 const playing = (l: CurriculumLesson) => `${l.title} (you play ${l.targetColor === 'black' ? 'Black' : 'White'})`;
 

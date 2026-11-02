@@ -124,9 +124,9 @@ allowing mate in one.
 
 ## Drills from the games
 
-The study path now opens with three drill sets made from hoot65's own positions of the last 120 days
+The study path now opens with four drill sets made from hoot65's own positions
 (`src/data/game_drills.json`, picked by `scripts/game-analysis/drills.mjs`), in the order the checks
-are made at the board:
+are made at the board. The first three come from the last 120 days:
 
 1. **What does the last move attack?** Twelve positions where the opponent's move put a piece in
    danger (a minor piece or more, undefended or attacked by something cheaper) and hoot65 left it
@@ -140,11 +140,25 @@ are made at the board:
    Half of those moves took a pawn and gave up the piece for it: three bishop captures on f7, a
    knight on a6, a rook on g3 and the queen on b5. In nine of the games the opponent took the piece
    on the next move.
+4. **Does your move allow mate?** Twelve positions where hoot65's own move let the opponent give mate
+   at once, while the game was still open: Maia's expected score between 15% and 85%, and Stockfish
+   19 no worse than -2.5 for hoot65 before the move. Allowed mates are rarer than loose pieces, so
+   this scan reaches back to January 2024 (54 positions, 22 of them in open games; the twelve newest
+   are used, from 2024-08-25 to 2026-10-10). Eight of the mates were by the queen and four by a rook;
+   the opponent found the mate in eleven of the twelve games. In eight of the positions hoot65 stood
+   five pawns or more ahead by Stockfish's count (once with a forced mate of their own) before the
+   move that allowed it.
 
 Each position is a one-decision lesson with its own review card. The opponent's last move is
-replayed first, then every move that keeps the material (threats, safe moves) or wins it (free
-pieces) is accepted, measured by a material search over every legal move and checked again one ply
-deeper.
+replayed first, then every move that keeps the material (threats, safe moves, moves that allow no
+mate) or wins it (free pieces) is accepted, measured by a material search over every legal move and
+checked again one ply deeper. For the mate set Stockfish 19 (depth 18) then cut the accepted moves to
+those within 1.5 pawns of its best move or still winning by 3 pawns, best first
+(`scripts/game-analysis/verify-drills.mjs`). That removed 44 of the moves the material search had
+accepted: each stops the mate in one but scores at least 1.5 pawns below Stockfish's best and below
++3 (in one position four of them let a lead of 8.8 pawns fall to about 0). A wrong move that stops the
+mate is told so, and that a stronger move exists; one that allows a mate asks for the opponent's
+checks.
 Playing the move from the game shows what it cost: the capture that followed is played out on the
 board. 50 recent positions passed every test, and the twelve newest of each kind were kept, one per
 game. Re-run the scan as more games are played.

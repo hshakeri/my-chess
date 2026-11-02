@@ -1,5 +1,5 @@
 import { CurriculumLesson } from '../types/curriculum';
-import { missedThreatLessons, freePieceLessons, hangingMoveLessons } from './gameDrills';
+import { missedThreatLessons, freePieceLessons, hangingMoveLessons, allowedMateLessons } from './gameDrills';
 
 /**
  * The study path: the core lessons grouped by the pattern they repeat, in the order to learn them.
@@ -10,11 +10,13 @@ import { missedThreatLessons, freePieceLessons, hangingMoveLessons } from './gam
  *
  * Group order follows docs/game-analysis.md, which measured hoot65's archive with the Maia model:
  * the costliest board checks in recent games are a piece left where it can be taken, a threat not
- * answered and a free piece not taken. The path opens with those checks drilled on positions from
- * hoot65's own games (src/curriculum/gameDrills.ts), in the order they are made at the board: what
- * the opponent's move attacks, what can be taken, and whether the move about to be played leaves
- * anything to take. The two loose-piece groups of the opening lessons follow; allowing mate in one is rarer but costs the most each time, so the king in the
- * centre comes next; the structure group and finishing technique follow.
+ * answered and a free piece not taken, then allowing mate in one (rarer, but the costliest single
+ * error). The path opens with those checks drilled on positions from hoot65's own games
+ * (src/curriculum/gameDrills.ts), in the order they are made at the board: what the opponent's move
+ * attacks, what can be taken, whether the move about to be played leaves anything to take, and
+ * whether it allows mate. The two loose-piece groups of the opening lessons follow, then the king in
+ * the centre (knight mates against a king that has not castled), the structure group and finishing
+ * technique.
  */
 export interface PatternGroup {
   id: string;
@@ -51,6 +53,14 @@ export const patternPath: PatternGroup[] = [
       'Positions from your own recent games: nothing was in danger, and your move left a piece where it could be taken, because nothing defended it or something cheaper attacked it.',
     check: 'Before every move: after it, what could your opponent take?',
     lessonIds: hangingMoveLessons.map((l) => l.id),
+  },
+  {
+    id: 'pattern-does-your-move-allow-mate',
+    title: 'Does your move allow mate?',
+    idea:
+      'Positions from your own games: the game was still open, and your move let your opponent give mate on the next move.',
+    check: 'Before every move: after it, which checks would your opponent have, and is one of them mate?',
+    lessonIds: allowedMateLessons.map((l) => l.id),
   },
   {
     id: 'pattern-queen-takes-on-g4',

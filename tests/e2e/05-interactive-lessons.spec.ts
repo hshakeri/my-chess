@@ -4,7 +4,7 @@ import { Chess } from 'chess.js';
 import type { GameDrill } from '../../src/curriculum/gameDrills';
 
 // Read as a file: the test runner loads specs as ES modules, where a JSON import needs an attribute
-const gameDrills: { threat: GameDrill[]; free: GameDrill[]; hang: GameDrill[] } = JSON.parse(readFileSync('src/data/game_drills.json', 'utf8'));
+const gameDrills: { threat: GameDrill[]; free: GameDrill[]; hang: GameDrill[]; mate: GameDrill[] } = JSON.parse(readFileSync('src/data/game_drills.json', 'utf8'));
 
 test.describe('05. Interactive Lessons, Feedback Loops & Spaced Repetition (F16 - F18)', () => {
   test.beforeEach(async ({ page }) => {
@@ -60,9 +60,9 @@ test.describe('05. Interactive Lessons, Feedback Loops & Spaced Repetition (F16 
     const right = new Chess(board.fen()).move(d.accepted[0]);
     const alt = (m: { color: string; piece: string }) => `${m.color === 'w' ? 'White' : 'Black'} ${m.piece}`;
 
-    // The study path opens with the three sets as rows of numbered tiles
+    // The study path opens with the four sets as rows of numbered tiles
     const tiles = page.locator('[data-drill-set] [data-lesson-id]');
-    await expect(tiles).toHaveCount(gameDrills.threat.length + gameDrills.free.length + gameDrills.hang.length);
+    await expect(tiles).toHaveCount(gameDrills.threat.length + gameDrills.free.length + gameDrills.hang.length + gameDrills.mate.length);
     await tiles.first().click();
 
     // The opponent's move is replayed; there is no lesson tree, which would print the answer

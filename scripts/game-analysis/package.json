@@ -2,10 +2,11 @@
   "name": "my-chess-game-analysis",
   "private": true,
   "type": "module",
-  "description": "Offline analysis of a Chess.com archive with the Maia model; not part of the app build.",
+  "description": "Offline analysis of a Chess.com archive with the Maia model and Stockfish; not part of the app build.",
   "dependencies": {
     "chess.js": "1.4.0",
     "maia3-js": "0.2.0",
-    "onnxruntime-node": "1.31.1"
+    "onnxruntime-node": "1.31.1",
+    "stockfish": "19.0.1"
   }
 }
