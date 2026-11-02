@@ -260,7 +260,13 @@ Next: the roadmap below.
   pieces on long lines, and "Caro-Kann Exchange" (`lesson-black-caro-exchange`, 4 games), in the
   group on the Caro-Kann bishop; every stated fact is replayed in `tests/unit/curriculum/caro-*.spec.ts`.
   Other gaps that analysis showed, by seed games: 1.e4 e6 (10), 1.e4 g6 (7), 1.e4 Nc6 (5) as White
-  (the French needs a choice of system first: hoot65's own second moves vary), and 2.d3 (3) as Black.
+  (the French needs a choice of system first: hoot65's own second moves vary; against 1...g6 hoot65
+  already scores 5 of 7), and 2.d3 (3) as Black. Against the Two Knights (3...Nf6) the lessons teach
+  4.d3 (a branch of the Evans lesson), but hoot65 played 4.d4 in 10 of 12 seed games (6 points);
+  lessons for 4.d4 exd4 5.O-O are the next content step if the plan keeps 4.d4 as the upgrade. Many
+  exits are hoot65 leaving the plan themselves at move 1 as Black: 1...d6 in 41 of 108 games against
+  1.e4 and 1...Nf6 in 29 of 30 against 1.d4 (the decided repertoire is the Caro-Kann and the c6-d5
+  wall); the Diagnostics divergence list shows them.
 
 ## How to verify before pushing
 
