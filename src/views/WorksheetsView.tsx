@@ -17,6 +17,7 @@ import { ChessPiece } from '../components/ChessPiece';
 import { MistakeSheet } from './MistakeSheet';
 import { TacticsSheet } from './TacticsSheet';
 import { BoardCardSheet } from './PointsCard';
+import { isWorksheetMastered, worksheetCode } from '../curriculum/itemCodes';
 
 const FILES = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'] as const;
 const RANKS = ['8', '7', '6', '5', '4', '3', '2', '1'] as const;
@@ -131,7 +132,8 @@ export const WorksheetBoard: React.FC<{
 export const WorksheetsView: React.FC<{ initialWorksheetId?: string }> = ({ initialWorksheetId }) => {
   // Default to the Scandinavian drill worksheet
   const [selectedWorksheet, setSelectedWorksheet] = useState<PrintableWorksheetData>(() => {
-    return allWorksheets.find((ws) => ws.id === initialWorksheetId) || hoot65ScandiWorksheet || allWorksheets[0];
+    const first = [hoot65ScandiWorksheet, ...allWorksheets].find((ws) => ws && !isWorksheetMastered(ws.id));
+    return allWorksheets.find((ws) => ws.id === initialWorksheetId) || first || allWorksheets[0];
   });
 
   const [filterType, setFilterType] = useState<'all' | 'curriculum_lesson' | 'hoot65_drill'>('all');
@@ -140,7 +142,9 @@ export const WorksheetsView: React.FC<{ initialWorksheetId?: string }> = ({ init
   const [ownSheet, setOwnSheet] = useState<'none' | 'mistakes' | 'tactics' | 'ahead' | 'card'>('none');
   const showMistakes = ownSheet === 'mistakes';
 
+  // The worksheets on the mastered list (src/data/mastered.json) are left out
   const filteredWorksheets = allWorksheets.filter((ws) => {
+    if (isWorksheetMastered(ws.id)) return false;
     if (filterType === 'all') return true;
     return ws.type === filterType;
   });
@@ -319,6 +323,11 @@ export const WorksheetsView: React.FC<{ initialWorksheetId?: string }> = ({ init
                       <h4 className="text-sm font-bold text-white line-clamp-1">
                         {ws.title}
                       </h4>
+                      {worksheetCode(ws.id) && (
+                        <span data-code={worksheetCode(ws.id)} className="inline-block mt-0.5 px-1.5 rounded text-[10px] font-mono font-semibold bg-slate-800 text-slate-300 border border-slate-700">
+                          {worksheetCode(ws.id)}
+                        </span>
+                      )}
                       <p className="text-xs text-slate-400 line-clamp-2 mt-0.5">
                         {ws.subtitle}
                       </p>
@@ -355,7 +364,7 @@ export const WorksheetsView: React.FC<{ initialWorksheetId?: string }> = ({ init
                     : 'Master Chess Curriculum Study Sheet'}
                 </span>
                 <span className="text-xs font-mono font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-800 border border-slate-300">
-                  ECO {selectedWorksheet.eco || 'OPEN'}
+                  {worksheetCode(selectedWorksheet.id) ? `${worksheetCode(selectedWorksheet.id)} · ` : ''}ECO {selectedWorksheet.eco || 'OPEN'}
                 </span>
               </div>
               <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-950 tracking-tight">

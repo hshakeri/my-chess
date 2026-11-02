@@ -1,4 +1,5 @@
 import deckData from '../data/tactics_deck.json';
+import { isTacticMastered } from '../curriculum/itemCodes';
 
 /**
  * The tactics deck (DC-2), Woodpecker style: positions from hoot65's own games right after a blunder,
@@ -50,6 +51,9 @@ export interface TacticPosition {
 }
 
 export const tacticsDeck = deckData as TacticPosition[];
+
+/** The deck less the positions on the mastered list (src/data/mastered.json): what the app practises and prints. */
+export const practiceDeck = tacticsDeck.filter((t) => !isTacticMastered(t.id));
 
 export const TACTICS_STORAGE_KEY = 'my_chess_tactics_v1';
 export const GOOD_MS = 5_000;

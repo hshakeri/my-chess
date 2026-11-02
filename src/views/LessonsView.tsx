@@ -42,8 +42,9 @@ import { SpeedRunPanel, SPEED_MIN_MOVES, speedMoves } from './SpeedRunPanel';
 import { ProgressPanel } from './ProgressPanel';
 import { PlanReviewPanel } from './PlanReviewPanel';
 import { TacticsDeckPanel } from './TacticsDeckPanel';
-import { readTacticSessions, readTacticStates, tacticsDeck, toRedo } from '../services/tacticsDeck';
+import { practiceDeck, readTacticSessions, readTacticStates, toRedo } from '../services/tacticsDeck';
 import { dueIdeas } from '../services/ideaCards';
+import { exerciseCode, exercisesToPractise, isLessonMastered, lessonCode } from '../curriculum/itemCodes';
 import type { SparRequest } from '../services/sparLog';
 import type { HumanElo } from '../types/engine';
 
@@ -186,6 +187,20 @@ const REFUTATION_HOLD_MS = 700;
 const LINE_COMPLETE_HOLD_MS = 1600;
 
 const PATTERN_LIBRARY_ID = 'pattern-library';
+// The lessons and positions on the mastered list (src/data/mastered.json): out of the other lists, kept here
+const MASTERED_ID = 'mastered';
+
+/** An item's code (src/curriculum/itemCodes.ts), the one printed beside it in the book. */
+const CodeTag: React.FC<{ code?: string; className?: string }> = ({ code, className = 'bg-slate-800 text-slate-300 border-slate-700' }) =>
+  code ? (
+    <span data-code={code} title="Its code in the book: on the mastered list, it is left out of the book and the app" className={`px-1.5 py-0.5 rounded text-[10px] font-mono font-semibold border ${className}`}>
+      {code}
+    </span>
+  ) : null;
+
+/** The list a lesson is found in: the mastered ones, the pattern library or the study path. */
+const listOf = (lesson: CurriculumLesson): string =>
+  isLessonMastered(lesson.id) ? MASTERED_ID : lesson.relevance === 'outside-repertoire' ? PATTERN_LIBRARY_ID : 'all';
 
 function cleanSan(san: string): string {
   return san.replace(/[!?+#]/g, '');
@@ -210,16 +225,17 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
   const resolveInitialLesson = (): CurriculumLesson => {
     if (initialLesson) return initialLesson;
     const requested = initialLessonId ? allCurriculumLessons.find((l) => l.id === initialLessonId) : undefined;
-    return requested || scandinavianRefutationDrill || allCurriculumLessons[0];
+    // With the first lesson mastered, the next one of the study path
+    const path = inPatternOrder(allCurriculumLessons.filter((l) => l.relevance !== 'outside-repertoire' && !isGameDrill(l.id)));
+    const first = [scandinavianRefutationDrill, ...path, ...allCurriculumLessons].find((l) => l && !isLessonMastered(l.id));
+    return requested || first || allCurriculumLessons[0];
   };
 
   const [currentLesson, setCurrentLesson] = useState<CurriculumLesson>(resolveInitialLesson);
 
   // Lesson list filter: 'all' (core lessons), a course id, or the pattern library.
   // A hand-off straight into a pattern-library lesson opens that list so the active card is visible.
-  const [selectedFilter, setSelectedFilter] = useState<string>(() =>
-    resolveInitialLesson().relevance === 'outside-repertoire' ? PATTERN_LIBRARY_ID : 'all'
-  );
+  const [selectedFilter, setSelectedFilter] = useState<string>(() => listOf(resolveInitialLesson()));
 
   const [currentPlyIndex, setCurrentPlyIndex] = useState<number>(() => currentLesson.startPly ?? 0);
   const [phase, setPhase] = useState<LessonPhase>('line');
@@ -262,7 +278,7 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
   const [progressOpen, setProgressOpen] = useState(false);
   const [plansOpen, setPlansOpen] = useState(false);
   const [tacticsOpen, setTacticsOpen] = useState(false);
-  const tacticsRedo = useMemo(() => (tacticsOpen ? 0 : toRedo(tacticsDeck, readTacticStates())), [tacticsOpen]);
+  const tacticsRedo = useMemo(() => (tacticsOpen ? 0 : toRedo(practiceDeck, readTacticStates())), [tacticsOpen]);
   // Read again whenever the plan review closes
   const plansDue = useMemo(() => (plansOpen ? 0 : dueIdeas(allCurriculumLessons).length), [plansOpen]);
 
@@ -316,8 +332,11 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
     []
   );
   const isActiveCard = useCallback(
-    // A card counts once studied, when a core lesson owns it, or when it comes from a game review (CL-3)
-    (card: StoredCard) => card.reps > 0 || card.lessonIds.some((id) => coreLessonIds.has(id)) || isGameCard(card),
+    // A card counts once studied, when a core lesson owns it, or when it comes from a game review (CL-3),
+    // unless every lesson it belongs to is mastered
+    (card: StoredCard) =>
+      !(card.lessonIds.length > 0 && card.lessonIds.every(isLessonMastered)) &&
+      (card.reps > 0 || card.lessonIds.some((id) => coreLessonIds.has(id)) || isGameCard(card)),
     [coreLessonIds]
   );
 
@@ -379,7 +398,7 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
   // the line-complete hold, from "Next exercise" and from setupLessonBoard, never from an effect,
   // so switching lessons can never re-enter it with stale phase state.
   const loadExercise = useCallback((lesson: CurriculumLesson, index: number) => {
-    const ex = lesson.exercises[index];
+    const ex = exercisesToPractise(lesson)[index];
     if (!ex) {
       setPhase('complete');
       setCorrectFeedback(null);
@@ -405,7 +424,7 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
   // last annotation and arrows can be read, then the exercise quiz loads (or the lesson completes).
   const finishLine = useCallback(
     (lesson: CurriculumLesson) => {
-      if (lesson.exercises.length === 0) {
+      if (exercisesToPractise(lesson).length === 0) {
         setPhase('complete');
         return;
       }
@@ -494,7 +513,7 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
       runIdRef.current += 1;
       if (startPly >= line.length) {
         // Nothing left to play on the line: straight to the exercises (or complete)
-        if (lesson.exercises.length > 0) loadExercise(lesson, 0);
+        if (exercisesToPractise(lesson).length > 0) loadExercise(lesson, 0);
         else setPhase('complete');
         return;
       }
@@ -516,7 +535,7 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
     [phase, activeLine, currentPlyIndex]
   );
   const currentExercise: CurriculumExercise | undefined =
-    phase === 'exercises' ? currentLesson.exercises[exerciseIndex] : undefined;
+    phase === 'exercises' ? exercisesToPractise(currentLesson)[exerciseIndex] : undefined;
   const isLessonComplete = phase === 'complete';
   const studentColor: 'w' | 'b' = currentLesson.targetColor === 'black' ? 'b' : 'w';
   const isStudentTurn = position.turn === studentColor || currentLesson.targetColor === 'both';
@@ -1008,9 +1027,10 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
   };
 
   const patternLibrary = useMemo(
-    () => allCurriculumLessons.filter((l) => l.relevance === 'outside-repertoire'),
+    () => allCurriculumLessons.filter((l) => l.relevance === 'outside-repertoire' && !isLessonMastered(l.id)),
     []
   );
+  const masteredLessons = useMemo(() => allCurriculumLessons.filter((l) => isLessonMastered(l.id)), []);
 
   // The phone picker lists the core lessons by study-path group, then any core lesson not on the path
   const pathSections = useMemo(() => {
@@ -1018,10 +1038,10 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
     const sections = patternPath.map((g, i) => ({
       id: g.id,
       label: `${i + 1}. ${g.title}`,
-      lessons: g.lessonIds.map((id) => byId.get(id)).filter((l): l is CurriculumLesson => l !== undefined),
+      lessons: g.lessonIds.map((id) => byId.get(id)).filter((l): l is CurriculumLesson => l !== undefined && !isLessonMastered(l.id)),
     }));
     const onPath = new Set(patternPath.flatMap((g) => g.lessonIds));
-    const rest = allCurriculumLessons.filter((l) => l.relevance !== 'outside-repertoire' && !onPath.has(l.id));
+    const rest = allCurriculumLessons.filter((l) => l.relevance !== 'outside-repertoire' && !onPath.has(l.id) && !isLessonMastered(l.id));
     if (rest.length) sections.push({ id: 'other-lessons', label: 'Other lessons', lessons: rest });
     return sections;
   }, []);
@@ -1029,12 +1049,13 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
   const filteredLessons = useMemo(() => {
     if (selectedFilter === 'all') {
       // The study path: lessons grouped by the pattern they repeat (src/curriculum/patternPath.ts)
-      return inPatternOrder(allCurriculumLessons.filter((l) => l.relevance !== 'outside-repertoire'));
+      return inPatternOrder(allCurriculumLessons.filter((l) => l.relevance !== 'outside-repertoire' && !isLessonMastered(l.id)));
     }
     if (selectedFilter === PATTERN_LIBRARY_ID) return patternLibrary;
+    if (selectedFilter === MASTERED_ID) return masteredLessons;
     const course = curriculumCourses.find((c) => c.id === selectedFilter);
-    return course ? course.lessons : [];
-  }, [selectedFilter, patternLibrary]);
+    return course ? course.lessons.filter((l) => !isLessonMastered(l.id)) : [];
+  }, [selectedFilter, patternLibrary, masteredLessons]);
 
   // The list as blocks: each run of positions from one drill set becomes a row of numbered tiles,
   // every other lesson keeps its card
@@ -1053,14 +1074,14 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
   // A drill position knows its set, so a finished position can offer the next one
   const currentDrillSet = drillSetOf(currentLesson.id);
   const drillIndex = currentDrillSet ? currentDrillSet.findIndex((l) => l.id === currentLesson.id) : -1;
-  const nextDrill = currentDrillSet ? currentDrillSet[drillIndex + 1] : undefined;
+  const nextDrill = currentDrillSet ? currentDrillSet.slice(drillIndex + 1).find((l) => !isLessonMastered(l.id)) : undefined;
 
   // Keep the active lesson visible: a review-queue or hand-off lesson that lives outside the
   // current list switches the filter to where it is listed.
   useEffect(() => {
     if (isAdHocLesson) return; // a review card or a drill built on the fly has no card in the list
     if (!filteredLessons.some((l) => l.id === currentLesson.id)) {
-      setSelectedFilter(currentLesson.relevance === 'outside-repertoire' ? PATTERN_LIBRARY_ID : 'all');
+      setSelectedFilter(listOf(currentLesson));
     }
     // Only when the lesson changes; browsing other courses while a lesson is open is allowed.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -1087,7 +1108,7 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
     }
   };
 
-  const coreCount = allCurriculumLessons.length - patternLibrary.length;
+  const coreCount = allCurriculumLessons.length - patternLibrary.length - masteredLessons.length;
   const dueCount = dueCards.length;
   const lessonDueCount = Array.from(lessonCards.values()).filter((c) => c.due <= Date.now()).length;
   const sessionFinished = !!session && session.current === null && session.index >= session.cards.length;
@@ -1365,6 +1386,19 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
               <Library className="w-3.5 h-3.5" />
               Pattern Library ({patternLibrary.length})
             </button>
+            {masteredLessons.length > 0 && (
+              <button
+                type="button"
+                data-course={MASTERED_ID}
+                onClick={() => setSelectedFilter(MASTERED_ID)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors ${
+                  selectedFilter === MASTERED_ID ? 'bg-emerald-600 text-white' : 'bg-slate-900 text-slate-300 hover:bg-slate-800'
+                }`}
+                title="Lessons and positions on the mastered list: left out of the book, the study path and the cards"
+              >
+                Mastered ({masteredLessons.length})
+              </button>
+            )}
           </div>
 
           <div className="flex flex-col gap-2.5 max-h-[720px] overflow-y-auto custom-scrollbar pr-1">
@@ -1399,7 +1433,8 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
                             key={drill.id}
                             type="button"
                             data-lesson-id={drill.id}
-                            title={`${drill.title} (${drill.subtitle})`}
+                            title={`${lessonCode(drill.id) ?? ''} ${drill.title} (${drill.subtitle})`.trim()}
+                            data-code={lessonCode(drill.id)}
                             onClick={() => handleSelectLesson(drill)}
                             className={`relative w-9 h-9 rounded-lg border text-xs font-semibold transition-colors ${
                               isSelected
@@ -1438,6 +1473,7 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-1.5 flex-wrap mb-1">
+                          <CodeTag code={lessonCode(lesson.id)} />
                           {lesson.eco && (
                             <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-semibold bg-slate-800 text-slate-300 border border-slate-700">
                               {lesson.eco}
@@ -1523,6 +1559,15 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
                       </option>
                     ))}
                   </optgroup>
+                  {masteredLessons.length > 0 && (
+                    <optgroup label="Mastered">
+                      {masteredLessons.map((l) => (
+                        <option key={l.id} value={l.id}>
+                          {lessonCode(l.id)} {l.title}
+                        </option>
+                      ))}
+                    </optgroup>
+                  )}
                 </select>
               </label>
           {/* Active Lesson Header */}
@@ -1530,7 +1575,15 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
             <div className="flex items-center justify-between gap-3 flex-wrap">
               <div>
                 <span className="text-[11px] font-semibold text-emerald-400 uppercase tracking-wider">Active Lesson</span>
-                <h3 className="text-base font-bold text-white flex items-center gap-2">{currentLesson.title}</h3>
+                <h3 className="text-base font-bold text-white flex items-center gap-2">
+                  {currentLesson.title}
+                  <CodeTag code={lessonCode(currentLesson.id)} />
+                  {isLessonMastered(currentLesson.id) && (
+                    <span data-mastered="true" className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/10 text-emerald-300 border border-emerald-500/30">
+                      mastered
+                    </span>
+                  )}
+                </h3>
                 <p className="text-xs text-slate-400 mt-0.5">{currentLesson.subtitle}</p>
               </div>
 
@@ -1694,8 +1747,9 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
               <div className="flex items-center justify-between gap-2 mb-1">
                 <div className="font-bold text-indigo-300 text-xs uppercase tracking-wider flex items-center gap-1.5">
                   <Target className="w-4 h-4" />
-                  Exercise {exerciseIndex + 1} of {currentLesson.exercises.length}
+                  Exercise {exerciseIndex + 1} of {exercisesToPractise(currentLesson).length}
                   {currentExercise.title ? `: ${currentExercise.title}` : ''}
+                  <CodeTag code={exerciseCode(currentExercise.id)} className="bg-indigo-900/60 text-indigo-200 border-indigo-500/40 normal-case tracking-normal" />
                 </div>
                 <span className="text-[11px] text-indigo-300/80">{sideName(position.turn)} to move</span>
               </div>
@@ -1707,7 +1761,7 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
                   onClick={handleNextExercise}
                   className="mt-3 px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold"
                 >
-                  {exerciseIndex + 1 < currentLesson.exercises.length ? 'Next exercise' : 'Finish lesson'}
+                  {exerciseIndex + 1 < exercisesToPractise(currentLesson).length ? 'Next exercise' : 'Finish lesson'}
                 </button>
               )}
             </div>

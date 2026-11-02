@@ -17,13 +17,14 @@ import {
   readTacticSessions,
   readTacticStates,
   recordSolve,
-  tacticsDeck,
+  practiceDeck,
   type TacticGrade,
   type TacticPosition,
   type TacticSession,
   type TacticState,
 } from '../services/tacticsDeck';
 import type { SparRequest } from '../services/sparLog';
+import { tacticCode } from '../curriculum/itemCodes';
 import type { Square } from '../types/chess';
 
 const seconds = (ms: number) => `${(ms / 1000).toFixed(1)} s`;
@@ -47,7 +48,7 @@ function context(t: TacticPosition): string {
 
 export const TacticsDeckPanel: React.FC<{ onClose: () => void; deck?: TacticPosition[]; onSpar?: (request: SparRequest) => void }> = ({
   onClose,
-  deck = tacticsDeck,
+  deck = practiceDeck,
   onSpar,
 }) => {
   const [states, setStates] = useState<Record<string, TacticState>>(() => readTacticStates());
@@ -230,6 +231,11 @@ export const TacticsDeckPanel: React.FC<{ onClose: () => void; deck?: TacticPosi
                 <div className="flex justify-between text-xs text-slate-400">
                   <span>
                     Position {index + 1} of {session.length}
+                    {tacticCode(current.id) && (
+                      <span data-code={tacticCode(current.id)} className="ml-2 px-1.5 py-0.5 rounded font-mono text-[10px] font-semibold bg-slate-800 text-slate-300 border border-slate-700">
+                        {tacticCode(current.id)}
+                      </span>
+                    )}
                   </span>
                   {phase === 'solving' && <span className={`font-mono ${elapsed > GOOD_MS ? 'text-amber-300' : 'text-emerald-300'}`}>{seconds(elapsed)}</span>}
                 </div>

@@ -1,9 +1,20 @@
 import React, { useMemo } from 'react';
 import { WorksheetBoard } from './WorksheetsView';
-import { MOTIF_LABEL, isControl, numberLine, pickSession, readTacticStates, tacticsDeck, type TacticPosition } from '../services/tacticsDeck';
+import { MOTIF_LABEL, isControl, numberLine, pickSession, practiceDeck, readTacticStates, type TacticPosition } from '../services/tacticsDeck';
+import { tacticCode } from '../curriculum/itemCodes';
 
 /** Positions on one sheet; the answers fill the back. */
 export const SHEET_TACTICS = 12;
+
+/** A tactic's code, as in the book: on the mastered list, the position leaves the deck and the sheets. */
+const Code: React.FC<{ id: string }> = ({ id }) => {
+  const code = tacticCode(id);
+  return code ? (
+    <span data-code={code} className="px-1 rounded border border-slate-400 font-mono text-[10px] font-semibold">
+      {code}
+    </span>
+  ) : null;
+};
 
 const toMove = (t: TacticPosition) => (t.fen.split(' ')[1] === 'b' ? 'Black' : 'White');
 
@@ -16,7 +27,7 @@ const toMove = (t: TacticPosition) => (t.fen.split(' ')[1] === 'b' ? 'Black' : '
  * `ahead`: the visualization format (DC-4): each diagram is the position two plies earlier, with the
  * two moves that were played, and the win is to be found in the position after them (tactics only).
  */
-export const TacticsSheet: React.FC<{ deck?: TacticPosition[]; ahead?: boolean }> = ({ deck = tacticsDeck, ahead = false }) => {
+export const TacticsSheet: React.FC<{ deck?: TacticPosition[]; ahead?: boolean }> = ({ deck = practiceDeck, ahead = false }) => {
   const items = useMemo(
     () => pickSession(ahead ? deck.filter((t) => t.before && !isControl(t)) : deck, readTacticStates(), SHEET_TACTICS),
     [deck, ahead]
@@ -59,11 +70,11 @@ export const TacticsSheet: React.FC<{ deck?: TacticPosition[]; ahead?: boolean }
             <figcaption className="text-xs text-slate-800 mt-1">
               {ahead && t.before ? (
                 <>
-                  <b>{k + 1}.</b> After {numberLine(t.before.fen, t.before.moves)}, {toMove(t)} to play and win. ________
+                  <b>{k + 1}.</b> <Code id={t.id} /> After {numberLine(t.before.fen, t.before.moves)}, {toMove(t)} to play and win. ________
                 </>
               ) : (
                 <>
-                  <b>{k + 1}.</b> {toMove(t)} to play, after {t.lastMove.san}. ________
+                  <b>{k + 1}.</b> <Code id={t.id} /> {toMove(t)} to play, after {t.lastMove.san}. ________
                 </>
               )}
             </figcaption>

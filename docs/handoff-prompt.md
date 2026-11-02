@@ -163,6 +163,19 @@ Compromised Defence plays 9.Bg5; the Konikowski 9.Bf4 and the Elephant 7.Nxf6+ a
   piece set (`public/pieces`); the fonts are Times New Roman and Arial, whose metric twins Liberation
   Serif and Sans the Linux runner has, so pages break the same way there. All text is black and dark
   squares are a light grey.
+- Mastery codes (2026-11-02, asked for by hoot65): every lesson (L), exercise (E), position from
+  the games (G), tactic (T) and worksheet (W) has a code, given once by `npm run codes` and kept in
+  `src/data/item_codes.json`. Codes are never renumbered or reused, so the code on an old printout
+  still names the same item. The book prints it beside every chapter (and in the contents), practice,
+  exercise, drill position and tactic; the app shows it on lesson cards and the lesson header,
+  exercises, drill tiles (tooltip), tactics and worksheets. When hoot65 says they have mastered
+  something, `npm run codes -- master L12 T40` puts the codes on `src/data/mastered.json` with the
+  date, and the book and the app leave those items out: a lesson goes with its practice and its
+  exercises, a drill sheet and the tactics sheets take the next positions, a mastered lesson's cards
+  leave the sessions, and the Lessons tab keeps mastered lessons under "Mastered". Publishing
+  rebuilds the deployed book and app. `npm run codes -- restore L12` undoes it and `npm run codes --
+  list` prints every code. A new lesson, exercise or tactic fails
+  `tests/unit/curriculum/item-codes.spec.ts` until `npm run codes` gives it a code.
 Next: the roadmap below.
 
 ## Roadmap items not yet built (see `docs/pedagogy-audit.md` Section 7)
