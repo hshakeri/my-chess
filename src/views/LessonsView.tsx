@@ -1108,7 +1108,7 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
       {warmupOpen && <WarmupPanel onClose={() => setWarmupOpen(false)} />}
       {speedOpen && <SpeedRunPanel lesson={currentLesson} onClose={() => setSpeedOpen(false)} />}
       {plansOpen && <PlanReviewPanel onClose={() => setPlansOpen(false)} />}
-      {tacticsOpen && <TacticsDeckPanel onClose={() => setTacticsOpen(false)} />}
+      {tacticsOpen && <TacticsDeckPanel onClose={() => setTacticsOpen(false)} onSpar={onSpar} />}
       {progressOpen && (
         <ProgressPanel
           onClose={() => setProgressOpen(false)}

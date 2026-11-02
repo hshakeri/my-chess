@@ -352,7 +352,13 @@ test.describe('05. Interactive Lessons, Feedback Loops & Spaced Repetition (F16 
     await modal.locator(`[data-square="${wrong.to}"]`).click();
     await expect(result).toHaveAttribute('data-tactic-result', 'again');
     await expect(result).toContainText(`The move is ${second.solution}.`);
-    await modal.locator('button[data-action="tactics-close"]').click();
+    if (second.motif !== 'mate-in-one') {
+      // The won position can be played out against Maia, from after the winning move
+      await modal.locator('button[data-action="tactics-spar"]').click();
+      await expect(page.locator('[data-section="spar"]')).toContainText('win it from here');
+    } else {
+      await modal.locator('button[data-action="tactics-close"]').click();
+    }
     await expect(modal).toHaveCount(0);
     const states = await page.evaluate(() => JSON.parse(window.localStorage.getItem('my_chess_tactics_v1') ?? '{}'));
     expect(Object.keys(states).sort()).toEqual([first.id, second.id].sort());

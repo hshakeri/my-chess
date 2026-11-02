@@ -21,6 +21,7 @@ import {
   type TacticSession,
   type TacticState,
 } from '../services/tacticsDeck';
+import type { SparRequest } from '../services/sparLog';
 import type { Square } from '../types/chess';
 
 const seconds = (ms: number) => `${(ms / 1000).toFixed(1)} s`;
@@ -42,7 +43,11 @@ function context(t: TacticPosition): string {
   return `From your game of ${t.date}, seen from your opponent's side: you had just played ${t.lastMove.san}. ${found ? 'Your opponent found it.' : `Your opponent played ${t.played}.`}`;
 }
 
-export const TacticsDeckPanel: React.FC<{ onClose: () => void; deck?: TacticPosition[] }> = ({ onClose, deck = tacticsDeck }) => {
+export const TacticsDeckPanel: React.FC<{ onClose: () => void; deck?: TacticPosition[]; onSpar?: (request: SparRequest) => void }> = ({
+  onClose,
+  deck = tacticsDeck,
+  onSpar,
+}) => {
   const [states, setStates] = useState<Record<string, TacticState>>(() => readTacticStates());
   const [session, setSession] = useState<TacticPosition[]>([]);
   const [index, setIndex] = useState(0);
@@ -210,14 +215,38 @@ export const TacticsDeckPanel: React.FC<{ onClose: () => void; deck?: TacticPosi
                       {MOTIF_LABEL[current.motif]}. Stockfish's line: <span className="font-mono">{numberLine(current.fen, current.line)}</span>
                     </p>
                     <p className="text-xs text-slate-400">{context(current)}</p>
-                    <button
-                      type="button"
-                      data-action="tactics-next"
-                      onClick={next}
-                      className="px-3 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-500 text-white font-medium"
-                    >
-                      {index + 1 >= session.length ? 'Finish' : 'Next'}
-                    </button>
+                    <div className="flex flex-wrap gap-2">
+                      <button
+                        type="button"
+                        data-action="tactics-next"
+                        onClick={next}
+                        className="px-3 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-500 text-white font-medium"
+                      >
+                        {index + 1 >= session.length ? 'Finish' : 'Next'}
+                      </button>
+                      {/* After a mate in one there is nothing left to play */}
+                      {onSpar && current.motif !== 'mate-in-one' && (
+                        <button
+                          type="button"
+                          data-action="tactics-spar"
+                          onClick={() =>
+                            onSpar({
+                              lessonId: `review:tactic-${current.id}`,
+                              title: `Your game of ${current.date}: win it from here`,
+                              initialFen: current.fen,
+                              movesSan: [current.solution],
+                              studentColor: current.fen.split(' ')[1] === 'b' ? 'b' : 'w',
+                              elo: 1100,
+                              milestones: [],
+                            })
+                          }
+                          className="px-3 py-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-white font-medium"
+                          title="Play the won position on against Maia: keep the lead and finish the game"
+                        >
+                          Play it out vs Maia
+                        </button>
+                      )}
+                    </div>
                   </div>
                 )}
               </div>

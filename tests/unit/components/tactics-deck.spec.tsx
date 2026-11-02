@@ -114,6 +114,23 @@ describe('Tactics deck (DC-2)', () => {
     expect(view.container.querySelector('[data-section="tactics-sessions"]')?.textContent).toContain('1 Good, 0 Hard, 1 Again');
   });
 
+  it('plays a solved position on against Maia from after the winning move, but not after a mate in one', () => {
+    const requests: Array<{ initialFen: string; movesSan: string[]; studentColor: string; lessonId: string }> = [];
+    // White wins the rook on d8 with check; the king takes back, and the game goes on a rook up
+    const free = tactic('free', 'free-piece', { fen: '3rk3/5ppp/8/8/8/8/5PPP/3R2K1 w - - 0 30', solution: 'Rxd8+', accepted: ['Rxd8+'], line: ['Rxd8+', 'Kxd8'] });
+    const view = render(<TacticsDeckPanel deck={[free, tactic('m', 'mate-in-one')]} onClose={() => undefined} onSpar={(r) => requests.push(r)} />);
+    fireEvent.click(view.container.querySelector('[data-action="tactics-start"]')!);
+    expect(view.container.querySelector('[data-tactic]')?.getAttribute('data-tactic')).toBe('free');
+    play(free.fen, 'Rxd8+');
+    fireEvent.click(view.container.querySelector('[data-action="tactics-spar"]')!);
+    expect(requests).toEqual([expect.objectContaining({ lessonId: 'review:tactic-free', initialFen: free.fen, movesSan: ['Rxd8+'], studentColor: 'w' })]);
+    // The mate in one: nothing to play out
+    fireEvent.click(view.container.querySelector('[data-action="tactics-next"]')!);
+    play(tactic('m', 'mate-in-one').fen, 'Rd8#');
+    expect(view.container.querySelector('[data-tactic-result]')?.getAttribute('data-correct')).toBe('true');
+    expect(view.container.querySelector('[data-action="tactics-spar"]')).toBeNull();
+  });
+
   it('sums up the deck for the Progress panel: seen, retired, to redo, and the solve time then and now', () => {
     const deck = [tactic('a', 'fork'), tactic('b', 'fork'), tactic('c', 'mate')];
     const states = { a: { tries: 3, streak: 3, grade: 'good' as const, at: 3 }, b: { tries: 1, streak: 0, grade: 'again' as const, at: 2 } };
