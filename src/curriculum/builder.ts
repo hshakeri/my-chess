@@ -5,6 +5,7 @@ import {
   CurriculumExercise,
   CurriculumMistakeTrap,
   MoveAcceptance,
+  PlanMilestone,
 } from '../types/curriculum';
 
 const START_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
@@ -78,6 +79,8 @@ export interface LessonConfig {
   startPly?: number;
   relevance?: 'core' | 'outside-repertoire';
   moves: MoveInput[];
+  /** Plan goals checked when the lesson's position is played on against Maia (CL-6). */
+  planMilestones?: PlanMilestone[];
   exercises: ExerciseInput[];
   mistakesAndTraps?: MistakeTrapInput[];
 }
@@ -459,6 +462,7 @@ export function buildVerifiedLesson(config: LessonConfig): CurriculumLesson {
     moves: verifiedMoves,
     exercises: verifiedExercises,
     commonMistakesAndTraps: verifiedMistakes,
+    ...(config.planMilestones ? { planMilestones: config.planMilestones } : {}),
   };
 }
 

@@ -3,7 +3,8 @@ import { db } from '../db/database';
 import { CardService } from '../services/cards';
 import { cardSpecsFromReview, moveLabel, reviewGame, type ReviewInput } from '../analytics/review';
 import { MISTAKE_CHECK, MISTAKE_LABEL } from '../analytics/errorTaxonomy';
-import type { EngineClient, ReviewProgress } from '../engine/worker/engineClient';
+import type { ReviewProgress } from '../engine/worker/engineClient';
+import { useEngineClient } from '../engine/EngineContext';
 import type { StoredGame } from '../types/db';
 import type { CriticalMoment, GameReview, StudentMark } from '../types/review';
 
@@ -15,7 +16,6 @@ interface GameReviewPanelProps {
   /** The position on the replay board: the number of moves played to reach it. */
   currentPly: number;
   onShowPly: (ply: number) => void;
-  getEngineClient?: () => EngineClient | null;
 }
 
 type Phase = 'loading' | 'idle' | 'marking' | 'revealed';
@@ -36,7 +36,9 @@ const stageText: Record<ReviewProgress['stage'], string> = {
  * critical moments are shown beside the marks, and every mistake with a material answer becomes a
  * review card for Today's session.
  */
-export const GameReviewPanel: React.FC<GameReviewPanelProps> = ({ game, currentPly, onShowPly, getEngineClient }) => {
+export const GameReviewPanel: React.FC<GameReviewPanelProps> = ({ game, currentPly, onShowPly }) => {
+  // The app's one engine worker, so a review does not load the Maia model a second time
+  const engineClient = useEngineClient();
   const userColor: 'white' | 'black' = game.userColor === 'black' ? 'black' : 'white';
   const opponent = userColor === 'white' ? game.black.name : game.white.name;
   const isUserMove = (moveIndex: number) => (moveIndex % 2 === 0) === (userColor === 'white');
@@ -88,7 +90,7 @@ export const GameReviewPanel: React.FC<GameReviewPanelProps> = ({ game, currentP
       blackRating: game.black.rating,
       pgn: game.pgn,
     };
-    const client = getEngineClient?.() ?? null;
+    const client = engineClient;
     let run: Run;
     if (client) {
       run = client.reviewGame(input, setProgress);
@@ -116,7 +118,7 @@ export const GameReviewPanel: React.FC<GameReviewPanelProps> = ({ game, currentP
         setRevealWanted(false);
         setError(err?.message || 'The review failed.');
       });
-  }, [game, userColor, getEngineClient]);
+  }, [game, userColor, engineClient]);
 
   const beginReview = () => {
     setMarks([]);

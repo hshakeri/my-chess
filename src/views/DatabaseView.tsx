@@ -26,17 +26,11 @@ import { syncPlayerGames, type SyncProgress } from '../services/chesscom';
 import type { StoredGame, GameFilter } from '../types/db';
 import { ChessPiece } from '../components/ChessPiece';
 import { GameReviewPanel } from './GameReviewPanel';
-import type { EngineClient } from '../engine/worker/engineClient';
 import seedGamesRaw from '../data/seed_hoot65_games.json';
 
 const seedGames = seedGamesRaw as unknown as StoredGame[];
 
-interface DatabaseViewProps {
-  /** The app's engine worker, shared so a game review does not load the Maia model a second time. */
-  getEngineClient?: () => EngineClient | null;
-}
-
-export const DatabaseView: React.FC<DatabaseViewProps> = ({ getEngineClient }) => {
+export const DatabaseView: React.FC = () => {
   const [games, setGames] = useState<StoredGame[]>([]);
   const [loading, setLoading] = useState(true);
   const [totalDbCount, setTotalDbCount] = useState(0);
@@ -717,7 +711,6 @@ export const DatabaseView: React.FC<DatabaseViewProps> = ({ getEngineClient }) =
         <GameReplayModal
           game={selectedGame}
           onClose={() => setSelectedGame(null)}
-          getEngineClient={getEngineClient}
         />
       )}
 
@@ -771,10 +764,9 @@ export const DatabaseView: React.FC<DatabaseViewProps> = ({ getEngineClient }) =
 interface GameReplayModalProps {
   game: StoredGame;
   onClose: () => void;
-  getEngineClient?: () => EngineClient | null;
 }
 
-const GameReplayModal: React.FC<GameReplayModalProps> = ({ game, onClose, getEngineClient }) => {
+const GameReplayModal: React.FC<GameReplayModalProps> = ({ game, onClose }) => {
   const [currentPly, setCurrentPly] = useState(0);
   const [orientation, setOrientation] = useState<'white' | 'black'>(
     game.userColor === 'black' ? 'black' : 'white'
@@ -1097,7 +1089,7 @@ const GameReplayModal: React.FC<GameReplayModalProps> = ({ game, onClose, getEng
           </div>
 
           {/* Post-game review (CL-3) */}
-          <GameReviewPanel game={game} currentPly={currentPly} onShowPly={setCurrentPly} getEngineClient={getEngineClient} />
+          <GameReviewPanel game={game} currentPly={currentPly} onShowPly={setCurrentPly} />
         </div>
       </div>
     </div>

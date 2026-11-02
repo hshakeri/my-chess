@@ -320,6 +320,71 @@ test.describe('05. Interactive Lessons, Feedback Loops & Spaced Repetition (F16 
     await modal.locator('button[data-action="warmup-close"]').click();
     await expect(modal).toHaveCount(0);
   });
+
+  test('Spar: the finished Scandinavian line is played on against Maia, with the plan goals and a review (CL-6)', async ({ page }) => {
+    test.setTimeout(150_000);
+    await page.locator('[data-lesson-id="lesson-scandinavian-refutation-drill"]').click();
+    // The lesson's main line after 1.e4 d5 (its unit tests replay it); Black's replies are played by the lesson
+    const line = ['exd5', 'Qxd5', 'Nc3', 'Qa5', 'd4', 'Nf6', 'Nf3', 'c6', 'Bc4', 'Bf5', 'Bd2', 'e6', 'Nd5', 'Qd8', 'Nxf6+', 'Qxf6', 'Qe2'];
+    const mirror = new Chess();
+    mirror.move('e4');
+    mirror.move('d5');
+    for (const san of line) {
+      const move = mirror.move(san);
+      if (move.color === 'w') {
+        await page.locator(`[data-square="${move.from}"]`).click();
+        await page.locator(`[data-square="${move.to}"]`).click();
+      }
+      await expect(page.locator(`[data-square="${move.to}"] img[alt="${move.color === 'w' ? 'White' : 'Black'} ${move.piece}"]`)).toBeVisible({ timeout: 5000 });
+    }
+
+    // The line is done: play its last position on against Maia 1100
+    await page.locator('button[data-action="spar"][data-elo="1100"]').click();
+    await expect(page.locator('[data-square="e2"] img[alt="White q"]')).toBeVisible();
+    const panel = page.locator('[data-section="spar"]');
+    await expect(panel).toContainText('Weakness Drill: Meeting the Scandinavian Defense');
+    await expect(panel.locator('[data-milestone="Castle"]')).toHaveAttribute('data-status', 'missed');
+    await expect(panel.locator('[data-milestone="Bring out every knight and bishop"]')).toHaveAttribute('data-status', 'already');
+    // Maia answers 10.Qe2 (the game so far is 19 plies)
+    await expect(page.locator('button[data-ply="20"]').first()).toBeVisible({ timeout: 30000 });
+
+    // One move of White's, chosen from the board: a legal quiet move
+    const placement = await page.evaluate(() => {
+      const rows: string[] = [];
+      for (let r = 8; r >= 1; r--) {
+        let row = '';
+        let empty = 0;
+        for (const f of 'abcdefgh') {
+          const piece = document.querySelector(`[data-square="${f}${r}"]`)?.getAttribute('data-piece');
+          if (!piece) {
+            empty++;
+            continue;
+          }
+          if (empty) row += String(empty);
+          empty = 0;
+          row += piece[0] === 'w' ? piece[1].toUpperCase() : piece[1];
+        }
+        rows.push(row + (empty ? String(empty) : ''));
+      }
+      return rows.join('/');
+    });
+    const position = new Chess(`${placement} w - - 0 11`);
+    const quiet = position.moves({ verbose: true }).filter((m) => !m.captured && m.piece !== 'k');
+    const pick = quiet.find((m) => m.piece === 'p') ?? quiet[0];
+    await page.locator(`[data-square="${pick.from}"]`).click();
+    await page.locator(`[data-square="${pick.to}"]`).click();
+    await expect(panel).toHaveAttribute('data-spar-moves', '1');
+    await expect(page.locator('button[data-ply="22"]').first()).toBeVisible({ timeout: 30000 });
+
+    // The review: the goals and the moves that cost expected score
+    await panel.locator('button[data-action="spar-review"]').click();
+    await expect(panel.locator('[data-section="spar-review"]')).toBeVisible({ timeout: 60000 });
+    await expect(panel.locator('[data-milestone="Castle"]')).toHaveAttribute('data-status', /met|missed/);
+    const log = await page.evaluate(() => JSON.parse(window.localStorage.getItem('my_chess_spar_log_v1') || '[]'));
+    expect(log).toHaveLength(1);
+    expect(log[0]).toMatchObject({ lessonId: 'lesson-scandinavian-refutation-drill', elo: 1100, studentColor: 'w' });
+    expect(log[0].moves).toHaveLength(3);
+  });
 });
 
 test.describe('05b. Lessons on a phone (iPhone viewport)', () => {

@@ -37,6 +37,8 @@ import { questionBeforeDecision, type MicroQuestion } from '../services/microQue
 import { logCct, readGateEnabled, writeGateEnabled } from '../services/cctLog';
 import { BoardQuestion, isRight, questionSquareStyles, type QuestionAnswer, type QuestionStatus } from '../components/BoardQuestion';
 import { WarmupPanel } from './WarmupPanel';
+import type { SparRequest } from '../services/sparLog';
+import type { HumanElo } from '../types/engine';
 
 type LessonPhase = 'line' | 'exercises' | 'complete';
 
@@ -51,6 +53,8 @@ interface LessonsViewProps {
   initialLessonId?: string;
   /** A lesson built on the fly (a repertoire line or a deviation drill) to open first. */
   initialLesson?: CurriculumLesson;
+  /** Play the lesson's last position on against Maia on the Play tab (CL-6). */
+  onSpar?: (request: SparRequest) => void;
 }
 
 /** One scheduled decision of the current run, for the review log under the board. */
@@ -191,7 +195,7 @@ function sideName(turn: 'w' | 'b'): string {
   return turn === 'w' ? 'White' : 'Black';
 }
 
-export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initialLesson }) => {
+export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initialLesson, onSpar }) => {
   const resolveInitialLesson = (): CurriculumLesson => {
     if (initialLesson) return initialLesson;
     const requested = initialLessonId ? allCurriculumLessons.find((l) => l.id === initialLessonId) : undefined;
@@ -1423,6 +1427,35 @@ export const LessonsView: React.FC<LessonsViewProps> = ({ initialLessonId, initi
               )}
             </div>
           </div>
+
+            {/* Once the line is played: play its last position on against Maia (CL-6) */}
+            {onSpar && phase !== 'line' && activeLine.length > 0 && (
+              <div className="bg-sky-950/30 border border-sky-500/40 rounded-xl p-3 flex flex-wrap items-center gap-2 text-xs text-sky-100" data-section="spar-offer">
+                <span className="mr-1">Play on from the line's last position against Maia, without the opening book:</span>
+                {([1100, 1300] as HumanElo[]).map((elo) => (
+                  <button
+                    key={elo}
+                    type="button"
+                    data-action="spar"
+                    data-elo={elo}
+                    onClick={() =>
+                      onSpar({
+                        lessonId: currentLesson.id,
+                        title: currentLesson.title,
+                        initialFen: currentLesson.initialFen,
+                        movesSan: activeLine.map((m) => m.san),
+                        studentColor,
+                        elo,
+                        milestones: currentLesson.planMilestones ?? [],
+                      })
+                    }
+                    className="px-2.5 py-1 rounded-md border border-sky-500/50 hover:bg-sky-900/60 font-semibold"
+                  >
+                    vs Maia {elo}
+                  </button>
+                ))}
+              </div>
+            )}
 
             {/* Toolbar */}
             <div className="bg-slate-900 border border-slate-800 rounded-xl p-3 flex flex-wrap items-center justify-between gap-3">

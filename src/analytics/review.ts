@@ -35,6 +35,8 @@ export interface ReviewInput {
   blackRating?: number;
   /** The game's PGN, for the clock times ([%clk]) and the time control. */
   pgn?: string;
+  /** The position the moves start from (a spar from a lesson); the standard start when absent. */
+  initialFen?: string;
 }
 
 /** One position for Maia: the position, up to seven positions before it, and the two ratings. */
@@ -93,6 +95,24 @@ export function moveLabel(ply: number, san: string): string {
   return ply % 2 === 0 ? `${no}.${san}` : `${no}...${san}`;
 }
 
+/** "23...Qxb2" for `san` played in the position `fen` (its move number and side to move). */
+export function labelAt(fen: string, san: string): string {
+  const [, turn, , , , fullmove] = fen.split(' ');
+  return turn === 'w' ? `${fullmove}.${san}` : `${fullmove}...${san}`;
+}
+
+/** The label of the reply to a move played in `fenBefore`: "24.Bxa1" after a move of Black's on move 23. */
+export function replyLabel(fenBefore: string, san: string): string {
+  const [, turn, , , , fullmove] = fenBefore.split(' ');
+  return turn === 'w' ? `${fullmove}...${san}` : `${Number(fullmove) + 1}.${san}`;
+}
+
+/** The game ply of the position `fen` counted from the standard start (0 before White's first move). */
+function absolutePly(fen: string): number {
+  const [, turn, , , , fullmove] = fen.split(' ');
+  return (Number(fullmove) - 1) * 2 + (turn === 'b' ? 1 : 0);
+}
+
 export async function reviewGame(input: ReviewInput, scorer: PositionScorer | null, opts: ReviewOptions = {}): Promise<GameReview> {
   const stop = () => {
     if (opts.isCancelled?.()) throw new ReviewCancelled();
@@ -101,10 +121,11 @@ export async function reviewGame(input: ReviewInput, scorer: PositionScorer | nu
   const opponent: 'w' | 'b' = user === 'w' ? 'b' : 'w';
 
   // The position before every ply, and after the last
-  const chess = new Chess();
+  const chess = new Chess(input.initialFen);
   const fens = [chess.fen()];
   const sans: string[] = [];
   const ucis: string[] = [];
+  const movers: Array<'w' | 'b'> = [];
   for (const san of input.movesSan) {
     let move;
     try {
@@ -114,9 +135,10 @@ export async function reviewGame(input: ReviewInput, scorer: PositionScorer | nu
     }
     sans.push(move.san);
     ucis.push(`${move.from}${move.to}${move.promotion ?? ''}`);
+    movers.push(move.color);
     fens.push(chess.fen());
   }
-  const userPlies = sans.map((_, i) => i).filter((i) => (i % 2 === 0 ? 'w' : 'b') === user);
+  const userPlies = sans.map((_, i) => i).filter((i) => movers[i] === user);
 
   // Clocks: only when every move has one
   const clocks = clocksFromPgn(input.pgn);
@@ -133,7 +155,7 @@ export async function reviewGame(input: ReviewInput, scorer: PositionScorer | nu
   if (scorer) {
     const rating = (c: 'w' | 'b') => (c === 'w' ? input.whiteRating : input.blackRating) || DEFAULT_RATING;
     const requests = fens.map((fen, i) => {
-      const turn: 'w' | 'b' = i % 2 === 0 ? 'w' : 'b';
+      const turn = fen.split(' ')[1] as 'w' | 'b';
       return {
         fen,
         priorFens: fens.slice(Math.max(0, i - 7), i),
@@ -189,14 +211,14 @@ export async function reviewGame(input: ReviewInput, scorer: PositionScorer | nu
     const after = expected(i + 1);
     moments.push({
       ply: i,
-      label: moveLabel(i, sans[i]),
+      label: labelAt(fens[i], sans[i]),
       fenBefore: fens[i],
       played: sans[i],
       ...(before !== undefined && after !== undefined && engine === 'maia' ? { expectedBefore: before, expectedAfter: after } : {}),
       ...(policy ? { playedShare: policy.get(ucis[i]) ?? 0, maiaBest } : {}),
       ...classification,
       ...clockAt(i),
-      phase: phaseOf(i),
+      phase: phaseOf(absolutePly(fens[i])),
     });
   }
   opts.onProgress?.('classifying', candidates.length, candidates.length);

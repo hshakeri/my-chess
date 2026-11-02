@@ -28,6 +28,11 @@ import { getRepertoireById } from './analytics/repertoire';
 import { lessonFromDeviation, lessonFromRepertoireLine } from './curriculum/factories';
 import { REPERTOIRE_LINE_TO_LESSON } from './curriculum/repertoireLessons';
 import seedGamesRaw from './data/seed_hoot65_games.json';
+import { EngineContext } from './engine/EngineContext';
+import { SparPanel, type SparReview } from './components/SparPanel';
+import { DEFAULT_MILESTONES, evaluateMilestones } from './analytics/planMilestones';
+import { logSpar, type SparRequest } from './services/sparLog';
+import type { ReviewProgress } from './engine/worker/engineClient';
 
 const seedGames = seedGamesRaw as unknown as StoredGame[];
 
@@ -143,6 +148,13 @@ export const App: React.FC = () => {
   // Rules Engine instance (ref preserved across re-renders)
   const rulesRef = useRef<RulesEngine>(new RulesEngine());
   const engineClientRef = useRef<EngineClient | null>(null);
+  // The same client for every tab through the engine context (state, so consumers see it once started)
+  const [engineClient, setEngineClient] = useState<EngineClient | null>(null);
+
+  // A spar: a lesson's position played on against Maia, with plan goals and a review (CL-6)
+  const [spar, setSpar] = useState<{ request: SparRequest; startFen: string; startPly: number } | null>(null);
+  const [sparReview, setSparReview] = useState<SparReview | null>(null);
+  const [sparProgress, setSparProgress] = useState<string | null>(null);
 
   // Board state
   const [position, setPosition] = useState<ChessPosition>(() => rulesRef.current.getPosition());
@@ -171,6 +183,7 @@ export const App: React.FC = () => {
   useEffect(() => {
     const client = new EngineClient();
     engineClientRef.current = client;
+    setEngineClient(client);
 
     const unsubscribe = client.onStatusChange((loaded) => {
       setModelLoaded(loaded);
@@ -233,6 +246,8 @@ export const App: React.FC = () => {
         elo,
         moveHistorySan,
         priorMoves,
+        // A spar meets the lesson's sidelines as Maia plays them, not the book's main line
+        ...(spar ? { options: { enableOpeningBook: false, thinkingTimeMs: 300 } } : {}),
       });
 
       if (response && response.bestMoveSan) {
@@ -253,7 +268,7 @@ export const App: React.FC = () => {
     } finally {
       setIsThinking(false);
     }
-  }, [elo, isThinking]);
+  }, [elo, isThinking, spar]);
 
   // Trigger engine move when it's engine's turn and at the live position
   useEffect(() => {
@@ -367,9 +382,99 @@ export const App: React.FC = () => {
     URL.revokeObjectURL(url);
   };
 
+  // ---- Spar from a lesson (CL-6) -----------------------------------------------------------------
+
+  const START_POSITION = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
+
+  /** Set the Play tab to the lesson's position and let Maia take the other side. */
+  const startSpar = useCallback(
+    (request: SparRequest) => {
+      // From the standard start the moves are replayed, so Maia sees the game so far; from any other
+      // start it gets the position alone (its move history is read from the standard start)
+      let rules: RulesEngine;
+      if (request.initialFen === START_POSITION) {
+        rules = new RulesEngine();
+        for (const san of request.movesSan) rules.makeMove(san);
+      } else {
+        const reached = new RulesEngine(request.initialFen);
+        for (const san of request.movesSan) reached.makeMove(san);
+        rules = new RulesEngine(reached.getFen());
+      }
+      rulesRef.current = rules;
+      const hist = rules.getHistory();
+      setHistory(hist);
+      setCurrentPly(hist.length);
+      setPosition(rules.getPosition());
+      setTierUsed(undefined);
+      setCentipawns(undefined);
+      setElo(request.elo);
+      setEngineColor(request.studentColor === 'w' ? 'b' : 'w');
+      setSpar({ request, startFen: rules.getFen(), startPly: hist.length });
+      setSparReview(null);
+      setSparProgress(null);
+      setActiveTab('play');
+    },
+    [setEngineColor]
+  );
+
+  const sparMoves = spar ? history.slice(spar.startPly).map((m) => m.san) : [];
+
+  /** The plan goals reached, and the CL-3 review of the spar's moves. */
+  const reviewSpar = useCallback(async () => {
+    if (!spar) return;
+    const { request, startFen } = spar;
+    const moves = history.slice(spar.startPly).map((m) => m.san);
+    const milestones = evaluateMilestones(startFen, moves, request.studentColor, [...DEFAULT_MILESTONES, ...request.milestones]);
+    setSparProgress('Reviewing your moves…');
+    let moments: SparReview['moments'] = [];
+    let engine: SparReview['engine'] = 'material';
+    const client = engineClientRef.current;
+    if (client) {
+      // The student's Chess.com rating, and Maia's own Elo (the review adds 400 to Chess.com ratings)
+      const student = 1150;
+      const maia = request.elo - 400;
+      const run = client.reviewGame(
+        {
+          gameId: `spar:${request.lessonId}:${Date.now()}`,
+          movesSan: moves,
+          initialFen: startFen,
+          userColor: request.studentColor === 'w' ? 'white' : 'black',
+          whiteRating: request.studentColor === 'w' ? student : maia,
+          blackRating: request.studentColor === 'w' ? maia : student,
+        },
+        (p: ReviewProgress) => setSparProgress(p.total > 1 ? `Reviewing: ${Math.round((100 * p.done) / p.total)}%` : 'Reviewing…')
+      );
+      try {
+        const review = await run.result;
+        if (review) {
+          moments = review.criticalMoments;
+          engine = review.engine;
+        }
+      } catch (err) {
+        console.warn('Spar review failed:', err);
+      }
+    }
+    const result: SparReview = { milestones, moments, engine };
+    setSparReview(result);
+    setSparProgress(null);
+    logSpar({
+      at: Date.now(),
+      lessonId: request.lessonId,
+      title: request.title,
+      elo: request.elo,
+      studentColor: request.studentColor,
+      startFen,
+      moves,
+      milestones,
+      moments: moments.map((m) => ({ label: m.label, type: m.type })),
+      engine,
+    });
+  }, [spar, history]);
+
   const gameOverStatus = rulesRef.current.getGameOverStatus();
 
   return (
+    <EngineContext.Provider value={engineClient}>
     <div className="min-h-screen flex flex-col bg-slate-950 text-slate-100 font-sans">
       {/* Top Navigation Bar */}
       <header className="no-print print:hidden app-navbar border-b border-slate-800 bg-slate-900/90 backdrop-blur sticky top-0 z-40 px-3 sm:px-4 py-2">
@@ -565,6 +670,23 @@ export const App: React.FC = () => {
 
             {/* Right Column: Engine Controls, Move List & Status */}
             <div className="lg:col-span-5 flex flex-col gap-4">
+              {spar && (
+                <SparPanel
+                  request={spar.request}
+                  startFen={spar.startFen}
+                  moves={sparMoves}
+                  review={sparReview}
+                  reviewing={sparProgress !== null}
+                  progressText={sparProgress ?? undefined}
+                  onReview={reviewSpar}
+                  onRestart={() => startSpar(spar.request)}
+                  onLeave={() => {
+                    setSpar(null);
+                    setSparReview(null);
+                  }}
+                />
+              )}
+
               {/* Engine Opponent Controls */}
               <EngineControls
                 elo={elo}
@@ -593,7 +715,7 @@ export const App: React.FC = () => {
         )}
 
         {/* Tab 2: Game Database */}
-        {activeTab === 'database' && <DatabaseView getEngineClient={() => engineClientRef.current} />}
+        {activeTab === 'database' && <DatabaseView />}
 
         {/* Tab 3: Opening Diagnostics */}
         {activeTab === 'diagnostics' && (
@@ -609,7 +731,7 @@ export const App: React.FC = () => {
 
         {/* Tab 4: Interactive Lessons */}
         {activeTab === 'lessons' && (
-          <LessonsView initialLessonId={pendingLesson?.id} initialLesson={pendingLesson?.lesson} />
+          <LessonsView initialLessonId={pendingLesson?.id} initialLesson={pendingLesson?.lesson} onSpar={startSpar} />
         )}
 
         {/* Tab 5: Printable Worksheets */}
@@ -625,6 +747,7 @@ export const App: React.FC = () => {
         currentFen={position.fen}
       />
     </div>
+    </EngineContext.Provider>
   );
 };
 

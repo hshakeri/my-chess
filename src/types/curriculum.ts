@@ -108,7 +108,24 @@ export interface CurriculumLesson {
   moves: CurriculumMove[];
   exercises: CurriculumExercise[];
   commonMistakesAndTraps?: CurriculumMistakeTrap[];
+  /**
+   * Goals of the plan to check when the lesson's position is played on against Maia (CL-6), on top
+   * of the goals every spar has (castle, bring out the minor pieces, keep the material).
+   */
+  planMilestones?: PlanMilestone[];
 }
+
+/** A goal of a lesson's plan, checked on the moves of a spar (CL-6). */
+export type PlanMilestone =
+  | { kind: 'castle'; label?: string }
+  | { kind: 'develop'; label?: string }
+  | { kind: 'keep_material'; label?: string }
+  /** A pawn of the student's arrives on `square` (a pawn break or a central push). */
+  | { kind: 'pawn_to'; square: string; label: string }
+  /** A piece of the student's of type `piece` stands on `square`. */
+  | { kind: 'piece_on'; square: string; piece: 'n' | 'b' | 'r' | 'q' | 'k'; label: string }
+  /** Both bishops are still on the board at the end. */
+  | { kind: 'bishop_pair'; label?: string };
 
 /**
  * High-level Course grouping containing multiple chapters/lessons
