@@ -1247,6 +1247,292 @@ export const damianoForWhiteLesson: CurriculumLesson = buildVerifiedLesson({
   ],
 });
 
+/**
+ * White against the French: the Advance, 2.d4 d5 3.e5 (hoot65's choice of system, 2026-11-02).
+ * Black attacks d4, the base of the chain, with ...c5, ...Nc6 and ...Qb6; c3 and Nf3 hold it, and
+ * the c1 bishop stays at home while the queen on b6 eyes b2. Evaluations are Stockfish 19's at
+ * depth 22. The counts are the seed games' by position: five of the six games that reached the
+ * position after 3.e5 came through 1.e4 d5 2.e5 e6 3.d4.
+ */
+export const frenchAdvanceForWhiteLesson: CurriculumLesson = buildVerifiedLesson({
+  id: 'lesson-white-vs-french',
+  title: 'Against the French as White',
+  subtitle: 'When Black strikes at the pawn chain',
+  category: 'opening',
+  sourceBook: 'Chess.com Live Archive',
+  author: 'hoot65 Diagnostic Analysis',
+  publicationYear: 2026,
+  eco: 'C02',
+  targetColor: 'white',
+  targetRatingBand: 'beginner',
+  relevance: 'core',
+  startPly: 2,
+  description:
+    '1...e6 came up in 10 of your White games: you answered 2.Nc3 in 7, 2.Nf3 in 2 and 2.d4 once. The position after 2.d4 d5 3.e5 came up in 6 of your games, five of them through 1.e4 d5 2.e5 e6 3.d4, and you scored 5 points. Black attacks d4, the base of your pawn chain, with ...c5, ...Nc6 and ...Qb6: hold it with c3 and Nf3, and keep the c1 bishop at home while the queen on b6 eyes b2.',
+  thematicObjective:
+    '2.d4 d5 3.e5 c5 4.c3 Nc6 5.Nf3 Qb6 6.a3 c4 7.Be2: c3, Nf3 and the queen hold d4, and the c1 bishop guards b2 (6.Be3? Qxb2; 7.Bf4?? Qxb2; 7.Bd3?? cxd3).',
+  keyTacticalMotif: 'The b2 pawn, guarded only by the c1 bishop, against the queen on b6',
+  moves: [
+    { san: 'e4', isUserMove: true },
+    { san: 'e6', isUserMove: false },
+    {
+      san: 'd4',
+      isUserMove: true,
+      annotation: 'A second pawn in the centre.',
+      hintTheme: 'A second centre pawn',
+      wrongMoveFeedback: {
+        Nc3: '2.Nc3 is good too, and was your move in 7 of these 10 games, but the Advance needs the c-pawn: after 2...d5 3.e5 the knight stands on c3, where the pawn has to go to support d4, and Stockfish rates 3.e5 there 0.9 pawns below 3.d4. This lesson plays 2.d4.',
+        Nf3: '2.Nf3 (2 of your games) is playable; 2.d4 takes the centre at once, and Stockfish rates it about a fifth of a pawn higher.',
+      },
+    },
+    // After 2.d4: 2...d5 1.
+    { san: 'd5', isUserMove: false, frequency: 1, annotation: 'Black attacks e4.' },
+    {
+      san: 'e5',
+      isUserMove: true,
+      annotation: 'The Advance: the pawn gains space and takes f6 from the g8 knight. The chain runs from d4 to e5, and d4, its base, is what Black will attack.',
+      hintTheme: 'Push past the attack',
+      wrongMoveFeedback: {
+        Nc3: '3.Nc3 is good too and leads to the main lines (Stockfish rates it a tenth of a pawn higher). This lesson plays the Advance.',
+        Nd2: '3.Nd2 is good too. This lesson plays the Advance.',
+        exd5: '3.exd5 is playable, but after 3...exd5 Black\'s c8 bishop is free: the e6 pawn no longer blocks it. This lesson plays the Advance.',
+      },
+    },
+    {
+      san: 'c5',
+      isUserMove: false,
+      // After 3.e5, by either move order: 3...c5 3, and one game each of 3...f6, 3...Bd7 and 3...a6.
+      frequency: 3,
+      annotation: 'Black strikes at d4, the base of the chain.',
+      arrows: [{ from: 'c5', to: 'd4', color: 'red' }],
+      alternatives: {
+        f6: [
+          {
+            san: 'Bd3',
+            isUserMove: true,
+            frequency: 1,
+            annotation: '3...f6 opens the diagonal from h5 to the king on e8. The bishop aims at g6, and the queen can check on h5.',
+            hintTheme: 'The diagonal to e8',
+            wrongMoveFeedback: {
+              Nf3: '4.Nf3, your move in this game, is good too (Stockfish +0.5), but 4.Bd3! is stronger (+1.2): the bishop aims at g6, and the queen can check on h5.',
+            },
+          },
+          {
+            san: 'Be7',
+            isUserMove: false,
+            annotation: 'Black develops, but the diagonal from h5 to e8 is still open.',
+            alternatives: {
+              fxe5: [
+                {
+                  san: 'Qh5+',
+                  isUserMove: true,
+                  annotation: 'Check along the open diagonal.',
+                  hintTheme: 'Check on the open diagonal',
+                  wrongMoveFeedback: {
+                    dxe5: '5.dxe5 is good too (Stockfish +0.8), but 5.Qh5+! is stronger (+2.0).',
+                    Nf3: '5.Nf3?? e4 forks the bishop and the knight.',
+                  },
+                },
+                { san: 'g6', isUserMove: false },
+                {
+                  san: 'Bxg6+',
+                  isUserMove: true,
+                  annotation: 'The bishop takes with check: 6...hxg6?? 7.Qxh8 wins the rook, so the king has to walk.',
+                },
+              ],
+            },
+          },
+          {
+            san: 'Qh5+',
+            isUserMove: true,
+            annotation: 'Check: 5...g6?? 6.Bxg6+ loses (6...hxg6 7.Qxh8 takes the rook), so the king has to move and can no longer castle.',
+            hintTheme: 'Check on the open diagonal',
+            wrongMoveFeedback: {
+              Nf3: '5.Nf3 is good too (Stockfish +0.9), but 5.Qh5+! is stronger (+1.3): the king has to move.',
+            },
+          },
+        ],
+        Bd7: [
+          {
+            san: 'c3',
+            isUserMove: true,
+            frequency: 1,
+            annotation: 'The same plan: c3, then Nf3, to hold d4 when ...c5 comes.',
+            wrongMoveFeedback: {
+              Nf3: '4.Nf3 is just as good. This lesson keeps the order of the main line: c3 first, then Nf3.',
+            },
+          },
+          { san: 'c5', isUserMove: false },
+          { san: 'Nf3', isUserMove: true, annotation: 'A second defender of d4.' },
+          { san: 'Nc6', isUserMove: false },
+          {
+            san: 'Be2',
+            isUserMove: true,
+            accept: { san: ['a3'] },
+            annotation: 'Develop and castle next.',
+          },
+        ],
+        a6: [
+          {
+            san: 'c3',
+            isUserMove: true,
+            frequency: 1,
+            annotation: 'The pawn goes to c3 first, ready to support d4 when ...c5 comes.',
+            wrongMoveFeedback: {
+              Nc3: '4.Nc3, your move in this game (you lost it), puts the knight on the square the c-pawn needs: after ...c5 no pawn can support d4. Stockfish rates 4.c3 about 0.4 pawns higher.',
+            },
+          },
+          { san: 'c5', isUserMove: false },
+          { san: 'Nf3', isUserMove: true, accept: { san: ['Bd3'] }, annotation: 'A second defender of d4, as in the main line.' },
+        ],
+      },
+    },
+    {
+      san: 'c3',
+      isUserMove: true,
+      annotation: 'Support d4 with a second pawn: if Black takes on d4, the c-pawn takes back and the chain stands.',
+      hintTheme: 'Support the base of the chain',
+      wrongMoveFeedback: {
+        Nf3: '4.Nf3, your move in 2 of these 3 games (you won both), allows 4...cxd4 5.Nxd4: a knight takes back, and the e5 pawn has no pawn behind it. Stockfish rates 4.c3 about a quarter of a pawn higher.',
+        'Bb5+': '4.Bb5+, your move in the third game, is met by 4...Nc6, which blocks with a developing move and adds an attacker on d4. Stockfish rates 4.c3 about half a pawn higher.',
+        dxc5: '4.dxc5? gives up the base of the chain: nothing defends e5 any more. Stockfish rates 4.c3 about half a pawn higher.',
+        Nc3: '4.Nc3? puts the knight on the square the c-pawn needs. Stockfish rates 4.c3 about 0.9 pawns higher.',
+      },
+    },
+    {
+      san: 'Nc6',
+      isUserMove: false,
+      annotation: 'A second attacker on d4.',
+      alternatives: {
+        cxd4: [
+          {
+            san: 'cxd4',
+            isUserMove: true,
+            annotation: 'Take back with the pawn: the chain stands. If the bishop checks on b4, block with 6.Nc3, which develops.',
+            wrongMoveFeedback: {
+              Qxd4: '5.Qxd4? brings the queen out early, where 5...Nc6 hits it with a developing move. Stockfish rates 5.cxd4 about 1.4 pawns higher.',
+              Nf3: '5.Nf3? dxc3 6.Nxc3 leaves you a pawn down. Take back with the pawn.',
+            },
+          },
+        ],
+        Qb6: [
+          {
+            san: 'Nf3',
+            isUserMove: true,
+            accept: { san: ['a3'] },
+            annotation: 'The queen hits b2 and lines up behind the c5 pawn against d4. Develop the knight to defend d4; the c1 bishop stays at home, since it is the only piece guarding b2.',
+            wrongMoveFeedback: {
+              Be3: '5.Be3? Qxb2 6.Nd2 Qxc3: the bishop was the only guard of b2, and Black is two pawns up (Stockfish: Black nearly two pawns ahead).',
+            },
+          },
+        ],
+      },
+    },
+    {
+      san: 'Nf3',
+      isUserMove: true,
+      annotation: 'Now d4 has three defenders: the c3 pawn, the knight and the queen.',
+      hintTheme: 'Count on d4',
+      wrongMoveFeedback: {
+        Be3: '5.Be3 defends d4 too, but it takes the bishop off c1, the only piece that guards b2, and 5...Qb6 hits b2 at once. Stockfish rates 5.Nf3 about 0.6 pawns higher.',
+        Bd3: '5.Bd3 stands in front of the queen on the d-file, so the queen no longer guards d4. Stockfish rates 5.Nf3 about 0.6 pawns higher.',
+      },
+    },
+    {
+      san: 'Qb6',
+      isUserMove: false,
+      annotation: 'The queen hits b2 and lines up behind the c5 pawn against d4. Only the c1 bishop guards b2.',
+      arrows: [{ from: 'b6', to: 'b2', color: 'red' }],
+    },
+    {
+      san: 'a3',
+      isUserMove: true,
+      annotation: 'Prepare b4, to gain space on the queenside; after a trade on d4 the pawn also keeps Black\'s pieces off b4. The c1 bishop stays at home.',
+      hintTheme: 'Space on the queenside',
+      wrongMoveFeedback: {
+        Be3: '6.Be3? Qxb2: the bishop was the only guard of b2. Stockfish rates Black about a pawn ahead.',
+        Bd2: '6.Bd2?? Qxb2: the bishop was the only guard of b2, and the queen also hits the a1 rook. Stockfish rates Black more than four pawns ahead. In one of your games the bishop went to d2 like this, and the queen took b2 and then the rook.',
+        Bf4: '6.Bf4?? Qxb2: the bishop was the only guard of b2. Stockfish rates Black more than three pawns ahead.',
+        Bg5: '6.Bg5?? Qxb2: the bishop was the only guard of b2. Stockfish rates Black more than three pawns ahead.',
+        dxc5: '6.dxc5? Bxc5 gives up the base of the chain, and the bishop on c5 hits f2. Stockfish rates 6.a3 about 0.9 pawns higher.',
+        Be2: '6.Be2 is good too. This lesson plays 6.a3.',
+        Bd3: '6.Bd3 is good too, but the bishop on d3 blocks the queen\'s guard of d4: after 6...cxd4 7.cxd4 the pawn has one defender against two attackers. This lesson plays 6.a3.',
+      },
+    },
+    {
+      san: 'c4',
+      isUserMove: false,
+      annotation: 'Black closes the queenside. The c-pawn no longer attacks d4, which has two attackers, the knight and the queen, against three defenders.',
+      alternatives: {
+        Bd7: [
+          {
+            san: 'b4',
+            isUserMove: true,
+            annotation: 'Now b4: the pawn hits c5.',
+            hintTheme: 'Space on the queenside',
+          },
+          { san: 'cxd4', isUserMove: false },
+          {
+            san: 'cxd4',
+            isUserMove: true,
+            annotation: 'Take back with the pawn.',
+            wrongMoveFeedback: {
+              Nxd4: '8.Nxd4?? Nxe5: with the d4 pawn gone nothing defends e5. Take back with the pawn.',
+            },
+          },
+          { san: 'Rc8', isUserMove: false, annotation: 'The rook takes the open c-file.' },
+          {
+            san: 'Bb2',
+            isUserMove: true,
+            accept: { san: ['Be3'] },
+            annotation: 'Now the bishop can leave c1: the b4 pawn shields b2 from the queen, and on b2 the bishop guards d4.',
+            wrongMoveFeedback: {
+              Bd3: '9.Bd3?? Nxd4: the bishop blocks the queen\'s guard of d4, and the pawn falls (Stockfish: Black more than a pawn ahead).',
+            },
+          },
+        ],
+        cxd4: [
+          {
+            san: 'cxd4',
+            isUserMove: true,
+            annotation: 'Take back with the pawn: the chain stands, and a3 keeps Black\'s pieces off b4.',
+            wrongMoveFeedback: {
+              b4: '7.b4? dxc3 8.Nxc3 leaves you a pawn down. Take back with the pawn: Stockfish rates 7.cxd4 about 0.8 pawns higher.',
+            },
+          },
+        ],
+      },
+    },
+    {
+      san: 'Be2',
+      isUserMove: true,
+      accept: { san: ['Nbd2'] },
+      annotation: 'Develop and castle next. The c1 bishop stays at home: it guards b2, which the queen still hits.',
+      hintTheme: 'Develop the other bishop',
+      wrongMoveFeedback: {
+        Bf4: '7.Bf4?? Qxb2: with the bishop gone nothing guards b2, and after 8.Nbd2 Qxc3 Black is two pawns up and hits the a1 rook. Stockfish rates Black about five pawns ahead.',
+        Be3: '7.Be3?? Qxb2: with the bishop gone nothing guards b2, and after 8.Nbd2 Qxc3 Black is two pawns up and hits the a1 rook. Stockfish rates Black nearly five pawns ahead.',
+        Bg5: '7.Bg5?? Qxb2: with the bishop gone nothing guards b2, and after 8.Nbd2 Qxc3 Black is two pawns up and hits the a1 rook. Stockfish rates Black more than five pawns ahead.',
+        Bd3: '7.Bd3?? cxd3: the c4 pawn guards d3, and the bishop is lost for a pawn.',
+      },
+    },
+  ],
+  exercises: [
+    {
+      id: 'ex-white-french-qh5',
+      title: 'The Bishop on d6',
+      // 1.e4 d5 2.e5 e6 3.d4 f6 4.Nf3 fxe5 5.Nxe5 Bd6 (your game, where you played 6.Qh5+)
+      fen: 'rnbqk1nr/ppp3pp/3bp3/3pN3/3P4/8/PPP2PPP/RNBQKB1R w KQkq - 1 6',
+      turn: 'w',
+      difficultyRating: 2,
+      prompt: 'White to play. Black has played ...f6, and the bishop on d6 attacks the knight on e5. What does White play?',
+      solutionSan: ['Qh5+', 'g6', 'Nxg6'],
+      explanation:
+        '6.Qh5+ g6 7.Nxg6: the queen checks along the diagonal that ...f6 opened, and after 6...g6 the knight takes the pawn. 7...hxg6?? 8.Qxh8 wins the rook, and the knight on g6 attacks it anyway; Stockfish rates White about four and a half pawns ahead. You found this in your game.',
+    },
+  ],
+});
+
 export const openingLessons: CurriculumLesson[] = [
   scotchGambitBreakthrough,
   evansGambitDestruction,
@@ -1254,5 +1540,6 @@ export const openingLessons: CurriculumLesson[] = [
   caroKannForWhiteLesson,
   nimzowitschForWhiteLesson,
   damianoForWhiteLesson,
+  frenchAdvanceForWhiteLesson,
   adamsAttackSicilian,
 ];

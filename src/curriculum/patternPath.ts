@@ -74,9 +74,16 @@ export const patternPath: PatternGroup[] = [
     id: 'pattern-loose-pieces-long-lines',
     title: 'Loose pieces on the long lines',
     idea:
-      'A bishop or queen on an open line takes whatever nothing defends: the b2 pawn once White\'s c1 bishop has left, the queen on c2, the bishop on d3 and the bishop on b5, and a queen that recaptures on d5 in front of a bishop on c4.',
+      'A bishop or queen on an open line takes whatever nothing defends: the b2 pawn once White\'s c1 bishop has left (which is why, as White in the French Advance, that bishop stays at home while a queen is on b6), the queen on c2, the bishop on d3 and the bishop on b5, and a queen that recaptures on d5 in front of a bishop on c4.',
     check: 'What does each enemy bishop and queen line hit, and is everything on it defended?',
-    lessonIds: ['lesson-black-wall-vs-london', 'lesson-black-slav-wall', 'lesson-black-wall-vs-flank', 'lesson-black-caro-kann-advance', 'lesson-black-caro-vs-bc4'],
+    lessonIds: [
+      'lesson-black-wall-vs-london',
+      'lesson-black-slav-wall',
+      'lesson-black-wall-vs-flank',
+      'lesson-black-caro-kann-advance',
+      'lesson-white-vs-french',
+      'lesson-black-caro-vs-bc4',
+    ],
   },
   {
     id: 'pattern-king-in-the-centre',

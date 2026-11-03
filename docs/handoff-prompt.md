@@ -284,12 +284,13 @@ Next: the roadmap below.
   stated fact is replayed in `tests/unit/curriculum/caro-*.spec.ts`, `two-knights-d4.spec.ts` and
   `white-vs-caro.spec.ts`.
   Other gaps that analysis showed, by seed games: 1.e4 e6 (10), 1.e4 g6 (7), 1.e4 Nc6 (5) as White
-  (the French needs a choice of system first: hoot65's own second moves vary; against 1...g6 hoot65
-  already scores 5 of 7); 2.d3 and 2.e5 (3 each) as Black now have a lesson. For the French, Stockfish 19 at depth 22: 2.d4 +0.36
-  and 2.Nc3 +0.39; after 2.d4 d5, 3.Nc3 +0.33 and 3.e5 (the Advance) +0.31; after 2.Nc3 d5, 3.d4 +0.39
-  (back into the main lines), 3.Nf3 +0.01 and 3.e5?! -0.48. hoot65's ten French games were not lost
-  to the opening: the costly moves came at moves 6 to 11 (6.Nb5, 7.O-O-O, 9.Qh4, 9.Ng5), so any one plan
-  helps. The Philidor (2...d6, 12 seed games, 7 points, always 3.Bc4) has no lesson either, but its
+  (against 1...g6 hoot65 already scores 5 of 7); 2.d3 and 2.e5 (3 each) as Black now have a lesson, and so
+  does the French: hoot65 chose the Advance, 2.d4 d5 3.e5, and "Against the French as White"
+  (`lesson-white-vs-french`, in "Loose pieces on the long lines" after the Caro-Kann Advance) teaches
+  ...c5 4.c3, ...Nc6 5.Nf3, and against ...Qb6 the c1 bishop staying home to guard b2 (6.a3 c4 7.Be2),
+  with its seed counts taken by position, since five of the six games reaching 3.e5 came through
+  1.e4 d5 2.e5 e6 3.d4 (`tests/unit/curriculum/white-vs-french.spec.ts`). hoot65's ten French games were
+  not lost to the opening: the costly moves came at moves 6 to 11 (6.Nb5, 7.O-O-O, 9.Qh4, 9.Ng5). The Philidor (2...d6, 12 seed games, 7 points, always 3.Bc4) has no lesson either, but its
   losses also came at moves 7 to 10, three of them a sacrifice on f7 that did not work (10.Nxf7 twice,
   9.Bxf7+, 1.4 to 7 pawns by Stockfish 19): a candidate for a drill set from the games, "Does the
   sacrifice on f7 work?", vetted like the other four (`scripts/game-analysis/verify-drills.mjs`). The Italian against 3...d6 (4 games) and 3...f5

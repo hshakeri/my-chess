@@ -32,7 +32,8 @@
     "lesson-siberian-trap": "L30",
     "lesson-noahs-ark-trap": "L31",
     "lesson-elephant-trap-qgd": "L32",
-    "lesson-black-caro-vs-e5-d3": "L33"
+    "lesson-black-caro-vs-e5-d3": "L33",
+    "lesson-white-vs-french": "L34"
   },
   "exercise": {
     "ex-scandi-drill-1": "E1",
@@ -78,7 +79,8 @@
     "ex-noahs-ark-1": "E41",
     "ex-elephant-trap-1": "E42",
     "ex-italian-d6-two-on-f3": "E43",
-    "ex-black-caro-e5-qa5": "E44"
+    "ex-black-caro-e5-qa5": "E44",
+    "ex-white-french-qh5": "E45"
   },
   "game": {
     "lesson-game-threat-186294577658-12": "G1",

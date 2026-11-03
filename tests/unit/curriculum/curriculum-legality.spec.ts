@@ -98,6 +98,8 @@ describe('Curriculum Move Legality & Verification (chess.js)', () => {
     // lesson against 2.Bc4 (2026-11-02) branches on White's fourth and fifth moves, and the Exchange lesson on
     // White's fourth and fifth, the Two Knights lesson with 4.d4 on Black's fifth, and White's lesson against
     // the Caro-Kann on Black's third and fourth, weighted from the seed; the Caro-Kann lesson against 2.e5 and 2.d3 branches on White's second and third moves.
+    // White's lesson against the French (2026-11-02) branches on Black's third move (weighted from the seed by
+    // position), fourth and sixth (unobserved, so unweighted).
     expect([...lessonsWithBranches].sort()).toEqual([
       'lesson-alapin-sicilian-centre',
       'lesson-black-caro-bg4-timing',
@@ -120,6 +122,7 @@ describe('Curriculum Move Legality & Verification (chess.js)', () => {
       'lesson-two-knights-d4',
       'lesson-white-vs-caro-kann',
       'lesson-white-vs-damiano',
+      'lesson-white-vs-french',
       'lesson-white-vs-nimzowitsch',
     ]);
   });
