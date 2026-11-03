@@ -16,9 +16,9 @@ also runs on every push to another branch).
 
 - React 18 + Vite 6 + TypeScript (strict) + Tailwind; chess.js 1.4; Dexie 4 (IndexedDB); ts-fsrs 5
   for scheduling; maia3-js + onnxruntime-web in a Web Worker for the human-like engine.
-- Tests: Vitest (`npm test`, 542 tests: SSR `renderToString` specs, jsdom interaction specs under
+- Tests: Vitest (`npm test`, 555 tests: SSR `renderToString` specs, jsdom interaction specs under
   `tests/unit/curriculum/lessons-view-interactions.spec.tsx`, fake-indexeddb for the database) and
-  Playwright (`npm run test:e2e`, 112 tests incl. iPhone-viewport tests). Keep both green or update
+  Playwright (`npm run test:e2e`, 113 tests incl. iPhone-viewport tests). Keep both green or update
   tests deliberately and say why. The board question before each lesson move (CL-5) is on by default:
   a test that plays lesson moves either answers it or sets localStorage `my_chess_cct_gate` to `off`
   first (`page.addInitScript` in e2e, the jsdom spec's beforeEach). No `if (await ...isVisible())` guards in specs: a missing control
@@ -158,8 +158,8 @@ Compromised Defence plays 9.Bg5; the Konikowski 9.Bf4 and the Elephant 7.Nxf6+ a
   a draft, reads from its bookmarks where each heading landed, puts a notes page wherever a sheet would
   start on a back (rendering again after each), fills in the page numbers (contents and each chapter's pointer to its
   practice), renders the book, and fails if any sheet is not a front page followed by its answers.
-  92 US Letter pages, 27 sheets (the four drill sheets, three tactics sheets at the end of Part I,
-  twenty practice sheets), 517 answers. Diagrams are SVG drawings with the app's
+  96 US Letter pages, 28 sheets (the four drill sheets, three tactics sheets at the end of Part I,
+  twenty-one practice sheets), 539 answers. Diagrams are SVG drawings with the app's
   piece set (`public/pieces`); the fonts are Times New Roman and Arial, whose metric twins Liberation
   Serif and Sans the Linux runner has, so pages break the same way there. All text is black and dark
   squares are a light grey.

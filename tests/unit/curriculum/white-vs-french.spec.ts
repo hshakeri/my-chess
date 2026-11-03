@@ -61,8 +61,10 @@ describe('Against the French as White: every fact the lesson states, replayed', 
     expect(attacks(after(...A, 'c5', 'Bb5+', 'Nc6'), 'd4', 'b')).toEqual(['c5', 'c6']);
   });
 
-  it('after 4...Nc6 5.Nf3 d4 has three defenders; 5.Bd3 blocks the queen\'s guard; 5.Be3 Qb6 leaves b2 unguarded', () => {
+  it('after 4...Nc6 5.Nf3 d4 has three defenders, as after 5.Nf3 against 3...Bd7 and 3...a6; 5.Bd3 blocks the queen\'s guard; 5.Be3 Qb6 leaves b2 unguarded', () => {
     expect(attacks(after(...A, 'c5', 'c3', 'Nc6', 'Nf3'), 'd4', 'w')).toEqual(['c3', 'd1', 'f3']);
+    expect(attacks(after(...A, 'Bd7', 'c3', 'c5', 'Nf3'), 'd4', 'w')).toEqual(['c3', 'd1', 'f3']);
+    expect(attacks(after(...A, 'a6', 'c3', 'c5', 'Nf3'), 'd4', 'w')).toEqual(['c3', 'd1', 'f3']);
     expect(attacks(after(...A, 'c5', 'c3', 'Nc6', 'Bd3'), 'd4', 'w')).toEqual(['c3']);
     const be3 = after(...A, 'c5', 'c3', 'Nc6', 'Be3', 'Qb6');
     expect([attacks(be3, 'b2', 'b'), attacks(be3, 'b2', 'w')]).toEqual([['b6'], []]);
@@ -91,10 +93,18 @@ describe('Against the French as White: every fact the lesson states, replayed', 
     expect(game.map((g) => g.userResult)).toEqual(['loss']);
   });
 
-  it('6.dxc5 Bxc5 hits f2; 6.Bd3 cxd4 7.cxd4 leaves d4 one defender against two attackers; 6.a3 guards b4 once the c-pawns are traded', () => {
+  it('6.dxc5 Bxc5 hits f2; after 6.Bd3 cxd4 7.cxd4 the bishop blocks the queen\'s guard of d4, but 7...Nxd4 8.Nxd4 Qxd4 9.Bb5+ uncovers it with check; 6.a3 guards b4 once the c-pawns are traded', () => {
     expect(attacks(after(...Q, 'dxc5', 'Bxc5'), 'f2', 'b')).toEqual(['c5']);
     const bd3 = after(...Q, 'Bd3', 'cxd4', 'cxd4');
     expect([attacks(bd3, 'd4', 'w'), attacks(bd3, 'd4', 'b')]).toEqual([['f3'], ['b6', 'c6']]);
+    const trap = after(...Q, 'Bd3', 'cxd4', 'cxd4', 'Nxd4', 'Nxd4', 'Qxd4', 'Bb5+');
+    expect(trap.inCheck()).toBe(true);
+    expect(attacks(trap, 'd4', 'w')).toEqual(['d1']);
+    // Every answer to the check leaves the queen on d4 to be taken
+    for (const reply of trap.moves()) {
+      const line = after(...Q, 'Bd3', 'cxd4', 'cxd4', 'Nxd4', 'Nxd4', 'Qxd4', 'Bb5+', reply);
+      expect(line.move('Qxd4').captured, reply).toBe('q');
+    }
     expect(attacks(after(...Q, 'a3', 'cxd4', 'cxd4'), 'b4', 'w')).toEqual(['a3']);
   });
 
@@ -151,6 +161,18 @@ describe('Against the French as White: every fact the lesson states, replayed', 
   it('the exercise: ...f6 opened the diagonal from h5 to e8, the d6 bishop hits e5, and after 6.Qh5+ g6 7.Nxg6 the knight hits h8; 7...hxg6 8.Qxh8 wins the rook', () => {
     const ex = frenchAdvanceForWhiteLesson.exercises[0];
     const start = new Chess(ex.fen);
+    // 6...g6 is forced: 6...Ke7 or 6...Kf8 7.Qf7#; the f-pawn has gone
+    const check = new Chess(ex.fen);
+    check.move('Qh5+');
+    expect(check.moves().sort()).toEqual(['Ke7', 'Kf8', 'g6']);
+    for (const king of ['Ke7', 'Kf8']) {
+      const mate = new Chess(ex.fen);
+      mate.move('Qh5+');
+      mate.move(king);
+      mate.move('Qf7+');
+      expect(mate.isCheckmate(), king).toBe(true);
+    }
+    expect(['f7', 'f6', 'f5', 'f4'].some((sq) => start.get(sq as Square)?.type === 'p')).toBe(false);
     for (const sq of ['f7', 'g6']) expect(start.get(sq as Square), sq).toBeUndefined();
     expect(attacks(start, 'e5', 'b')).toEqual(['d6']);
     const line = new Chess(ex.fen);
