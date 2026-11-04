@@ -16,9 +16,9 @@ also runs on every push to another branch).
 
 - React 18 + Vite 6 + TypeScript (strict) + Tailwind; chess.js 1.4; Dexie 4 (IndexedDB); ts-fsrs 5
   for scheduling; maia3-js + onnxruntime-web in a Web Worker for the human-like engine.
-- Tests: Vitest (`npm test`, 555 tests: SSR `renderToString` specs, jsdom interaction specs under
+- Tests: Vitest (`npm test`, 561 tests: SSR `renderToString` specs, jsdom interaction specs under
   `tests/unit/curriculum/lessons-view-interactions.spec.tsx`, fake-indexeddb for the database) and
-  Playwright (`npm run test:e2e`, 113 tests incl. iPhone-viewport tests). Keep both green or update
+  Playwright (`npm run test:e2e`, 116 tests incl. iPhone-viewport tests). Keep both green or update
   tests deliberately and say why. The board question before each lesson move (CL-5) is on by default:
   a test that plays lesson moves either answers it or sets localStorage `my_chess_cct_gate` to `off`
   first (`page.addInitScript` in e2e, the jsdom spec's beforeEach). No `if (await ...isVisible())` guards in specs: a missing control
@@ -63,6 +63,11 @@ also runs on every push to another branch).
   lesson book use the same order. The header holds today's routine and the trainers: warm-up,
   tactics deck, speed run, progress (with mastery by group), plan review.
 - **Printable Worksheets** and the generated **lesson book** (`scripts/lesson-book.ts`).
+- **Lesson Book** tab (`#/book`, `src/views/BookView.tsx`): every page of the deployed PDF, drawn by
+  pdf.js (legacy build, loaded only on this tab) page by page as the reader scrolls, so the whole
+  book shows on a phone too; the book's bookmarks as a contents menu, a page box, and the PDF to
+  download or print. `/my-chess/book/` redirects to it. The dev server serves a locally built `book/`
+  at the same path; without one the tab says the book is made at publish time.
 
 ## Maintainer decisions already taken (do not reopen)
 

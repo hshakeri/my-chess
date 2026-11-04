@@ -4,12 +4,12 @@
  * /my-chess/, so hash routes need no server fallback.
  *
  *   #/play                    the Play tab; #/play?fen=<FEN>&color=w|b opens a position there
- *   #/database  #/diagnostics  #/worksheets  #/lessons
+ *   #/database  #/diagnostics  #/worksheets  #/lessons  #/book
  *   #/lesson/<lesson id>      a lesson on the Lessons tab
  *   #/game/<game id>          a stored game's replay and review on the Games tab
  */
 
-export type View = 'play' | 'database' | 'diagnostics' | 'lessons' | 'worksheets';
+export type View = 'play' | 'database' | 'diagnostics' | 'lessons' | 'worksheets' | 'book';
 
 export interface Route {
   view: View;
@@ -22,7 +22,7 @@ export interface Route {
 /** The published app; links printed on paper point here. */
 export const APP_URL = 'https://hshakeri.github.io/my-chess/';
 
-const VIEWS: View[] = ['play', 'database', 'diagnostics', 'lessons', 'worksheets'];
+const VIEWS: View[] = ['play', 'database', 'diagnostics', 'lessons', 'worksheets', 'book'];
 
 export function parseHash(hash: string): Route | null {
   const match = /^#\/([^?]*)(?:\?(.*))?$/.exec(hash.trim());

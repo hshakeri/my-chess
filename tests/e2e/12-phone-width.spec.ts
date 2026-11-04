@@ -10,11 +10,11 @@ test.describe('12. Every view fits a 375-pixel phone', () => {
 
   const pageWidth = (page: Page) => page.evaluate(() => document.documentElement.scrollWidth);
 
-  test('Play, Lessons, Games, Diagnostics (every tab) and Worksheets have no horizontal scroll', async ({ page }) => {
-    // Nine screens, and Diagnostics analyses the whole archive: more than the default 30 s on a slow runner
+  test('Play, Lessons, Games, Diagnostics (every tab), Worksheets and Book have no horizontal scroll', async ({ page }) => {
+    // Ten screens, and Diagnostics analyses the whole archive: more than the default 30 s on a slow runner
     test.setTimeout(90_000);
     await page.addInitScript(() => window.localStorage.setItem('my_chess_cct_gate', 'off'));
-    for (const route of ['play', 'lessons', 'database', 'worksheets']) {
+    for (const route of ['play', 'lessons', 'database', 'worksheets', 'book']) {
       await page.goto(`/#/${route}`);
       await expect(page.locator('[data-tab]').first()).toBeVisible();
       await page.waitForTimeout(300);

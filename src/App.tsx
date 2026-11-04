@@ -6,6 +6,7 @@ import {
   Activity,
   GraduationCap,
   Printer,
+  BookOpen,
 } from 'lucide-react';
 
 import { RulesEngine } from './engine/rules';
@@ -34,6 +35,7 @@ import { DatabaseView } from './views/DatabaseView';
 import { DiagnosticsView } from './views/DiagnosticsView';
 import { LessonsView } from './views/LessonsView';
 import { WorksheetsView } from './views/WorksheetsView';
+import { BookView } from './views/BookView';
 import { gamesRepo } from './db/gamesRepo';
 import { StoredGame } from './types/db';
 import { CurriculumLesson } from './types/curriculum';
@@ -52,7 +54,7 @@ import type { ReviewProgress } from './engine/worker/engineClient';
 
 const seedGames = seedGamesRaw as unknown as StoredGame[];
 
-type ActiveTab = 'play' | 'database' | 'diagnostics' | 'lessons' | 'worksheets';
+type ActiveTab = 'play' | 'database' | 'diagnostics' | 'lessons' | 'worksheets' | 'book';
 
 const ADOPTED_REPERTOIRES_KEY = 'my_chess_adopted_repertoires_v1';
 
@@ -834,6 +836,22 @@ export const App: React.FC = () => {
               <span className="hidden sm:inline">Printable Worksheets</span>
               <span className="sm:hidden">Worksheets</span>
             </button>
+
+            <button
+              type="button"
+              data-tab="book"
+              data-tab-nav="book"
+              onClick={() => selectTab('book')}
+              className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap shrink-0 transition-colors ${
+                activeTab === 'book'
+                  ? 'bg-emerald-600 text-white shadow-sm'
+                  : 'text-slate-300 hover:text-white hover:bg-slate-800'
+              }`}
+            >
+              <BookOpen className="w-4 h-4" />
+              <span className="hidden sm:inline">Lesson Book</span>
+              <span className="sm:hidden">Book</span>
+            </button>
           </nav>
         </div>
       </header>
@@ -1096,6 +1114,9 @@ export const App: React.FC = () => {
 
         {/* Tab 5: Printable Worksheets */}
         {activeTab === 'worksheets' && <WorksheetsView />}
+
+        {/* Tab 6: the whole lesson book (the PDF made when the site is published) */}
+        {activeTab === 'book' && <BookView />}
       </main>
 
       {/* Custom FEN/PGN Setup Modal */}
